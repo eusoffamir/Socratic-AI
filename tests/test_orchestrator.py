@@ -114,3 +114,28 @@ def test_ab_only_mode_makes_every_question_ab():
     formats.append(ins["format"])
     assert formats == [ab, ab, ab]
     assert not any("Rotated" in o for o in overrides)  # same format twice is fine in this mode
+
+
+
+def _answered(s, answer, assessment):
+    # decide() does not log turns (graph.py does), so add the answer by hand.
+    orc.decide(s, assessment)
+    s.setdefault("turns", []).append({"answer": answer, "assessment": assessment})
+
+
+def test_fallback_comment_is_one_paragraph_about_the_answers():
+    s = orc.new_session("pattern_or_luck", total_rounds=5)
+    orc.decide(s, None)
+    _answered(s, "luck", good_assessment())
+    _answered(s, "i dont know", frustrated_assessment())
+    text = orc.fallback_comment(s)
+    assert "1 of 2 answers" in text
+    assert "short" in text            # about 2 words per answer
+    assert "open the hint" in text    # was stuck once
+    assert "\n" not in text
+
+
+def test_no_fallback_comment_before_any_answer():
+    s = orc.new_session("pattern_or_luck")
+    orc.decide(s, None)
+    assert orc.fallback_comment(s) is None

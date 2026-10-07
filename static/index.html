@@ -309,7 +309,6 @@
   .card .idea .mono-label{color:var(--signal); display:block; margin-bottom:8px;}
   .card .q{font-weight:600; font-size:16.5px; line-height:1.5; margin-top:2px;}
   .card p{margin:0;}
-  .closing .card{border-color:var(--signal);}
   .entry.learner{justify-content:flex-end;}
   .entry.learner .bubble{
     max-width:80%; background:var(--panel-2); color:var(--ink);
@@ -368,12 +367,9 @@
   .radar .rl{font-family:var(--sans); font-size:15px; fill:var(--ink);}
   .radar .rl.faint{fill:var(--ink-faint);}
   .radar .rl.top{fill:var(--caution); font-weight:700;}
-  .highlights{display:grid; grid-template-columns:1fr; gap:10px; margin-top:18px;}
-  .hl{border-radius:8px; padding:10px 12px;}
-  .hl.good{background:var(--signal-soft);}
-  .hl.work{background:var(--caution-soft);}
-  .hl .v{font-weight:600; text-transform:capitalize; margin-top:2px;}
-  .hl .d{font-size:13px; color:var(--ink-soft); line-height:1.4;}
+  /* one paragraph on how the learner answered (end of session only) */
+  .coach-comment{margin-top:26px; padding-top:18px; border-top:1px solid var(--rule);}
+  .coach-comment p{margin:8px 0 0; font-size:15px; line-height:1.65; max-width:70ch;}
   .bar-row{display:grid; grid-template-columns:96px 1fr 34px; align-items:center; gap:10px; margin-bottom:8px;}
   .bar-row .label{font-size:13px; text-transform:capitalize;}
   .bar-track{height:8px; background:var(--panel-2); border-radius:4px; overflow:hidden;}
@@ -1106,18 +1102,17 @@ $('homeBtn').addEventListener('click', () => location.reload());
 function addTutor(parts, format, tools, closing){
   const ran = (tools || []).map(t =>
     `<div class="ran">Ran <b>${esc(t.tool.replace(/_/g, ' '))}</b> · ${esc(Object.values(t.args).join(' / '))}</div>`).join('');
-  // Order: question first (the thing to answer), then the hint. During the
-  // session the hint is a suggestion the learner can open only if they want it, so
-  // they try to think first. The closing "Work on next" is always shown.
+  // Order: question first (the thing to answer), then the hint. The hint is a
+  // suggestion the learner can open only if they want it, so they try to think
+  // first. The closing turn has no card: the session just ends with a short
+  // line, and the profile with its Comments follows.
   const hasHint = parts.key_idea && !closing;
   const hintBtn = !hasHint ? ''
     : `<button type="button" class="hint-btn" aria-expanded="false" aria-label="Show hint" title="Hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
-  const idea = !parts.key_idea ? ''
-    : closing ? `<div class="idea"><span class="mono-label">Work on next</span>${inline(parts.key_idea)}</div>`
+  const idea = !hasHint ? ''
     : `<div class="hint-body hidden">${ran}<div class="idea"><span class="mono-label">Hint</span>${inline(parts.key_idea)}</div></div>`;
-  const html = [
+  const html = closing ? '' : [
     parts.question || hasHint ? `<div class="qrow">${parts.question ? `<p class="q">${inline(parts.question)}</p>` : ''}${hintBtn}</div>` : '',
-    closing ? ran : '',
     idea,
   ].join('');
   const chip = closing ? '<span class="chip">Session complete</span>' : (format ? `<span class="chip">${esc(formatLabel(format))}</span>` : '');
@@ -1127,7 +1122,7 @@ function addTutor(parts, format, tools, closing){
     `<span class="mark" aria-hidden="true"><img src="/static/img/socrates.png" alt=""></span>
      <div class="body">
        <div class="entry-head">${chip}${fb}</div>
-       <div class="card">${html}</div>
+       ${html ? `<div class="card">${html}</div>` : ''}
      </div>`);
   $('log').appendChild(n);
   scrollToEnd();
@@ -1329,13 +1324,9 @@ function reportHTML(data, final){
       <div class="count">${c}/${n}</div></div>`;
   }).join('');
 
-  const highlights = n ? `
-    <div class="highlights">
-      <div class="hl good"><div class="mono-label">Strongest</div><div class="v">${esc(s.strongest_standard)}</div>
-        <div class="d">${esc(data.standards[s.strongest_standard])}</div></div>
-      <div class="hl work"><div class="mono-label">Next</div><div class="v">${esc(s.weakest_standard)}</div>
-        <div class="d">${esc(data.standards[s.weakest_standard])}</div></div>
-    </div>` : '';
+  // One paragraph on how the learner answered, written when the session ends.
+  const comment = data.comment ? `
+    <div class="coach-comment"><div class="mono-label">Comments</div><p>${esc(data.comment)}</p></div>` : '';
 
   return `
     ${final ? '<div class="mono-label">Your thinking profile</div>' : ''}
@@ -1345,13 +1336,14 @@ function reportHTML(data, final){
       <div>
         <div class="mono-label">Level reached</div>
         ${radar}
-        ${highlights}
       </div>
       <div>
         <div class="mono-label">Standards</div>
         <div style="margin-top:10px;">${bars}</div>
       </div>
     </div>
+
+    ${comment}
 
     ${final ? `<div class="report-actions">
         <button id="againBtn">New case</button>

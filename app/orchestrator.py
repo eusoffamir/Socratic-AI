@@ -8,7 +8,7 @@ Two ways to pick the next move:
   apply_plan()  the guard: takes the Planner agent's proposal and enforces the
                 fixed rules on it. "Agents decide, rules guard."
 """
-from .content import FORMATS, LEVELS, STANDARDS
+from .content import FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
 from .tools import TOOLS
 
 GOOD_STANDARDS_THRESHOLD = 2  # standards met to count an answer as "good"
@@ -231,3 +231,37 @@ def summarize(session):
         "strongest_standard": strongest,
         "weakest_standard": weakest,
     }
+
+
+
+def fallback_comment(session):
+    """A plain-code paragraph on how the learner answered, used when the Coach
+    AI is off (mock mode) or its call fails. Same answers, same text."""
+    answers = [t["answer"] for t in session.get("turns", []) if t.get("answer") is not None]
+    history = [t["assessment"] for t in session["history"]]
+    if not answers or not history:
+        return None
+    n = len(history)
+    words = round(sum(len(a.split()) for a in answers) / len(answers))
+    good = sum(_is_good(a) for a in history)
+    stuck = sum(bool(a.get("confused_or_frustrated")) for a in history)
+    met = {k: sum(a["standards"].get(k, 0) for a in history) for k in STANDARDS}
+    worst = min(met, key=met.get)
+
+    if good / n >= 0.7:
+        text = f"Solid work. {good} of {n} answers showed clear reasoning."
+    elif good / n >= 0.4:
+        text = f"A fair start. {good} of {n} answers showed clear reasoning."
+    else:
+        text = f"Your reasoning was hard to see. Only {good} of {n} answers showed it clearly."
+    if words < 8:
+        text += f" Your answers were short, about {words} words each. Short answers hide your thinking, so add one reason."
+    elif words > 40:
+        text += f" Your answers were long, about {words} words each. Lead with your main point, then one reason."
+    else:
+        text += f" Your answers were a good length, about {words} words each."
+    if met[worst] < n:
+        text += f" Next time, focus on {worst}. {STANDARD_TIPS[worst]}"
+    if stuck:
+        text += " When you feel stuck, open the hint before you give up."
+    return text

@@ -23,6 +23,19 @@ STANDARDS = {
     "fairness": "it treats other views, or the chance of being wrong, honestly",
 }
 
+# One short tip per standard, shown in the learner's profile when it is the weakest.
+STANDARD_TIPS = {
+    "clarity": "Say your idea in one plain sentence.",
+    "accuracy": "Check your claim against the notes.",
+    "precision": "Use a number or an example.",
+    "relevance": "Answer the exact question asked.",
+    "depth": "Give a reason. Say why.",
+    "breadth": "Look at one more angle.",
+    "logic": "Make each step follow from the last.",
+    "significance": "Focus on what matters most.",
+    "fairness": "Say how you could be wrong.",
+}
+
 FORMATS = [
     "open question",
     "predict what happens next",

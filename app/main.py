@@ -1,5 +1,6 @@
 import copy
 import json
+import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -168,6 +169,28 @@ def submit_answer(sid: str, req: AnswerRequest):
     return {**_turn_response(session, result), "last_assessment": result["assessment"]}
 
 
+# Only one Coach call per session, even if the stats panel and the final
+# profile ask at the same moment.
+_comment_lock = threading.Lock()
+
+
+def _final_comment(sid, session):
+    """One paragraph on how the learner answered. Written once when the
+    session ends, then saved with the session. If the Coach AI is off or
+    fails, a plain-code paragraph is used, so the profile never breaks."""
+    if not session.get("ended"):
+        return None
+    with _comment_lock:
+        if not session.get("comment"):
+            try:
+                session["comment"] = llm_client.call_coach(session)
+            except Exception:  # any model problem: fall back, never block the profile
+                session["comment"] = None
+            session["comment"] = session["comment"] or orchestrator.fallback_comment(session)
+            _persist(sid, session)
+    return session["comment"]
+
+
 @app.get("/api/session/{sid}/stats")
 def get_stats(sid: str):
     sid, session = _get_session(sid)
@@ -178,5 +201,6 @@ def get_stats(sid: str):
         "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],
         "standards": STANDARDS,
         "summary": orchestrator.summarize(session),
+        "comment": _final_comment(sid, session),
         "history": session["history"],
     }

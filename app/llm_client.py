@@ -15,8 +15,8 @@ import time
 
 from . import tools
 from .content import CONCEPTS, FORMATS, STANDARDS
-from .prompts import (AB_FORMAT, ASSESSOR_SYSTEM, CHECKER_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
-                      assessor_user, checker_user, planner_user, tutor_user)
+from .prompts import (AB_FORMAT, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
+                      assessor_user, checker_user, coach_user, planner_user, tutor_user)
 
 
 def _pick_provider():
@@ -228,6 +228,16 @@ def call_checker(instruction, answer, parts):
     if not data or data.get("ok", True):
         return []
     return [str(p) for p in data.get("problems", [])][:4]
+
+
+def call_coach(session):
+    """The Coach: one paragraph on how the learner answered, written once at
+    the end of a session. Returns None in mock mode, so the caller uses the
+    plain-code paragraph instead."""
+    if PROVIDER == "mock":
+        return None
+    text = _generate(COACH_SYSTEM, coach_user(session), max_tokens=300)
+    return " ".join(text.split()) or None  # one paragraph, no stray line breaks
 
 
 def _mock_tutor(payload):

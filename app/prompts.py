@@ -84,6 +84,44 @@ Return ONLY this JSON and nothing else:
 Each problem is 12 words or fewer and tells the tutor what to fix. If everything is fine, ok is true and problems is []."""
 
 
+COACH_SYSTEM = """You are the coach for Socratic AI. A learner has just finished a short Socratic session on a quant topic. Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.
+
+Look at the answers for:
+- length: too short to show their thinking, or long and unfocused
+- reasons: did they say why (for example "because"), or only give an opinion
+- detail: did they use numbers or examples, or vague words
+- focus: did they answer the exact question asked
+- other views: did they consider another angle or the chance of being wrong
+- giving up: did they say "I don't know" or ask for help
+
+Write:
+- 50 to 80 words. One paragraph. No lists, no headings.
+- Speak to the learner as "you". Plain English. Short sentences.
+- Start with an honest overall judgement in a few words. Then one thing they did well, pointing to something they actually wrote. Then one or two concrete ways to improve next time.
+- Be honest. If the answers were weak, say so kindly. Do not flatter. Never say "Great job".
+- No emoji, no exclamation marks, no slang. Do not list scores.
+Reply with only the paragraph."""
+
+
+def coach_user(session):
+    """All question and answer pairs of the session, for the Coach. Each
+    answer replies to the question in the turn before it."""
+    turns = session["turns"]
+    pairs = []
+    for prev, t in zip(turns, turns[1:]):
+        if t.get("answer") is None:
+            continue
+        a = t.get("assessment") or {}
+        q = prev["parts"].get("question", "")
+        if prev["parts"].get("options"):
+            q += " Options: " + " / ".join(prev["parts"]["options"])
+        pairs.append({"question": q, "answer": t["answer"], "words": len(t["answer"].split()),
+                      "standards_met": _met(a) if a.get("standards") else [],
+                      "move": a.get("reasoning_move"), "stuck": bool(a.get("confused_or_frustrated"))})
+    return json.dumps({"topic": CONCEPTS[session["concept_id"]]["title"], "answers": pairs},
+                      indent=1, ensure_ascii=False)
+
+
 def assessor_user(session, answer):
     return json.dumps({"question_asked": session["last_tutor"], "learner_answer": answer}, indent=1, ensure_ascii=False)
 
