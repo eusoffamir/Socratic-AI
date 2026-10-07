@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+langgraph
+google-genai
+anthropic
+python-dotenv
+pytest
+httpx

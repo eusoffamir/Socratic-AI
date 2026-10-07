@@ -1,0 +1,12 @@
+# secrets: never upload the real API key
+.env
+
+# local Python files
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# learner data (saved sessions and transcripts stay on this computer)
+sessions/
+transcripts/

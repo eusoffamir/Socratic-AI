@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Socratic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ---------- theme ---------- */
+  :root{
+    --paper:#f6f5f1; --panel:#ffffff; --panel-2:#efede6;
+    --ink:#16211c; --ink-soft:#56615a; --ink-faint:#8a938d; --rule:#dcd9d0;
+    --signal:#1f6f5c; --signal-soft:#e3f0eb; --caution:#b5762b; --caution-soft:#f8eddd;
+    --blue:#2f5aa8; --blue-soft:#e4ebf7;
+    --rail:#1f6f5c; --rail-ink:#ffffff;
+    --learner:#16211c; --learner-ink:#f6f5f1;
+    --serif:'Source Serif 4', Georgia, serif;
+    --mono:'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    --sans:'Inter', system-ui, sans-serif;
+    --radius:12px;
+    --shadow:0 1px 2px rgba(22,33,28,.05), 0 4px 16px rgba(22,33,28,.05);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#121714; --panel:#1a211d; --panel-2:#222a25;
+      --ink:#e7ebe8; --ink-soft:#a5afa9; --ink-faint:#717b75; --rule:#2e3732;
+      --signal:#5cb89b; --signal-soft:#1d3029; --caution:#dca15a; --caution-soft:#33281b;
+      --blue:#8fb0e8; --blue-soft:#1c2536;
+      --rail:#17302a; --rail-ink:#e7ebe8;
+      --learner:#e7ebe8; --learner-ink:#121714;
+      --shadow:none; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121714; --panel:#1a211d; --panel-2:#222a25;
+    --ink:#e7ebe8; --ink-soft:#a5afa9; --ink-faint:#717b75; --rule:#2e3732;
+    --signal:#5cb89b; --signal-soft:#1d3029; --caution:#dca15a; --caution-soft:#33281b;
+    --blue:#8fb0e8; --blue-soft:#1c2536;
+    --rail:#17302a; --rail-ink:#e7ebe8;
+    --learner:#e7ebe8; --learner-ink:#121714;
+    --shadow:none; color-scheme:dark;
+  }
+
+  /* ---------- base ---------- */
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%;}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px;
+    line-height:1.55; -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  .hidden{display:none !important;}
+  .view{height:100vh; height:100dvh;}
+  .mono-label{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);}
+  .mark{
+    width:26px; height:26px; border-radius:7px; background:var(--signal); color:var(--paper);
+    display:grid; place-items:center; font-family:var(--serif); font-weight:600; font-size:15px; flex:none;
+  }
+  .mark{overflow:hidden;}
+  .mark img{width:100%; height:100%; object-fit:cover; display:block;}
+  button{
+    font-family:var(--sans); font-size:14px; font-weight:600; cursor:pointer;
+    background:var(--ink); color:var(--paper); border:1px solid var(--ink); border-radius:8px; padding:10px 18px;
+    transition:opacity .15s, background .15s, border-color .15s;
+  }
+  button:hover:not(:disabled){opacity:.88;}
+  button:disabled{opacity:.4; cursor:default;}
+  button.ghost{background:transparent; color:var(--ink); border-color:var(--rule);}
+  button.ghost:hover:not(:disabled){background:var(--panel-2); opacity:1;}
+  .icon-btn{
+    width:36px; height:36px; padding:0; display:grid; place-items:center; border-radius:8px;
+    background:transparent; color:var(--ink-soft); border:1px solid transparent;
+  }
+  .icon-btn:hover:not(:disabled){background:var(--panel-2); color:var(--ink); opacity:1;}
+  .icon-btn svg{width:18px; height:18px;}
+  button:focus-visible, .seg label:focus-within, .case-row:focus-visible{
+    outline:2px solid var(--signal); outline-offset:2px;
+  }
+  .seg{display:inline-flex; border:1px solid var(--rule); border-radius:8px; overflow:hidden; background:var(--panel);}
+  .seg label{position:relative; padding:6px 14px; font-size:13px; cursor:pointer; color:var(--ink-soft); border-right:1px solid var(--rule);}
+  .seg label:last-child{border-right:none;}
+  .seg input{position:absolute; opacity:0; pointer-events:none;}
+  .seg label:has(input:checked){background:var(--ink); color:var(--paper);}
+  .seg b{font-weight:600;}
+  .thinking{display:flex; align-items:center; gap:10px; color:var(--ink-soft); font-size:13px;}
+  .dots{display:inline-flex; gap:4px;}
+  .dots i{width:6px; height:6px; border-radius:50%; background:var(--ink-faint); animation:blink 1.2s infinite ease-in-out;}
+  .dots i:nth-child(2){animation-delay:.15s;} .dots i:nth-child(3){animation-delay:.3s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;} 40%{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ .dots i{animation:none; opacity:.6;} }
+  .error{
+    border:1px solid var(--caution); background:var(--caution-soft); border-radius:8px; padding:10px 14px;
+    font-size:14px; line-height:1.5;
+  }
+  .tag{
+    display:inline-block; font-size:11.5px; font-weight:600; border-radius:6px; padding:2px 8px;
+    background:var(--signal-soft); color:var(--signal);
+  }
+  .tag.t1{background:var(--caution-soft); color:var(--caution);}
+  .tag.t2{background:var(--blue-soft); color:var(--blue);}
+
+  /* ======================= HOME ======================= */
+  #homeView{display:grid; grid-template-columns:72px minmax(0, 1fr);}
+  .rail{
+    background:var(--rail); color:var(--rail-ink); display:flex; flex-direction:column; align-items:center;
+    gap:10px; padding:16px 0;
+  }
+  .rail .logo{
+    width:42px; height:42px; border-radius:50%; background:var(--rail-ink); color:var(--rail);
+    display:grid; place-items:center; font-family:var(--serif); font-weight:600; font-size:20px; margin-bottom:14px;
+    overflow:hidden;
+  }
+  .rail .logo img{width:100%; height:100%; object-fit:cover; display:block;}
+  .rail .icon-btn{width:44px; height:44px; color:var(--rail-ink); border-radius:10px; opacity:.75;}
+  .rail .icon-btn:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
+  .rail .icon-btn.active{background:rgba(255,255,255,.18); opacity:1;}
+  .rail .icon-btn svg{width:20px; height:20px;}
+  .rail .spacer{flex:1;}
+
+  .home-main{display:flex; flex-direction:column; min-width:0; min-height:0;}
+  .topbar{
+    height:64px; flex:none; display:flex; align-items:center; gap:16px; padding:0 32px;
+    border-bottom:1px solid var(--rule); background:var(--paper);
+  }
+  .topbar h1{font-size:18px; font-weight:600; margin:0;}
+  .topbar .credit{font-size:13.5px; color:var(--ink-faint); white-space:nowrap;}
+  .topbar .credit b{color:var(--ink-soft); font-weight:600;}
+  .topbar .spacer{flex:1;}
+  .rounds{
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
+    margin-left:24px; padding-left:48px; border-left:1px solid var(--rule);
+  }
+  .rounds .mono-label{font-size:12.5px;}
+  .rounds .seg{border-radius:14px;}
+  .rounds .seg label{padding:14px 34px; font-size:22px;}
+  /* Mode button: "Normal" (gray, default) <-> "2 choices" (vibrant A-blue to B-orange, the A/B button colors) */
+  .mode{display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
+    margin-left:24px; padding-left:48px; border-left:1px solid var(--rule);}  /* same spacing + divider as .rounds */
+  .mode .mono-label{font-size:12.5px;}
+  .mode-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px; height:64px; min-width:200px;
+    padding:0 26px; border-radius:14px; background:var(--panel-2); color:var(--ink-faint); border:2px solid var(--rule);
+    font-weight:600; font-size:20px; transition:background .2s, color .2s, border-color .2s, box-shadow .2s, transform .1s;
+  }
+  .mode-btn:hover:not(:disabled){color:var(--ink-soft); opacity:1;}
+  .mode-btn:active{transform:scale(.97);}
+  .mode-btn .on-text, .mode-btn[aria-pressed="true"] .off-text{display:none;}
+  .mode-btn[aria-pressed="true"] .on-text{display:inline;}
+  /* fixed colors (not theme tokens) so it stays vibrant, with white text readable, in light and dark */
+  .mode-btn[aria-pressed="true"]{
+    background:linear-gradient(135deg, #2f5aa8, #b5602b); color:#fff; border-color:transparent;
+    box-shadow:0 4px 16px rgba(47,90,168,.35);
+  }
+  .mode-btn[aria-pressed="true"]:hover:not(:disabled){color:#fff;}
+  .home-scroll{flex:1; overflow:auto; padding:28px 32px 40px;}
+  .home-inner{width:100%;}
+
+  .hero{
+    display:flex; align-items:center; gap:28px; background:var(--panel); border:1px solid var(--rule);
+    border-radius:18px; padding:28px 32px; box-shadow:var(--shadow);
+  }
+  .hero-art{
+    width:120px; height:120px; border-radius:50%; background:var(--signal-soft); flex:none;
+    display:grid; place-items:center;
+  }
+  .hero-art{overflow:hidden;}
+  .hero-art img{width:100%; height:100%; object-fit:cover; object-position:35% center; display:block;}
+  .hero-text{min-width:0;}
+  .hero h2{
+    font-family:var(--serif); font-weight:600; font-size:clamp(28px, 3.4vw, 42px); line-height:1.1;
+    margin:0 0 8px; letter-spacing:-.01em;
+  }
+  .hero p{color:var(--ink-soft); font-size:17px; margin:0;}
+  #homeStatus{margin-top:14px;}
+
+  .section-head{display:flex; align-items:center; gap:10px; margin:32px 0 14px;}
+  .section-head h3{font-size:16px; font-weight:600; margin:0;}
+  .cases{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;}
+  .case-row{
+    display:flex; align-items:center; gap:20px; text-align:left; width:100%;
+    background:var(--panel); color:var(--ink); border:1px solid var(--rule); border-radius:14px;
+    padding:16px 18px; box-shadow:var(--shadow); font-weight:400; font-size:15px;
+  }
+  .case-row:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .case-row .thumb{width:120px; height:84px; border-radius:10px; background:var(--panel-2); flex:none; display:grid; place-items:center; padding:10px 12px;}
+  .case-row .thumb svg{width:100%; height:auto; display:block;}
+  .case-row .info{flex:1; min-width:0;}
+  .case-row .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--ink-faint); margin-left:8px;}
+  .case-row .resume{
+    display:inline-block; margin-left:10px; padding:2px 9px; border-radius:6px; font-size:11.5px; font-weight:600;
+    background:var(--signal); color:var(--paper);
+  }
+  .case-row .t{display:block; font-weight:600; font-size:16.5px; margin:6px 0 2px;}
+  .case-row .m{display:block; color:var(--ink-soft); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .case-row .go{
+    width:44px; height:44px; border-radius:50%; border:2px solid var(--ink); display:grid; place-items:center; flex:none;
+  }
+  .case-row .go svg{width:14px; height:14px; margin-left:2px;}
+  .case-row:hover .go{background:var(--ink); color:var(--paper);}
+
+  /* ======================= SESSION ======================= */
+  #sessionView{display:grid; grid-template-columns:300px minmax(0, 1fr); transition:grid-template-columns .2s;}
+  #sessionView.collapsed{grid-template-columns:0 minmax(0, 1fr);}
+  .side{
+    background:var(--panel); border-right:1px solid var(--rule); display:flex; flex-direction:column;
+    min-height:0; overflow:hidden;
+  }
+  #sessionView.collapsed .side{border-right:none;}
+  .side-head{height:56px; flex:none; display:flex; align-items:center; gap:10px; padding:0 12px 0 18px;}
+  .side-head .name{font-family:var(--mono); font-size:12px; letter-spacing:.08em; color:var(--ink-soft); flex:1; white-space:nowrap;}
+  .side-body{flex:1; overflow:auto; padding:40px 18px 18px; min-width:300px;}
+  .side-body h2{font-family:var(--serif); font-weight:600; font-size:22px; line-height:1.25; margin:8px 0 6px;}
+  .cf-goal{color:var(--ink-soft); font-size:14px; margin:0 0 24px;}
+  .cf-scenario{font-family:var(--serif); font-size:15.5px; line-height:1.6; background:var(--panel-2); border-radius:12px; padding:16px 18px; margin:0;}
+  .cf-section{margin-top:36px;}
+  .cf-chart svg{display:block; width:100%; height:auto; margin-top:16px;}
+  .cf-chart .cap{font-size:13px; color:var(--ink-soft); margin-top:14px; line-height:1.5;}
+  #cfChart, .rm-chart{position:relative;}
+  .cf-chart .ax, .rm-chart .ax{font-family:var(--mono); font-size:10px; fill:var(--ink-faint);}
+  .cf-chart .band-label, .rm-chart .band-label{font-size:11px; font-weight:600; fill:var(--ink-soft);}
+  /* plain underlined text link, no box */
+  .read-again{
+    display:block; margin:12px 0 0 auto; padding:0;  /* right-aligned under the scenario */
+    background:none; border:none; border-radius:0; color:var(--ink-soft);
+    font-size:14px; font-weight:500; text-decoration:underline; text-underline-offset:3px;
+  }
+  .read-again:hover:not(:disabled){color:var(--signal); opacity:1;}
+  .ptip{
+    position:absolute; top:4px; transform:translateX(-50%); pointer-events:none; white-space:nowrap;
+    background:var(--panel); color:var(--ink); border:1px solid var(--rule); font-size:12px; padding:5px 9px;
+    border-radius:7px; box-shadow:0 2px 10px rgba(0,0,0,.12);
+  }
+  .ptip .up{color:var(--signal); font-weight:600;} .ptip .down{color:var(--caution); font-weight:600;}
+  .cbar{display:grid; grid-template-columns:72px 1fr 44px; align-items:center; gap:8px; margin-top:10px; font-size:12.5px;}
+  .cbar .track{height:10px; background:var(--panel-2); border-radius:3px; overflow:hidden;}
+  .cbar .fill{height:100%; background:var(--signal);}
+  .cbar:first-child .fill{background:var(--caution);}
+  .cbar .v{font-family:var(--mono); font-size:11.5px; text-align:right; color:var(--ink-soft);}
+  .side-foot{flex:none; display:flex; align-items:center; gap:8px; justify-content:space-between; padding:12px 14px; border-top:1px solid var(--rule); min-width:300px;}
+  .side-foot .home-link{display:flex; align-items:center; gap:8px; padding:8px 16px 8px 12px; font-weight:500; border-radius:999px;}
+  .side-foot svg{width:16px; height:16px;}
+  .side-foot .foot-icons{display:flex; gap:2px;}
+
+  .chatpane{display:flex; flex-direction:column; min-width:0; min-height:0;}
+  .chat-top{
+    height:56px; flex:none; display:flex; align-items:center; gap:14px; padding:0 20px;
+    border-bottom:1px solid var(--rule);
+  }
+  .status{font-family:var(--mono); font-size:16px; font-weight:500; letter-spacing:.05em; color:var(--ink); white-space:nowrap;}
+  .status .sep{color:var(--ink-faint); margin:0 6px;}
+  .status .lv{color:var(--signal);}
+  .status .lv-label{color:var(--ink-faint);}
+  #hudLevel{margin-right:14px;}
+  .ticks{display:flex; gap:5px; width:200px; flex:none;}
+  .tick{flex:1; height:7px; background:var(--rule); border-radius:3px;}
+  .tick.done{background:var(--signal);}
+  .tick.now{background:var(--caution);}
+  .chat-top .spacer{flex:1;}
+  /* Profile button: a pill with a small radar icon; filled while the panel is open */
+  .profile-btn{
+    display:inline-flex; align-items:center; gap:8px; padding:7px 16px 7px 12px; border-radius:999px;
+    background:var(--panel); color:var(--ink); border:1px solid var(--rule); box-shadow:var(--shadow);
+    font-family:var(--mono); font-size:15px; font-weight:500; letter-spacing:.05em; text-transform:uppercase;
+  }
+  .profile-btn svg{width:18px; height:18px; color:var(--signal);}
+  .profile-btn:hover:not(:disabled){border-color:var(--signal); color:var(--signal); opacity:1;}
+  .profile-btn[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:var(--paper);}
+  .profile-btn[aria-pressed="true"] svg{color:var(--paper);}
+  #openSide{display:none;}
+  #sessionView.collapsed #openSide{display:grid;}
+
+  .chat-scroll{flex:1; overflow:auto; min-height:0;}
+  .chat-inner{max-width:780px; margin:0 auto; padding:28px 24px 16px;}
+  #log{display:flex; flex-direction:column; gap:32px;}
+  .entry{display:flex; gap:12px; max-width:100%;}
+  .entry.tutor .mark{margin-top:2px;}
+  .entry .body{min-width:0; flex:1;}
+  .chip{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--signal); background:var(--signal-soft); border-radius:4px; padding:3px 8px; flex:none;
+  }
+  .entry-head{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; margin-bottom:10px; min-height:26px;}
+  .entry-head .fb{color:var(--ink-faint); font-size:13px; display:flex; gap:7px;}
+  .entry-head .fb::before{content:"\2713"; color:var(--signal); font-weight:600; opacity:.6;}
+  .card{
+    background:var(--panel); border:1px solid var(--rule); border-radius:2px var(--radius) var(--radius) var(--radius);
+    padding:22px 26px; box-shadow:var(--shadow); overflow-wrap:anywhere; display:flex; flex-direction:column; gap:18px;
+  }
+  .card .ran{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ink-soft); text-transform:uppercase;}
+  .card .ran b{color:var(--signal); font-weight:500;}
+  .card .idea{background:var(--signal-soft); border-radius:10px; padding:16px 20px; font-size:16px; line-height:1.6;}
+  /* key idea hidden behind a round "Hint" icon at the right of the question */
+  .qrow{display:flex; align-items:flex-start; gap:14px;}
+  .qrow .q{flex:1; min-width:0;}
+  .hint-btn{
+    flex:none; width:36px; height:36px; padding:0; display:grid; place-items:center; cursor:pointer;
+    color:var(--signal); background:var(--signal-soft); border:1px solid transparent; border-radius:50%;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .hint-btn:hover{border-color:var(--signal);}
+  .hint-btn:focus-visible{outline:2px solid var(--signal); outline-offset:2px;}
+  .hint-btn svg{width:18px; height:18px;}
+  .hint-btn[aria-expanded="true"]{background:var(--signal); color:var(--panel);}
+  .hint-body{display:flex; flex-direction:column; gap:14px;}
+  .hint-body:not(.hidden) .idea{animation:hintIn .2s ease-out;}
+  @keyframes hintIn{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .hint-body .idea{animation:none !important;} }
+  .card .idea .mono-label{color:var(--signal); display:block; margin-bottom:8px;}
+  .card .q{font-weight:600; font-size:16.5px; line-height:1.5; margin-top:2px;}
+  .card p{margin:0;}
+  .closing .card{border-color:var(--signal);}
+  .entry.learner{justify-content:flex-end;}
+  .entry.learner .bubble{
+    max-width:80%; background:var(--panel-2); color:var(--ink);
+    border-radius:16px; padding:10px 16px; white-space:pre-wrap; overflow-wrap:anywhere;
+  }
+
+  .composer{flex:none; padding:0 24px 18px;}
+  .composer-inner{max-width:780px; margin:0 auto;}
+  .choices{display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  /* A = blue, B = orange, so the two sides are easy to tell apart */
+  .choice{--c:var(--blue); --c-soft:var(--blue-soft);}
+  .choice + .choice{--c:var(--caution); --c-soft:var(--caution-soft);}
+  .choice{
+    flex:1; min-width:150px; text-align:left; background:var(--c-soft); color:var(--ink);
+    border:2px solid transparent; font-weight:600; font-size:16.5px; padding:14px 18px;
+    display:flex; gap:14px; align-items:center; border-radius:14px; transition:border-color .15s, box-shadow .15s;
+  }
+  .choice .l{
+    width:32px; height:32px; flex:none; display:grid; place-items:center; border-radius:9px;
+    background:var(--c); color:var(--paper); font-family:var(--mono); font-size:14px; font-weight:600;
+  }
+  .choice:hover:not(:disabled){border-color:var(--c); opacity:1;}
+  .choice[aria-pressed="true"]{border-color:var(--c); box-shadow:0 0 0 3px var(--c-soft), 0 2px 10px rgba(22,33,28,.10);}
+  .choice[aria-pressed="true"]::after{content:"\2713"; margin-left:auto; color:var(--c); font-weight:700; font-size:18px;}
+  /* once one is picked, the other fades back */
+  .choices:has([aria-pressed="true"]) .choice[aria-pressed="false"]{opacity:.55;}
+  .composer-box{
+    background:var(--panel); border:1px solid var(--rule); border-radius:20px; padding:12px 12px 10px 16px;
+    box-shadow:0 2px 12px rgba(22,33,28,.08);
+  }
+  .composer-box{transition:border-color .2s, box-shadow .2s;}
+  /* one soft glow on the rounded box; the textarea itself never gets an outline */
+  .composer-box:focus-within{border-color:var(--signal); box-shadow:0 0 0 3px var(--signal-soft), 0 2px 12px rgba(22,33,28,.08);}
+  textarea:focus, textarea:focus-visible{outline:none;}
+  textarea{
+    display:block; width:100%; resize:none; border:none; background:transparent; color:var(--ink); font-family:var(--sans);
+    font-size:15.5px; line-height:1.5; padding:4px 0; min-height:30px; max-height:200px; outline:none;
+  }
+  textarea::placeholder{color:var(--ink-faint);}
+  .composer-row{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px;}
+  .composer-row .ghost{padding:5px 12px; font-size:13px; font-weight:500; border-radius:999px;}
+  .send{width:36px; height:36px; padding:0; border-radius:50%; display:grid; place-items:center; background:var(--signal); border-color:var(--signal); color:#fff;}
+  .send svg{width:16px; height:16px;}
+
+  /* ---------- thinking profile ---------- */
+  .report{
+    background:var(--panel); border:1px solid var(--rule); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:22px 22px; margin:24px 0 8px;
+  }
+  .report h2{font-family:var(--serif); font-weight:600; font-size:24px; margin:4px 0 4px;}
+  .report .lead{color:var(--ink-soft); font-size:14px; margin:0 0 18px;}
+  .report h2 + .report-grid{margin-top:18px;}  /* no subtitle before any answers */
+  .report h3{margin:22px 0 10px; font-weight:400;}
+  .report-grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:32px;}
+  .radar{display:block; width:100%; max-width:420px; height:auto; margin:6px auto 0; overflow:visible;}
+  .radar .rl{font-family:var(--sans); font-size:15px; fill:var(--ink);}
+  .radar .rl.faint{fill:var(--ink-faint);}
+  .radar .rl.top{fill:var(--caution); font-weight:700;}
+  .highlights{display:grid; grid-template-columns:1fr; gap:10px; margin-top:18px;}
+  .hl{border-radius:8px; padding:10px 12px;}
+  .hl.good{background:var(--signal-soft);}
+  .hl.work{background:var(--caution-soft);}
+  .hl .v{font-weight:600; text-transform:capitalize; margin-top:2px;}
+  .hl .d{font-size:13px; color:var(--ink-soft); line-height:1.4;}
+  .bar-row{display:grid; grid-template-columns:96px 1fr 34px; align-items:center; gap:10px; margin-bottom:8px;}
+  .bar-row .label{font-size:13px; text-transform:capitalize;}
+  .bar-track{height:8px; background:var(--panel-2); border-radius:4px; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--signal); border-radius:4px;}
+  .bar-row .count{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); text-align:right;}
+  .report-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;}
+  .note{font-size:12.5px; color:var(--ink-faint); margin-top:32px; padding-top:16px; border-top:1px solid var(--rule);}
+  .backdrop{display:none;}
+
+  /* ---------- profile panel (slides in from the right) ---------- */
+  .profile-panel{
+    position:fixed; top:0; right:0; bottom:0; width:min(440px, 92vw); z-index:30;
+    background:var(--panel); border-left:1px solid var(--rule); box-shadow:-8px 0 32px rgba(0,0,0,.12);
+    display:flex; flex-direction:column; transform:translateX(100%); transition:transform .22s ease;
+  }
+  .profile-panel.open{transform:none;}
+  .pp-backdrop{
+    position:fixed; inset:0; z-index:25; background:rgba(0,0,0,.25);
+    opacity:0; pointer-events:none; transition:opacity .22s;
+  }
+  .pp-backdrop.open{opacity:1; pointer-events:auto;}
+  /* one surface: the close button floats in the corner, next to the heading */
+  .pp-head{position:absolute; top:22px; right:22px; z-index:1;}
+  .pp-body{flex:1; overflow:auto; padding:28px 24px 24px;}
+  .pp-body .report h2{padding-right:44px;}
+  .pp-body .report{border:none; box-shadow:none; padding:0; margin:0; background:transparent;}
+  .pp-body .report-grid{grid-template-columns:1fr; gap:26px;}
+  @media (prefers-reduced-motion: reduce){ .profile-panel, .pp-backdrop{transition:none;} }
+
+  /* ---------- reading pop-up (opens when a case is clicked) ---------- */
+  .read-modal{position:fixed; inset:0; z-index:40; display:grid; place-items:center; padding:16px;}
+  .rm-backdrop{position:absolute; inset:0; background:rgba(10,16,13,.5);}
+  .rm-card{
+    position:relative; width:min(700px, 92vw); max-height:86vh; display:flex; flex-direction:column;
+    background:var(--panel); color:var(--ink); border:1px solid var(--rule); border-radius:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3); animation:rmIn .2s ease-out;
+  }
+  @keyframes rmIn{from{opacity:0; transform:translateY(10px) scale(.98);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .rm-card{animation:none;} }
+  .rm-head{position:relative; padding:24px 28px 16px; border-bottom:1px solid var(--rule); flex:none;}
+  .rm-head .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--ink-faint); margin-left:8px;}
+  .rm-head h2{font-family:var(--serif); font-weight:600; font-size:26px; line-height:1.2; margin:10px 48px 4px 0;}
+  .rm-head .rm-sub{font-size:13.5px; color:var(--ink-soft);}
+  .rm-head .rm-x{position:absolute; top:18px; right:18px;}
+  .rm-body{flex:1; overflow:auto; padding:22px 28px 8px;}
+  .rm-body section{margin-bottom:26px;}
+  .rm-body h3{margin:0 0 10px;}
+  .rm-idea{margin:0; padding:0; list-style:none; display:grid; gap:8px;}
+  .rm-idea li{position:relative; padding-left:22px; font-size:16px; line-height:1.5;}
+  .rm-idea li::before{content:""; position:absolute; left:4px; top:9px; width:8px; height:8px; border-radius:50%; background:var(--signal);}
+  .rm-body .rm-example{font-size:15.5px; line-height:1.55; margin:0 0 6px;}
+  .rm-chart{max-width:440px;}
+  .rm-chart svg{display:block; width:100%; height:auto; margin-top:8px;}
+  .rm-words{margin:0; display:grid; gap:8px;}
+  .rm-words div{display:grid; grid-template-columns:150px 1fr; gap:12px; padding:10px 14px; background:var(--panel-2); border-radius:10px;}
+  .rm-words dt{font-weight:600;}
+  .rm-words dd{margin:0; color:var(--ink-soft);}
+  .rm-think{background:var(--signal-soft); border-radius:12px; padding:16px 18px; margin-bottom:18px;}
+  .rm-think .mono-label{color:var(--signal); display:block; margin-bottom:6px;}
+  .rm-think p{margin:0; font-weight:600; font-size:16px; line-height:1.5;}
+  .rm-foot{
+    flex:none; display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap;
+    padding:14px 28px 18px; border-top:1px solid var(--rule);
+  }
+  .rm-foot #rmStatus{margin-right:auto;}
+  .rm-foot button{border-radius:999px;}
+  .rm-start{
+    display:inline-flex; align-items:center; gap:10px; padding:11px 22px; font-size:15px;
+    background:var(--signal); border-color:var(--signal); color:var(--paper);  /* paper = readable in both themes */
+  }
+  .rm-start svg{width:13px; height:13px;}
+  .rm-start:disabled{opacity:.85; cursor:progress;}
+  .rm-start .spin{
+    width:15px; height:15px; border-radius:50%; border:2px solid currentColor; border-right-color:transparent;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){ .rm-start .spin{animation-duration:2s;} }
+  @media (max-width:560px){
+    .rm-head, .rm-body, .rm-foot{padding-left:18px; padding-right:18px;}
+    .rm-words div{grid-template-columns:1fr; gap:2px;}
+  }
+
+  /* ---------- first-time tour: small pop-ups that point at one thing at a time ---------- */
+  .tour-block{position:fixed; inset:0; z-index:48;}               /* stops clicks on the page during the tour */
+  .tour-ring{
+    position:fixed; z-index:49; border-radius:12px; pointer-events:none;
+    box-shadow:0 0 0 4px var(--signal), 0 0 0 9999px rgba(10,16,13,.45);
+    transition:top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+  }
+  .tour-pop{
+    position:fixed; z-index:50; width:min(320px, calc(100vw - 24px)); background:var(--panel); color:var(--ink);
+    border:1px solid var(--rule); border-radius:14px; padding:18px 18px 14px; box-shadow:0 12px 40px rgba(0,0,0,.25);
+    animation:tourIn .2s ease-out;
+  }
+  @keyframes tourIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .tour-pop .tp-step{position:absolute; top:20px; right:18px; font-family:var(--mono); font-size:11px; letter-spacing:.08em; color:var(--signal);}
+  .tour-pop h4{margin:0 0 6px; padding-right:52px; font-size:17px; font-weight:600;}  /* room for the step counter on the right */
+  .tour-pop p{margin:0; color:var(--ink-soft); font-size:14.5px; line-height:1.5;}
+  .tour-pop .tp-actions{display:flex; align-items:center; gap:8px; margin-top:16px;}
+  .tour-pop .tp-actions .spacer{flex:1;}
+  .tour-pop button{padding:7px 14px; font-size:13.5px; border-radius:999px;}
+  .tour-pop .tp-next{background:var(--signal); border-color:var(--signal); color:var(--paper);}
+  .tour-pop .tp-skip{border:none; background:none; color:var(--ink-faint); padding-left:0; font-weight:500;}
+  .tour-pop .tp-skip:hover:not(:disabled){color:var(--ink); background:none;}
+  .tour-pop .arrow{
+    position:absolute; width:14px; height:14px; background:var(--panel); transform:rotate(45deg);
+    border:1px solid var(--rule);
+  }
+  .tour-pop.below .arrow{top:-8px; border-right:none; border-bottom:none;}
+  .tour-pop.above .arrow{bottom:-8px; border-left:none; border-top:none;}
+  .tour-pop.right .arrow{left:-8px; border-top:none; border-right:none;}
+  .tour-pop.center .arrow{display:none;}
+  @media (prefers-reduced-motion: reduce){ .tour-ring{transition:none;} .tour-pop{animation:none;} }
+
+  /* ---------- smaller screens ---------- */
+  @media (max-width:1100px){
+    .cases{grid-template-columns:minmax(0, 1fr);}
+  }
+  @media (max-width:899px){
+    /* session: sidebar becomes a slide-in drawer */
+    #sessionView, #sessionView.collapsed{grid-template-columns:minmax(0, 1fr);}
+    .side{
+      position:fixed; inset:0 auto 0 0; width:min(320px, 86vw); z-index:20; transform:translateX(-100%);
+      transition:transform .2s; box-shadow:4px 0 24px rgba(0,0,0,.15);
+    }
+    #sessionView.drawer-open .side{transform:none;}
+    #sessionView.drawer-open .backdrop{display:block; position:fixed; inset:0; z-index:15; background:rgba(0,0,0,.35);}
+    .side-body, .side-foot{min-width:0;}
+    #openSide{display:grid;}
+    #collapseSide{display:none;}
+    .report-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:700px){
+    /* home: rail becomes a slim top bar */
+    #homeView{grid-template-columns:1fr; grid-template-rows:56px minmax(0, 1fr);}
+    .rail{flex-direction:row; padding:0 12px; gap:6px;}
+    .rail .logo{width:34px; height:34px; font-size:17px; margin:0 8px 0 0;}
+    .rail .icon-btn{width:40px; height:40px;}
+    .topbar{padding:0 16px; height:56px;}
+    .home-scroll{padding:16px 16px 32px;}
+    .hero{flex-direction:column; align-items:flex-start; gap:16px; padding:22px 20px;}
+    .rounds{margin-left:0; padding-left:0; border-left:none;}
+    .rounds .seg label{padding:12px 28px; font-size:19px;}
+    .mode{margin-left:0; padding-left:0; border-left:none;}
+    .mode-btn{height:54px; font-size:18px;}
+    .hero-art{display:none;}
+    .case-row{padding:12px 14px; gap:12px;}
+    .case-row .thumb{width:64px; height:50px;}
+    .case-row .m{white-space:normal;}
+    .chat-top{padding:0 12px; gap:10px;}
+    .ticks{display:none;}
+    .status{font-size:13px;}
+    .profile-btn{font-size:13px; padding:6px 12px 6px 10px;}
+    .chat-inner{padding:20px 14px 12px;}
+    .composer{padding:0 12px 12px;}
+    .bar-row{grid-template-columns:84px 1fr 30px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- icon set, used with <svg><use href="#i-..."/></svg> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3.5v17l15-8.5z" fill="currentColor"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 20V5M5 11.5 12 4.5l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4v16" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 5.5 4.5 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="currentColor"/></symbol>
+</svg>
+
+<!-- ======================= home ======================= -->
+<div id="homeView" class="view">
+  <nav class="rail" aria-label="Main">
+    <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
+    <button class="icon-btn active" title="Home" aria-current="page"><svg><use href="#i-home"/></svg></button>
+    <div class="spacer"></div>
+    <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
+    <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
+  </nav>
+
+  <div class="home-main">
+    <header class="topbar">
+      <h1>Home</h1>
+      <div class="spacer"></div>
+      <span class="credit">Created by <b>Eusoff Amir</b></span>
+    </header>
+
+    <div class="home-scroll">
+      <div class="home-inner">
+        <section class="hero">
+          <div class="hero-art" aria-hidden="true">
+            <img src="/static/img/hero.png" alt="">
+          </div>
+          <div class="hero-text">
+            <h2>Learn to think like a quant</h2>
+            <p>Agentic AI for Fostering Critical Thinking Education</p>
+          </div>
+          <div class="rounds">
+            <span class="mono-label">Rounds</span>
+            <div class="seg" role="radiogroup" aria-label="Rounds">
+              <label><input type="radio" name="rounds" value="3"><b>3</b></label>
+              <label><input type="radio" name="rounds" value="5" checked><b>5</b></label>
+              <label><input type="radio" name="rounds" value="8"><b>8</b></label>
+            </div>
+          </div>
+          <div class="mode">
+            <span class="mono-label">Mode</span>
+            <button class="mode-btn" id="abOnly" aria-pressed="false"
+                    title="Press for A or B?: every question gives you 2 choices to pick from">
+              <span class="off-text">Normal</span><span class="on-text">A or B?</span>
+            </button>
+          </div>
+        </section>
+        <div id="homeStatus" aria-live="polite"></div>
+
+        <div class="section-head"><h3>Cases</h3></div>
+        <div class="cases" id="cases"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= session ======================= -->
+<div id="sessionView" class="view hidden collapsed">
+  <aside class="side" aria-label="Case file">
+    <div class="side-head">
+      <span class="mark" aria-hidden="true"><img src="/static/img/socrates.png" alt=""></span>
+      <span class="name">SOCRATIC AI</span>
+      <button class="icon-btn" id="collapseSide" title="Hide case"><svg><use href="#i-side"/></svg></button>
+    </div>
+    <div class="side-body">
+      <div class="mono-label" id="cfNum"></div>
+      <h2 id="cfTitle"></h2>
+      <p class="cf-goal" id="cfGoal"></p>
+      <p class="cf-scenario" id="cfScenario"></p>
+      <button class="read-again" id="readAgain">Read again</button>
+      <div class="cf-section cf-chart">
+        <div class="mono-label" id="cfChartTitle">The picture</div>
+        <div id="cfChart"></div>
+      </div>
+    </div>
+    <div class="side-foot">
+      <button class="ghost home-link" id="homeBtn"><svg><use href="#i-back"/></svg>Home</button>
+      <span class="foot-icons">
+        <button class="icon-btn help-btn" data-tour="session" title="How to use"><svg><use href="#i-help"/></svg></button>
+        <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
+      </span>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="chatpane">
+    <header class="chat-top">
+      <button class="icon-btn" id="openSide" title="Show case"><svg><use href="#i-side"/></svg></button>
+      <span class="status" id="hudStatus"></span>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <div class="spacer"></div>
+      <span class="status" id="hudLevel"></span>
+      <button class="profile-btn" id="statsToggle" aria-pressed="false" aria-controls="profilePanel" title="Your thinking stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.5 7.3v9.4L12 21.5 3.5 16.7V7.3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 6.5 16.5 10l-1.6 6.2-4.9-.9L7.8 10.3z" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>My stats</button>
+    </header>
+
+    <div class="chat-scroll" id="chatScroll">
+      <div class="chat-inner">
+        <div id="log" aria-live="polite"></div>
+        <section id="report" class="hidden"></section>
+      </div>
+    </div>
+
+    <div class="composer" id="composer">
+      <div class="composer-inner">
+        <div class="choices hidden" id="choices" role="group" aria-label="Pick one"></div>
+        <div class="composer-box">
+          <textarea id="answerBox" rows="1" placeholder="Your answer..." aria-label="Your answer"></textarea>
+          <div class="composer-row">
+            <button class="ghost" id="stuckBtn" title="The tutor will slow down and make it easier.">I'm stuck</button>
+            <button class="send" id="sendBtn" title="Send (Enter)" aria-label="Send"><svg><use href="#i-up"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pp-backdrop" id="profileBackdrop"></div>
+  <aside class="profile-panel" id="profilePanel" aria-label="My stats" inert>
+    <div class="pp-head">
+      <button class="icon-btn" id="closeProfile" title="Close (Esc)" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="pp-body" id="profileBody"></div>
+  </aside>
+</div>
+
+<!-- ======================= reading pop-up ======================= -->
+<div class="read-modal hidden" id="readModal" role="dialog" aria-modal="true" aria-labelledby="rmTitle">
+  <div class="rm-backdrop" data-close></div>
+  <div class="rm-card">
+    <header class="rm-head">
+      <span class="tag" id="rmTag"></span><span class="num" id="rmNum"></span>
+      <h2 id="rmTitle"></h2>
+      <div class="rm-sub">Read first · about 2 min</div>
+      <button class="icon-btn rm-x" data-close title="Close (Esc)" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="rm-body" id="rmBody"></div>
+    <footer class="rm-foot" id="rmFoot">
+      <div id="rmStatus" aria-live="polite"></div>
+      <button class="ghost hidden" id="rmOver">Start over</button>
+      <button class="rm-start" id="rmStart">Start this case <svg><use href="#i-play"/></svg></button>
+    </footer>
+  </div>
+</div>
+
+<script>
+const state = { sessionId: null, concept: null, totalRounds: 5, round: 0, level: '', ended: false, busy: false,
+                options: [], picked: null };
+let concepts = [];
+const $ = id => document.getElementById(id);
+
+// ---------- helpers ----------
+
+// fetch + JSON, throwing an Error with the server's message on any failure,
+// so a failed model call shows up on screen instead of silently freezing.
+async function api(url, opts){
+  let res;
+  try { res = await fetch(url, opts); }
+  catch(e){ throw new Error('No connection. Is the server running?'); }
+  let data = null;
+  try { data = await res.json(); } catch(e){}
+  if(!res.ok){
+    const detail = data && data.detail;
+    throw new Error(typeof detail === 'string' ? detail : `Server error (${res.status}).`);
+  }
+  return data;
+}
+
+function postJSON(url, body){
+  return api(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// The models sometimes add light Markdown (**bold**). Render just that much, after escaping.
+function inline(text){
+  return esc(String(text).trim())
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>');
+}
+
+function scrollToEnd(){ const s = $('chatScroll'); s.scrollTo({top: s.scrollHeight, behavior: 'smooth'}); }
+
+function el(tag, className, html){
+  const n = document.createElement(tag);
+  if(className) n.className = className;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function note(className, text, parent){
+  const n = el('div', className);
+  n.textContent = text;
+  (parent || $('log')).appendChild(n);
+  if(!parent) scrollToEnd();
+  return n;
+}
+
+function formatLabel(fmt){
+  const short = {'open question':'Open question', 'predict what happens next':'Predict',
+                 'spot the flaw in a claim':'Spot the flaw', 'choose A or B and defend the choice':'A or B'};
+  return short[fmt] || fmt || '';
+}
+
+// ---------- theme ----------
+
+// Follows the system setting until the learner picks one. Saved per browser.
+function currentTheme(){
+  const set = document.documentElement.dataset.theme;
+  if(set) return set;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function applyTheme(theme){
+  if(theme) document.documentElement.dataset.theme = theme;
+  const icon = currentTheme() === 'dark' ? '#i-sun' : '#i-moon';
+  document.querySelectorAll('.theme-btn use').forEach(u => u.setAttribute('href', icon));
+}
+try { applyTheme(localStorage.getItem('theme')); } catch(e){ applyTheme(null); }
+document.querySelectorAll('.theme-btn').forEach(b => b.addEventListener('click', () => {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('theme', next); } catch(e){}
+}));
+
+// ---------- case pictures ----------
+
+// Case 01: NVDA name with made-up example prices (NOT real NVDA data) over 10 trading days. Mixed first week,
+// then 5 up days in a row (the friend's "pattern"). Illustration, not real data.
+const CASE1_STOCK = {
+  prices: [102.4, 101.1, 101.8, 100.6, 100.2, 101.0, 101.9, 102.7, 103.8, 105.1],
+  days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+};
+
+// Price line chart. mini = the small home-page thumbnail (no axes or labels).
+function priceChartSVG(mini){
+  const {prices, days} = CASE1_STOCK;
+  const W = mini ? 240 : 280, H = mini ? 92 : 190;
+  const L = mini ? 6 : 36, R = mini ? 6 : 8, T = mini ? 10 : 30, B = mini ? 8 : 24;
+  const lo = 99, hi = 106;
+  const x = i => L + i * (W - L - R) / (prices.length - 1);
+  const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const line = prices.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const area = `${line}L${x(prices.length - 1).toFixed(1)},${H - B}L${x(0).toFixed(1)},${H - B}Z`;
+  const bandX = (x(4) + x(5)) / 2;
+  const band = `<rect x="${bandX.toFixed(1)}" y="${mini ? 0 : T - 18}" width="${(W - R - bandX + (mini ? R : 0)).toFixed(1)}"
+      height="${(H - B - (mini ? 0 : T - 18)).toFixed(1)}" rx="6" style="fill:var(--caution-soft)"/>`;
+  const dots = prices.map((v, i) => i < 5 ? '' :
+    `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${mini ? 3 : 4}" stroke-width="2" style="fill:var(--signal);stroke:var(--panel)"/>`).join('');
+  if(mini){
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${band}
+      <path d="${area}" style="fill:var(--signal)" fill-opacity=".12"/>
+      <path d="${line}" fill="none" stroke-width="2.5" stroke-linejoin="round" style="stroke:var(--signal)"/>${dots}</svg>`;
+  }
+  const grid = [100, 102, 104, 106].map(t => `
+    <line x1="${L}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" style="stroke:var(--rule)"/>
+    <text x="${L - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end" class="ax">$${t}</text>`).join('');
+  const xlabels = days.map((d, i) =>
+    `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" class="ax">${d[0]}</text>`).join('');
+  const hits = prices.map((_, i) => {
+    const step = (W - L - R) / (prices.length - 1);
+    return `<rect class="hit" data-i="${i}" x="${(x(i) - step / 2).toFixed(1)}" y="${T - 18}" width="${step.toFixed(1)}" height="${H - B - T + 18}" fill="transparent"/>`;
+  }).join('');
+  return `<svg class="price" viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="NVDA price over 10 days: mixed for 5 days, then up 5 days in a row, from $100.20 to $105.10.">
+    ${band}
+    <text x="${((bandX + W - R) / 2).toFixed(1)}" y="${T - 6}" text-anchor="middle" class="band-label">5 up days ▲</text>
+    ${grid}
+    <path d="${area}" style="fill:var(--signal)" fill-opacity=".10"/>
+    <path d="${line}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="stroke:var(--signal)"/>
+    ${dots}${xlabels}
+    <line class="xh" y1="${T - 18}" y2="${H - B}" style="stroke:var(--ink-faint)" stroke-dasharray="3 3" visibility="hidden"/>
+    ${hits}
+  </svg><div class="ptip hidden" role="status"></div>`;
+}
+
+// Hover a day: dashed crosshair + tooltip with the price and the day's move.
+function wirePriceHover(box){
+  const svg = box.querySelector('svg.price'), tip = box.querySelector('.ptip');
+  if(!svg || !tip) return;
+  const xh = svg.querySelector('.xh');
+  svg.querySelectorAll('.hit').forEach(r => r.addEventListener('pointerenter', () => {
+    const i = Number(r.dataset.i), p = CASE1_STOCK.prices[i];
+    const cx = Number(r.getAttribute('x')) + Number(r.getAttribute('width')) / 2;
+    xh.setAttribute('x1', cx); xh.setAttribute('x2', cx); xh.setAttribute('visibility', 'visible');
+    const move = i ? p - CASE1_STOCK.prices[i - 1] : 0;
+    const moveTxt = i ? ` <span class="${move >= 0 ? 'up' : 'down'}">${move >= 0 ? '▲ +' : '▼ −'}${Math.abs(move).toFixed(2)}</span>` : '';
+    tip.innerHTML = `${CASE1_STOCK.days[i]} · <b>$${p.toFixed(2)}</b>${moveTxt}`;
+    const vb = svg.viewBox.baseVal, scale = svg.getBoundingClientRect().width / vb.width;
+    tip.style.left = Math.min(Math.max(cx * scale, 60), svg.getBoundingClientRect().width - 60) + 'px';
+    tip.classList.remove('hidden');
+  }));
+  svg.addEventListener('pointerleave', () => { xh.setAttribute('visibility', 'hidden'); tip.classList.add('hidden'); });
+}
+
+// A small picture per case, shown until a tool run replaces it with real numbers.
+const CASE_PICTURES = {
+  pattern_or_luck: {
+    title: 'NVDA · last 10 days',
+    svg: mini => priceChartSVG(mini),
+  },
+  holds_on_new_data: {
+    title: '200 rules → 1 winner',
+    svg: () => {
+      let dots = '';
+      for(let r = 0; r < 5; r++) for(let c = 0; c < 20; c++){
+        const hit = r === 2 && c === 13;
+        dots += `<circle cx="${8 + c*11.8}" cy="${10 + r*16}" r="${hit ? 5 : 3}" style="fill:var(${hit ? '--caution' : '--ink-faint'})"/>`;
+      }
+      return `<svg viewBox="0 0 240 82" role="img" aria-label="Grid of dots with one highlighted">${dots}</svg>`;
+    },
+  },
+  together_not_cause: {
+    title: '2 lines, 1 shape',
+    svg: () => {
+      const a = [40,32,44,28,36,20,30,18,26,14], b = [52,46,56,40,50,34,44,30,40,26];
+      const pts = s => s.map((y, i) => `${10 + i*24},${y}`).join(' ');
+      return `<svg viewBox="0 0 240 70" role="img" aria-label="Two lines moving together">
+        <polyline points="${pts(a)}" fill="none" stroke-width="3" style="stroke:var(--signal)"/>
+        <polyline points="${pts(b)}" fill="none" stroke-width="3" stroke-dasharray="5 4" style="stroke:var(--caution)"/></svg>`;
+    },
+  },
+};
+
+function showCasePicture(id){
+  const p = CASE_PICTURES[id];
+  $('cfChartTitle').textContent = p ? p.title : 'The picture';
+  $('cfChart').innerHTML = p ? p.svg(false) : '';
+  wirePriceHover($('cfChart'));
+}
+
+// Real numbers from a tool run, drawn as two bars.
+function showToolChart(run){
+  const c = run.chart;
+  if(!c) return;
+  const unit = c.unit || '';
+  const max = Math.max(...c.bars.map(b => Math.abs(b.value)), 1);
+  $('cfChartTitle').textContent = c.title;
+  $('cfChart').innerHTML = c.bars.map(b => `
+    <div class="cbar"><span>${esc(b.label)}</span>
+      <div class="track"><div class="fill" style="width:${Math.round(Math.abs(b.value) / max * 100)}%"></div></div>
+      <span class="v">${b.value > 0 && unit ? '+' : ''}${esc(b.value)}${esc(unit)}</span></div>`).join('')
+    + `<div class="cap">${esc(run.summary)}</div>`;
+}
+
+// ---------- home ----------
+
+// ---------- saved progress ----------
+// Each case remembers its unfinished session id in this browser. The session
+// itself is saved on the server (sessions/<id>.json), so it survives a reload
+// or a server restart.
+const progress = {};  // conceptId -> {sid, round, total}
+
+function savedSessions(){
+  try { return JSON.parse(localStorage.getItem('saved-sessions')) || {}; } catch(e){ return {}; }
+}
+function setSaved(conceptId, sid){
+  const m = savedSessions();
+  if(sid) m[conceptId] = sid; else delete m[conceptId];
+  try { localStorage.setItem('saved-sessions', JSON.stringify(m)); } catch(e){}
+}
+
+async function loadProgress(){
+  await Promise.all(Object.entries(savedSessions()).map(async ([cid, sid]) => {
+    try {
+      const d = await api(`/api/session/${sid}`);
+      if(d.ended || d.concept_id !== cid) setSaved(cid, null);
+      else progress[cid] = {sid, round: d.round, total: d.total_rounds};
+    } catch(e){ setSaved(cid, null); }  // gone (e.g. deleted): forget it
+  }));
+  document.querySelectorAll('.case-row').forEach(row => {
+    const pr = progress[row.dataset.id];
+    row.querySelector('.resume')?.remove();
+    if(pr) row.querySelector('.num').insertAdjacentHTML('afterend',
+      `<span class="resume">Round ${pr.round}/${pr.total}</span>`);
+  });
+}
+
+async function loadConcepts(){
+  concepts = await api('/api/concepts');
+  $('cases').innerHTML = concepts.map((c, i) => `
+    <button class="case-row" data-id="${esc(c.id)}">
+      <span class="thumb" aria-hidden="true">${CASE_PICTURES[c.id] ? CASE_PICTURES[c.id].svg(true) : ''}</span>
+      <span class="info">
+        <span class="tag t${i % 3}">${esc(c.tag || '')}</span><span class="num">CASE 0${i + 1}</span>
+        <span class="t">${esc(c.title)}</span>
+        <span class="m">${esc(c.mission)}</span>
+      </span>
+      <span class="go" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+    </button>`).join('');
+  await loadProgress();
+}
+
+$('abOnly').addEventListener('click', e => {
+  const b = e.currentTarget;
+  b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+});
+
+$('cases').addEventListener('click', e => {
+  const row = e.target.closest('.case-row');
+  if(row) openReading(row.dataset.id, 'home');
+});
+
+// ---------- reading pop-up ----------
+// Clicking a case opens a short reading first. "Start this case" begins the
+// session; the seconds it was open are saved in the transcript (reading_seconds).
+const reading = {id: null, openedAt: 0, mode: 'home', opener: null};
+
+function openReading(id, mode){
+  const idx = concepts.findIndex(c => c.id === id);
+  const c = concepts[idx];
+  if(!c || !c.reading) return;
+  const r = c.reading;
+  Object.assign(reading, {id, mode, openedAt: Date.now(), opener: document.activeElement});
+  $('rmTag').className = `tag t${idx % 3}`;
+  $('rmTag').textContent = c.tag || '';
+  $('rmNum').textContent = `CASE 0${idx + 1}`;
+  $('rmTitle').textContent = c.title;
+  const pic = CASE_PICTURES[id];
+  $('rmBody').innerHTML = `
+    <section><h3 class="mono-label">The idea</h3>
+      <ul class="rm-idea">${r.idea.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section>
+    <section><h3 class="mono-label">Example</h3>
+      <p class="rm-example">${esc(r.example)}</p>
+      ${pic ? `<div class="rm-chart">${pic.svg(false)}</div>` : ''}</section>
+    <section><h3 class="mono-label">Key words</h3>
+      <dl class="rm-words">${r.key_words.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl></section>
+    <div class="rm-think"><span class="mono-label">Think about</span><p>${esc(r.think)}</p></div>`;
+  wirePriceHover($('rmBody').querySelector('.rm-chart') || $('rmBody'));
+  $('rmBody').scrollTop = 0;
+  $('rmStatus').innerHTML = '';
+  const fromSession = mode === 'session';
+  // from a session there is nothing to start, so the footer is hidden; the X closes it
+  $('rmFoot').classList.toggle('hidden', fromSession);
+  const pr = !fromSession && progress[id];
+  $('rmOver').classList.toggle('hidden', !pr);
+  $('rmStart').innerHTML = pr ? `Continue (${pr.round}/${pr.total}) <svg><use href="#i-play"/></svg>`
+                              : `Start this case <svg><use href="#i-play"/></svg>`;
+  $('readModal').classList.remove('hidden');
+  (fromSession ? $('readModal').querySelector('.rm-x') : $('rmStart')).focus();
+}
+
+const readingOpen = () => !$('readModal').classList.contains('hidden');
+
+function closeReading(){
+  if(!readingOpen() || $('rmStart').disabled) return;  // not while a session is starting
+  $('readModal').classList.add('hidden');
+  if(reading.opener && document.contains(reading.opener)) reading.opener.focus();
+}
+
+$('readModal').addEventListener('click', e => { if(e.target.closest('[data-close]')) closeReading(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && readingOpen()) closeReading(); });
+const readSeconds = () => Math.round((Date.now() - reading.openedAt) / 1000);
+$('rmStart').addEventListener('click', () =>
+  progress[reading.id] ? resumeSession(reading.id) : startSession(reading.id, readSeconds()));
+$('rmOver').addEventListener('click', () => startSession(reading.id, readSeconds()));
+$('readAgain').addEventListener('click', () => openReading(state.concept.id, 'session'));
+
+function setHomeBusy(busy){
+  document.querySelectorAll('.case-row, #rmStart, #rmOver').forEach(b => b.disabled = busy);
+}
+
+async function startSession(conceptId, readingSeconds = 0){
+  const rounds = Number(document.querySelector('input[name="rounds"]:checked').value);
+  const fromPopup = readingOpen();
+  const status = fromPopup ? $('rmStatus') : $('homeStatus');  // errors show where the learner is looking
+  const btn = $('rmStart'), btnLabel = btn.innerHTML;
+  setHomeBusy(true);
+  status.innerHTML = '';
+  // loading shows on the Start button itself
+  if(fromPopup) btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Starting...';
+  else status.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Starting...</div>';
+  let data;
+  try {
+    data = await postJSON('/api/session', {concept_id: conceptId, total_rounds: rounds,
+                                           ab_only: $('abOnly').getAttribute('aria-pressed') === 'true',
+                                           reading_seconds: readingSeconds});
+  } catch(e){
+    btn.innerHTML = btnLabel;
+    status.innerHTML = '';
+    note('error', e.message, status);
+    setHomeBusy(false);
+    return;
+  }
+  btn.innerHTML = btnLabel;
+  status.innerHTML = '';
+  setHomeBusy(false);
+  $('readModal').classList.add('hidden');
+
+  enterSession(conceptId, data);
+  setSaved(conceptId, data.session_id);
+  delete progress[conceptId];
+  showTurn(data);
+  $('answerBox').focus();
+  if(!tourSeen('session')) setTimeout(() => startTour('session'), 600);
+}
+
+// Switch to the session screen and fill the case sidebar (new or continued session).
+function enterSession(conceptId, data){
+  const idx = concepts.findIndex(c => c.id === conceptId);
+  state.concept = concepts[idx];
+  state.sessionId = data.session_id;
+  state.totalRounds = data.total_rounds;
+  state.ended = false;
+
+  $('homeView').classList.add('hidden');
+  $('sessionView').classList.remove('hidden');
+  $('cfNum').textContent = `Case 0${idx + 1}`;
+  $('cfTitle').textContent = state.concept.title;
+  $('cfGoal').textContent = state.concept.mission;
+  $('cfScenario').textContent = state.concept.scenario;
+  showCasePicture(state.concept.id);
+}
+
+// Continue a saved case: load it from the server and replay the chat so far.
+async function resumeSession(conceptId){
+  const btn = $('rmStart'), btnLabel = btn.innerHTML;
+  setHomeBusy(true);
+  $('rmStatus').innerHTML = '';
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Loading...';
+  let data;
+  try { data = await api(`/api/session/${progress[conceptId].sid}`); }
+  catch(e){
+    btn.innerHTML = btnLabel;
+    note('error', e.message, $('rmStatus'));
+    setHomeBusy(false);
+    return;
+  }
+  btn.innerHTML = btnLabel;
+  setHomeBusy(false);
+  $('readModal').classList.add('hidden');
+
+  enterSession(conceptId, data);
+  data.turns.forEach(t => {
+    if(t.answer != null) addLearner(t.answer);
+    showTurn({parts: t.parts, format: t.format, tools: t.tools,
+              round: data.round, level: data.level, ended: false});
+  });
+  requestAnimationFrame(() => { $('chatScroll').scrollTop = $('chatScroll').scrollHeight; });
+  $('answerBox').focus();
+}
+
+// ---------- session sidebar ----------
+
+const narrow = window.matchMedia('(max-width:899px)');
+$('collapseSide').addEventListener('click', () => $('sessionView').classList.add('collapsed'));
+$('openSide').addEventListener('click', () => {
+  const v = $('sessionView');
+  if(narrow.matches) v.classList.add('drawer-open');
+  else v.classList.remove('collapsed');
+});
+$('backdrop').addEventListener('click', () => $('sessionView').classList.remove('drawer-open'));
+// Progress is saved after every answer, so going Home needs no warning.
+$('homeBtn').addEventListener('click', () => location.reload());
+
+// ---------- conversation ----------
+
+function addTutor(parts, format, tools, closing){
+  const ran = (tools || []).map(t =>
+    `<div class="ran">Ran <b>${esc(t.tool.replace(/_/g, ' '))}</b> · ${esc(Object.values(t.args).join(' / '))}</div>`).join('');
+  // Order: question first (the thing to answer), then the hint. During the
+  // session the hint is a suggestion the learner can open only if they want it, so
+  // they try to think first. The closing "Work on next" is always shown.
+  const hasHint = parts.key_idea && !closing;
+  const hintBtn = !hasHint ? ''
+    : `<button type="button" class="hint-btn" aria-expanded="false" aria-label="Show hint" title="Hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  const idea = !parts.key_idea ? ''
+    : closing ? `<div class="idea"><span class="mono-label">Work on next</span>${inline(parts.key_idea)}</div>`
+    : `<div class="hint-body hidden">${ran}<div class="idea"><span class="mono-label">Hint</span>${inline(parts.key_idea)}</div></div>`;
+  const html = [
+    parts.question || hasHint ? `<div class="qrow">${parts.question ? `<p class="q">${inline(parts.question)}</p>` : ''}${hintBtn}</div>` : '',
+    closing ? ran : '',
+    idea,
+  ].join('');
+  const chip = closing ? '<span class="chip">Session complete</span>' : (format ? `<span class="chip">${esc(formatLabel(format))}</span>` : '');
+  // the short feedback sits in the header row, beside the format chip
+  const fb = parts.feedback ? `<span class="fb">${inline(parts.feedback)}</span>` : '';
+  const n = el('div', 'entry tutor' + (closing ? ' closing' : ''),
+    `<span class="mark" aria-hidden="true"><img src="/static/img/socrates.png" alt=""></span>
+     <div class="body">
+       <div class="entry-head">${chip}${fb}</div>
+       <div class="card">${html}</div>
+     </div>`);
+  $('log').appendChild(n);
+  scrollToEnd();
+  return n;
+}
+
+// Hint icon: show or hide the key idea. When opened near the bottom, scroll so
+// the key idea is not hidden behind the answer box.
+$('log').addEventListener('click', e => {
+  const btn = e.target.closest('.hint-btn');
+  if(!btn) return;
+  const body = btn.closest('.card').querySelector('.hint-body');
+  const open = body.classList.toggle('hidden') === false;
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Hide hint' : 'Show hint');
+  if(open) body.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+});
+
+function addLearner(text){
+  const n = el('div', 'entry learner');
+  const b = el('div', 'bubble');
+  b.textContent = text;
+  n.appendChild(b);
+  $('log').appendChild(n);
+  scrollToEnd();
+  return n;
+}
+
+// One tutor turn arrived: draw it, update the case file and the status bar.
+function showTurn(data){
+  state.round = data.round;
+  state.level = data.level || state.level;
+  state.ended = data.ended;
+  const parts = data.parts || {question: data.reply};
+  (data.tools || []).forEach(showToolChart);
+  addTutor(parts, data.format, data.tools, data.ended);
+  setChoices(data.ended ? [] : (parts.options || []));
+  updateHud();
+  // the A/B buttons make the chat area shorter, so scroll again once they are drawn
+  requestAnimationFrame(scrollToEnd);
+}
+
+function updateHud(){
+  // `round` = number of questions asked so far, so the learner is answering question `round`.
+  const {round, totalRounds, ended, level} = state;
+  const sep = '<span class="sep">·</span>';
+  $('hudStatus').innerHTML = ended ? `COMPLETE ${sep} ${totalRounds} ROUNDS` : `ROUND ${round}/${totalRounds}`;
+  // the level sits on the right, beside Profile
+  $('hudLevel').innerHTML = ended ? '' : `<span class="lv-label">LEVEL:</span> <span class="lv">${esc(level.toUpperCase())}</span>`;
+  const ticks = $('ticks');
+  ticks.innerHTML = '';
+  for(let i = 0; i < totalRounds; i++){
+    const done = ended || i < round - 1;
+    ticks.appendChild(el('div', 'tick' + (done ? ' done' : (i === round - 1 ? ' now' : ''))));
+  }
+}
+
+// ---------- A / B choices ----------
+
+function setChoices(options){
+  state.options = options.length === 2 ? options : [];
+  state.picked = null;
+  const box = $('choices');
+  box.innerHTML = state.options.map((o, i) =>
+    `<button class="choice" type="button" aria-pressed="false" data-i="${i}"><span class="l">${'AB'[i]}</span>${esc(o)}</button>`).join('');
+  box.classList.toggle('hidden', !state.options.length);
+  $('answerBox').placeholder = state.options.length ? 'Pick A or B, then say why...' : 'Your answer...';
+}
+
+$('choices').addEventListener('click', e => {
+  const b = e.target.closest('.choice');
+  if(!b || state.busy) return;
+  const i = Number(b.dataset.i);
+  state.picked = state.picked === i ? null : i;
+  $('choices').querySelectorAll('.choice').forEach(c => c.setAttribute('aria-pressed', String(Number(c.dataset.i) === state.picked)));
+  $('answerBox').placeholder = state.picked == null ? 'Pick A or B, then say why...' : 'Why?';
+  $('answerBox').focus();
+});
+
+// ---------- sending ----------
+
+function setBusy(busy){
+  state.busy = busy;
+  $('sendBtn').disabled = busy;
+  $('stuckBtn').disabled = busy;
+  $('choices').querySelectorAll('.choice').forEach(c => c.disabled = busy);
+}
+
+async function sendAnswer(text){
+  const box = $('answerBox');
+  const fromBox = text == null;
+  const typed = box.value;  // kept so it can be put back if sending fails
+  let answer = (text ?? typed).trim();
+  if(fromBox && state.picked != null){
+    const pick = `${'AB'[state.picked]}: ${state.options[state.picked]}.`;
+    answer = answer ? `${pick} Why: ${answer}` : pick;
+  }
+  if(!answer || state.ended || state.busy) return;
+  const entry = addLearner(answer);
+  if(fromBox){ box.value = ''; autosize(); }
+  setBusy(true);
+  const pending = el('div', 'thinking', '<span class="dots"><i></i><i></i><i></i></span>Thinking...');
+  $('log').appendChild(pending);
+  scrollToEnd();
+
+  let data;
+  try {
+    data = await postJSON(`/api/session/${state.sessionId}/answer`, {answer});
+  } catch(e){
+    // The server leaves the session untouched on failure, so put the answer
+    // back in the box and let the learner simply send it again.
+    pending.remove();
+    entry.remove();
+    if(fromBox){ box.value = typed; autosize(); }
+    note('error', e.message + ' Not counted. Press Send again.');
+    setBusy(false);
+    return;
+  }
+  pending.remove();
+  setBusy(false);
+  showTurn(data);
+
+  if(data.ended){
+    setSaved(state.concept.id, null);  // finished: no "Continue" badge
+    closeProfile();
+    $('composer').classList.add('hidden');
+    $('statsToggle').classList.add('hidden');
+    showFinalReport();
+  } else {
+    if(profileOpen()) refreshProfile();  // keep the open panel up to date
+    box.focus();
+  }
+}
+
+// ---------- thinking profile ----------
+
+// 6-point radar, one point per Socratic level. Each point = how often the
+// learner made that move, scaled to their own most-used move (which touches
+// the outer ring), so the shape shows where they are strongest. The level
+// they reached is highlighted; levels not reached yet are faded.
+let radarId = 0;
+function radarSVG(levels, counts, n, reachedIdx){
+  const W = 400, H = 310, cx = W / 2, cy = H / 2 + 6, R = 96;
+  const gid = `glow${++radarId}`;
+  const pt = (i, r) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / levels.length;  // first level at the top
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  const ring = f => levels.map((_, i) => pt(i, R * f).map(v => v.toFixed(1)).join(',')).join(' ');
+  const grid = [1/3, 2/3, 1].map(f =>
+    `<polygon points="${ring(f)}" fill="none" style="stroke:var(--rule)" stroke-width="1"/>`).join('');
+  const spokes = levels.map((_, i) => {
+    const [x, y] = pt(i, R);
+    return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" style="stroke:var(--rule)"/>`;
+  }).join('');
+  const best = Math.max(...levels.map(l => counts[l.key] || 0), 0);
+  // a small minimum so the shape is still visible when a move was never used
+  const vals = levels.map(l => Math.max(best ? (counts[l.key] || 0) / best : 0, 0.08));
+  const shape = levels.map((_, i) => pt(i, R * vals[i]).map(v => v.toFixed(1)).join(',')).join(' ');
+  const dots = best ? levels.map((_, i) => {
+    const [x, y] = pt(i, R * vals[i]);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:var(--signal)"/>`;
+  }).join('') : '';
+  const labels = levels.map((l, i) => {
+    const [x, y] = pt(i, R + 18);
+    const anchor = Math.abs(x - cx) < 4 ? 'middle' : (x > cx ? 'start' : 'end');
+    const words = l.name === 'Question the question' ? ['Question the', 'question'] : [l.name];
+    const dy = y < cy - 4 ? -(words.length - 1) * 16 : (y > cy + 4 ? 8 : 5);
+    const cls = i === reachedIdx ? 'rl top' : (i < reachedIdx ? 'rl' : 'rl faint');
+    const tspans = words.map((w, k) => `<tspan x="${x.toFixed(1)}" dy="${k ? 16 : 0}">${esc(w)}</tspan>`).join('');
+    return `<text class="${cls}" x="${x.toFixed(1)}" y="${(y + dy).toFixed(1)}" text-anchor="${anchor}">${tspans}</text>`;
+  }).join('');
+  return `<svg class="radar" viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="Radar of the 6 Socratic levels. Reached: ${esc(levels[reachedIdx] ? levels[reachedIdx].name : 'none')}">
+    <defs><radialGradient id="${gid}"><stop offset="0" style="stop-color:var(--signal)" stop-opacity=".35"/>
+      <stop offset="1" style="stop-color:var(--signal)" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="${cx}" cy="${cy}" r="${R * 0.7}" fill="url(#${gid})"/>
+    ${grid}${spokes}
+    <polygon points="${shape}" style="fill:var(--signal);stroke:var(--signal)" fill-opacity=".22" stroke-width="2" stroke-linejoin="round"/>
+    ${dots}${labels}
+  </svg>`;
+}
+
+// Builds the profile. Used twice: in the right-side panel ("Profile" button,
+// mid-session) and inline in the chat when the session ends.
+function reportHTML(data, final){
+  const s = data.summary;
+  const n = s.rounds_completed;
+  const reachedIdx = data.levels.findIndex(l => l.name === s.highest_level_reached);
+
+  const radar = radarSVG(data.levels, s.reasoning_move_count, n, reachedIdx);
+
+  const bars = Object.keys(data.standards).map(k => {
+    const c = s.standards_met_count[k] || 0;
+    const pct = n ? Math.round(c / n * 100) : 0;
+    return `<div class="bar-row" title="${esc(data.standards[k])}">
+      <div class="label">${esc(k)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="count">${c}/${n}</div></div>`;
+  }).join('');
+
+  const highlights = n ? `
+    <div class="highlights">
+      <div class="hl good"><div class="mono-label">Strongest</div><div class="v">${esc(s.strongest_standard)}</div>
+        <div class="d">${esc(data.standards[s.strongest_standard])}</div></div>
+      <div class="hl work"><div class="mono-label">Next</div><div class="v">${esc(s.weakest_standard)}</div>
+        <div class="d">${esc(data.standards[s.weakest_standard])}</div></div>
+    </div>` : '';
+
+  return `
+    ${final ? '<div class="mono-label">Your thinking profile</div>' : ''}
+    <h2>${n ? `You reached <em>${esc(s.highest_level_reached)}</em>` : 'Nothing yet'}</h2>
+
+    <div class="report-grid">
+      <div>
+        <div class="mono-label">Level reached</div>
+        ${radar}
+        ${highlights}
+      </div>
+      <div>
+        <div class="mono-label">Standards</div>
+        <div style="margin-top:10px;">${bars}</div>
+      </div>
+    </div>
+
+    ${final ? `<div class="report-actions">
+        <button id="againBtn">New case</button>
+        <button class="ghost" id="reviewBtn">Review chat</button>
+      </div>` : ''}
+    <div class="note">Based on Paul &amp; Elder's 9 standards. Hover a bar for details.</div>`;
+}
+
+function fetchStats(){ return api(`/api/session/${state.sessionId}/stats`); }
+
+// End of session: the full profile appears in the chat.
+async function showFinalReport(){
+  let data;
+  try { data = await fetchStats(); }
+  catch(e){ note('error', e.message); return; }
+  const panel = $('report');
+  panel.className = 'report';
+  panel.innerHTML = reportHTML(data, true);
+  $('againBtn').addEventListener('click', () => location.reload());
+  $('reviewBtn').addEventListener('click', () => $('chatScroll').scrollTo({top: 0, behavior: 'smooth'}));
+  panel.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+// Mid-session: the "Profile" button slides a panel in from the right.
+const profileOpen = () => $('profilePanel').classList.contains('open');
+
+async function refreshProfile(){
+  const body = $('profileBody');
+  try { body.innerHTML = `<div class="report">${reportHTML(await fetchStats(), false)}</div>`; }
+  catch(e){ body.innerHTML = ''; note('error', e.message, body); }
+}
+
+function openProfile(){
+  $('profilePanel').classList.add('open');
+  $('profilePanel').inert = false;
+  $('profileBackdrop').classList.add('open');
+  $('statsToggle').setAttribute('aria-pressed', 'true');
+  refreshProfile();
+}
+
+function closeProfile(){
+  $('profilePanel').classList.remove('open');
+  $('profilePanel').inert = true;
+  $('profileBackdrop').classList.remove('open');
+  $('statsToggle').setAttribute('aria-pressed', 'false');
+}
+
+$('statsToggle').addEventListener('click', () => profileOpen() ? closeProfile() : openProfile());
+$('closeProfile').addEventListener('click', closeProfile);
+$('profileBackdrop').addEventListener('click', closeProfile);
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && profileOpen()) closeProfile(); });
+
+// ---------- composer ----------
+
+function autosize(){
+  const box = $('answerBox');
+  box.style.height = 'auto';
+  box.style.height = Math.min(box.scrollHeight, 200) + 'px';
+}
+
+$('sendBtn').addEventListener('click', () => sendAnswer());
+$('stuckBtn').addEventListener('click', () => sendAnswer("I'm stuck and not sure how to answer this."));
+$('answerBox').addEventListener('input', autosize);
+$('answerBox').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendAnswer(); }
+});
+
+// ---------- first-time tour ----------
+// Small pop-ups that point at one part of the screen at a time. Shown once per
+// browser for the home page and once for the first session; the "?" buttons
+// replay them. Text is short on purpose.
+
+const lastOf = sel => [...document.querySelectorAll(sel)].pop();
+const TOURS = {
+  home: [
+    {title: 'Welcome', text: 'Click one to start learning.', target: '.case-row'},
+    {title: 'Rounds', text: 'Choose the number of rounds.', target: '.rounds .seg'},
+    {title: 'Mode', text: 'Choose mixed questions or 2-choice questions.', target: '#abOnly'},
+  ],
+  session: [
+    {title: 'IMPORTANT', text: 'READ THIS before starting.',
+     target: '.side-body', narrowTarget: '#openSide', narrowText: 'Open this panel. READ THIS before starting.'},
+    {title: 'Progress', text: 'Which round you are on.', target: '#hudStatus'},
+    {title: 'Level', text: 'Your thinking level. It goes up when you reason well.', target: '#hudLevel'},
+    {title: 'The question', text: 'Read it, then answer in your own words.', target: () => lastOf('.entry.tutor .q')},
+    {title: 'Hint', text: 'Open this for help.', target: () => lastOf('.hint-btn')},
+    {title: 'Answer here', text: "Type and press Enter to send. Press \"I'm stuck\" when confused.", target: '.composer-box'},
+    {title: 'My stats', text: 'See how you think in real time.', target: '#statsToggle'},
+  ],
+};
+
+const tour = {name: null, steps: [], i: 0};
+
+function tourSeen(name){ try { return localStorage.getItem('tour-' + name) === 'done'; } catch(e){ return false; } }
+function markTourSeen(name){ try { localStorage.setItem('tour-' + name, 'done'); } catch(e){} }
+
+// The case sidebar is hidden on phones, and closed by default on wide screens.
+const sideHidden = () => narrow.matches || $('sessionView').classList.contains('collapsed');
+
+// null = a centered step with no target; undefined = target not on screen, skip the step
+function tourTarget(step){
+  const t = sideHidden() && step.narrowTarget ? step.narrowTarget : step.target;
+  if(!t) return null;
+  const el = typeof t === 'function' ? t() : document.querySelector(t);
+  return el && el.getClientRects().length ? el : undefined;
+}
+
+function startTour(name){
+  endTour(false);
+  $('sessionView').classList.remove('drawer-open');
+  if(profileOpen()) closeProfile();
+  tour.name = name;
+  tour.steps = TOURS[name].filter(st => tourTarget(st) !== undefined);
+  tour.i = 0;
+  if(!tour.steps.length) return;
+  document.body.insertAdjacentHTML('beforeend',
+    `<div class="tour-block" id="tourBlock"></div><div class="tour-ring" id="tourRing"></div>
+     <div class="tour-pop" id="tourPop" role="dialog" aria-modal="true" aria-labelledby="tourTitle"></div>`);
+  renderTour();
+}
+
+function renderTour(){
+  const pop = $('tourPop'), ring = $('tourRing');
+  if(!pop) return;
+  const step = tour.steps[tour.i], n = tour.steps.length, last = tour.i === n - 1;
+  pop.innerHTML = `<span class="arrow"></span>
+    <div class="tp-step">${tour.i + 1} / ${n}</div>
+    <h4 id="tourTitle">${esc(step.title)}</h4>
+    <p>${esc(sideHidden() && step.narrowText ? step.narrowText : step.text)}</p>
+    <div class="tp-actions">
+      <button class="ghost tp-skip">${last ? '' : 'Skip'}</button>
+      <span class="spacer"></span>
+      ${tour.i ? '<button class="ghost tp-back">Back</button>' : ''}
+      <button class="tp-next">${last ? 'Got it' : 'Next'}</button>
+    </div>`;
+  pop.querySelector('.tp-next').addEventListener('click', () => last ? endTour(true) : (tour.i++, renderTour()));
+  const back = pop.querySelector('.tp-back');
+  if(back) back.addEventListener('click', () => { tour.i--; renderTour(); });
+  pop.querySelector('.tp-skip').addEventListener('click', () => endTour(true));
+  pop.querySelector('.tp-next').focus();
+  placeTour();
+}
+
+function placeTour(){
+  const pop = $('tourPop'), ring = $('tourRing');
+  if(!pop) return;
+  const el = tourTarget(tour.steps[tour.i]);
+  const vw = window.innerWidth, vh = window.innerHeight, gap = 14, m = 12;
+  pop.className = 'tour-pop';
+  if(!el){  // centered welcome: dim everything, no ring
+    Object.assign(ring.style, {top: vh / 2 + 'px', left: vw / 2 + 'px', width: '0px', height: '0px'});
+    pop.classList.add('center');
+    Object.assign(pop.style, {top: (vh - pop.offsetHeight) / 2 + 'px', left: (vw - pop.offsetWidth) / 2 + 'px'});
+    return;
+  }
+  el.scrollIntoView({block: 'nearest'});
+  const r = el.getBoundingClientRect(), pad = 6;
+  // keep the ring inside the screen (e.g. the full-height sidebar)
+  const rt = Math.max(r.top - pad, 4), rl = Math.max(r.left - pad, 4);
+  const rb = Math.min(r.bottom + pad, vh - 4), rr = Math.min(r.right + pad, vw - 4);
+  Object.assign(ring.style, {top: rt + 'px', left: rl + 'px', width: rr - rl + 'px', height: rb - rt + 'px'});
+  const pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let top, left, side;
+  if(r.bottom + gap + ph < vh - m){ side = 'below'; top = r.bottom + gap; }
+  else if(r.top - gap - ph > m){ side = 'above'; top = r.top - gap - ph; }
+  else { side = 'right'; top = Math.min(Math.max(r.top, m), vh - ph - m); }
+  if(side === 'right'){
+    left = Math.min(r.right + gap, vw - pw - m);
+  } else {
+    left = Math.min(Math.max(r.left + r.width / 2 - pw / 2, m), vw - pw - m);
+  }
+  pop.classList.add(side);
+  Object.assign(pop.style, {top: top + 'px', left: left + 'px'});
+  const arrow = pop.querySelector('.arrow');
+  if(side === 'right') arrow.style.cssText = `top:${Math.min(Math.max(r.top + 16 - top, 14), ph - 28)}px`;
+  else arrow.style.cssText = `left:${Math.min(Math.max(r.left + r.width / 2 - left - 7, 16), pw - 30)}px`;
+}
+
+function endTour(markSeen){
+  ['tourBlock', 'tourRing', 'tourPop'].forEach(id => { const n = $(id); if(n) n.remove(); });
+  if(markSeen && tour.name) markTourSeen(tour.name);
+  tour.name = null;
+}
+
+window.addEventListener('resize', placeTour);
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && tour.name) endTour(true); });
+document.querySelectorAll('.help-btn').forEach(b => b.addEventListener('click', () => startTour(b.dataset.tour)));
+
+loadConcepts()
+  .then(() => { if(!tourSeen('home')) setTimeout(() => startTour('home'), 400); })
+  .catch(e => note('error', e.message, $('homeStatus')));
+</script>
+</body>
+</html>
