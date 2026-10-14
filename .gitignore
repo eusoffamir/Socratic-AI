@@ -10,3 +10,6 @@ __pycache__/
 # learner data (saved sessions and transcripts stay on this computer)
 sessions/
 transcripts/
+
+# supervisor's grant proposal: private, never upload
+docs/2026_EdEx SoTL Grant Proposal*.docx
