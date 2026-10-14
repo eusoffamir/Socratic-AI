@@ -1,237 +1,151 @@
-# Socratic AI, prototype v2 (agentic)
+# Socratic AI
 
-A multi-agent Socratic tutor: four AI agents (Assessor, Planner, Tutor,
-Checker) plus plain-code guard rules, wired with LangGraph, served by FastAPI,
-with a small browser front end. The design idea: **agents decide, rules guard.**
+A tutor app that helps university students new to quant think for themselves
+instead of being handed answers. It asks Socratic questions, marks each answer
+for the quality of the reasoning, and shows the learner how they did.
 
-A session works like this: the learner picks a quant case, and a fixed number
-of rounds (5 by default) runs. Each round:
+Final year project 26S004 at UTP, "Agentic AI for Fostering Critical Thinking
+Education", supervised by Dr Ho Tatt Wei.
 
-1. **Assess.** The Assessor agent scores the learner's last answer against the
-   9 intellectual standards and returns structured JSON.
-2. **Plan.** The Planner agent proposes the next move: level up, stay or down,
-   the question format, a hint, and maybe a tool to run.
-3. **Guard.** Plain Python (`orchestrator.apply_plan`) checks the plan against
-   the fixed rules and fixes it if needed. A frustrated learner always gets an
-   easier A/B question. No moving up after a weak answer. No format twice in a
-   row. The round count is never decided by an AI. If the plan is missing or
-   broken, the old fixed rules (`decide()`) take over.
-4. **Tutor.** The Tutor agent may first run a small quant simulation
-   (`app/tools.py`), then replies in 3 parts: feedback, key idea, one question
-   (plus 2 options for A/B questions).
-5. **Check.** Free code checks (length, one question, no repeat), then the
-   Checker agent (does it give the answer away?). If either fails, the Tutor
-   rewrites once.
+Live prototype: https://socratic-ai-qlk6.onrender.com (free hosting, so the
+first visit after a quiet spell can take up to a minute).
 
-Every turn, with the full agent trace, is saved to
-`transcripts/<session_id>.jsonl`. Each agent can be switched off in `.env`
-(`AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`).
+## How it works
 
-At the end, the stats panel shows which standards and reasoning moves the
-learner showed.
+The learner picks one of 3 short quant cases (pattern or luck, will a rule work
+again, moving together vs causing) and plays 3, 6 or unlimited rounds. Each
+round has 4 AI agents and a set of plain-code rules. The design idea is
+**agents decide, rules guard**.
 
-## What's in here
+1. **Assessor** marks the answer against Paul and Elder's 9 intellectual
+   standards (clarity, accuracy, precision, relevance, depth, breadth, logic,
+   significance, fairness) and names the reasoning move the learner made.
+2. **Planner** proposes the next step: move up, stay or move down a level,
+   the question format, a hint, and maybe a simulation.
+3. **Rules** (plain Python, no AI) check the plan and fix it if needed. For
+   example, a frustrated learner always gets an easier A or B question, a
+   level only goes up after 2 good answers in a row or 1 strong answer, and the
+   number of rounds is never decided by the AI.
+4. **Tutor** writes the reply: short feedback, a key idea (hidden behind a hint
+   button) and one question. It may use a small simulation of the case.
+5. **Checker** reviews the reply (no giving away the answer, no repeated
+   question) after free code checks. If something is wrong, the Tutor rewrites
+   once.
+
+The questions climb Richard Paul's 6 levels: Clarify, Assumptions, Evidence,
+Viewpoints, Implications and Question the question. At the end, a **Coach** AI
+writes one paragraph on how the learner answered.
+
+Other parts: a reading pop-up before each case, a tutorial that shows how
+answers are marked, an A or B only mode, a status panel (level reached and the
+9 standards), an overall status across cases, saved progress, and a copy check
+that scores 0 when a learner pastes a hint instead of thinking.
+
+## Folders
 
 ```
-app/
-  content.py       the 6 Socratic levels, 9 intellectual standards, 4 question
-                   formats, and the 3 quant "concepts" (the prototype's
-                   knowledge base, standing in for RAG for now)
-  prompts.py       the Tutor, Assessor, Planner and Checker system prompts,
-                   and the JSON payloads sent to each on every turn
-  tools.py         3 small seeded quant simulations the Tutor can run
-  checker.py       free code checks on a Tutor reply
-  llm_client.py    picks the provider (Gemini / Claude / mock) and makes the
-                   calls; mock mode fakes both agents so you can run and demo
-                   the app with no API key
-  orchestrator.py  the fixed rules (R1-R9 from Table 3) and the guard that
-                   checks the Planner's proposal
-  graph.py         LangGraph wiring: assess -> plan -> guard -> tutor -> check
-                   (-> rewrite once), one run per turn
-  main.py          FastAPI app, its endpoints, and transcript saving
-static/
-  index.html       the browser UI: case cards, a status line (round and
-                   level), a case file panel (scenario, chart, notes that
-                   grow), 3-part tutor cards, A/B buttons, "I'm stuck" (R5),
-                   and the end-of-session thinking profile
-tests/
-  test_orchestrator.py   unit tests for the fixed rules
-  test_agents.py         guard, JSON parsing, code checks, and full mock
-                         sessions with each agent switched off
-  test_tools.py          the quant simulations
-transcripts/       one .jsonl per session (created on first run)
-sessions/          one .json per session, for continuing later (created on first run)
-data/              empty for now; meant for the reading material RAG will use
-.env.example       template for your .env (API keys and provider settings)
+app/          the server: agents, prompts, rules, simulations, saving
+  main.py         FastAPI app and all endpoints
+  graph.py        one turn: assess, plan, guard, tutor, check, rewrite once
+  orchestrator.py the plain-code rules ("rules guard")
+  prompts.py      the prompts for all 5 AI roles
+  llm_client.py   calls Gemini (free) or returns mock replies (no key)
+  content.py      the 6 levels, 9 standards, 3 cases and the tutorial script
+  tools.py        3 small seeded quant simulations, one per case
+  checker.py      free code checks on a Tutor reply
+  copycheck.py    catches answers pasted from a hint
+  limits.py       daily limit of AI calls, to stay inside the free quota
+  storage.py      saves to files locally, or to Supabase online
+  tutorial.py     scoring for the tutorial
+static/       the web page (index.html) and images
+tests/        automatic tests (run with pytest)
+deploy/       supabase.sql, the database tables for the online version
+docs/         thesis draft and the assessor evaluation plan and marking guide
+eval/         the test set of answers for checking the Assessor against humans
+render.yaml   settings for the free Render hosting
 ```
 
-## Setup
+## Run it on your own computer
 
-You need Python 3.11 or newer (the existing `.venv` was built with 3.13).
+You need Python 3.11 or newer.
 
 ```bash
-cd socratic-ai
 python -m venv .venv
-```
-
-Activate the venv:
-
-```bash
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
-# Windows (Git Bash)
-source .venv/Scripts/activate
-# macOS / Linux
-source .venv/bin/activate
-```
-
-Then install the dependencies and create your `.env`:
-
-```bash
+.venv\Scripts\Activate.ps1         # Windows PowerShell (macOS/Linux: source .venv/bin/activate)
 pip install -r requirements.txt
-cp .env.example .env        # PowerShell: Copy-Item .env.example .env
-```
-
-### Choosing a model
-
-There are three ways to run this. Pick one and set it in `.env`.
-
-**Free, real model (recommended if you have no API budget).** Get a free key
-at https://aistudio.google.com/apikey (just a Google account, no card):
-```
-GOOGLE_API_KEY=your-key-here
-```
-The free tier has a requests-per-minute limit. That's fine for testing by
-hand, but it will throttle you if you send requests in a tight loop (e.g. an
-automated evaluation script). If that happens, slow down the requests or set
-`GEMINI_MODEL` to a smaller/cheaper model.
-
-**Paid, real model.** If you have Anthropic API credits, set
-`ANTHROPIC_API_KEY` and leave `GOOGLE_API_KEY` blank.
-
-**No key at all.** Leave both keys blank, or set `MOCK=1`. The Tutor and
-Assessor replies will be fake/templated, but every rule, the whole request
-flow, and the stats screen run exactly as they would live. That's good for
-demoing the architecture, not for judging how good the tutoring is.
-
-The provider is picked in this order (first match wins):
-
-1. `PROVIDER` is set (`gemini`, `anthropic` or `mock`): use that.
-2. `MOCK=1`: mock.
-3. `GOOGLE_API_KEY` is set: Gemini.
-4. `ANTHROPIC_API_KEY` is set: Claude.
-5. Otherwise: mock.
-
-| Variable            | Default            | Purpose                                 |
-| ------------------- | ------------------ | --------------------------------------- |
-| `GOOGLE_API_KEY`    | (none)             | Key for Gemini                          |
-| `GEMINI_MODEL`      | `gemini-3.5-flash-lite` | Gemini model to call                    |
-| `ANTHROPIC_API_KEY` | (none)             | Key for Claude                          |
-| `ANTHROPIC_MODEL`   | `claude-sonnet-5`  | Claude model to call                    |
-| `PROVIDER`          | auto               | Force `gemini` / `anthropic` / `mock`   |
-| `MOCK`              | `0`                | `1` forces mock unless `PROVIDER` is set |
-| `AGENT_PLANNER`     | `1`                | `0` uses the fixed rules only           |
-| `AGENT_TOOLS`       | `1`                | `0` stops the Tutor running simulations |
-| `AGENT_CHECKER`     | `1`                | `0` skips the review and rewrite step   |
-
-The provider is chosen once, when the server starts. `--reload` only watches
-`.py` files, so after you edit `.env`, stop the server and start it again.
-
-Don't commit `.env`, since it holds your API key. Commit `.env.example`
-instead.
-
-## Run it
-
-```bash
+copy .env.example .env             # then open .env and fill it in
 uvicorn app.main:app --reload
 ```
 
-Then open http://127.0.0.1:8000 in a browser, pick a topic, and start.
+Then open http://127.0.0.1:8000.
 
-## Troubleshooting
+### Settings in `.env`
 
-If a model call fails, the page shows the reason and puts your answer back in
-the box. Nothing is counted, so you can just press Send again.
+| Setting | What it does |
+| --- | --- |
+| `GOOGLE_API_KEY` | Free Gemini key from https://aistudio.google.com/apikey. Leave it blank to run in mock mode with fake replies and no AI. |
+| `GEMINI_MODEL` | Default `gemini-3.5-flash-lite`, which is fast and has 500 free calls a day. |
+| `PROVIDER` | Force `gemini` or `mock`. Blank means it is picked from the keys. |
+| `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER` | `0` switches that agent off, for "with vs without" tests or to save calls. |
+| `DAILY_CALL_BUDGET` | New sessions stop after this many AI calls a day (default 400, `0` = no limit). |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | Save to a free Supabase database instead of local files. Needed online. |
 
-- **"overloaded right now" (HTTP 503 from Gemini).** Google is busy. The app
-  already retries twice; wait a moment and resend.
-- **"quota used up" (HTTP 429).** Each round makes about 4 to 6 model calls
-  (Assessor, Planner, Tutor, maybe a tool round, Checker, maybe a rewrite),
-  so the free tier's per-minute limit runs out fast. Switching an agent off
-  in `.env` cuts calls. Wait a
-  minute, or switch `GEMINI_MODEL` to another model, since each model has its
-  own quota. Run `python -c "from google import genai; import os; from dotenv
-  import load_dotenv; load_dotenv(); print([m.name for m in
-  genai.Client(api_key=os.environ['GOOGLE_API_KEY']).models.list()])"` to see
-  which models your key can use.
-- **Mock replies when you expected a real model, or the other way round.**
-  Check the provider order above. `PROVIDER` overrides `MOCK`.
+The settings are read when the server starts, so restart it after editing
+`.env`. Never upload `.env`, because it holds your keys.
 
-## API
+One 6-round session uses about 25 AI calls, so the free tier fits roughly 15
+to 20 sessions a day, with about 3 learners answering at the same moment.
 
-The browser UI uses these endpoints. You can also call them directly; the
-interactive docs are at http://127.0.0.1:8000/docs.
+## The online version
 
-| Method | Path                       | What it does                                                        |
-| ------ | -------------------------- | ------------------------------------------------------------------- |
-| GET    | `/`                        | Serves the UI                                                       |
-| GET    | `/api/concepts`            | Lists the topics (`id`, `title`, `mission`)                         |
-| POST   | `/api/session`             | Starts a session. Body: `{"concept_id": "pattern_or_luck", "total_rounds": 5, "ab_only": false, "reading_seconds": 0}` (`ab_only: true` makes every question an A/B choice; `reading_seconds` is how long the reading pop-up was open, saved in the transcript). Returns the `session_id` and the Tutor's opening message |
-| POST   | `/api/session/{id}/answer` | Sends the learner's answer. Body: `{"answer": "..."}`. Returns the Tutor's reply (`parts`: feedback, key_idea, question, options), the round, the level, any `tools` run, a short agent `trace` and the last assessment |
-| GET    | `/api/session/{id}`        | Returns a saved session (round, level, and every turn) so the page can continue it |
-| GET    | `/api/session/{id}/stats`  | Returns the per-session summary and full assessment history         |
+The live app runs on Render's free plan (`render.yaml`) and saves sessions to a
+free Supabase database (`deploy/supabase.sql`), because Render wipes its files
+on every restart. Render installs every new version pushed to the `main`
+branch on GitHub.
 
-The topic ids are `pattern_or_luck`, `holds_on_new_data` and
-`together_not_cause`.
+Before a testing day, open `/api/health`. It says in plain words whether saving
+works, which AI is in use, and how many AI calls were used today. It never
+calls the AI itself.
 
-## Run the tests
+Gemini's free tier lets Google use what learners type to improve its products,
+so testers should not type personal details.
+
+## Endpoints
+
+| Method | Path | What it does |
+| --- | --- | --- |
+| GET | `/` | The web page |
+| GET | `/api/health` | Whether saving and the AI work, and today's call count |
+| GET | `/api/concepts` | The 3 cases with their readings |
+| POST | `/api/session` | Starts a case. Body: `concept_id`, `total_rounds` (3, 6, or 0 for no limit), `ab_only`, `reading_seconds` |
+| GET | `/api/session/{id}` | A saved session, to continue it |
+| POST | `/api/session/{id}/answer` | Sends an answer. Body: `{"answer": "..."}` |
+| POST | `/api/session/{id}/end` | Ends an unlimited session |
+| GET | `/api/session/{id}/stats` | The status panel: level, standards and the Coach comment |
+| POST | `/api/overview` | Overall status across the sessions played in this browser |
+| GET | `/api/tutorial` | The tutorial script |
+| POST | `/api/tutorial/score` | Marks the tutorial's round 3 answer |
+
+Interactive docs are at `/docs` while the server runs.
+
+## Tests
 
 ```bash
 pytest
 ```
 
-These test the parts that should behave the same on every run: the rules,
-the guard, the tools, the code checks, and whole sessions in mock mode. The
-agents themselves call a live model, so judge them by reading transcripts,
-which is what Chapter 4 (your requirement check, R1-R9) is for.
+The tests check everything that should behave the same every time: the rules,
+the guard, the simulations, the code checks, saving, the daily limit and whole
+sessions in mock mode. They never call the real AI or the real database. How
+good the AI agents are is judged from real transcripts and from the Assessor
+evaluation (see `docs/assessor-evaluation-plan.md`).
 
-## Changing the content or the rules
+## Known gaps
 
-- **Add a topic:** add an entry to `CONCEPTS` in `app/content.py` with a
-  `title`, `mission`, `scenario` and a list of `notes`. It shows up in the UI
-  automatically.
-- **Change how fast learners move up or get hints:** edit the constants at
-  the top of `app/orchestrator.py` (`GOOD_STANDARDS_THRESHOLD`,
-  `STREAK_TO_ADVANCE`, `STREAK_TO_SCAFFOLD`), then run `pytest`.
-- **Change what the agents say or how they score:** edit `TUTOR_SYSTEM` or
-  `ASSESSOR_SYSTEM` in `app/prompts.py`.
-
-## What maps to what in the thesis
-
-- **R1, R2 (mission and fixed round count):** `orchestrator.new_session`,
-  the `"open"`/`"end"` actions in `decide()`.
-- **R3, R9 (memory, no re-asking):** `session["said"]` and `session["questions"]`,
-  passed into the Tutor's prompt as `LEARNER_SAID` / `ASKED_QUESTIONS`, and
-  checked again in `checker.code_check`.
-- **R4, R6 (feedback each turn, varied formats):** `prompts.tutor_user`
-  builds `what_was_strong` / `what_was_missing` from the Assessor's output;
-  `_next_format` rotates through `FORMATS`.
-- **R5 (frustration):** `assessment["confused_or_frustrated"]`, enforced in
-  both `decide()` and the guard `apply_plan()`. The Planner cannot override it.
-- **R7 (separate, structured assessment):** `Assessor` is its own prompt and
-  its own call, never mixed into the Tutor's prompt.
-- **R8 (stats):** `GET /api/session/{id}/stats`, rendered by the stats panel
-  in `index.html`.
-
-## Known gaps to close next
-
-- The knowledge base in `content.py` is hand-written, not RAG. Swapping in
-  real retrieval only touches `prompts.tutor_user` (the `NOTES` field), and
-  `graph.py` has room for a retrieval node before `tutor`.
-- Sessions are saved to `sessions/<id>.json` after every turn and can be
-  continued after a reload or restart. There are no logins, so "your" saved
-  cases are remembered per browser only.
-- The Assessor's JSON parsing has a fallback for stray prose, but hasn't been
-  stress-tested against a live model yet, only the mock.
-- No login or per-user history across sessions, so the "look at my stats over
-  time" part of your product vision isn't built yet, only per-session stats.
+- The case notes are hand-written, not taken from real reading material (no
+  RAG yet).
+- There are no logins, so "my progress" only covers sessions played in the
+  same browser. The parent research project needs an anonymous participant
+  code to link a student's sessions.
+- The Assessor has not yet been checked against human markers.
+- Whether a learner opened the hint is not recorded.
