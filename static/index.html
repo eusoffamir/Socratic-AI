@@ -179,6 +179,7 @@
   .hero-art{overflow:hidden;}
   .hero-art img{width:100%; height:100%; object-fit:cover; object-position:35% center; display:block;}
   .hero-text{min-width:0;}
+  .phone-credit{display:none;}
   .hero h2{
     font-family:var(--serif); font-weight:600; font-size:clamp(28px, 3.4vw, 42px); line-height:1.1;
     margin:0 0 8px; letter-spacing:-.01em;
@@ -665,6 +666,48 @@
     .chat-inner{padding:20px 14px 12px;}
     .composer{padding:0 12px 12px;}
     .entry.learner .bubble.example{width:100%; max-width:100%;}
+
+    /* ----- phone layout (15 October 2026: on a phone the cases were hidden below
+       a tall top card, and the Status tab covered the chat) ----- */
+    /* home: one bar instead of two; the credit moves to the bottom of the list */
+    .topbar{display:none;}
+    .phone-credit{display:block; margin:24px 0 0; text-align:center; font-size:13px; color:var(--ink-faint);}
+    .phone-credit b{color:var(--ink-soft); font-weight:600;}
+    .home-scroll{padding:14px 14px 24px;}
+    /* the top card: smaller title, Rounds and Mode side by side */
+    .hero{display:grid; grid-template-columns:auto minmax(0, 1fr); gap:14px 16px; padding:18px; border-radius:16px;}
+    .hero-text{grid-column:1 / -1;}
+    .hero h2{font-size:25px; margin-bottom:4px;}
+    .hero p{font-size:14px;}
+    .rounds, .mode{gap:6px; min-width:0;}
+    .rounds .mono-label, .mode .mono-label{font-size:11px;}
+    .rounds .seg{border-radius:12px;}
+    .rounds .seg label{padding:9px 16px; font-size:17px;}
+    .mode-btn{height:44px; min-width:0; width:100%; padding:0 12px; font-size:16px; border-radius:12px;}
+    .section-head{margin:20px 0 10px;}
+    .cases{gap:12px;}
+    /* tips: a slim strip */
+    .tips{padding:8px 14px; font-size:12.5px; line-height:1.45; gap:8px;}
+    .tips .tip-label{font-size:10px; padding:2px 6px;}
+
+    /* session: Status becomes a round button in the top bar, so it never covers the chat */
+    .chat-top{padding-right:62px; gap:8px;}
+    /* the buttons always fit: a long level name ("Question the question") is cut with "…" instead */
+    .chat-top > button, .hud-progress{flex:none;}
+    .chat-top .status{font-size:12.5px; letter-spacing:.02em;}
+    .end-word{display:none;}  /* "End session" becomes "End", so the level name keeps its room */
+    #hudLevel{flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; margin-right:0;}
+    body:has(#statsToggle.hidden) .chat-top, body:has(#statsToggle[aria-pressed="true"]) .chat-top{padding-right:12px;}
+    .stats-tab{
+      writing-mode:horizontal-tb; top:8px; right:12px; transform:none; width:40px; height:40px;
+      padding:0; gap:0; font-size:0; justify-content:center; border-radius:50%; border:1px solid var(--rule);
+    }
+    .stats-tab .ic{width:38px; height:38px;}
+    /* tutor messages: avatar beside the feedback line, the card uses the full width */
+    .entry.tutor{display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px; align-items:start;}
+    .entry.tutor .body{display:contents;}
+    .entry.tutor .card{grid-column:1 / -1;}
+    #log{gap:24px;}
   }
 </style>
 </head>
@@ -731,6 +774,7 @@
 
         <div class="section-head"><h3>Cases</h3></div>
         <div class="cases" id="cases"></div>
+        <p class="phone-credit">Created by <b>Eusoff Amir</b></p>  <!-- phones only: the top bar is hidden there -->
       </div>
     </div>
 
@@ -788,7 +832,7 @@
       </div>
       <div class="spacer"></div>
       <span class="status" id="hudLevel"></span>
-      <button class="ghost end-btn hidden" id="endBtn" title="Finish now and see your profile">End session</button>
+      <button class="ghost end-btn hidden" id="endBtn" title="Finish now and see your profile">End<span class="end-word"> session</span></button>
       <button class="top-home" id="topHome" title="Back to Home"><svg><use href="#i-back"/></svg>Home</button>
     </header>
 
@@ -1707,7 +1751,7 @@ function reportHTML(data, final){
         <button id="againBtn">New case</button>
         <button class="ghost" id="reviewBtn">Review chat</button>
       </div>` : ''}
-    <div class="note">Based on Paul &amp; Elder's 9 standards. Hover a name for details.</div>`;
+    <div class="note">Based on Paul &amp; Elder's 9 standards.${matchMedia('(hover: hover)').matches ? ' Hover a name for details.' : ''}</div>`;
 }
 
 function fetchStats(){ return tut.active ? Promise.resolve(tutStats()) : api(`/api/session/${state.sessionId}/stats`); }
