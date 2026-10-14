@@ -19,6 +19,13 @@ def test_streaks_close_to_theory():
     assert 110 < hits < 200
 
 
+def test_lucky_rules_do_not_carry_over_to_new_data():
+    # The 10 best rules on old data average about 0% on new data, which is the
+    # lesson. The single best rule showed +8%, which looked like a win.
+    old, new = [b["value"] for b in tools.run_tool("test_many_rules")["chart"]["bars"]]
+    assert old > 10 and abs(new) < 5
+
+
 def test_bad_arguments_are_clamped_or_ignored():
     r = tools.run_tool("simulate_streaks", {"stocks": 10 ** 9, "days": "lots", "evil": 1})
     assert r["args"] == {"stocks": 5000, "days": 5}

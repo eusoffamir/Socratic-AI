@@ -10,6 +10,7 @@ import random
 import statistics
 
 SEED = 26005
+TOP_RULES = 10  # test_many_rules reports the average of this many best rules
 
 
 def _clamp(value, low, high, default):
@@ -46,12 +47,18 @@ def test_many_rules(rules=200, days=100):
         old = sum(rng.gauss(0, 1) for _ in range(days))
         new = sum(rng.gauss(0, 1) for _ in range(days))
         results.append((old, new))
-    best_old, best_new = max(results)
+    # The average of the 10 best on old data, not the single best: one rule's
+    # new-data result is mostly noise (it was +8%, which looked like a win),
+    # while the average shows the real point, that luck does not carry over.
+    top = sorted(results, reverse=True)[:min(TOP_RULES, rules)]
+    old = sum(o for o, _ in top) / len(top)
+    new = sum(n for _, n in top) / len(top)
     return {
         "args": {"rules": rules, "days": days},
-        "summary": f"The best of {rules} random rules made {best_old:+.0f}% on old data, but {best_new:+.0f}% on new data.",
-        "chart": {"title": "Best random rule",
-                  "bars": [{"label": "Old data", "value": round(best_old)}, {"label": "New data", "value": round(best_new)}],
+        "summary": f"The {len(top)} best of {rules} random rules made {old:+.0f}% on old data on average, "
+                   f"but {new:+.0f}% on new data.",
+        "chart": {"title": f"{len(top)} best random rules",
+                  "bars": [{"label": "Old data", "value": round(old)}, {"label": "New data", "value": round(new)}],
                   "unit": "%"},
     }
 

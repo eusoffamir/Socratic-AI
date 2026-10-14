@@ -177,7 +177,7 @@ CONCEPTS = {
                 "The fix is to split the data, using the first part to find the rule and the second part to test it.",
                 "If the rule still works on the second part, that is much better proof.",
             ],
-            "example": "The best of 200 random rules made +32% on old data, but only +8% on new data.",
+            "example": "The 10 best of 200 random rules made +21% on old data on average, but -2% on new data.",
             "key_words": [
                 ["Backtest", "testing a rule on old prices"],
                 ["Overfitting", "a rule that fits past noise instead of a real pattern"],
