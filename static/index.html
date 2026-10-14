@@ -882,6 +882,14 @@ function inline(text){
     .replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>');
 }
 
+// Render's free plan sleeps when nobody uses it and takes up to a minute to
+// wake, while a normal turn takes about 3 seconds. So a long wait gets a
+// message, and the learner knows the page is not stuck.
+const DOTS = '<span class="dots"><i></i><i></i><i></i></span>';
+const SLOW_MS = 8000;
+const SLOW_TEXT = 'This is taking longer than usual, because the free server may be waking up. It can take up to a minute.';
+function whenSlow(show){ return setTimeout(show, SLOW_MS); }
+
 function scrollToEnd(){ const s = $('chatScroll'); s.scrollTo({top: s.scrollHeight, behavior: 'smooth'}); }
 
 function el(tag, className, html){
@@ -1300,18 +1308,21 @@ async function startSession(conceptId, readingSeconds = 0){
   // loading shows on the Start button itself
   if(fromPopup) btn.innerHTML = '<span class="spin" aria-hidden="true"></span>Starting...';
   else status.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Starting...</div>';
+  const slow = whenSlow(() => status.innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
   let data;
   try {
     data = await postJSON('/api/session', {concept_id: conceptId, total_rounds: rounds,
                                            ab_only: $('abOnly').getAttribute('aria-pressed') === 'true',
                                            reading_seconds: readingSeconds});
   } catch(e){
+    clearTimeout(slow);
     btn.innerHTML = btnLabel;
     status.innerHTML = '';
     note('error', e.message, status);
     setHomeBusy(false);
     return;
   }
+  clearTimeout(slow);
   btn.innerHTML = btnLabel;
   status.innerHTML = '';
   setHomeBusy(false);
@@ -1539,6 +1550,7 @@ async function sendAnswer(text){
   const pending = el('div', 'thinking', '<span class="dots"><i></i><i></i><i></i></span>Thinking...');
   $('log').appendChild(pending);
   scrollToEnd();
+  const slow = whenSlow(() => pending.innerHTML = DOTS + SLOW_TEXT);
 
   let data;
   try {
@@ -1546,6 +1558,7 @@ async function sendAnswer(text){
   } catch(e){
     // The server leaves the session untouched on failure, so put the answer
     // back in the box and let the learner simply send it again.
+    clearTimeout(slow);
     pending.remove();
     entry.remove();
     if(fromBox){ box.value = typed; autosize(); }
@@ -1553,6 +1566,7 @@ async function sendAnswer(text){
     setBusy(false);
     return;
   }
+  clearTimeout(slow);
   pending.remove();
   setBusy(false);
   showTurn(data);
