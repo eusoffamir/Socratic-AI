@@ -64,6 +64,25 @@ def test_guard_drops_unknown_tools_and_ends_on_time():
     assert ins["action"] == "end"
 
 
+def test_profile_keeps_the_highest_level_after_moving_down():
+    # Audit, 15 Oct 2026: a learner who reached Evidence and then got stuck was
+    # moved down by the Planner, and the profile said "You reached Assumptions".
+    s = opened()
+    orc.apply_plan(s, plan("up", FORMATS[1]), good_assessment())
+    orc.apply_plan(s, plan("up", FORMATS[2]), good_assessment())
+    assert s["level_idx"] == 2
+    orc.apply_plan(s, plan("down", AB), frustrated_assessment())
+    assert s["level_idx"] == 1  # the teaching still moves down to help
+    assert orc.summarize(s)["highest_level_reached"] == "Evidence"
+
+
+def test_old_saved_sessions_without_best_level_still_work():
+    s = opened()
+    s["level_idx"] = 3
+    del s["best_level_idx"]
+    assert orc.summarize(s)["highest_level_reached"] == "Viewpoints"
+
+
 # ---------- parsing ----------
 
 def test_parse_json_handles_fences_and_prose():
@@ -102,6 +121,18 @@ def test_code_check():
     assert checker.code_check(ok, {"format": FORMATS[0]}, ["why"])  # repeat
     assert checker.code_check(ok, {"format": AB}, [])  # missing options
     assert checker.code_check({**ok, "key_idea": "word " * 40}, {"format": FORMATS[0]}, [])
+
+
+def test_tutor_asking_for_a_tool_with_none_left_is_asked_again(monkeypatch):
+    # Without this, a tool request with no tools left became an empty question card.
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    replies = iter(['{"tool": "simulate_streaks", "args": {}}',
+                    '{"feedback": "You gave a reason.", "key_idea": "Luck is common.", "question": "Why?"}'])
+    monkeypatch.setattr(llm_client, "_generate", lambda *a, **k: next(replies))
+    s = opened()
+    ins = orc.decide(s, good_assessment())
+    parts, runs = llm_client.call_tutor(s, ins, "luck", good_assessment(), use_tools=False)
+    assert parts["question"] == "Why?" and runs == []
 
 
 # ---------- whole turns in mock mode ----------

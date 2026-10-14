@@ -24,6 +24,7 @@ def new_session(concept_id, total_rounds=5, ab_only=False, reading_seconds=0):
         "ab_only": ab_only,        # learner picked "A/B only" mode: every question is A or B
         "reading_seconds": reading_seconds,  # seconds the reading pop-up was open before Start
         "level_idx": 0,
+        "best_level_idx": 0,       # highest level reached; never goes down (see best_level_idx)
         "good_streak": 0,
         "weak_streak": 0,
         "last_format": None,
@@ -138,6 +139,7 @@ def _finish(session, instruction):
         instruction["format"] = FORMATS[-1]
     # R6/R9: remember what's been asked so the tutor prompt can avoid repeats.
     session["asked"].append((session["level_idx"], instruction["format"]))
+    session["best_level_idx"] = best_level_idx(session)
     session["last_format"] = instruction["format"]
     session["round"] += 1
     return instruction
@@ -215,6 +217,15 @@ def apply_plan(session, plan, assessment):
     return _finish(session, instruction), overrides
 
 
+def best_level_idx(session):
+    """The highest level the learner reached. The Planner may move a stuck
+    learner down to help them, but the profile still shows the highest level
+    (audit, 15 October 2026: a learner who reached Evidence and then got stuck
+    was shown "You reached Assumptions"). Sessions saved before then have no
+    best_level_idx, so their current level is used."""
+    return max(session.get("best_level_idx", 0), session["level_idx"])
+
+
 def summarize(session):
     met_counts = {k: 0 for k in STANDARDS}
     move_counts = {k: 0 for k, _, _ in LEVELS}
@@ -228,7 +239,7 @@ def summarize(session):
             move_counts[a["reasoning_move"]] += 1
     strongest = max(met_counts, key=met_counts.get) if n else None
     weakest = min(met_counts, key=met_counts.get) if n else None
-    highest_level = LEVELS[session["level_idx"]][1]
+    highest_level = LEVELS[best_level_idx(session)][1]
     return {
         "rounds_completed": n,
         "highest_level_reached": highest_level,

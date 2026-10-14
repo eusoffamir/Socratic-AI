@@ -231,12 +231,13 @@ def overview(req: OverviewRequest):
         played += 1
         finished += bool(s["ended"])
         history += s["history"]
-        best_idx = max(best_idx, s["level_idx"])
+        reached = orchestrator.best_level_idx(s)
+        best_idx = max(best_idx, reached)
         c = per_case.setdefault(s["concept_id"], {"sessions": 0, "level_idx": 0, "rounds": 0, "history": []})
         c["sessions"] += 1
         c["rounds"] += len(s["history"])
         c["history"] += s["history"]
-        c["level_idx"] = max(c["level_idx"], s["level_idx"])
+        c["level_idx"] = max(c["level_idx"], reached)
     summary = orchestrator.summarize({"history": history, "level_idx": best_idx})
     return {
         "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],

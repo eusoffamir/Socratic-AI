@@ -180,17 +180,25 @@ def call_tutor(session, instruction, answer, assessment, use_tools=True, tool_ru
     answers (a small think, act, observe loop). Returns (parts, tool_runs)."""
     tool_runs = list(tool_runs or [])
     can_use_tools = use_tools and instruction["action"] == "continue" and not problems
+    nudge = None
     while True:
         tools_left = MAX_TOOLS_PER_TURN - len(tool_runs) if can_use_tools else 0
-        payload = tutor_user(session, instruction, answer, assessment, tool_runs, max(tools_left, 0), draft, problems)
+        payload = tutor_user(session, instruction, answer, assessment, tool_runs, max(tools_left, 0), draft,
+                             problems or nudge)
         if PROVIDER == "mock":
             data = _mock_tutor(json.loads(payload))
         else:
             text = _generate(TUTOR_SYSTEM, payload, max_tokens=400, json_mode=True)
             data = _parse_json(text) or {"question": text}  # plain text still works as a reply
-        if data.get("tool") and tools_left > 0:
-            tool_runs.append(tools.run_tool(data["tool"], data.get("args")))
-            continue
+        if data.get("tool"):
+            if tools_left > 0:
+                tool_runs.append(tools.run_tool(data["tool"], data.get("args")))
+                continue
+            if nudge is None:
+                # It asked for a tool with none left, which would leave an
+                # empty question card. Ask once more for a normal reply.
+                nudge = ["No tools are left. Reply with feedback, key_idea and question."]
+                continue
         return clean_parts(data, instruction), tool_runs
 
 
