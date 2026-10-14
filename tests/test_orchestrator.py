@@ -139,3 +139,48 @@ def test_no_fallback_comment_before_any_answer():
     s = orc.new_session("pattern_or_luck")
     orc.decide(s, None)
     assert orc.fallback_comment(s) is None
+
+
+def test_no_round_limit_never_ends_by_itself():
+    s = orc.new_session("pattern_or_luck", total_rounds=0)  # the "∞" option
+    orc.decide(s, None)
+    for _ in range(20):
+        ins = orc.decide(s, good_assessment())
+        assert ins["action"] != "end"
+    assert not s["ended"]
+
+
+def test_end_button_ends_an_unlimited_session(monkeypatch, tmp_path):
+    from fastapi.testclient import TestClient
+    from app import llm_client, main
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "s")
+    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path / "t")
+    client = TestClient(main.app)
+    sid = client.post("/api/session", json={"concept_id": "pattern_or_luck", "total_rounds": 0}).json()["session_id"]
+    for _ in range(7):
+        assert not client.post(f"/api/session/{sid}/answer", json={"answer": "it could be luck, about 3%"}).json()["ended"]
+    r = client.post(f"/api/session/{sid}/end").json()
+    assert r["ended"] and r["rounds_answered"] == 7
+    assert client.get(f"/api/session/{sid}").json()["ended"]
+    assert client.get(f"/api/session/{sid}/stats").json()["summary"]["rounds_completed"] == 7
+
+
+def test_overview_combines_every_session(monkeypatch, tmp_path):
+    from fastapi.testclient import TestClient
+    from app import llm_client, main
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "s")
+    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path / "t")
+    client = TestClient(main.app)
+    ids = []
+    for case, answers in [("pattern_or_luck", 2), ("together_not_cause", 1), ("pattern_or_luck", 0)]:
+        sid = client.post("/api/session", json={"concept_id": case, "total_rounds": 3}).json()["session_id"]
+        for _ in range(answers):
+            client.post(f"/api/session/{sid}/answer", json={"answer": "it could be luck, about 3%, so I would test it"})
+        ids.append(sid)
+    r = client.post("/api/overview", json={"session_ids": ids + ["not-a-real-id"]}).json()
+    assert r["sessions_played"] == 2                      # the unanswered one and the bad id are skipped
+    assert r["summary"]["rounds_completed"] == 3
+    assert {c["id"] for c in r["cases"]} == {"pattern_or_luck", "together_not_cause"}
+    assert client.post("/api/overview", json={"session_ids": []}).json()["sessions_played"] == 0

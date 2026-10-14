@@ -3,7 +3,7 @@ free code checks, and a full mock turn with each agent switched off."""
 import pytest
 
 from app import checker, graph, llm_client, orchestrator as orc
-from app.content import FORMATS
+from app.content import FORMATS, STANDARDS
 from tests.test_orchestrator import frustrated_assessment, good_assessment, weak_assessment
 
 AB = FORMATS[-1]
@@ -76,6 +76,21 @@ def test_clean_parts_keeps_options_only_for_ab():
     data = {"question": "Which?", "options": ["A) Luck", "B) Pattern", "C) extra"]}
     assert llm_client.clean_parts(data, {"format": AB})["options"] == ["Luck", "Pattern"]
     assert llm_client.clean_parts(data, {"format": FORMATS[0]})["options"] == []
+
+
+def test_clean_assessment_gives_a_safe_shape():
+    # A messy Assessor reply: odd key names, scores as text, missing fields.
+    messy = {"standards": {"Clarity ": "1", "depth": True, "logic": "0", "made_up": 1, "accuracy": 0.0},
+             "reasoning_move": "Evidence", "learner_points": "only one point"}
+    a = llm_client.clean_assessment(messy)
+    assert a["standards"] == {k: int(k in ("clarity", "depth")) for k in STANDARDS}
+    assert a["reasoning_move"] == "evidence"
+    assert a["confused_or_frustrated"] is False and a["learner_points"] == ["only one point"]
+    # The cleaned reply works everywhere the session uses it.
+    s = opened()
+    orc.apply_plan(s, plan(), a)
+    assert orc.summarize(s)["standards_met_count"]["clarity"] == 1
+    assert llm_client.clean_assessment({"standards": {}, "reasoning_move": "guessing"})["reasoning_move"] == "none"
 
 
 # ---------- free code checks ----------
@@ -214,3 +229,51 @@ def test_unknown_or_bad_session_id_is_404(monkeypatch, tmp_path):
     assert client.get("/api/session/00000000-0000-0000-0000-000000000000").status_code == 404
     assert client.get("/api/session/..%2F..%2Fapp%2Fmain").status_code == 404
     assert client.post("/api/session/not-a-uuid/answer", json={"answer": "x"}).status_code == 404
+
+
+def test_copied_hint_in_a_real_case_is_called_out(monkeypatch):
+    from app import copycheck
+    from app.content import CONCEPTS
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    called = []
+    monkeypatch.setattr(llm_client, "call_assessor", lambda *a: called.append(1) or {})
+    s = orc.new_session("pattern_or_luck", total_rounds=3)
+    graph.run_turn(s, None)
+    hint = s["turns"][-1]["parts"]["key_idea"] or CONCEPTS["pattern_or_luck"]["notes"][0]
+    r = graph.run_turn(s, hint)
+    assert r["assessment"]["copied_hint"] and sum(r["assessment"]["standards"].values()) == 0
+    assert not called                           # the Assessor is skipped
+    assert "copied" in r["parts"]["feedback"]   # the Tutor calls it out
+    assert orc.fallback_comment(s).startswith("You copied the hint")
+
+
+def test_own_answer_in_a_real_case_is_not_flagged():
+    from app import copycheck
+    s = orc.new_session("pattern_or_luck")
+    own = "I think it could be luck, because many stocks go up for a few days, so I would test it on new days."
+    assert not copycheck.is_copied(own, copycheck.session_sources(s), copycheck.session_story(s))
+
+
+# Honest answers that repeat short facts from the case (found in the audit of
+# 14 October 2026: they used to be flagged as copied and scored 0).
+@pytest.mark.parametrize("own", [
+    "The stock went up 5 days in a row, so my friend thinks it is a pattern",
+    "It went up 5 days in a row but that could be luck",
+    "My friend means a stock went up 5 days in a row, so it will keep going up",
+    "A stock went up 5 days in a row",
+])
+def test_repeating_case_facts_is_not_copying(own):
+    from app import copycheck
+    s = orc.new_session("pattern_or_luck")
+    assert not copycheck.is_copied(own, copycheck.session_sources(s), copycheck.session_story(s))
+
+
+@pytest.mark.parametrize("cid", ["pattern_or_luck", "holds_on_new_data", "together_not_cause"])
+def test_pasting_a_note_or_reading_line_is_still_copying(cid):
+    from app import copycheck
+    from app.content import CONCEPTS
+    s = orc.new_session(cid)
+    c = CONCEPTS[cid]
+    for pasted in [*c["notes"], *c["reading"]["idea"]]:
+        if len(pasted.split()) >= copycheck.RUN:  # a line shorter than one run cannot be caught
+            assert copycheck.is_copied(pasted, copycheck.session_sources(s), copycheck.session_story(s)), pasted

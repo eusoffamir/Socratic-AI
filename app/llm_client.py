@@ -14,7 +14,7 @@ import random
 import time
 
 from . import tools
-from .content import CONCEPTS, FORMATS, STANDARDS
+from .content import CONCEPTS, FORMATS, MOVES, STANDARDS
 from .prompts import (AB_FORMAT, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
                       assessor_user, checker_user, coach_user, planner_user, tutor_user)
 
@@ -194,6 +194,35 @@ def call_tutor(session, instruction, answer, assessment, use_tools=True, tool_ru
         return clean_parts(data, instruction), tool_runs
 
 
+def _flag(value):
+    """1 or 0 from a score the model may write as 1, true, "1" or "yes"."""
+    if isinstance(value, str):
+        return int(value.strip().lower() in ("1", "true", "yes"))
+    return int(bool(value))
+
+
+def clean_assessment(data):
+    """Turn an Assessor reply into one safe shape: all 9 standards as 0 or 1,
+    a known move, and every field the rules and stats read. Odd key names or
+    scores written as text would otherwise crash the turn, or be saved and
+    break the stats later."""
+    raw = data.get("standards") if isinstance(data.get("standards"), dict) else {}
+    raw = {str(k).strip().lower(): v for k, v in raw.items()}
+    move = str(data.get("reasoning_move") or "").strip().lower()
+    points = data.get("learner_points")
+    points = points if isinstance(points, list) else [points] if points else []
+    try:
+        confidence = float(data.get("confidence") or 0)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    return {"standards": {k: _flag(raw.get(k)) for k in STANDARDS},
+            "reasoning_move": move if move in MOVES else "none",
+            "learner_points": [str(p) for p in points][:3],
+            "confused_or_frustrated": _flag(data.get("confused_or_frustrated")) == 1,
+            "evidence_quote": str(data.get("evidence_quote") or ""),
+            "confidence": confidence}
+
+
 def call_assessor(session, answer):
     user_payload = assessor_user(session, answer)
     if PROVIDER == "mock":
@@ -201,7 +230,7 @@ def call_assessor(session, answer):
     data = _parse_json(_generate(ASSESSOR_SYSTEM, user_payload, max_tokens=400, json_mode=True))
     if data is None or "standards" not in data:
         raise LLMError("The assessor returned a reply that isn't valid JSON. Try sending your answer again.")
-    return data
+    return clean_assessment(data)
 
 
 def call_planner(session, assessment):
@@ -245,7 +274,9 @@ def _mock_tutor(payload):
     if payload.get("suggest_tool") and payload["tools_left"] > 0 and not payload["TOOL_RESULTS"]:
         return {"tool": payload["suggest_tool"], "args": {}}
     if payload["action"] == "open":
-        return {"feedback": f"Welcome. We have {payload['total_rounds']} rounds.",
+        rounds = payload['total_rounds']
+        return {"feedback": f"Welcome. We have {rounds} rounds." if isinstance(rounds, int)
+                            else "Welcome. Keep going as long as you like.",
                 "key_idea": payload["NOTES"][0],
                 "question": "[mock] What do you think is going on here?",
                 "options": ["Real pattern", "Just luck"]}  # kept only if the format is A/B
@@ -253,7 +284,8 @@ def _mock_tutor(payload):
         return {"feedback": "[mock] You gave clear reasons.",
                 "key_idea": "Next time, think about other viewpoints.",
                 "question": "What would change your mind?"}
-    feedback = "I hear you. Let's slow down." if payload.get("acknowledge_frustration") else "[mock] You gave a reason."
+    feedback = ("You copied the hint, please answer in your own words." if payload.get("learner_copied_hint")
+                else "I hear you. Let's slow down." if payload.get("acknowledge_frustration") else "[mock] You gave a reason.")
     key_idea = payload["TOOL_RESULTS"][-1]["summary"] if payload["TOOL_RESULTS"] else payload["NOTES"][-1]
     n = len(payload["ASKED_QUESTIONS"]) + 1
     return {"feedback": feedback, "key_idea": key_idea,
@@ -275,7 +307,7 @@ def _mock_planner(session, assessment):
 
 def _mock_assessor(answer):
     random.seed(len(answer))
-    frustrated = any(w in answer.lower() for w in ["idk", "i don't know", "dont know", "too many", "confus", "stuck"])
+    frustrated = any(w in answer.lower() for w in ["idk", "i don't know", "dont know", "too many", "confus", "stuck", "not sure"])
     standards = {k: (1 if random.random() > 0.5 else 0) for k in STANDARDS}
     move = "none" if frustrated or len(answer.split()) < 3 else random.choice(
         ["clarify", "assumption", "evidence", "viewpoint", "implication"])

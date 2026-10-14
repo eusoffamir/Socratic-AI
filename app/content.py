@@ -23,17 +23,97 @@ STANDARDS = {
     "fairness": "it treats other views, or the chance of being wrong, honestly",
 }
 
-# One short tip per standard, shown in the learner's profile when it is the weakest.
+# One tip per standard, used in the end-of-session comments. Written as smooth,
+# easy sentences (the student found clipped "It is red." style hard to read).
 STANDARD_TIPS = {
-    "clarity": "Say your idea in one plain sentence.",
-    "accuracy": "Check your claim against the notes.",
-    "precision": "Use a number or an example.",
-    "relevance": "Answer the exact question asked.",
-    "depth": "Give a reason. Say why.",
-    "breadth": "Look at one more angle.",
-    "logic": "Make each step follow from the last.",
-    "significance": "Focus on what matters most.",
-    "fairness": "Say how you could be wrong.",
+    "clarity": "Try to say your main idea in one clear sentence.",
+    "accuracy": "Check that what you say matches the facts in the case.",
+    "precision": "Add a number or a real example to back up your point.",
+    "relevance": "Make sure you answer the exact question that was asked.",
+    "depth": "Explain why, not just what, by giving a reason.",
+    "breadth": "Look at the problem from one more angle.",
+    "logic": "Make sure each step leads clearly to the next one.",
+    "significance": "Focus on the point that matters most.",
+    "fairness": "Say how you might be wrong, or what someone else might think.",
+}
+
+# "Learn with Socrates": a fixed 3-round tutorial. Socrates answers round 1,
+# the learner picks in round 2 and Socrates adds the why, the learner answers
+# round 3 (checked by the real Assessor, or by plain code if it fails).
+# Each example sentence lists the standards it meets, so all 9 light up.
+# The level goes up 1 step per round, like a real case after a good answer.
+# DRAFT text, to be checked by the supervisor. Numbers match the case notes.
+TUTORIAL = {
+    "id": "tutorial",
+    "title": "Tutorial",
+    "tag": "Start here",
+    "mission": "Learn how to answer critically.",
+    "scenario": "A coin has landed on heads 4 times in a row, and your friend says tails is now \"due\".",
+    # shown in the reading pop-up before the tutorial starts, same as a case
+    "reading": {
+        "idea": [
+            "Every flip has a 50% chance of heads and a 50% chance of tails.",
+            "A coin has no memory, so the last 4 flips do not change the next one.",
+            "Getting 4 heads in a row happens about 6% of the time (50% × 50% × 50% × 50%), so luck can easily do it.",
+            "In this app, every answer is checked against 9 standards, and each standard you meet earns 1 point.",
+        ],
+        "example": "Your friend saw 4 heads and now bets on tails, but the coin has no idea what came before.",
+        "key_words": [
+            ["Due", "expected to happen soon"],
+            ["Assumption", "something you believe without checking it"],
+            ["Standard", "a sign of good thinking, such as clarity or logic"],
+        ],
+        "think": "If a coin has no memory, can tails ever really be \"due\"?",
+    },
+    "rounds": [
+        {
+            "level": "clarify",
+            "feedback": "Watch me type my answer, then press Enter to send it.",
+            "format": "open question",
+            "question": "What does \"due\" mean here, in your own words?",
+            "key_idea": "Each flip is still 50%, because a coin has no memory.",
+            "answer": [
+                ["\"Due\" means my friend thinks tails is more likely now,", ["clarity", "relevance"]],
+                ["but a coin has no memory,", ["accuracy", "logic"]],
+                ["so each flip is still 50%, even after 4 heads.", ["precision", "depth"]],
+                ["The past flips do not change the next one.", ["significance"]],
+                ["I could be wrong if the coin is bent, so I would test that first.", ["fairness", "breadth"]],
+            ],
+        },
+        {
+            "level": "assumption",
+            "feedback": "Now pick A or B, and I will type the why.",
+            "format": "choose A or B and defend the choice",
+            "question": "What is your friend assuming?",
+            "key_idea": "Ask yourself whether the coin can know what came before.",
+            "options": ["The coin remembers past flips", "The coin is bent"],
+            "best": 0,
+            "pick_standards": ["accuracy"],  # earned only by the right pick
+            "right": "Good pick. Watch how I explain why.",
+            "wrong": "A is the stronger choice. Watch how I explain why.",
+            "answer": [
+                ["\"Due\" only makes sense if the coin keeps score of past flips,", ["clarity", "relevance", "logic"]],
+                ["but it does not, so each flip stays at 50% and the 4 heads change nothing.", ["precision", "depth"]],
+                ["That hidden belief is the main mistake in the claim.", ["significance"]],
+                ["I could be wrong if the coin is bent, but a bent coin would favour heads, not tails.", ["breadth", "fairness"]],
+            ],
+        },
+        {
+            "level": "evidence",
+            "feedback": "Now you try, and aim to meet all 9 standards.",
+            "format": "open question",
+            "question": "A stock rose 5 days in a row. How would you check whether this is a real pattern or just luck?",
+            "key_idea": "One streak is not proof, but a pattern that repeats on new days is.",
+            # shown after the learner answers, to compare
+            "answer": [
+                ["I would test it on new days instead of the same 5 days,", ["clarity", "relevance", "depth"]],
+                ["because 5 ups in a row happens about 3% of the time, so out of 500 stocks about 15 do it by luck.",
+                 ["precision", "accuracy", "logic"]],
+                ["If the rise keeps repeating on new days, that would be real proof.", ["significance"]],
+                ["But I could be wrong, since real news might be pushing it up, so I would check that too.", ["fairness", "breadth"]],
+            ],
+        },
+    ],
 }
 
 FORMATS = [
@@ -50,31 +130,31 @@ CONCEPTS = {
         "mission": "Tell a real pattern from luck.",
         "tag": "Luck",
         "tool": "simulate_streaks",
-        "scenario": "A stock went up 5 days in a row. Your friend says: \"It's a pattern! Buy it now!\"",
-        # Notes use numbers and symbols, not long sentences: the learners read them fast.
+        "scenario": "A stock went up 5 days in a row. Your friend says, \"It is a pattern, so buy it now.\"",
+        # Notes keep the numbers but read as smooth, easy sentences.
         "notes": [
-            "Each day = coin flip: up or down.",
-            "5 ups in a row = 1/32 chance.",
-            "Many stocks × many days → streaks happen often, by luck.",
-            "A streak alone ≠ proof of a pattern.",
-            "Real pattern = shows up again and again.",
+            "Each day, a stock going up or down is a bit like a coin flip.",
+            "Going up 5 days in a row happens about 3% of the time.",
+            "With many stocks and many days, streaks like this happen often, just by luck.",
+            "A streak on its own does not prove there is a pattern.",
+            "A real pattern is one that keeps showing up again and again.",
         ],
         # Short reading shown in a pop-up before the case starts. DRAFT: written for
         # the prototype, to be checked by the supervisor. Numbers match tools.py.
         "reading": {
             "idea": [
-                "Each day = coin flip: up or down.",
-                "5 ups in a row = 1/2 × 1/2 × 1/2 × 1/2 × 1/2 = 1/32.",
-                "500 stocks → about 500 ÷ 32 ≈ 15 do it, by luck.",
-                "1 streak ≠ proof. Proof = it repeats on new days.",
+                "Each day, a stock going up or down is a bit like a coin flip.",
+                "Going up 5 days in a row happens about 3% of the time (50% × 50% × 50% × 50% × 50%).",
+                "Out of 500 stocks, that means about 15 will do it, just by luck.",
+                "So one streak is not proof, but a streak that repeats on new days is.",
             ],
-            "example": "NVDA went up 5 days in a row. Out of 500 stocks, about 15 do this every week, just by luck.",
+            "example": "NVDA went up 5 days in a row, but out of 500 stocks about 15 do this every week just by luck.",
             "key_words": [
                 ["Streak", "the same move, many days in a row"],
-                ["Luck", "no reason behind it, like a coin flip"],
-                ["Pattern", "a move that repeats, for a real reason"],
+                ["Luck", "no real reason behind it, like a coin flip"],
+                ["Pattern", "a move that repeats for a real reason"],
             ],
-            "think": "If 15 of 500 stocks do this by luck, how could you tell if NVDA is different?",
+            "think": "If 15 out of 500 stocks do this by luck, how could you tell whether NVDA is different?",
         },
     },
     "holds_on_new_data": {
@@ -82,25 +162,25 @@ CONCEPTS = {
         "mission": "See why a rule that worked can fail.",
         "tag": "Testing",
         "tool": "test_many_rules",
-        "scenario": "Someone tried 200 buying rules on old prices. 1 rule would have made a lot of money.",
+        "scenario": "Someone tried 200 buying rules on old prices, and 1 of them would have made a lot of money.",
         "notes": [
-            "Trading rule = a simple plan. Example: buy after 3 down days.",
-            "Experts split old data: part 1 finds the rule, part 2 tests it.",
-            "Try 200 rules → 1 looks great, by luck.",
-            "Fits the past too well = overfitting. It learned noise, not a pattern.",
-            "Still works on new data → much better proof.",
+            "A trading rule is a simple plan, such as buying after 3 down days.",
+            "Experts split old data in two, so they find the rule with the first part and then test it on the second.",
+            "If you try 200 rules, at least 1 will look great just by luck.",
+            "A rule that fits the past too well is overfitting, which means it learned noise instead of a real pattern.",
+            "A rule that still works on new data gives much better proof.",
         ],
         "reading": {
             "idea": [
-                "Trading rule = a simple plan. Example: buy after 3 down days.",
-                "Try 200 rules on old prices → 1 will look great, by luck.",
-                "Fix: split the data. Part 1 finds the rule. Part 2 tests it.",
-                "Still works on part 2 → much better proof.",
+                "A trading rule is a simple plan, such as buying after 3 down days.",
+                "If you try 200 rules on old prices, 1 of them will look great just by luck.",
+                "The fix is to split the data, using the first part to find the rule and the second part to test it.",
+                "If the rule still works on the second part, that is much better proof.",
             ],
-            "example": "Best of 200 random rules: +32% on old data → only +8% on new data.",
+            "example": "The best of 200 random rules made +32% on old data, but only +8% on new data.",
             "key_words": [
                 ["Backtest", "testing a rule on old prices"],
-                ["Overfitting", "a rule that fits past noise, not a real pattern"],
+                ["Overfitting", "a rule that fits past noise instead of a real pattern"],
                 ["New data", "prices the rule has never seen"],
             ],
             "think": "Why would a big winner on old data do worse on new data?",
@@ -113,23 +193,23 @@ CONCEPTS = {
         "tool": "random_pairs_correlation",
         "scenario": "For 1 year, a stock's price and the rain in 1 city went up and down together.",
         "notes": [
-            "2 things moving together = correlation.",
-            "Could be luck. Or a 3rd thing causes both: heat → ice cream ↑ and sunburn ↑.",
-            "Experts ask: Is there a reason? Does it repeat on new data?",
-            "No reason + no repeat = weak reason to buy.",
+            "When 2 things move up and down together, this is called correlation.",
+            "It could be luck, or a hidden 3rd thing could cause both, like hot weather raising both ice cream sales and sunburns.",
+            "Experts ask whether there is a real reason, and whether it repeats on new data.",
+            "With no reason and no repeat, it is a weak reason to buy.",
         ],
         "reading": {
             "idea": [
-                "2 things moving together = correlation.",
-                "It can be luck: 100 random pairs → about 19 move together strongly.",
-                "Or a 3rd thing causes both: heat → ice cream ↑ and sunburn ↑.",
-                "Ask 2 things: Is there a reason? Does it repeat on new data?",
+                "When 2 things move up and down together, this is called correlation.",
+                "It can happen by luck, since about 19 out of 100 random pairs move together strongly.",
+                "Or a hidden 3rd thing can cause both, like hot weather raising both ice cream sales and sunburns.",
+                "So ask yourself whether there is a real reason, and whether it repeats on new data.",
             ],
-            "example": "A stock's price and the rain moved together for 1 year. There is no clear reason rain moves a stock.",
+            "example": "A stock's price and the rain moved together for 1 year, but there is no clear reason why rain would move a stock.",
             "key_words": [
                 ["Correlation", "2 things moving up and down together"],
-                ["Cause", "one thing makes the other happen"],
-                ["Hidden 3rd factor", "something else behind both"],
+                ["Cause", "when one thing makes the other happen"],
+                ["Hidden 3rd factor", "something else that drives both"],
             ],
             "think": "What 3rd thing could make both the stock and the rain move?",
         },

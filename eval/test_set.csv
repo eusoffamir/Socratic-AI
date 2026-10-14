@@ -1,0 +1,62 @@
+﻿id,source,split,case,question,options,answer,purpose
+C17,constructed,tune,Will it work again?,How would you test if the rule works?,,"I would test it on new data, check new data, and test again on new data for proof, because data is proof.",trick: repeated keywords
+R31,transcript,test,Pattern or luck?,What does a streak of 5 ups tell us about the future?,,that it might go upward trend and go up.. but it also might go down since the stock price is too high now .. and the chance of it going up more is very low,
+R29,transcript,test,Pattern or luck?,"If that low chance is wrong, what changes about the pattern?",,go down tomorrow,
+C19,constructed,tune,"Moving together, but why?","A sceptic calls this pure luck: agree or disagree, and why?",Agree with sceptic / Disagree with sceptic,"A: Agree with sceptic. Why: about 19 of 100 random pairs move together strongly by luck, so one pair is weak proof. I might change my mind if it keeps happening on new data.",strong
+C16,constructed,test,Will it work again?,What does overfitting mean in your own words?,,"It is when the rule learns the random noise of the old prices instead of a real pattern, like memorising last year's exam answers instead of understanding the topic.","clarity, depth, example"
+R34,transcript,test,Pattern or luck?,What does a 1/32 chance mean for your friend's claim?,,this thing is luck,
+R25,transcript,tune,"Moving together, but why?","If the link fails on new data, what should you conclude?",,then theres no correlation,
+R30,transcript,test,Pattern or luck?,What are you assuming about the trend when you expect it to fall?,,the trend is not forever and might be pure luck,
+R03,transcript,test,Pattern or luck?,"Pattern or luck: which is it, and why?",Real pattern / Just luck,A: Real pattern. Why: because it just is,
+R36,transcript,tune,Pattern or luck?,How does finding 30 stocks going up by pure luck change your view?,,then it might be a trend,
+C12,constructed,test,Will it work again?,Why would the best rule do worse on new data?,,because overfitting,"short, keyword only"
+R26,transcript,test,Pattern or luck?,What does a 1/32 chance mean to you in your own words?,,low chance,
+C14,constructed,tune,Will it work again?,What is the person assuming when they trust the best rule?,,"They assume that because it made money in the past it will make money in the future, which is not always true.","assumption, fair"
+R10,transcript,test,Pattern or luck?,"Streak or random chance: which is it, and why?",Streak / Random chance,A: Streak. Why: because in a row,
+R33,transcript,test,Pattern or luck?,What data would prove this streak is more than just a 1/32 chance?,,the financial data or if the stock is hot from investments,
+R07,transcript,tune,Pattern or luck?,"Pattern or luck: which is it, and why?",Pattern / Luck,idk,
+R05,transcript,test,Pattern or luck?,"Chance or rule: which is the 5-day streak, and why?",Just chance / Real rule,A: Just chance. Why: because its not fixed.. the streak can end,
+C21,constructed,test,"Moving together, but why?",What would you need to see before buying because of the rain?,,"A clear reason, like the company selling umbrellas, and the link still working next year on data it has not seen.",evidence
+R15,transcript,tune,Pattern or luck?,How would a sceptic who thinks the streak is just random luck view your buying plan?,,it could be because its once in a lifetime occurance,
+R13,transcript,test,Pattern or luck?,"What is your friend assuming about the streak, and what changes if that assumption is wrong?",,"he keeps assuming that the price will go up again in a trend, that's why he told me to buy",
+C23,constructed,test,"Moving together, but why?",What does correlation mean?,,two things moving together,"short, clear"
+C15,constructed,tune,Will it work again?,"Would you use the best rule with real money, and why?",Yes / No,B: No. Why: it might just be lucky.,"A/B, short reason"
+R18,transcript,test,Pattern or luck?,"Pattern or luck: which is it, and why?",Real pattern / Just luck,A: Real pattern. Why: upward trend,
+C24,constructed,test,"Moving together, but why?","If the link fails on new data, what should you conclude?",,"That it was probably luck or a hidden factor that changed, so I should not buy because of the rain, though one failed test does not prove it can never work.","implication, fairness"
+R37,transcript,tune,Pattern or luck?,What makes a trend different from a single 5-day streak?,,its just luck,
+C09,constructed,test,Pattern or luck?,"If the streak is just luck, what happens if you buy now?",,"Then there is no reason it should keep rising, so buying now is closer to a coin flip than a sure win, and I could lose money.",implication
+C07,constructed,test,Pattern or luck?,What does a 3% chance mean for your friend's claim?,,"Stocks are really interesting and many people invest in them, my uncle bought some shares last year and he said the market is like a rollercoaster, and also crypto is popular now, so I think it depends on many things.","long, off-topic"
+C08,constructed,tune,Pattern or luck?,What is your friend assuming?,,"He is assuming the past streak will continue, but stock prices do not remember yesterday, so that assumption may be wrong.","assumption, logic, depth"
+R19,transcript,test,Pattern or luck?,"What are you assuming about that 1/32 chance, and what if that assumption is wrong?",,it might be right since my friend also says it,
+R08,transcript,test,Pattern or luck?,"Real pattern or just luck: which is it, and why?",Real pattern / Just luck,B: Just luck.,
+C22,constructed,tune,"Moving together, but why?",How would someone who disagrees with you see this?,,"They might say a whole year is a long time, so it cannot be luck. That is a fair point, but with many pairs to look at, some will still line up by chance.","fairness, breadth"
+R14,transcript,test,Pattern or luck?,"Trend or luck: which made the 30 stocks go up 5 days, and why?",Real trend / Just luck,A: Real trend. Why: because the stocks are expecting people to buy ..so it creates a trend,
+R01,transcript,test,Pattern or luck?,What does a 1/32 chance mean for your friend's claim?,,I'm stuck and not sure how to answer this.,
+C02,constructed,tune,Pattern or luck?,What does your friend mean by calling it a pattern?,,He means the price will keep going up because it went up before.,"clear, plain, one idea"
+C18,constructed,test,"Moving together, but why?",What could make the stock and the rain move together?,,"Maybe a hidden third thing, like the season. In the rainy season people stay home and shop online more, which could line up with both the rain and the stock of an online shop.","breadth, depth, example"
+R04,transcript,test,Pattern or luck?,"If you flip a coin 5 times, what is the chance of 5 heads?",,0.5 ^ 5 = 0.03 ... very low chace only 3%,
+C10,constructed,tune,Pattern or luck?,Pattern or luck: is that the right question to ask?,,"Maybe the better question is whether this stock does better than the market over many months, since one week tells us very little either way.",question the question
+C20,constructed,test,"Moving together, but why?",Does moving together prove that rain moves the stock?,,"Yes, because they moved together for a whole year.",faulty logic
+R28,transcript,test,Pattern or luck?,What does 1/32 mean for the stock price?,,theres low chance it might go up again,
+C01,constructed,tune,Pattern or luck?,"Pattern or luck: which is it, and why?",Real pattern / Just luck,"B: Just luck. Why: going up 5 days in a row happens about 3% of the time, so with 500 stocks about 15 would do it by chance. I could be wrong if there was real news, so I would check the news first.","strong, all standards"
+R27,transcript,test,Pattern or luck?,"If that 1/32 streak happens by luck, what happens to the price tomorrow?",,it might go down,
+R24,transcript,test,"Moving together, but why?","A sceptic calls this pure luck: agree or disagree, and why?",Agree with sceptic / Disagree with sceptic,B: Disagree with sceptic. Why: it might not be pure luck as well since there are correlations,
+C05,constructed,tune,Pattern or luck?,"Pattern or luck: which is it, and why?",Real pattern / Just luck,"Because 3% but maybe, so therefore however 500 stocks.",trick: keyword stuffing
+R09,transcript,test,Pattern or luck?,What makes you say it is just luck?,,because just guessing,
+R06,transcript,test,Pattern or luck?,"Real pattern or just luck: which is it, and why?",Real pattern / Just luck,A: Real pattern. Why: cause its trending,
+C13,constructed,tune,Will it work again?,How would you test if the rule really works?,,"Split the data. Use the first half to find the rule and the second half to test it. If it still makes money on the second half, I trust it more, although even that could be luck if I keep re-testing many rules.",strong with fairness
+R23,transcript,test,"Moving together, but why?",How would you test if this solar link holds true on new data?,,make a model prediction and see if the new data's error loss,
+R02,transcript,test,Pattern or luck?,What does a 1/32 chance mean in your own words?,,I'm stuck and not sure how to answer this.,
+R11,transcript,tune,Pattern or luck?,What does your friend mean by a pattern here?,,"nah because if it keeps going up, it might go down",
+R17,transcript,test,Pattern or luck?,"If you buy now, what do you expect happens next on day 6?",,since my friend says it goes up.. i guess go up,
+R22,transcript,test,"Moving together, but why?","If your coincidence assumption is wrong, what makes them move together?",,if the stock/ company is a solar company that is affected by rain... meaning if it rains the power output is less ... if it sunny then power output is high ... hence the correlation,
+R12,transcript,tune,Pattern or luck?,"If the 1/32 streak happens by luck, what happens to the price next?",,it might go down,
+R20,transcript,test,Pattern or luck?,"What assumption are you making by trusting your friend, and what if that is wrong?",,he wont lie to me,
+R32,transcript,test,Pattern or luck?,"If your assumption that the streak must reverse is wrong, what happens next?",,then i lose money for gambling,
+R16,transcript,tune,Pattern or luck?,What does your friend mean by the word pattern?,,i will buy,
+R21,transcript,test,"Moving together, but why?",What do you think it means for rain and a stock price to move together?,,it dosent mean anything... it might be pure coincidence,
+R35,transcript,test,Pattern or luck?,"Real pattern or luck: which is it, and why?",Real pattern / Just luck,A: Real pattern. Why: i think so,
+C06,constructed,tune,Pattern or luck?,What is the chance of 5 ups in a row if each day is 50/50?,,"It is 50%, because each day is 50% so five days is also 50%.",confident but wrong
+C04,constructed,test,Pattern or luck?,How would a sceptic view your plan to buy?,,"A sceptic would say the streak is just luck, and they have a point, since about 3% of stocks do this anyway. I still think it is worth checking the company news before deciding.","fairness, breadth"
+C11,constructed,test,Will it work again?,Why would the best of 200 rules do worse on new data?,,"Because with 200 rules, one will fit the old prices by luck, like +32%, but that luck does not repeat, so on new data it drops to about +8%.",strong
+C03,constructed,tune,Pattern or luck?,What data would prove this streak is more than luck?,,"I would check whether the same stock keeps rising on new days it has not seen yet, for example the next 20 days, because one streak can happen by luck.","evidence, precision, depth"

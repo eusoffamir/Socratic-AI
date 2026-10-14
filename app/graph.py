@@ -18,7 +18,7 @@ from typing import Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from . import checker, llm_client, orchestrator
+from . import checker, copycheck, llm_client, orchestrator
 
 MAX_REWRITES = 1
 
@@ -48,7 +48,13 @@ class TurnState(TypedDict, total=False):
 
 def _assess_node(state: TurnState) -> TurnState:
     if state.get("answer") is not None:
-        state["assessment"] = llm_client.call_assessor(state["session"], state["answer"])
+        # Rule first: an answer copied from a hint or the notes is not the
+        # learner's thinking, so it scores 0 and the Assessor is not called.
+        s = state["session"]
+        if copycheck.is_copied(state["answer"], copycheck.session_sources(s), copycheck.session_story(s)):
+            state["assessment"] = copycheck.copied_assessment()
+        else:
+            state["assessment"] = llm_client.call_assessor(state["session"], state["answer"])
     else:
         state["assessment"] = None  # first turn of the session, nothing to assess yet
     return state
@@ -56,7 +62,7 @@ def _assess_node(state: TurnState) -> TurnState:
 
 def _plan_node(state: TurnState) -> TurnState:
     s = state["session"]
-    ending = s["round"] >= s["total_rounds"]
+    ending = orchestrator.is_last_round(s)
     state["planned"] = state["assessment"] is not None and not ending and agent_on("AGENT_PLANNER")
     state["plan"] = llm_client.call_planner(s, state["assessment"]) if state["planned"] else None
     return state
@@ -125,6 +131,8 @@ def _rewrite_node(state: TurnState) -> TurnState:
 
 def _finish_node(state: TurnState) -> TurnState:
     s, parts = state["session"], state["parts"]
+    if (state.get("assessment") or {}).get("copied_hint") and state["instruction"]["action"] != "end":
+        parts["feedback"] = copycheck.CALL_OUT  # rule: always these exact words
     state["reply"] = llm_client.parts_text(parts)
     s["last_tutor"] = state["reply"]
     if parts["question"]:

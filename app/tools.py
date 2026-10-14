@@ -30,7 +30,7 @@ def simulate_streaks(stocks=500, days=5):
         hits += all(ups)
     return {
         "args": {"stocks": stocks, "days": days},
-        "summary": f"{stocks} stocks × {days} days → {hits} went up every day. Pure luck.",
+        "summary": f"Out of {stocks} random stocks over {days} days, {hits} went up every single day, purely by luck.",
         "chart": {"title": f"{days} up days in a row, by luck",
                   "bars": [{"label": "Streak", "value": hits}, {"label": "No streak", "value": stocks - hits}]},
     }
@@ -49,7 +49,7 @@ def test_many_rules(rules=200, days=100):
     best_old, best_new = max(results)
     return {
         "args": {"rules": rules, "days": days},
-        "summary": f"{rules} random rules → best one: {best_old:+.0f}% on old data, {best_new:+.0f}% on new data.",
+        "summary": f"The best of {rules} random rules made {best_old:+.0f}% on old data, but {best_new:+.0f}% on new data.",
         "chart": {"title": "Best random rule",
                   "bars": [{"label": "Old data", "value": round(best_old)}, {"label": "New data", "value": round(best_new)}],
                   "unit": "%"},
@@ -77,7 +77,7 @@ def random_pairs_correlation(pairs=100, length=12):
             pass  # a flat series has no correlation; count it as weak
     return {
         "args": {"pairs": pairs, "length": length},
-        "summary": f"{pairs} unrelated random pairs → {strong} moved together strongly. Pure luck.",
+        "summary": f"Out of {pairs} unrelated random pairs, {strong} moved together strongly, purely by luck.",
         "chart": {"title": "Unrelated pairs that moved together",
                   "bars": [{"label": "Strong link", "value": strong}, {"label": "Weak link", "value": pairs - strong}]},
     }

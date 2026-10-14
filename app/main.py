@@ -15,9 +15,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import graph, llm_client, orchestrator
+from . import graph, llm_client, orchestrator, tutorial
 from .llm_client import LLMError
-from .content import CONCEPTS, LEVELS, STANDARDS
+from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
 app = FastAPI(title="Socratic AI")
 
@@ -36,13 +36,22 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 class StartRequest(BaseModel):
     concept_id: str = "pattern_or_luck"
-    total_rounds: int = 5
+    total_rounds: int = 6  # 3, 6, or 0 for no limit (the "∞" option)
     ab_only: bool = False
     reading_seconds: int = 0  # seconds the reading pop-up was open before "Start this case"
 
 
 class AnswerRequest(BaseModel):
     answer: str
+
+
+class OverviewRequest(BaseModel):
+    session_ids: list[str] = []  # the sessions this browser has started (no logins, so no per-user history)
+
+
+class TutorialScoreRequest(BaseModel):
+    answer: str = ""
+    r2_pick: int | None = None  # 0 = A, 1 = B
 
 
 def _run_turn_safely(session, answer):
@@ -61,6 +70,7 @@ def _save_turn(sid, session, result):
     TRANSCRIPT_DIR.mkdir(exist_ok=True)
     line = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "session_id": sid, "concept_id": session["concept_id"], "ab_only": session.get("ab_only", False),
+            "total_rounds": session["total_rounds"],  # 0 = no limit
             "reading_seconds": session.get("reading_seconds", 0),
             "provider": llm_client.PROVIDER,
             **result["trace"]}
@@ -82,11 +92,11 @@ def _get_session(sid):
     try:
         sid = str(uuid.UUID(sid))  # only real ids, so the path can't point anywhere else
     except ValueError:
-        raise HTTPException(404, "Session not found. Start a new one.")
+        raise HTTPException(404, "This session could not be found, so please start a new one.")
     if sid not in SESSIONS:
         path = SESSION_DIR / f"{sid}.json"
         if not path.exists():
-            raise HTTPException(404, "Session not found. Start a new one.")
+            raise HTTPException(404, "This session could not be found, so please start a new one.")
         SESSIONS[sid] = json.loads(path.read_text(encoding="utf-8"))
     return sid, SESSIONS[sid]
 
@@ -125,12 +135,25 @@ def list_concepts():
             for k, v in CONCEPTS.items()]
 
 
+# The tutorial is a fixed script. Only round 3 calls a model (the Assessor,
+# once). Nothing is saved to disk: it is practice, not thesis data.
+@app.get("/api/tutorial")
+def get_tutorial():
+    return {**TUTORIAL, "max": tutorial.MAX_SCORE,
+            "levels": [{"key": k, "name": name} for k, name, _ in LEVELS], "standards": STANDARDS}
+
+
+@app.post("/api/tutorial/score")
+def score_tutorial(req: TutorialScoreRequest):
+    return tutorial.final_result(req.r2_pick, req.answer[:2000])
+
+
 @app.post("/api/session")
 def start_session(req: StartRequest):
     if req.concept_id not in CONCEPTS:
         raise HTTPException(400, f"Unknown concept_id. Choose one of {list(CONCEPTS)}")
     sid = str(uuid.uuid4())
-    session, result = _run_turn_safely(orchestrator.new_session(req.concept_id, req.total_rounds, req.ab_only,
+    session, result = _run_turn_safely(orchestrator.new_session(req.concept_id, max(req.total_rounds, 0), req.ab_only,
                                                             max(0, min(req.reading_seconds, 3600))), None)
     SESSIONS[sid] = session
     _persist(sid, session)
@@ -167,6 +190,57 @@ def submit_answer(sid: str, req: AnswerRequest):
     _save_turn(sid, session, result)
     # last_assessment is for the stats screen; never shown to the learner mid-question
     return {**_turn_response(session, result), "last_assessment": result["assessment"]}
+
+
+@app.post("/api/session/{sid}/end")
+def end_session(sid: str):
+    """Sessions with no round limit end when the learner presses End session.
+    The last question, still unanswered, is left out; every answered round counts."""
+    sid, session = _get_session(sid)
+    if not session["ended"]:
+        session["ended"] = True
+        session["ended_by_learner"] = True
+        _persist(sid, session)
+    return {"ended": True, "rounds_answered": len(session["history"])}
+
+
+@app.post("/api/overview")
+def overview(req: OverviewRequest):
+    """The learner's overall status across every case they played in this
+    browser: highest level, the 9 standards over all answers, and the best
+    level per case. Same summary shape as /stats, so the page reuses its
+    drawings. Unknown or broken ids are skipped. The tutorial is practice and
+    is not saved, so it never counts here."""
+    history, best_idx, played, finished, per_case = [], 0, 0, 0, {}
+    for sid in req.session_ids[:300]:
+        try:
+            _, s = _get_session(sid)
+        except HTTPException:
+            continue
+        if not s["history"]:
+            continue  # opened but never answered
+        played += 1
+        finished += bool(s["ended"])
+        history += s["history"]
+        best_idx = max(best_idx, s["level_idx"])
+        c = per_case.setdefault(s["concept_id"], {"sessions": 0, "level_idx": 0, "rounds": 0, "history": []})
+        c["sessions"] += 1
+        c["rounds"] += len(s["history"])
+        c["history"] += s["history"]
+        c["level_idx"] = max(c["level_idx"], s["level_idx"])
+    summary = orchestrator.summarize({"history": history, "level_idx": best_idx})
+    return {
+        "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],
+        "standards": STANDARDS,
+        "summary": summary,
+        "sessions_played": played, "sessions_finished": finished,
+        "cases": [{"id": cid, "title": CONCEPTS[cid]["title"], "sessions": v["sessions"], "rounds": v["rounds"],
+                   "level": LEVELS[v["level_idx"]][1],
+                   # for the standards filter in the overall status panel
+                   "standards_met_count": orchestrator.summarize(
+                       {"history": v["history"], "level_idx": v["level_idx"]})["standards_met_count"]}
+                  for cid, v in per_case.items()],
+    }
 
 
 # Only one Coach call per session, even if the stats panel and the final

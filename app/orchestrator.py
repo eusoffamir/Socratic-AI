@@ -117,9 +117,15 @@ def _record(session, assessment):
         session["said"].extend(assessment.get("learner_points", []))
 
 
+def is_last_round(session):
+    """True when the fixed number of rounds is used up. total_rounds 0 means
+    no limit (the "∞" option): it only ends when the learner presses End."""
+    return bool(session["total_rounds"]) and session["round"] >= session["total_rounds"]
+
+
 def _end_if_done(session):
     # R2: fixed number of rounds, decided here, never by an LLM.
-    if session["round"] >= session["total_rounds"]:
+    if is_last_round(session):
         session["ended"] = True
         return {"action": "end", "round": session["round"], "total_rounds": session["total_rounds"],
                 "summary": summarize(session)}
@@ -248,20 +254,25 @@ def fallback_comment(session):
     met = {k: sum(a["standards"].get(k, 0) for a in history) for k in STANDARDS}
     worst = min(met, key=met.get)
 
+    copied = sum(bool(a.get("copied_hint")) for a in history)
     if good / n >= 0.7:
-        text = f"Solid work. {good} of {n} answers showed clear reasoning."
+        text = f"This was solid work, with {good} of {n} answers showing clear reasoning."
     elif good / n >= 0.4:
-        text = f"A fair start. {good} of {n} answers showed clear reasoning."
+        text = f"This was a fair start, with {good} of {n} answers showing clear reasoning."
     else:
-        text = f"Your reasoning was hard to see. Only {good} of {n} answers showed it clearly."
+        text = f"Your reasoning was hard to see, since only {good} of {n} answers showed it clearly."
     if words < 8:
-        text += f" Your answers were short, about {words} words each. Short answers hide your thinking, so add one reason."
+        text += f" Your answers were quite short, about {words} words each, which hides your thinking, so try adding one reason."
     elif words > 40:
-        text += f" Your answers were long, about {words} words each. Lead with your main point, then one reason."
+        text += f" Your answers were long, about {words} words each, so lead with your main point and then give one reason."
     else:
         text += f" Your answers were a good length, about {words} words each."
     if met[worst] < n:
         text += f" Next time, focus on {worst}. {STANDARD_TIPS[worst]}"
     if stuck:
-        text += " When you feel stuck, open the hint before you give up."
+        text += " When you feel stuck, try to open the hint before you give up."
+    if copied:  # called out first, before anything else
+        times = "once" if copied == 1 else f"{copied} times"
+        text = (f"You copied the hint instead of answering in your own words {times}, so those answers scored 0. "
+                "Please do not do that next time. " + text)
     return text
