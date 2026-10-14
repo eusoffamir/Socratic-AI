@@ -177,8 +177,9 @@ def parts_text(parts):
 
 
 def call_tutor(session, instruction, answer, assessment, use_tools=True, tool_runs=None, draft=None, problems=None):
-    """The Tutor agent. It may run up to MAX_TOOLS_PER_TURN tools before it
-    answers (a small think, act, observe loop). Returns (parts, tool_runs)."""
+    """The Tutor agent. It may run up to MAX_TOOLS_PER_TURN runs of this case's
+    own tool before it answers (a small think, act, observe loop). Returns
+    (parts, tool_runs)."""
     tool_runs = list(tool_runs or [])
     can_use_tools = use_tools and instruction["action"] == "continue" and not problems
     nudge = None
@@ -192,13 +193,14 @@ def call_tutor(session, instruction, answer, assessment, use_tools=True, tool_ru
             text = _generate(TUTOR_SYSTEM, payload, max_tokens=400, json_mode=True)
             data = _parse_json(text) or {"question": text}  # plain text still works as a reply
         if data.get("tool"):
-            if tools_left > 0:
+            if tools_left > 0 and data["tool"] == CONCEPTS[session["concept_id"]]["tool"]:
                 tool_runs.append(tools.run_tool(data["tool"], data.get("args")))
                 continue
             if nudge is None:
-                # It asked for a tool with none left, which would leave an
-                # empty question card. Ask once more for a normal reply.
-                nudge = ["No tools are left. Reply with feedback, key_idea and question."]
+                # It asked for a tool with none left, or another case's tool,
+                # which would leave an empty question card. Ask once more for a
+                # normal reply.
+                nudge = ["No more tools now. Reply with feedback, key_idea and question."]
                 continue
         return clean_parts(data, instruction), tool_runs
 

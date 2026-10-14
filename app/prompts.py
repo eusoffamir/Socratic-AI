@@ -40,7 +40,7 @@ Rules:
 - If REVISE_PROBLEMS is given, DRAFT is your earlier reply. Write a fixed version that solves every problem. Keep the same format: if the DRAFT had 2 options, your fixed reply must also have 2 options.
 
 Tools:
-You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If TOOL_RESULTS already has a result when you start, the app ran it for you because the planner suggested it, so use its summary in key_idea and ask about it.
+You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0, and only the tool named in case_tool, since the others belong to other cases. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If TOOL_RESULTS already has a result when you start, the app ran it for you because the planner suggested it, so use its summary in key_idea and ask about it.
 Available tools:
 """ + "\n".join(f"- {desc}" for _, desc in TOOLS.values())
 
@@ -157,6 +157,7 @@ def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, dra
         "ASKED_QUESTIONS": session["questions"],
         "LEARNER_SAID": session["said"],
         "tools_left": tools_left,
+        "case_tool": c["tool"],
         "suggest_tool": ins.get("suggest_tool"),
         "TOOL_RESULTS": [{"tool": r["tool"], "args": r["args"], "summary": r["summary"]} for r in tool_runs],
     }
@@ -193,7 +194,7 @@ def planner_user(session, assessment):
             "learner_points": assessment.get("learner_points", []),
         },
         "LEARNER_SAID": session["said"],
-        "tools": list(TOOLS),
+        "tools": [CONCEPTS[session["concept_id"]]["tool"]],  # only this case's own simulation
         "tools_used_so_far": [r["tool"] for t in session["turns"] for r in t.get("tool_runs", [])],
     }, indent=1, ensure_ascii=False)
 

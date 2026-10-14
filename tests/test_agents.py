@@ -74,6 +74,15 @@ def test_guard_drops_unknown_tools_and_ends_on_time():
     assert ins["action"] == "end"
 
 
+def test_guard_keeps_simulations_to_the_case_own_tool():
+    # Seen 15 Oct 2026: case 3's random pairs tool in the streak case gave a confusing question.
+    s = opened()  # pattern_or_luck, whose tool is simulate_streaks
+    ins, overrides = orc.apply_plan(s, plan(suggest_tool="random_pairs_correlation"), good_assessment())
+    assert ins["suggest_tool"] is None and "another case" in overrides[-1]
+    ins, _ = orc.apply_plan(s, plan(fmt=FORMATS[2], suggest_tool="simulate_streaks"), good_assessment())
+    assert ins["suggest_tool"] == "simulate_streaks"
+
+
 def test_profile_keeps_the_highest_level_after_moving_down():
     # Audit, 15 Oct 2026: a learner who reached Evidence and then got stuck was
     # moved down by the Planner, and the profile said "You reached Assumptions".

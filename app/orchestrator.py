@@ -8,8 +8,7 @@ Two ways to pick the next move:
   apply_plan()  the guard: takes the Planner agent's proposal and enforces the
                 fixed rules on it. "Agents decide, rules guard."
 """
-from .content import FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
-from .tools import TOOLS
+from .content import CONCEPTS, FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
 
 GOOD_STANDARDS_THRESHOLD = 2  # standards met to count an answer as "good"
 STREAK_TO_ADVANCE = 2         # good answers in a row to move up a level
@@ -145,6 +144,11 @@ def _finish(session, instruction):
     return instruction
 
 
+def case_tool(session):
+    """The one simulation that belongs to this case."""
+    return CONCEPTS[session["concept_id"]]["tool"]
+
+
 def welcome(total_rounds):
     """The first feedback line, written by code so the number of rounds is
     always right (R1, R2). Seen 15 October 2026: in a 6-round session the
@@ -221,10 +225,15 @@ def apply_plan(session, plan, assessment):
     level_key, level_name, level_desc = LEVELS[session["level_idx"]]
 
     tool = plan.get("suggest_tool")
+    if tool and tool != case_tool(session):
+        # Each case has its own simulation. Seen 15 October 2026: the "random
+        # pairs" tool from case 3 in the streak case led to a confusing question.
+        overrides.append("Tool belongs to another case. Dropped.")
+        tool = None
     instruction = {
         "action": "continue", "round": session["round"] + 1, "total_rounds": session["total_rounds"],
         "level_name": level_name, "level_desc": level_desc, "format": fmt, "hint": hint,
-        "suggest_tool": tool if tool in TOOLS else None,
+        "suggest_tool": tool,
         "plan_reason": str(plan.get("reason", ""))[:200],
     }
     if frustrated:
