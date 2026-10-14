@@ -18,7 +18,7 @@ from typing import Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from . import checker, copycheck, llm_client, orchestrator
+from . import checker, copycheck, llm_client, orchestrator, tools
 
 MAX_REWRITES = 1
 
@@ -78,8 +78,20 @@ def _guard_node(state: TurnState) -> TurnState:
     return state
 
 
+def _used_tools(session):
+    return {r["tool"] for t in session["turns"] for r in t.get("tool_runs") or []}
+
+
 def _tutor_node(state: TurnState) -> TurnState:
     rewriting = bool(state.get("problems"))
+    tool = state["instruction"].get("suggest_tool")
+    if (tool and not rewriting and not state.get("tool_runs") and agent_on("AGENT_TOOLS")
+            and tool not in _used_tools(state["session"])):
+        # Rule: the Planner's suggested simulation is run here, so the Tutor
+        # gets real numbers. Seen 15 October 2026: the Tutor ignored the
+        # suggestion and no simulation ran in a whole session. Each tool runs
+        # once per session, since it is seeded and would repeat the same result.
+        state["tool_runs"] = [{**tools.run_tool(tool), "run_by": "planner"}]
     state["parts"], state["tool_runs"] = llm_client.call_tutor(
         state["session"], state["instruction"], state.get("answer"), state["assessment"],
         use_tools=agent_on("AGENT_TOOLS"), tool_runs=state.get("tool_runs"),

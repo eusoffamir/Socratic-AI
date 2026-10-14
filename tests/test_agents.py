@@ -151,6 +151,22 @@ def test_full_session_with_each_agent_off(monkeypatch, off):
     assert used_tool == (off not in ("AGENT_PLANNER", "AGENT_TOOLS"))
 
 
+def test_planner_suggested_tool_is_run_by_code_once_per_session(monkeypatch):
+    # Seen 15 Oct 2026: the Planner suggested simulate_streaks, the Tutor ignored it.
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setattr(llm_client, "call_planner", lambda *a: plan(suggest_tool="simulate_streaks"))
+    seen = []
+    def tutor(session, ins, answer, assessment, **k):
+        seen.append(k["tool_runs"])
+        return {"feedback": "", "key_idea": "", "question": f"Q{len(seen)}?", "options": ["X", "Y"]}, k["tool_runs"]
+    monkeypatch.setattr(llm_client, "call_tutor", tutor)
+    s = graph.run_turn(orc.new_session("pattern_or_luck", total_rounds=8), None)["session"]
+    s = graph.run_turn(s, "it could be luck because many stocks rise")["session"]
+    assert [r["tool"] for r in seen[-1]] == ["simulate_streaks"] and seen[-1][0]["run_by"] == "planner"
+    graph.run_turn(s, "so a streak is not proof of a pattern")
+    assert seen[-1] in (None, [])  # already run once this session: not again
+
+
 @pytest.mark.parametrize("rounds, expected", [(6, "We have 6 rounds"), (0, "no round limit")])
 def test_welcome_line_is_written_by_code(monkeypatch, rounds, expected):
     # Seen 15 Oct 2026: a 6-round session got the no-limit welcome from the Tutor.

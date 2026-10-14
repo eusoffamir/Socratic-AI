@@ -40,7 +40,7 @@ Rules:
 - If REVISE_PROBLEMS is given, DRAFT is your earlier reply. Write a fixed version that solves every problem. Keep the same format: if the DRAFT had 2 options, your fixed reply must also have 2 options.
 
 Tools:
-You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If suggest_tool is set, the planner thinks that tool would help now.
+You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If TOOL_RESULTS already has a result when you start, the app ran it for you because the planner suggested it, so use its summary in key_idea and ask about it.
 Available tools:
 """ + "\n".join(f"- {desc}" for _, desc in TOOLS.values())
 
