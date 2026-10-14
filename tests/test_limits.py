@@ -21,6 +21,20 @@ def test_new_sessions_stop_when_the_budget_is_used(monkeypatch):
     assert r.status_code == 429 and r.json()["detail"] == limits.FULL_MESSAGE
 
 
+def test_blank_answers_are_refused_and_empty_sessions_skip_the_coach(monkeypatch):
+    # Audit, 15 Oct 2026: a blank answer used a round, and ending before any
+    # answer still called the Coach AI.
+    fresh(monkeypatch, 0)
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    coach = []
+    monkeypatch.setattr(llm_client, "call_coach", lambda s: coach.append(1) or "comment")
+    client = TestClient(main.app)
+    sid = client.post("/api/session", json={"total_rounds": 0}).json()["session_id"]
+    assert client.post(f"/api/session/{sid}/answer", json={"answer": "   "}).status_code == 400
+    client.post(f"/api/session/{sid}/end")
+    assert client.get(f"/api/session/{sid}/stats").json()["comment"] is None and coach == []
+
+
 def test_the_count_starts_again_on_a_new_day(monkeypatch):
     fresh(monkeypatch, 2)
     limits.count_call()

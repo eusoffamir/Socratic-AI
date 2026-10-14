@@ -212,6 +212,8 @@ def submit_answer(sid: str, req: AnswerRequest):
     sid, session = _get_session(sid)
     if session["ended"]:
         raise HTTPException(400, "This session has already ended.")
+    if not req.answer.strip():  # the page blocks this too; a blank answer would waste a round and AI calls
+        raise HTTPException(400, "Please type an answer first.")
     session, result = _run_turn_safely(session, req.answer[:MAX_ANSWER_CHARS])
     SESSIONS[sid] = session
     _persist(sid, session)
@@ -283,8 +285,8 @@ def _final_comment(sid, session):
     """One paragraph on how the learner answered. Written once when the
     session ends, then saved with the session. If the Coach AI is off or
     fails, a plain-code paragraph is used, so the profile never breaks."""
-    if not session.get("ended"):
-        return None
+    if not session.get("ended") or not session["history"]:
+        return None  # nothing answered, so nothing to comment on (and no wasted AI call)
     with _comment_lock:
         if not session.get("comment"):
             try:
