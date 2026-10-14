@@ -122,6 +122,25 @@ def load_session(sid):
     return load_sessions([sid]).get(sid)
 
 
+def all_sessions():
+    """Every saved session as (id, session, updated_at), for the data export."""
+    if BACKEND == "supabase":
+        rows, page = [], 1000  # the database sends at most 1000 rows per request
+        while True:
+            r = _db("GET", "sessions", headers=_headers(),
+                    params={"select": "id,data,updated_at", "order": "updated_at", "limit": str(page),
+                            "offset": str(len(rows))})
+            batch = r.json()
+            rows += batch
+            if len(batch) < page:
+                return [(row["id"], row["data"], row["updated_at"]) for row in rows]
+    out = []
+    for path in sorted(SESSION_DIR.glob("*.json")):
+        mtime = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(timespec="seconds")
+        out.append((path.stem, json.loads(path.read_text(encoding="utf-8")), mtime))
+    return out
+
+
 # What a failed database check most likely means, by HTTP status.
 _DB_PROBLEMS = {401: "the secret key is wrong", 403: "the secret key is not allowed to read the tables",
                 404: "the tables are missing, so run deploy/supabase.sql in Supabase"}

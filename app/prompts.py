@@ -5,6 +5,11 @@ from .tools import TOOLS
 
 AB_FORMAT = FORMATS[-1]  # "choose A or B and defend the choice"
 
+# Saved with every assessed answer, so marks from different Assessor prompts are
+# never mixed up in the thesis. Change it whenever ASSESSOR_SYSTEM or
+# assessor_user changes. Answers saved before 15 October 2026 have no version.
+ASSESSOR_VERSION = "2026-10-15"
+
 # Word limits the Tutor is asked to keep. The Checker allows a little slack
 # (see checker.py) so a reply one word over does not cost a rewrite call.
 WORD_LIMITS = {"feedback": 15, "key_idea": 15, "question": 20}

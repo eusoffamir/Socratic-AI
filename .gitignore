@@ -13,3 +13,6 @@ transcripts/
 
 # supervisor's grant proposal: private, never upload
 docs/2026_EdEx SoTL Grant Proposal*.docx
+
+# data exports hold real learner answers: never upload them
+eval/exports/

@@ -18,7 +18,7 @@ from typing import Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from . import checker, copycheck, llm_client, orchestrator, tools
+from . import checker, copycheck, llm_client, orchestrator, prompts, tools
 
 MAX_REWRITES = 1
 
@@ -159,6 +159,7 @@ def _finish_node(state: TurnState) -> TurnState:
         "round": ins["round"],
         "answer": state.get("answer"),
         "assessment": state["assessment"],
+        "assessor_version": prompts.ASSESSOR_VERSION if state.get("answer") is not None else None,
         "plan": state.get("plan"),
         "guard_overrides": state["overrides"],
         "instruction": ins,
