@@ -12,6 +12,10 @@ from .content import CONCEPTS, FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
 
 GOOD_STANDARDS_THRESHOLD = 2  # standards met to count an answer as "good"
 STREAK_TO_ADVANCE = 2         # good answers in a row to move up a level
+STRONG_STANDARDS_THRESHOLD = 5  # standards met for a "strong" answer, which moves up at once
+# Why the strong shortcut (audit, 15 October 2026): with only "2 good in a
+# row", even a perfect learner reached Evidence at most in 6 rounds, so
+# Viewpoints to Question the question were out of reach in normal sessions.
 STREAK_TO_SCAFFOLD = 2        # weak answers in a row to add a hint
 
 
@@ -42,6 +46,15 @@ def _is_good(assessment):
         return False
     met = sum(assessment["standards"].values())
     return assessment["reasoning_move"] != "none" and met >= GOOD_STANDARDS_THRESHOLD
+
+
+def _is_strong(assessment):
+    return _is_good(assessment) and sum(assessment["standards"].values()) >= STRONG_STANDARDS_THRESHOLD
+
+
+def _ready_to_move_up(session, assessment):
+    """Called after the streaks are updated for this answer."""
+    return session["good_streak"] >= STREAK_TO_ADVANCE or _is_strong(assessment)
 
 
 def _next_format(session, force_easy):
@@ -89,7 +102,7 @@ def decide(session, assessment=None):
             session["weak_streak"] = 0 if good else session["weak_streak"] + 1
 
             advanced = False
-            if session["good_streak"] >= STREAK_TO_ADVANCE and session["level_idx"] < len(LEVELS) - 1:
+            if _ready_to_move_up(session, assessment) and session["level_idx"] < len(LEVELS) - 1:
                 session["level_idx"] += 1
                 session["good_streak"] = 0
                 advanced = True
@@ -202,11 +215,12 @@ def apply_plan(session, plan, assessment):
         if change == "up" and not good:
             overrides.append("Answer was weak. Did not move up.")
             change = "stay"
-        elif change == "up" and session["good_streak"] < STREAK_TO_ADVANCE:
+        elif change == "up" and not _ready_to_move_up(session, assessment):
             # Same pace as the fixed rules. Seen 15 October 2026: the Planner
             # moved a learner from Clarify to Evidence in 2 answers, saying
             # "reasoned well" even when the Assessor scored the answer weak.
-            overrides.append(f"Needs {STREAK_TO_ADVANCE} good answers in a row. Did not move up yet.")
+            overrides.append(f"Needs {STREAK_TO_ADVANCE} good answers in a row, or one strong answer. "
+                             "Did not move up yet.")
             change = "stay"
         if fmt == session["last_format"] and not session.get("ab_only"):
             # R6: never the same format twice in a row (except in "A/B only" mode).

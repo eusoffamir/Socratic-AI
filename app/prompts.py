@@ -75,7 +75,7 @@ Socratic levels, from easiest to hardest: """ + ", ".join(name for _, name, _ in
 Question formats: """ + "; ".join(FORMATS) + """.
 
 Good habits:
-- Move "up" one level only after 2 good answers in a row, so only when this answer is good and good_streak is at least 1 (good_streak counts the good answers before this one). A good answer meets at least 2 standards and shows a reasoning move. "stay" while they are still building. "down" one level if they are lost.
+- Move "up" one level after 2 good answers in a row (this answer is good and good_streak is at least 1, since good_streak counts the good answers before this one), or at once after one strong answer. A good answer meets at least 2 standards and shows a reasoning move. A strong answer meets at least 5 standards and shows a reasoning move. "stay" while they are still building. "down" one level if they are lost.
 - In reason, describe the answer as the assessment shows it. Do not call a weak answer good.
 - Use a different format from last_format.
 - Set hint to true after weak answers, so the tutor gives a helpful fact.

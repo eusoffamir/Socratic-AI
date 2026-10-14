@@ -74,6 +74,27 @@ def test_guard_drops_unknown_tools_and_ends_on_time():
     assert ins["action"] == "end"
 
 
+def test_one_strong_answer_moves_up_at_once():
+    # Audit, 15 Oct 2026: with only "2 good in a row", 6 rounds could not go past Evidence.
+    s = opened()
+    orc.apply_plan(s, plan("up", FORMATS[1]), good_assessment(n_met=5))
+    assert s["level_idx"] == 1
+    s2 = orc.new_session("pattern_or_luck", total_rounds=8)
+    orc.decide(s2, None)
+    orc.decide(s2, good_assessment(n_met=5))  # the fixed rules agree
+    assert s2["level_idx"] == 1
+
+
+def test_six_strong_rounds_can_reach_the_top_level():
+    s = orc.new_session("pattern_or_luck", total_rounds=6)
+    orc.decide(s, None)
+    i = 0
+    while not s["ended"]:
+        i += 1
+        orc.apply_plan(s, plan("up", FORMATS[i % 3]), good_assessment(n_met=6))
+    assert orc.summarize(s)["highest_level_reached"] == "Question the question"
+
+
 def test_guard_keeps_simulations_to_the_case_own_tool():
     # Seen 15 Oct 2026: case 3's random pairs tool in the streak case gave a confusing question.
     s = opened()  # pattern_or_luck, whose tool is simulate_streaks
