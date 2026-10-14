@@ -1,0 +1,21 @@
+id,run,clarity,accuracy,precision,relevance,depth,breadth,logic,significance,fairness,level,evidence_quote
+C17,1,1,1,0,1,0,0,0,1,0,none,I would test it on new data
+R31,1,1,1,0,1,1,1,1,1,0,viewpoint,it might go upward trend and go up.. but it also might go down since the stock price is too high now
+R29,1,1,0,0,1,0,0,0,0,0,none,go down tomorrow
+C19,1,1,1,1,1,1,1,1,1,1,evidence,about 19 of 100 random pairs move together strongly by luck
+C16,1,1,1,1,1,1,0,1,1,0,clarify,"It is when the rule learns the random noise of the old prices instead of a real pattern, like memorising last year's exam answers instead of understanding the topic."
+R34,1,1,1,0,1,0,0,0,0,0,none,this thing is luck
+R25,1,1,0,0,1,0,0,0,0,0,none,then theres no correlation
+R30,1,1,1,0,1,0,0,0,1,0,assumption,the trend is not forever and might be pure luck
+R03,1,1,0,0,1,0,0,0,0,0,none,A: Real pattern. Why: because it just is
+R36,1,1,0,0,1,0,0,0,0,0,none,then it might be a trend
+C12,1,1,1,0,1,0,0,0,1,0,none,because overfitting
+R26,1,1,0,0,1,0,0,0,0,0,none,low chance
+C14,1,1,1,0,1,1,0,1,1,0,assumption,They assume that because it made money in the past it will make money in the future
+R10,1,1,0,0,1,0,0,0,0,0,none,A: Streak. Why: because in a row
+R33,1,1,0,0,1,0,0,0,0,0,none,the financial data or if the stock is hot from investments
+R07,1,0,0,0,0,0,0,0,0,0,none,idk
+R05,1,1,1,0,1,0,0,0,0,0,none,A: Just chance. Why: because its not fixed.. the streak can end
+C21,1,1,1,0,1,1,0,1,1,0,evidence,"A clear reason, like the company selling umbrellas, and the link still working next year on data it has not seen."
+R15,1,1,0,0,1,0,0,0,0,0,none,it could be because its once in a lifetime occurance
+R13,1,1,1,0,1,0,0,1,1,0,assumption,he keeps assuming that the price will go up again in a trend

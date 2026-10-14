@@ -37,6 +37,23 @@ class StartRequest(BaseModel):
     total_rounds: int = 6  # 3, 6, or 0 for no limit (the "∞" option)
     ab_only: bool = False
     reading_seconds: int = 0  # seconds the reading pop-up was open before "Start this case"
+    participant_code: str = ""  # study mode only (see study_codes)
+    consent: bool = False       # study mode only: the learner ticked "I agree to take part"
+
+
+def study_codes():
+    """Study mode for the research project: on when STUDY_CODES lists the
+    participant codes the lecturer hands out (e.g. "P001,P002"). Then only
+    those codes can start a session, after agreeing to take part, and each
+    session is saved with its code, so a student's sessions can be linked
+    (pre and post) without a name. Off (empty) by default, until the
+    supervisor and the ethics approval agree. Read each time, so tests can
+    switch it."""
+    return {c.strip().upper() for c in os.getenv("STUDY_CODES", "").split(",") if c.strip()}
+
+
+class CodeRequest(BaseModel):
+    code: str = ""
 
 
 # Longest answer sent to the agents. A real answer is a few sentences; this
@@ -75,6 +92,7 @@ def _save_turn(sid, session, result):
             "session_id": sid, "concept_id": session["concept_id"], "ab_only": session.get("ab_only", False),
             "total_rounds": session["total_rounds"],  # 0 = no limit
             "reading_seconds": session.get("reading_seconds", 0),
+            "participant_code": session.get("participant_code"),  # None outside study mode
             "provider": llm_client.PROVIDER,
             **result["trace"]}
     storage.append_transcript(sid, line)
@@ -150,9 +168,22 @@ def health():
     ok = saving_ok and ai_ok
     budget = limits.DAILY_CALL_BUDGET or "no limit"
     return JSONResponse({"ok": ok, "saving": {"ok": saving_ok, "message": saving}, "ai": {"ok": ai_ok, "message": ai},
+                         "study_mode": f"on, {len(study_codes())} participant codes" if study_codes() else "off",
                          "today": {"ai_calls": limits.calls_today(), "budget": budget,
                                    "new_sessions_allowed": limits.budget_left()}},
                         status_code=200 if ok else 503)
+
+
+@app.get("/api/config")
+def config():
+    """What the page needs to know at start: is study mode on (consent and code first)?"""
+    return {"study_mode": bool(study_codes())}
+
+
+@app.post("/api/participant/check")
+def check_participant(req: CodeRequest):
+    """Lets the consent screen say "wrong code" before a session starts."""
+    return {"ok": req.code.strip().upper() in study_codes()}
 
 
 @app.get("/api/concepts")
@@ -179,11 +210,21 @@ def score_tutorial(req: TutorialScoreRequest):
 def start_session(req: StartRequest):
     if req.concept_id not in CONCEPTS:
         raise HTTPException(400, f"Unknown concept_id. Choose one of {list(CONCEPTS)}")
+    new = orchestrator.new_session(req.concept_id, max(req.total_rounds, 0), req.ab_only,
+                                   max(0, min(req.reading_seconds, 3600)))
+    codes = study_codes()
+    if codes:
+        code = req.participant_code.strip().upper()
+        if code not in codes:
+            raise HTTPException(403, "This participant code is not on the study list, so please check it with your lecturer.")
+        if not req.consent:
+            raise HTTPException(403, "Please agree to take part before you start.")
+        new["participant_code"] = code
+        new["consent_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     if not limits.budget_left():
         raise HTTPException(429, limits.FULL_MESSAGE)
     sid = str(uuid.uuid4())
-    session, result = _run_turn_safely(orchestrator.new_session(req.concept_id, max(req.total_rounds, 0), req.ab_only,
-                                                            max(0, min(req.reading_seconds, 3600))), None)
+    session, result = _run_turn_safely(new, None)
     SESSIONS[sid] = session
     _persist(sid, session)
     _save_turn(sid, session, result)

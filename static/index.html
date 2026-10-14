@@ -545,6 +545,21 @@
     .rm-head, .rm-body, .rm-foot{padding-left:18px; padding-right:18px;}
   }
 
+  /* ---------- study mode: consent and participant code ---------- */
+  .study-card{width:min(560px, 94vw);}
+  .study-body p{margin:0 0 12px; line-height:1.6;}
+  .study-field{display:flex; flex-direction:column; gap:6px; margin-top:8px; font-weight:600; font-size:14px;}
+  .study-field input{
+    font:inherit; font-family:var(--mono); font-size:16px; letter-spacing:.06em; text-transform:uppercase;
+    padding:10px 12px; border-radius:10px; border:1px solid var(--rule); background:var(--panel-2); color:var(--ink);
+  }
+  .study-field input:focus-visible{outline:2px solid var(--signal); outline-offset:1px;}
+  .study-field input::placeholder{text-transform:none; letter-spacing:0; font-family:var(--sans); font-size:15px;}
+  .study-hint{display:block; font-size:13px; color:var(--ink-soft); margin:6px 0 14px;}
+  .study-agree{display:flex; gap:10px; align-items:flex-start; font-size:14.5px; margin-bottom:14px; cursor:pointer;}
+  .study-agree input{width:18px; height:18px; margin-top:2px; accent-color:var(--signal);}
+  #studyGo:disabled{opacity:.5; cursor:not-allowed;}
+
   /* ---------- first-time tour: small pop-ups that point at one thing at a time ---------- */
   .tour-block{position:fixed; inset:0; z-index:48;}               /* stops clicks on the page during the tour */
   .tour-ring{
@@ -900,6 +915,34 @@
       <div id="rmStatus" aria-live="polite"></div>
       <button class="ghost hidden" id="rmOver">Start over</button>
       <button class="rm-start" id="rmStart">Start this case <svg><use href="#i-play"/></svg></button>
+    </footer>
+  </div>
+</div>
+
+<!-- Study mode only (STUDY_CODES set on the server): consent and participant code before any case.
+     The text is a DRAFT, to be replaced with the wording from the ethics approval. -->
+<div class="read-modal hidden" id="studyModal" role="dialog" aria-modal="true" aria-labelledby="studyTitle">
+  <div class="rm-backdrop"></div>
+  <div class="rm-card study-card">
+    <header class="rm-head">
+      <span class="tag t1">Draft</span>
+      <h2 id="studyTitle">Before you start</h2>
+      <div class="rm-sub">This consent text is a draft, and the final wording will come from the ethics approval.</div>
+    </header>
+    <div class="rm-body study-body">
+      <p>This app is part of a research study on critical thinking at Universiti Teknologi PETRONAS, led by Dr Ho Tatt Wei.</p>
+      <p>If you take part, the app saves your answers and how the AI marked them. It does not save your name, so please do not type personal details in your answers.</p>
+      <p>Your answers are sent to an AI service so they can be marked.</p>
+      <p>Taking part is your choice, and you can stop at any time.</p>
+      <label class="study-field" for="studyCode">Participant code
+        <input id="studyCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" placeholder="For example P001">
+      </label>
+      <span class="study-hint">Your lecturer gives you this code. It links your sessions together without your name.</span>
+      <label class="study-agree" for="studyAgree"><input id="studyAgree" type="checkbox"> I have read this, and I agree to take part.</label>
+    </div>
+    <footer class="rm-foot">
+      <div id="studyStatus" aria-live="polite"></div>
+      <button class="rm-start" id="studyGo" disabled>Agree and continue</button>
     </footer>
   </div>
 </div>
@@ -1373,13 +1416,21 @@ async function startSession(conceptId, readingSeconds = 0){
   try {
     data = await postJSON('/api/session', {concept_id: conceptId, total_rounds: rounds,
                                            ab_only: $('abOnly').getAttribute('aria-pressed') === 'true',
-                                           reading_seconds: readingSeconds});
+                                           reading_seconds: readingSeconds,
+                                           participant_code: study.code || '', consent: !!study.code});
   } catch(e){
     clearTimeout(slow);
     btn.innerHTML = btnLabel;
     status.innerHTML = '';
-    note('error', e.message, status);
     setHomeBusy(false);
+    if(study.on && /participant code|agree to take part/.test(e.message)){
+      // the code was removed from the list, or consent is missing: ask again
+      studyForget();
+      $('readModal').classList.add('hidden');
+      openStudy(e.message);
+      return;
+    }
+    note('error', e.message, status);
     return;
   }
   clearTimeout(slow);
@@ -2350,8 +2401,43 @@ setInterval(() => {
   setTimeout(() => { tipIndex = (tipIndex + 1) % TIPS.length; showTip(); el.classList.remove('fade'); }, reduceMotion ? 0 : 400);
 }, 8000);
 
-loadConcepts()
-  .then(() => { if(!tourSeen('home')) setTimeout(() => startTour('home'), 400); })
+// ---------- study mode: consent and participant code ----------
+// Only when the server has STUDY_CODES set. The code is kept in this browser
+// and sent with every new session, so a student's sessions can be linked.
+const study = {on: false, code: null};
+function studyForget(){ study.code = null; try { localStorage.removeItem('study'); } catch(e){} }
+function openStudy(message){
+  $('studyModal').classList.remove('hidden');
+  $('studyStatus').innerHTML = '';
+  if(message) note('error', message, $('studyStatus'));
+  $('studyCode').focus();
+}
+function studyReady(){ $('studyGo').disabled = !($('studyCode').value.trim() && $('studyAgree').checked); }
+$('studyCode').addEventListener('input', studyReady);
+$('studyAgree').addEventListener('change', studyReady);
+$('studyGo').addEventListener('click', async () => {
+  const code = $('studyCode').value.trim().toUpperCase();
+  $('studyStatus').innerHTML = '';
+  let d;
+  try { d = await postJSON('/api/participant/check', {code}); }
+  catch(e){ note('error', e.message, $('studyStatus')); return; }
+  if(!d.ok){ note('error', 'This code is not on the study list, so please check it with your lecturer.', $('studyStatus')); return; }
+  study.code = code;
+  try { localStorage.setItem('study', JSON.stringify({code, consentAt: new Date().toISOString()})); } catch(e){}
+  $('studyModal').classList.add('hidden');
+  if(!tourSeen('home')) setTimeout(() => startTour('home'), 300);
+});
+async function initStudy(){
+  try { study.on = (await api('/api/config')).study_mode; } catch(e){ study.on = false; }
+  if(!study.on) return true;
+  try { study.code = (JSON.parse(localStorage.getItem('study')) || {}).code || null; } catch(e){}
+  if(study.code) return true;
+  openStudy();
+  return false;
+}
+
+Promise.all([loadConcepts(), initStudy()])
+  .then(([, ready]) => { if(ready && !tourSeen('home')) setTimeout(() => startTour('home'), 400); })
   .catch(e => note('error', e.message, $('homeStatus')));
 </script>
 </body>

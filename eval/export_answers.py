@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 
 from app.content import STANDARDS  # noqa: E402
 
-COLUMNS = (["session_id", "last_saved", "case", "total_rounds", "ab_only", "reading_seconds", "ended",
+COLUMNS = (["session_id", "participant_code", "last_saved", "case", "total_rounds", "ab_only", "reading_seconds", "ended",
             "round", "level_asked", "format", "question", "hint_opened", "answer", "answer_words"]
            + list(STANDARDS)
            + ["standards_met", "reasoning_move", "confused_or_frustrated", "copied_hint", "assessor_version"])
@@ -42,7 +42,8 @@ def rows_of(sid, session, saved):
             question += " Options: " + " / ".join(f"{l}) {o}" for l, o in zip("AB", options))
         ins = prev.get("instruction") or {}
         yield {
-            "session_id": sid, "last_saved": saved, "case": session.get("concept_id"),
+            "session_id": sid, "participant_code": session.get("participant_code") or "",  # blank outside study mode
+            "last_saved": saved, "case": session.get("concept_id"),
             "total_rounds": session.get("total_rounds"),  # 0 = no limit
             "ab_only": int(bool(session.get("ab_only"))), "reading_seconds": session.get("reading_seconds", 0),
             "ended": int(bool(session.get("ended"))), "round": prev.get("round"),  # the round of the question answered
