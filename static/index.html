@@ -2239,6 +2239,25 @@ function renderTour(){
   pop.querySelector('.tp-skip').addEventListener('click', () => endTour(true));
   pop.querySelector('.tp-next').focus();
   placeTour();
+  followTour();
+}
+
+// Keep the ring on its target while the tour is open. Seen on an iPhone
+// (15 October 2026): the ring was measured once, while the case panel was
+// still sliding in and the story's font was still loading, so it sat up and
+// to the left of the story. Now it moves whenever the target moves.
+function followTour(){
+  cancelAnimationFrame(tour.raf);
+  let last = '';
+  const tick = () => {
+    if(!$('tourPop')) return;  // the tour ended
+    const el = tourTarget(tour.steps[tour.i]);
+    const r = el && el.getBoundingClientRect();
+    const key = r ? [r.top, r.left, r.width, r.height, innerWidth, innerHeight].map(Math.round).join() : 'none';
+    if(key !== last){ last = key; placeTour(); }
+    tour.raf = requestAnimationFrame(tick);
+  };
+  tour.raf = requestAnimationFrame(tick);
 }
 
 function placeTour(){
@@ -2286,6 +2305,7 @@ function placeTour(){
 }
 
 function endTour(markSeen){
+  cancelAnimationFrame(tour.raf);
   ['tourBlock', 'tourRing', 'tourPop'].forEach(id => { const n = $(id); if(n) n.remove(); });
   if(markSeen && tour.name) markTourSeen(tour.name);
   tour.name = null;
