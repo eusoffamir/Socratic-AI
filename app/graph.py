@@ -133,6 +133,8 @@ def _finish_node(state: TurnState) -> TurnState:
     s, parts = state["session"], state["parts"]
     if (state.get("assessment") or {}).get("copied_hint") and state["instruction"]["action"] != "end":
         parts["feedback"] = copycheck.CALL_OUT  # rule: always these exact words
+    if state["instruction"]["action"] == "open":
+        parts["feedback"] = orchestrator.welcome(s["total_rounds"])  # rule: the right number of rounds
     state["reply"] = llm_client.parts_text(parts)
     s["last_tutor"] = state["reply"]
     if parts["question"]:

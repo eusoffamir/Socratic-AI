@@ -35,7 +35,7 @@ Rules:
 - If acknowledge_frustration is true, the feedback says in a few calm words that you heard them, and the question is easier.
 - When hint is true, the key_idea should make the next step easier.
 - Never show scores, levels, or the words "assessor", "planner" or "checker".
-- If action is "open": feedback is a one-line welcome that says the number of rounds (if total_rounds is "no limit", say the learner can keep going and press End session when they are done). Then key_idea and the first question.
+- If action is "open": feedback is "" (the app writes the welcome itself). Give key_idea and the first question.
 - If action is "end": feedback names one thing they did well, key_idea names one thing to work on (use summary), question is one thing to think about on their own. options is [].
 - If REVISE_PROBLEMS is given, DRAFT is your earlier reply. Write a fixed version that solves every problem. Keep the same format: if the DRAFT had 2 options, your fixed reply must also have 2 options.
 

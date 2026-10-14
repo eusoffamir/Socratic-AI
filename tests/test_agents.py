@@ -151,6 +151,14 @@ def test_full_session_with_each_agent_off(monkeypatch, off):
     assert used_tool == (off not in ("AGENT_PLANNER", "AGENT_TOOLS"))
 
 
+@pytest.mark.parametrize("rounds, expected", [(6, "We have 6 rounds"), (0, "no round limit")])
+def test_welcome_line_is_written_by_code(monkeypatch, rounds, expected):
+    # Seen 15 Oct 2026: a 6-round session got the no-limit welcome from the Tutor.
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    r = graph.run_turn(orc.new_session("pattern_or_luck", total_rounds=rounds), None)
+    assert expected in r["parts"]["feedback"]
+
+
 def test_checker_triggers_one_rewrite(monkeypatch):
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
     calls = []

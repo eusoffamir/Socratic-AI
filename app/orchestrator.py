@@ -145,6 +145,15 @@ def _finish(session, instruction):
     return instruction
 
 
+def welcome(total_rounds):
+    """The first feedback line, written by code so the number of rounds is
+    always right (R1, R2). Seen 15 October 2026: in a 6-round session the
+    Tutor wrote the no-limit welcome ("press End session when you are done")."""
+    if total_rounds:
+        return f"Welcome. We have {total_rounds} rounds on this case, so take your time with each answer."
+    return "Welcome. There is no round limit, so press End session when you are done."
+
+
 def _plan_is_usable(plan):
     return (isinstance(plan, dict)
             and plan.get("level_change") in ("stay", "up", "down")
