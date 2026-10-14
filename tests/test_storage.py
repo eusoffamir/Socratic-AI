@@ -37,6 +37,27 @@ def test_supabase_saves_and_loads_sessions(monkeypatch):
     assert all(h["apikey"] == "sb_secret_test" and "Authorization" not in h for h in calls)
 
 
+def test_health_check_reads_the_tables_and_explains_problems(monkeypatch):
+    fake_db(monkeypatch)
+    monkeypatch.setattr(storage, "_db", lambda *a, **k: httpx.Response(200, json=[]))
+    assert storage.check() == (True, "Saving to Supabase works.")
+
+    def refused(*a, **k):
+        request = httpx.Request("GET", "https://example.supabase.co/rest/v1/sessions")
+        raise httpx.HTTPStatusError("no", request=request, response=httpx.Response(401, request=request))
+    monkeypatch.setattr(storage, "_db", refused)
+    ok, message = storage.check()
+    assert not ok and "secret key is wrong" in message
+
+
+def test_health_check_warns_when_render_would_wipe_the_files(monkeypatch):
+    monkeypatch.delenv("RENDER", raising=False)
+    assert storage.check()[0]
+    monkeypatch.setenv("RENDER", "true")
+    ok, message = storage.check()
+    assert not ok and "SUPABASE_URL" in message
+
+
 def test_a_failed_save_does_not_block_the_learner(monkeypatch):
     def broken(*a, **k):
         raise httpx.ConnectError("no internet")

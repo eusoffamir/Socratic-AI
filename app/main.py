@@ -1,4 +1,5 @@
 import copy
+import os
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -10,7 +11,7 @@ load_dotenv()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -133,6 +134,21 @@ def _turn_response(session, result):
 @app.get("/")
 def index():
     return FileResponse(STATIC_DIR / "index.html")
+
+
+@app.get("/api/health")
+def health():
+    """A check page to open before a testing day: is saving working, and which
+    AI is in use? It never calls the AI, so it costs no quota."""
+    saving_ok, saving = storage.check()
+    if llm_client.PROVIDER == "mock":
+        ai_ok, ai = not os.getenv("RENDER"), "Using mock replies, so no real AI. Set GOOGLE_API_KEY to use Gemini."
+    else:
+        model = llm_client.GEMINI_MODEL if llm_client.PROVIDER == "gemini" else llm_client.ANTHROPIC_MODEL
+        ai_ok, ai = True, f"Using {llm_client.PROVIDER} ({model}). This page does not call it, to save quota."
+    ok = saving_ok and ai_ok
+    return JSONResponse({"ok": ok, "saving": {"ok": saving_ok, "message": saving}, "ai": {"ok": ai_ok, "message": ai}},
+                        status_code=200 if ok else 503)
 
 
 @app.get("/api/concepts")

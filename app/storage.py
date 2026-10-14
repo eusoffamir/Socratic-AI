@@ -120,3 +120,32 @@ def load_sessions(sids):
 
 def load_session(sid):
     return load_sessions([sid]).get(sid)
+
+
+# What a failed database check most likely means, by HTTP status.
+_DB_PROBLEMS = {401: "the secret key is wrong", 403: "the secret key is not allowed to read the tables",
+                404: "the tables are missing, so run deploy/supabase.sql in Supabase"}
+
+
+def check():
+    """(ok, message) for the /api/health page. It only reads, so it never adds
+    test rows to the thesis data. Failed saves are otherwise only logged."""
+    if BACKEND == "supabase":
+        try:
+            for table in ("sessions", "transcript_lines"):
+                _db("GET", table, headers=_headers(), params={"select": "id", "limit": "1"})
+        except httpx.HTTPStatusError as e:
+            code = e.response.status_code
+            return False, f"Saving to Supabase is broken, because {_DB_PROBLEMS.get(code, f'it replied with error {code}')}."
+        except httpx.HTTPError:
+            return False, "Saving to Supabase is broken, because the database could not be reached."
+        return True, "Saving to Supabase works."
+    if os.getenv("RENDER"):  # Render sets this on its servers
+        return False, ("Saving to files, but Render wipes them on every restart, so set SUPABASE_URL and "
+                       "SUPABASE_SECRET_KEY on Render.")
+    try:
+        for folder in (SESSION_DIR, TRANSCRIPT_DIR):
+            folder.mkdir(exist_ok=True)
+    except OSError:
+        return False, "Saving to files is broken, because the folders could not be made."
+    return True, "Saving to files on this computer works."
