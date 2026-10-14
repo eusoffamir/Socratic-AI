@@ -198,6 +198,12 @@ def apply_plan(session, plan, assessment):
         if change == "up" and not good:
             overrides.append("Answer was weak. Did not move up.")
             change = "stay"
+        elif change == "up" and session["good_streak"] < STREAK_TO_ADVANCE:
+            # Same pace as the fixed rules. Seen 15 October 2026: the Planner
+            # moved a learner from Clarify to Evidence in 2 answers, saying
+            # "reasoned well" even when the Assessor scored the answer weak.
+            overrides.append(f"Needs {STREAK_TO_ADVANCE} good answers in a row. Did not move up yet.")
+            change = "stay"
         if fmt == session["last_format"] and not session.get("ab_only"):
             # R6: never the same format twice in a row (except in "A/B only" mode).
             fmt = _next_format(session, force_easy=False)

@@ -23,8 +23,18 @@ def plan(change="stay", fmt=FORMATS[1], **extra):
 
 def test_guard_accepts_a_sensible_plan():
     s = opened()
+    orc.apply_plan(s, plan("stay", FORMATS[1]), good_assessment())
     ins, overrides = orc.apply_plan(s, plan("up", FORMATS[2]), good_assessment())
     assert s["level_idx"] == 1 and ins["format"] == FORMATS[2] and overrides == []
+
+
+def test_guard_needs_two_good_answers_in_a_row_to_move_up():
+    # Seen 15 Oct 2026: the Planner moved Clarify to Evidence in 2 answers.
+    s = opened()
+    ins, overrides = orc.apply_plan(s, plan("up", FORMATS[1]), good_assessment())
+    assert s["level_idx"] == 0 and "2 good answers" in overrides[0]
+    orc.apply_plan(s, plan("up", FORMATS[2]), good_assessment())
+    assert s["level_idx"] == 1
 
 
 def test_guard_frustration_wins_over_the_plan():
@@ -68,8 +78,8 @@ def test_profile_keeps_the_highest_level_after_moving_down():
     # Audit, 15 Oct 2026: a learner who reached Evidence and then got stuck was
     # moved down by the Planner, and the profile said "You reached Assumptions".
     s = opened()
-    orc.apply_plan(s, plan("up", FORMATS[1]), good_assessment())
-    orc.apply_plan(s, plan("up", FORMATS[2]), good_assessment())
+    for fmt in [FORMATS[1], FORMATS[2]] * 2:  # 2 good answers in a row per level
+        orc.apply_plan(s, plan("up", fmt), good_assessment())
     assert s["level_idx"] == 2
     orc.apply_plan(s, plan("down", AB), frustrated_assessment())
     assert s["level_idx"] == 1  # the teaching still moves down to help
