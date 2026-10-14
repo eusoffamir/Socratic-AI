@@ -1416,6 +1416,7 @@ function enterSession(conceptId, data){
   const idx = concepts.findIndex(c => c.id === conceptId);
   state.concept = concepts[idx];
   state.sessionId = data.session_id;
+  state.hintOpened = false;
   state.totalRounds = data.total_rounds;
   state.ended = false;
 
@@ -1511,6 +1512,8 @@ $('log').addEventListener('click', e => {
   btn.setAttribute('aria-expanded', open);
   btn.setAttribute('aria-label', open ? 'Hide hint' : 'Show hint');
   if(open) body.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  // saved with the next answer, so the thesis can compare answers with and without the hint
+  if(open && btn === lastOf('.hint-btn')) state.hintOpened = true;
 });
 
 function addLearner(text){
@@ -1614,7 +1617,7 @@ async function sendAnswer(text){
 
   let data;
   try {
-    data = await postJSON(`/api/session/${state.sessionId}/answer`, {answer});
+    data = await postJSON(`/api/session/${state.sessionId}/answer`, {answer, hint_opened: !!state.hintOpened});
   } catch(e){
     // The server leaves the session untouched on failure, so put the answer
     // back in the box and let the learner simply send it again.
@@ -1629,6 +1632,7 @@ async function sendAnswer(text){
   clearTimeout(slow);
   pending.remove();
   setBusy(false);
+  state.hintOpened = false;  // a new question, so its hint has not been opened yet
   showTurn(data);
 
   if(data.ended) finishSession();

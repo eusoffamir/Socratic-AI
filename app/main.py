@@ -46,6 +46,7 @@ MAX_ANSWER_CHARS = 2000
 
 class AnswerRequest(BaseModel):
     answer: str
+    hint_opened: bool = False  # the learner opened the hint of this question before answering
 
 
 class OverviewRequest(BaseModel):
@@ -215,6 +216,8 @@ def submit_answer(sid: str, req: AnswerRequest):
     if not req.answer.strip():  # the page blocks this too; a blank answer would waste a round and AI calls
         raise HTTPException(400, "Please type an answer first.")
     session, result = _run_turn_safely(session, req.answer[:MAX_ANSWER_CHARS])
+    # saved with the answer, for a "with vs without hint" comparison in the thesis
+    result["trace"]["hint_opened"] = session["turns"][-1]["hint_opened"] = req.hint_opened
     SESSIONS[sid] = session
     _persist(sid, session)
     _save_turn(sid, session, result)

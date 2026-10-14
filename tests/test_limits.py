@@ -35,6 +35,17 @@ def test_blank_answers_are_refused_and_empty_sessions_skip_the_coach(monkeypatch
     assert client.get(f"/api/session/{sid}/stats").json()["comment"] is None and coach == []
 
 
+def test_hint_opened_is_saved_with_the_answer(monkeypatch):
+    fresh(monkeypatch, 0)
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    client = TestClient(main.app)
+    sid = client.post("/api/session", json={}).json()["session_id"]
+    client.post(f"/api/session/{sid}/answer", json={"answer": "luck, since many stocks do it", "hint_opened": True})
+    client.post(f"/api/session/{sid}/answer", json={"answer": "test it on new days"})
+    turns = main.SESSIONS[sid]["turns"]
+    assert [t.get("hint_opened") for t in turns] == [None, True, False]
+
+
 def test_the_count_starts_again_on_a_new_day(monkeypatch):
     fresh(monkeypatch, 2)
     limits.count_call()
