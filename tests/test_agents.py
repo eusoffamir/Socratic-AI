@@ -178,8 +178,8 @@ def test_reading_seconds_is_saved_in_the_transcript(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
     from app import main
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
-    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path)
-    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "sessions")
+    monkeypatch.setattr(main.storage, "TRANSCRIPT_DIR", tmp_path)
+    monkeypatch.setattr(main.storage, "SESSION_DIR", tmp_path / "sessions")
     client = TestClient(main.app)
     assert "reading" in client.get("/api/concepts").json()[0]
     sid = client.post("/api/session", json={"concept_id": "pattern_or_luck", "reading_seconds": 42}).json()["session_id"]
@@ -196,9 +196,16 @@ def _client(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
     from app import main
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
-    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path / "transcripts")
-    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "sessions")
+    monkeypatch.setattr(main.storage, "TRANSCRIPT_DIR", tmp_path / "transcripts")
+    monkeypatch.setattr(main.storage, "SESSION_DIR", tmp_path / "sessions")
     return main, TestClient(main.app)
+
+
+def test_very_long_answer_is_cut(monkeypatch, tmp_path):
+    main, client = _client(monkeypatch, tmp_path)
+    sid = client.post("/api/session", json={"concept_id": "pattern_or_luck"}).json()["session_id"]
+    assert client.post(f"/api/session/{sid}/answer", json={"answer": "luck " * 2000}).status_code == 200
+    assert len(main.SESSIONS[sid]["turns"][-1]["answer"]) == main.MAX_ANSWER_CHARS
 
 
 def test_session_survives_a_server_restart(monkeypatch, tmp_path):

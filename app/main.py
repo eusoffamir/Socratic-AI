@@ -1,5 +1,4 @@
 import copy
-import json
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -15,22 +14,20 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import graph, llm_client, orchestrator, tutorial
+from . import graph, llm_client, orchestrator, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
 app = FastAPI(title="Socratic AI")
 
-# Live sessions are kept in memory and also saved to sessions/<id>.json after
-# every turn, so a learner can leave and continue later, even after a server
-# restart. One file is about 5 to 20 KB.
+# Live sessions are kept in memory and also saved after every turn (see
+# storage.py: files on this computer, a free database online), so a learner
+# can leave and continue later, even after a server restart. One session is
+# about 5 to 20 KB. Each turn also adds one transcript line with the full
+# agent trace. No names or personal data are stored. Kept for the thesis Results.
 SESSIONS: dict[str, dict] = {}
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-# One .jsonl file per session, one line per turn, with the full agent trace.
-# No names or personal data are stored. Kept for the thesis Results.
-TRANSCRIPT_DIR = Path(__file__).resolve().parent.parent / "transcripts"
-SESSION_DIR = Path(__file__).resolve().parent.parent / "sessions"
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
@@ -39,6 +36,11 @@ class StartRequest(BaseModel):
     total_rounds: int = 6  # 3, 6, or 0 for no limit (the "∞" option)
     ab_only: bool = False
     reading_seconds: int = 0  # seconds the reading pop-up was open before "Start this case"
+
+
+# Longest answer sent to the agents. A real answer is a few sentences; this
+# stops a huge paste from using up the free model quota on a public link.
+MAX_ANSWER_CHARS = 2000
 
 
 class AnswerRequest(BaseModel):
@@ -67,37 +69,42 @@ def _run_turn_safely(session, answer):
 
 
 def _save_turn(sid, session, result):
-    TRANSCRIPT_DIR.mkdir(exist_ok=True)
     line = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "session_id": sid, "concept_id": session["concept_id"], "ab_only": session.get("ab_only", False),
             "total_rounds": session["total_rounds"],  # 0 = no limit
             "reading_seconds": session.get("reading_seconds", 0),
             "provider": llm_client.PROVIDER,
             **result["trace"]}
-    with open(TRANSCRIPT_DIR / f"{sid}.jsonl", "a", encoding="utf-8") as f:
-        f.write(json.dumps(line, ensure_ascii=False) + "\n")
+    storage.append_transcript(sid, line)
 
 
 def _persist(sid, session):
-    """Save the session so it can be continued later. Written to a temp file
-    first, then renamed, so a crash never leaves half a file."""
-    SESSION_DIR.mkdir(exist_ok=True)
-    tmp = SESSION_DIR / f"{sid}.json.tmp"
-    tmp.write_text(json.dumps(session, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(SESSION_DIR / f"{sid}.json")
+    """Save the session so it can be continued later."""
+    storage.save_session(sid, session)
+
+
+NOT_FOUND = "This session could not be found, so please start a new one."
+
+
+def _clean_id(sid):
+    """The id in standard form, or None if it is not a real id, so a saved
+    path or database query can never point anywhere else."""
+    try:
+        return str(uuid.UUID(sid))
+    except (ValueError, TypeError, AttributeError):
+        return None
 
 
 def _get_session(sid):
-    """The live session from memory, else from disk, else 404."""
-    try:
-        sid = str(uuid.UUID(sid))  # only real ids, so the path can't point anywhere else
-    except ValueError:
-        raise HTTPException(404, "This session could not be found, so please start a new one.")
+    """The live session from memory, else from storage, else 404."""
+    sid = _clean_id(sid)
+    if sid is None:
+        raise HTTPException(404, NOT_FOUND)
     if sid not in SESSIONS:
-        path = SESSION_DIR / f"{sid}.json"
-        if not path.exists():
-            raise HTTPException(404, "This session could not be found, so please start a new one.")
-        SESSIONS[sid] = json.loads(path.read_text(encoding="utf-8"))
+        session = storage.load_session(sid)
+        if session is None:
+            raise HTTPException(404, NOT_FOUND)
+        SESSIONS[sid] = session
     return sid, SESSIONS[sid]
 
 
@@ -145,7 +152,7 @@ def get_tutorial():
 
 @app.post("/api/tutorial/score")
 def score_tutorial(req: TutorialScoreRequest):
-    return tutorial.final_result(req.r2_pick, req.answer[:2000])
+    return tutorial.final_result(req.r2_pick, req.answer[:MAX_ANSWER_CHARS])
 
 
 @app.post("/api/session")
@@ -184,7 +191,7 @@ def submit_answer(sid: str, req: AnswerRequest):
     sid, session = _get_session(sid)
     if session["ended"]:
         raise HTTPException(400, "This session has already ended.")
-    session, result = _run_turn_safely(session, req.answer)
+    session, result = _run_turn_safely(session, req.answer[:MAX_ANSWER_CHARS])
     SESSIONS[sid] = session
     _persist(sid, session)
     _save_turn(sid, session, result)
@@ -212,11 +219,13 @@ def overview(req: OverviewRequest):
     drawings. Unknown or broken ids are skipped. The tutorial is practice and
     is not saved, so it never counts here."""
     history, best_idx, played, finished, per_case = [], 0, 0, 0, {}
-    for sid in req.session_ids[:300]:
-        try:
-            _, s = _get_session(sid)
-        except HTTPException:
-            continue
+    sids = list(dict.fromkeys(filter(None, map(_clean_id, req.session_ids[:300]))))
+    # one storage call for every session not in memory yet
+    SESSIONS.update(storage.load_sessions([sid for sid in sids if sid not in SESSIONS]))
+    for sid in sids:
+        s = SESSIONS.get(sid)
+        if s is None:
+            continue  # unknown id
         if not s["history"]:
             continue  # opened but never answered
         played += 1

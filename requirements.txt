@@ -1,8 +1,9 @@
-fastapi
-uvicorn
-langgraph
-google-genai
-anthropic
-python-dotenv
-pytest
-httpx
+# Pinned to the versions the tests pass with, so a deploy installs the same ones.
+fastapi==0.141.1
+uvicorn==0.51.0
+langgraph==1.2.12
+google-genai==1.75.0
+anthropic==1.9.0
+python-dotenv==1.2.2
+pytest==9.1.1
+httpx==0.28.1

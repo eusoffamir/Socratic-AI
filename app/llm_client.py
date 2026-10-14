@@ -34,7 +34,7 @@ def _pick_provider():
 
 PROVIDER = _pick_provider()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 # Gemini 3.x models "think" before answering, and those thinking tokens count
 # against max_output_tokens. With a tight cap the visible reply gets cut off

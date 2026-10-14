@@ -1,0 +1,21 @@
+# Render Blueprint: one free web service for Socratic AI.
+# Render asks for the values marked "sync: false" once, when you create it.
+# The keys stay on Render, never in this public repo.
+services:
+  - type: web
+    name: socratic-ai
+    runtime: python
+    plan: free
+    region: singapore              # near the Supabase Asia-Pacific database and the testers
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/concepts
+    envVars:
+      - key: GOOGLE_API_KEY        # Gemini free key from https://aistudio.google.com/apikey
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: SUPABASE_URL          # Supabase > Project Settings > Data API > Project URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY   # Supabase > Project Settings > API Keys > Secret key (sb_secret_...)
+        sync: false

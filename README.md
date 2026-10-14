@@ -125,7 +125,7 @@ The provider is picked in this order (first match wins):
 | Variable            | Default            | Purpose                                 |
 | ------------------- | ------------------ | --------------------------------------- |
 | `GOOGLE_API_KEY`    | (none)             | Key for Gemini                          |
-| `GEMINI_MODEL`      | `gemini-3.8-flash` | Gemini model to call                    |
+| `GEMINI_MODEL`      | `gemini-3.5-flash-lite` | Gemini model to call                    |
 | `ANTHROPIC_API_KEY` | (none)             | Key for Claude                          |
 | `ANTHROPIC_MODEL`   | `claude-sonnet-5`  | Claude model to call                    |
 | `PROVIDER`          | auto               | Force `gemini` / `anthropic` / `mock`   |

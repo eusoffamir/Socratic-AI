@@ -8,7 +8,7 @@ def test_default_gemini_model_uses_supported_model(monkeypatch):
     monkeypatch.delenv("GEMINI_MODEL", raising=False)
     import app.llm_client as llm_client
     importlib.reload(llm_client)
-    assert llm_client.GEMINI_MODEL == "gemini-3.8-flash"
+    assert llm_client.GEMINI_MODEL == "gemini-3.5-flash-lite"
 
 
 def good_assessment(move="evidence", n_met=3):
@@ -154,8 +154,8 @@ def test_end_button_ends_an_unlimited_session(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
     from app import llm_client, main
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
-    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "s")
-    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path / "t")
+    monkeypatch.setattr(main.storage, "SESSION_DIR", tmp_path / "s")
+    monkeypatch.setattr(main.storage, "TRANSCRIPT_DIR", tmp_path / "t")
     client = TestClient(main.app)
     sid = client.post("/api/session", json={"concept_id": "pattern_or_luck", "total_rounds": 0}).json()["session_id"]
     for _ in range(7):
@@ -170,8 +170,8 @@ def test_overview_combines_every_session(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
     from app import llm_client, main
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
-    monkeypatch.setattr(main, "SESSION_DIR", tmp_path / "s")
-    monkeypatch.setattr(main, "TRANSCRIPT_DIR", tmp_path / "t")
+    monkeypatch.setattr(main.storage, "SESSION_DIR", tmp_path / "s")
+    monkeypatch.setattr(main.storage, "TRANSCRIPT_DIR", tmp_path / "t")
     client = TestClient(main.app)
     ids = []
     for case, answers in [("pattern_or_luck", 2), ("together_not_cause", 1), ("pattern_or_luck", 0)]:
