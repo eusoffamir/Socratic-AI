@@ -1666,12 +1666,15 @@ function reportHTML(data, final){
 
   const radar = standardsRadarSVG(data.standards, s.standards_met_count, n);
 
+  // "Congratulations!" only when the learner moved above level 1 (Clarify is
+  // where everyone starts, so it sounded odd after a weak session).
+
   // One paragraph on how the learner answered, written when the session ends.
   const comment = data.comment ? `
     <div class="coach-comment"><div class="mono-label">Comments</div><p>${esc(data.comment)}</p></div>` : '';
 
   return `
-    <h2>${n ? `${final ? 'Congratulations! ' : ''}You reached <em>${esc(s.highest_level_reached)}</em>` : 'Nothing yet'}</h2>
+    <h2>${n ? `${final && reachedIdx > 0 ? 'Congratulations! ' : ''}You reached <em>${esc(s.highest_level_reached)}</em>` : 'Nothing yet'}</h2>
 
     <div class="report-grid">
       <div>
