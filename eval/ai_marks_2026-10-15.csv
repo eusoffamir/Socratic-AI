@@ -19,3 +19,44 @@ R05,1,1,1,0,1,0,0,0,0,0,none,A: Just chance. Why: because its not fixed.. the st
 C21,1,1,1,0,1,1,0,1,1,0,evidence,"A clear reason, like the company selling umbrellas, and the link still working next year on data it has not seen."
 R15,1,1,0,0,1,0,0,0,0,0,none,it could be because its once in a lifetime occurance
 R13,1,1,1,0,1,0,0,1,1,0,assumption,he keeps assuming that the price will go up again in a trend
+C23,1,1,1,0,1,0,0,0,0,0,clarify,two things moving together
+C15,1,1,1,0,1,1,0,1,1,0,implication,No. Why: it might just be lucky.
+R18,1,1,0,0,1,0,0,0,0,0,none,A: Real pattern. Why: upward trend
+C24,1,1,1,0,1,1,1,1,1,1,viewpoint,"That it was probably luck or a hidden factor that changed, so I should not buy because of the rain, though one failed test does not prove it can never work."
+R37,1,1,1,0,1,0,0,0,0,0,none,its just luck
+C09,1,1,1,0,1,1,0,1,1,0,implication,"Then there is no reason it should keep rising, so buying now is closer to a coin flip than a sure win, and I could lose money."
+C07,1,1,0,0,0,0,1,0,0,0,viewpoint,"the market is like a rollercoaster, and also crypto is popular now, so I think it depends on many things"
+C08,1,1,1,0,1,1,0,1,1,0,assumption,"He is assuming the past streak will continue, but stock prices do not remember yesterday"
+R19,1,1,0,0,0,0,0,0,0,0,none,it might be right since my friend also says it
+R08,1,1,1,0,1,0,0,0,0,0,none,B: Just luck.
+C22,1,1,1,0,1,1,1,1,1,1,viewpoint,"They might say a whole year is a long time, so it cannot be luck. That is a fair point, but with many pairs to look at, some will still line up by chance."
+R14,1,1,0,0,1,0,0,0,0,0,none,because the stocks are expecting people to buy ..so it creates a trend
+R01,1,1,0,0,1,0,0,0,0,0,none,I'm stuck and not sure how to answer this.
+C02,1,1,1,0,1,0,0,1,1,0,none,He means the price will keep going up because it went up before.
+C18,1,1,1,0,1,1,0,1,1,0,assumption,"Maybe a hidden third thing, like the season. In the rainy season people stay home and shop online more"
+R04,1,1,1,1,1,0,0,1,1,0,evidence,0.5 ^ 5 = 0.03 ... very low chace only 3%
+C10,1,1,1,0,1,1,1,1,1,0,question_the_question,"Maybe the better question is whether this stock does better than the market over many months, since one week tells us very little either way."
+C20,1,1,0,0,1,0,0,0,0,0,none,"Yes, because they moved together for a whole year."
+R28,1,1,1,0,1,0,0,1,0,0,none,theres low chance it might go up again
+C01,1,1,1,1,1,1,1,1,1,1,evidence,"going up 5 days in a row happens about 3% of the time, so with 500 stocks about 15 would do it by chance"
+R27,1,1,0,0,1,0,0,0,0,0,none,it might go down
+R24,1,1,1,0,1,0,0,0,0,0,none,Disagree with sceptic. Why: it might not be pure luck as well since there are correlations
+C05,1,0,0,0,1,0,0,0,0,0,none,"Because 3% but maybe, so therefore however 500 stocks."
+R09,1,0,0,0,1,0,0,0,0,0,none,because just guessing
+R06,1,1,0,0,1,0,0,0,0,0,none,A: Real pattern. Why: cause its trending
+C13,1,1,1,0,1,1,1,1,1,1,evidence,Split the data. Use the first half to find the rule and the second half to test it.
+R23,1,0,0,0,1,0,0,0,0,0,evidence,make a model prediction and see if the new data's error loss
+R02,1,1,0,0,0,0,0,0,0,0,none,I'm stuck and not sure how to answer this.
+R11,1,1,1,0,1,0,1,0,0,0,viewpoint,"if it keeps going up, it might go down"
+R17,1,1,0,0,1,0,0,1,0,0,none,since my friend says it goes up.. i guess go up
+R22,1,1,1,0,1,1,0,1,1,0,assumption,if the stock/ company is a solar company that is affected by rain... meaning if it rains the power output is less
+R12,1,1,0,0,1,0,0,0,0,0,none,it might go down
+R20,1,1,0,0,1,0,0,0,0,0,assumption,he wont lie to me
+R32,1,1,0,0,1,0,0,0,0,0,implication,then i lose money for gambling
+R16,1,0,0,0,0,0,0,0,0,0,none,i will buy
+R21,1,1,1,0,1,0,0,0,1,0,none,it dosent mean anything... it might be pure coincidence
+R35,1,1,0,0,1,0,0,0,0,0,none,A: Real pattern. Why: i think so
+C06,1,1,0,0,1,0,0,0,0,0,none,"It is 50%, because each day is 50% so five days is also 50%."
+C04,1,1,1,1,1,1,1,1,1,1,viewpoint,"A sceptic would say the streak is just luck, and they have a point, since about 3% of stocks do this anyway."
+C11,1,1,1,1,1,1,0,1,1,0,evidence,"Because with 200 rules, one will fit the old prices by luck, like +32%, but that luck does not repeat, so on new data it drops to about +8%."
+C03,1,1,1,1,1,1,0,1,1,0,evidence,"check whether the same stock keeps rising on new days it has not seen yet, for example the next 20 days"
