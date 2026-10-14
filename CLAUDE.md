@@ -10,6 +10,16 @@ Read this first. It holds everything decided so far in earlier chat sessions.
 - The student feels lost easily when many things change at once. Work one step at a time, explain what you did in plain words, and do not add large new features without asking.
 - Be honest about uncertainty. Mark anything unverified clearly. Never invent citations.
 
+## Two laptops: keep everything in sync (IMPORTANT)
+
+The student works on **two laptops**, each with its own copy of this folder and its own VS Code and Claude chats. GitHub (`eusoffamir/Socratic-AI`) is the only link between them, so nothing may be left only on one laptop.
+
+- **Start of every chat:** run `git pull` before changing anything, so this laptop has the other laptop's work. If it fails or shows a conflict, stop and explain it in plain words before doing anything else.
+- **After every finished, tested change:** commit and `git push` straight away, without asking (student's instruction, 15 October 2026). Say in the reply that it was pushed, because a push also redeploys the live app on Render. Plain push only, never force push.
+- **Project knowledge goes in this file**, not only in Claude's memory folder, because the memory folder (`~/.claude/projects/...`) stays on one laptop and is not synced.
+- **Not synced by Git, so set up by hand on each laptop:** `.env` (keys; copy it by hand, never upload it), `.claude/settings.local.json` (the rules `PowerShell(git push)` and `Bash(git push)` that let Claude push), and `docs/2026_EdEx SoTL Grant Proposal.docx` (Dr Ho's private file, ignored on purpose). Learner data is in Supabase, so it is shared by both laptops and the live app.
+- On a laptop where Git was installed after VS Code opened, `git` is not found until VS Code is fully restarted. Until then use `& "C:\Program Files\Git\cmd\git.exe"`.
+
 ## What the project is, in simple words
 
 An app that makes students think for themselves instead of handing them answers, and then tests whether it works.
