@@ -170,6 +170,14 @@ def test_full_session_with_each_agent_off(monkeypatch, off):
     assert used_tool == (off not in ("AGENT_PLANNER", "AGENT_TOOLS"))
 
 
+def test_assessor_gets_the_case_facts_to_judge_accuracy():
+    from app import prompts
+    from app.content import CONCEPTS
+    payload = prompts.assessor_user({"concept_id": "pattern_or_luck", "last_tutor": "Why?"}, "luck")
+    assert CONCEPTS["pattern_or_luck"]["notes"][0] in payload
+    assert "NOTES" not in prompts.assessor_user({"last_tutor": "Why?"}, "luck")  # the tutorial has no case
+
+
 def test_checker_is_shown_the_questions_already_asked(monkeypatch):
     # So it can catch the same question asked again in new words.
     monkeypatch.setattr(llm_client, "PROVIDER", "gemini")

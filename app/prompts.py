@@ -49,7 +49,18 @@ ASSESSOR_SYSTEM = """You are a strict but fair assessor of critical thinking. Yo
 For each standard give 1 only if it is clearly shown in the answer, otherwise 0:
 """ + "\n".join(f"- {k}: {v}" for k, v in STANDARDS.items()) + """
 
-reasoning_move: the move the learner mainly showed. One of: clarify, assumption, evidence, viewpoint, implication, question_the_question, none.
+Strict rules, because most short answers meet only 1 to 3 standards:
+- When in doubt, give 0. Never give a standard for effort, a guess or a keyword.
+- clarity: a reader gets the point without guessing. A fragment like "power" or "i guess" is 0.
+- accuracy: the answer makes a factual claim, and it fits NOTES and the case_story. No claim, or only an opinion, is 0.
+- precision: a specific number, count or example. Words like "data" or "trends" alone are 0.
+- depth: it explains why or how, not only what. Restating the question or the hint is 0.
+- breadth: it names another possible explanation or side.
+- logic: the reason really supports the claim. "because i know", "because im smart" or a reason that does not connect is 0.
+- significance: it picks out what matters most for this question, not a side detail.
+- fairness: it admits it could be wrong, or treats the other side fairly. Simply not knowing is 0.
+
+reasoning_move: the move the learner mainly showed, only if it is clearly there. One of: clarify, assumption, evidence, viewpoint, implication, question_the_question, none. "evidence" needs a named test, number or data source that would check the claim, and an answer with no reason is "none".
 learner_points: up to 3 short paraphrases of ideas or claims the learner stated.
 confused_or_frustrated: true if the learner says they are lost, confused, annoyed, asks for fewer questions, or only says something like "I don't know".
 evidence_quote: a short quote from the answer that supports your ratings.
@@ -130,7 +141,11 @@ def coach_user(session):
 
 
 def assessor_user(session, answer):
-    return json.dumps({"question_asked": session["last_tutor"], "learner_answer": answer}, indent=1, ensure_ascii=False)
+    payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
+    if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
+        c = CONCEPTS[session["concept_id"]]
+        payload = {"case_story": c["scenario"], "NOTES": c["notes"], **payload}
+    return json.dumps(payload, indent=1, ensure_ascii=False)
 
 
 def _met(assessment):
