@@ -151,6 +151,16 @@ def test_full_session_with_each_agent_off(monkeypatch, off):
     assert used_tool == (off not in ("AGENT_PLANNER", "AGENT_TOOLS"))
 
 
+def test_checker_is_shown_the_questions_already_asked(monkeypatch):
+    # So it can catch the same question asked again in new words.
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    sent = []
+    monkeypatch.setattr(llm_client, "_generate", lambda system, user, *a, **k: sent.append(user) or '{"ok": true}')
+    asked = ["Is the 5 day streak a real pattern or just luck, and why?"]
+    assert llm_client.call_checker({"format": FORMATS[0]}, "luck", {"question": "Why?"}, asked) == []
+    assert asked[0] in sent[0]
+
+
 def test_planner_suggested_tool_is_run_by_code_once_per_session(monkeypatch):
     # Seen 15 Oct 2026: the Planner suggested simulate_streaks, the Tutor ignored it.
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")

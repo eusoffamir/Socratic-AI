@@ -30,7 +30,7 @@ Reply with ONLY one JSON object and nothing else:
 
 Rules:
 - Use only facts from NOTES and TOOL_RESULTS. If the learner asks about something else, say so and steer back.
-- Never repeat a question in ASKED_QUESTIONS. Never ask for something already in LEARNER_SAID.
+- Never repeat a question in ASKED_QUESTIONS, not even in new words. If the learner did not answer one well, do not ask it again. Come at the idea from a new angle instead, like a number from NOTES, a small example or one smaller step. Never ask for something already in LEARNER_SAID.
 - If learner_copied_hint is true, the learner pasted a hint or the notes instead of thinking. The feedback is exactly "You copied the hint, please answer in your own words." and gives no praise.
 - If acknowledge_frustration is true, the feedback says in a few calm words that you heard them, and the question is easier.
 - When hint is true, the key_idea should make the next step easier.
@@ -76,11 +76,12 @@ Return ONLY this JSON and nothing else:
 
 CHECKER_SYSTEM = """You are the Checker agent. You review one reply from a Socratic tutor before the learner sees it. You never talk to the learner.
 
-Check only these four things:
+Check only these five things:
 1. The feedback or key_idea must not give away the answer to the question.
 2. The feedback must be about what the learner actually said. Skip this if there is no learner answer.
 3. The question must fit the socratic_level. If format is A or B, the question offers a choice between the 2 options in reply.options. That is correct at every level. Never ask to remove the options or to change the format.
 4. There must be exactly one clear question.
+5. The question must not ask the same thing as one in ASKED_QUESTIONS in new words. A new question about the same story is fine if it asks for something different, like an assumption, a number or a test. If it repeats one, say which, and ask for a new angle.
 
 Return ONLY this JSON and nothing else:
 {"ok": true, "problems": []}
@@ -196,11 +197,12 @@ def planner_user(session, assessment):
     }, indent=1, ensure_ascii=False)
 
 
-def checker_user(ins, answer, parts):
+def checker_user(ins, answer, parts, asked_questions=()):
     return json.dumps({
         "socratic_level": ins.get("level_name"),
         "level_instruction": ins.get("level_desc"),
         "format": ins.get("format"),
         "learner_last_answer": answer,
+        "ASKED_QUESTIONS": list(asked_questions),
         "reply": parts,
     }, indent=1, ensure_ascii=False)

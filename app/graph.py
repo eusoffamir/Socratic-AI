@@ -124,7 +124,10 @@ def _check_node(state: TurnState) -> TurnState:
         state["first_code_ok"] = not code_problems
     problems = code_problems
     if not problems:  # only spend a model call when the free checks pass
-        problems = llm_client.call_checker(ins, state.get("answer"), state["parts"])
+        # The Checker also judges repeats in new words (seen 15 October 2026:
+        # "pattern or luck, and why?" asked 3 rounds in a row). Plain code only
+        # catches exact repeats, since every question shares the story's words.
+        problems = llm_client.call_checker(ins, state.get("answer"), state["parts"], state["session"]["questions"])
     state["problems"] = problems
     state["check"] = {"ran": True, "history": prev + [problems]}
     return state

@@ -253,13 +253,13 @@ def call_planner(session, assessment):
         return None
 
 
-def call_checker(instruction, answer, parts):
+def call_checker(instruction, answer, parts, asked_questions=()):
     """The Checker agent. Returns a list of problems (empty means OK). If the
     call fails, the reply is let through rather than blocking the learner."""
     if PROVIDER == "mock":
         return []
     try:
-        data = _parse_json(_generate(CHECKER_SYSTEM, checker_user(instruction, answer, parts),
+        data = _parse_json(_generate(CHECKER_SYSTEM, checker_user(instruction, answer, parts, asked_questions),
                                      max_tokens=200, json_mode=True))
     except LLMError:
         return []
