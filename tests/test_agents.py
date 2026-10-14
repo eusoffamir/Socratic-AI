@@ -191,6 +191,20 @@ def test_full_session_with_each_agent_off(monkeypatch, off):
     assert used_tool == (off not in ("AGENT_PLANNER", "AGENT_TOOLS"))
 
 
+def test_assessor_uses_a_fixed_seed_and_the_tutor_does_not(monkeypatch):
+    # Reproducible scoring (grant proposal): same answer, same marks.
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    seeds = []
+    def fake(system, user, max_tokens, json_mode=False, seed=None):
+        seeds.append(seed)
+        return '{"standards": {}}' if seed else '{"question": "Why?"}'
+    monkeypatch.setattr(llm_client, "_generate", fake)
+    llm_client.call_assessor({"last_tutor": "Why?"}, "luck")
+    s = opened()
+    llm_client.call_tutor(s, orc.decide(s, good_assessment()), "luck", good_assessment(), use_tools=False)
+    assert seeds == [llm_client.ASSESSOR_SEED, None]
+
+
 def test_assessor_gets_the_case_facts_to_judge_accuracy():
     from app import prompts
     from app.content import CONCEPTS

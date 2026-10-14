@@ -46,6 +46,12 @@ GEMINI_THINKING_HEADROOM = 2048
 # How many times to retry when the provider says it's overloaded (HTTP 503).
 OVERLOAD_RETRIES = 2
 
+# Fixed seed for the Assessor, so the same answer gets the same marks (the
+# grant proposal needs reproducible scoring). The Tutor keeps some variety.
+# The temperature is left at Gemini's default on purpose: Google's advice for
+# its thinking models is not to lower it (from memory, not checked again).
+ASSESSOR_SEED = 26004
+
 # Most tool runs the Tutor agent may make in one turn.
 MAX_TOOLS_PER_TURN = 2
 
@@ -82,7 +88,7 @@ def _get_gemini():
     return _gemini_client
 
 
-def _generate_gemini(system, user, max_tokens, json_mode):
+def _generate_gemini(system, user, max_tokens, json_mode, seed=None):
     import httpx
     from google.genai import errors, types
     config = types.GenerateContentConfig(
@@ -92,6 +98,7 @@ def _generate_gemini(system, user, max_tokens, json_mode):
         # Short tutoring replies don't need deep thinking; "low" cuts each call
         # from ~20s to a few seconds.
         thinking_config=types.ThinkingConfig(thinking_level="low"),
+        seed=seed,
     )
     for attempt in range(OVERLOAD_RETRIES + 1):
         try:
@@ -134,11 +141,12 @@ def _generate_anthropic(system, user, max_tokens):
     return resp.content[0].text.strip()
 
 
-def _generate(system, user, max_tokens, json_mode=False):
-    """Dispatch one call to whichever provider is active. Returns raw text."""
+def _generate(system, user, max_tokens, json_mode=False, seed=None):
+    """Dispatch one call to whichever provider is active. Returns raw text.
+    A fixed seed asks the model to give the same reply to the same input."""
     limits.count_call()
     if PROVIDER == "gemini":
-        return _generate_gemini(system, user, max_tokens, json_mode)
+        return _generate_gemini(system, user, max_tokens, json_mode, seed)
     if PROVIDER == "anthropic":
         return _generate_anthropic(system, user, max_tokens)
     raise RuntimeError(f"Unknown PROVIDER: {PROVIDER!r}")  # mock is handled by the callers
@@ -238,7 +246,7 @@ def call_assessor(session, answer):
     user_payload = assessor_user(session, answer)
     if PROVIDER == "mock":
         return _mock_assessor(answer)
-    data = _parse_json(_generate(ASSESSOR_SYSTEM, user_payload, max_tokens=400, json_mode=True))
+    data = _parse_json(_generate(ASSESSOR_SYSTEM, user_payload, max_tokens=400, json_mode=True, seed=ASSESSOR_SEED))
     if data is None or "standards" not in data:
         raise LLMError("The assessor returned a reply that isn't valid JSON. Try sending your answer again.")
     return clean_assessment(data)
