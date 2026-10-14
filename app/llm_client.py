@@ -13,7 +13,7 @@ import os
 import random
 import time
 
-from . import tools
+from . import limits, tools
 from .content import CONCEPTS, FORMATS, MOVES, STANDARDS
 from .prompts import (AB_FORMAT, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
                       assessor_user, checker_user, coach_user, planner_user, tutor_user)
@@ -136,6 +136,7 @@ def _generate_anthropic(system, user, max_tokens):
 
 def _generate(system, user, max_tokens, json_mode=False):
     """Dispatch one call to whichever provider is active. Returns raw text."""
+    limits.count_call()
     if PROVIDER == "gemini":
         return _generate_gemini(system, user, max_tokens, json_mode)
     if PROVIDER == "anthropic":

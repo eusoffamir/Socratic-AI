@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import graph, llm_client, orchestrator, storage, tutorial
+from . import graph, limits, llm_client, orchestrator, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
@@ -147,7 +147,10 @@ def health():
         model = llm_client.GEMINI_MODEL if llm_client.PROVIDER == "gemini" else llm_client.ANTHROPIC_MODEL
         ai_ok, ai = True, f"Using {llm_client.PROVIDER} ({model}). This page does not call it, to save quota."
     ok = saving_ok and ai_ok
-    return JSONResponse({"ok": ok, "saving": {"ok": saving_ok, "message": saving}, "ai": {"ok": ai_ok, "message": ai}},
+    budget = limits.DAILY_CALL_BUDGET or "no limit"
+    return JSONResponse({"ok": ok, "saving": {"ok": saving_ok, "message": saving}, "ai": {"ok": ai_ok, "message": ai},
+                         "today": {"ai_calls": limits.calls_today(), "budget": budget,
+                                   "new_sessions_allowed": limits.budget_left()}},
                         status_code=200 if ok else 503)
 
 
@@ -175,6 +178,8 @@ def score_tutorial(req: TutorialScoreRequest):
 def start_session(req: StartRequest):
     if req.concept_id not in CONCEPTS:
         raise HTTPException(400, f"Unknown concept_id. Choose one of {list(CONCEPTS)}")
+    if not limits.budget_left():
+        raise HTTPException(429, limits.FULL_MESSAGE)
     sid = str(uuid.uuid4())
     session, result = _run_turn_safely(orchestrator.new_session(req.concept_id, max(req.total_rounds, 0), req.ab_only,
                                                             max(0, min(req.reading_seconds, 3600))), None)

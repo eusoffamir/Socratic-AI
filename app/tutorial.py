@@ -5,7 +5,7 @@ or if the model call fails, a rough plain-code check is used instead. Nothing
 is saved: the tutorial is practice, not thesis data."""
 import re
 
-from . import copycheck, llm_client, orchestrator
+from . import copycheck, limits, llm_client, orchestrator
 from .content import LEVELS, STANDARD_TIPS, STANDARDS, TUTORIAL
 
 MOVES = [k for k, _, _ in LEVELS]
@@ -80,7 +80,7 @@ def assess_answer(answer):
     if copied_share(answer) >= COPY_LIMIT:
         return {"standards": {k: 0 for k in STANDARDS}, "reasoning_move": "none",
                 "confused_or_frustrated": False, "source": "copy_check", "copied": True}
-    if llm_client.PROVIDER != "mock":
+    if llm_client.PROVIDER != "mock" and limits.budget_left():  # over budget: the word check, so it still works
         try:
             session = {"last_tutor": TUTORIAL["rounds"][2]["question"]}
             return {**_clean(llm_client.call_assessor(session, answer)), "source": "assessor"}
