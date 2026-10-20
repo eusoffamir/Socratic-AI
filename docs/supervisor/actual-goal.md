@@ -1,0 +1,50 @@
+# What is our actual goal? (checked 20 October 2026)
+
+Sources compared: Dr Ho's grant proposal, the official FYP project listing, Meeting 2 (19 October 2026) and Dr Ho's feedback on the slides (20 October 2026, 5:27 pm).
+
+## 1. The official FYP project listing (26S005)
+
+- **Title:** Agentic AI for Fostering Critical Thinking Education. Supervisor: Ts Dr Ho Tatt Wei. Cluster: Intelligent Signal and Imaging. Difficulty 4. Linked to the grant SoTL 015LF0-098.
+- **Description:** explore prompt engineering and advanced retrieval augmented generation of agentic LLMs to engage and assess critical thinking in learners.
+- **Problem:** critical thinking must be strengthened now that LLMs can do much of the analysis and software work, so students need an agentic AI tool to build their competency in complex decision making and design thinking.
+- **Objectives:** (1) develop an agentic AI to interactively teach undergraduates (the listing says "about deployment of AI agents"; Dr Ho later set the topic to quant); (2) develop a methodology to guide agentic AI to **assess** critical thinking skills; (3) develop a methodology to guide agentic AI to **adapt** to the learner's gaps and customise the learning experience.
+- **Deliverables:** (1) an agentic LLM, prompted and given a RAG knowledge graph; (2) an agentic workflow that interacts with the learner and customises the difficulty of the Socratic questions; (3) an agentic workflow that assesses the learner's critical thinking attainment.
+- **Tools:** Claude AI, an agentic workflow with LangGraph.
+
+## 2. The grant proposal (the parent project)
+
+- **The grant's two objectives:** (1) build a valid instrument that measures reasoning from Socratic dialogue transcripts; (2) test whether an adaptive Socratic chatbot improves analytical and inductive reasoning.
+- **The FYP's part:** the adaptive Socratic chatbot (grant Milestone 1) and the first automated assessor (Milestone 2). The psychometric validation, the factor analysis on 50 to 100 students and the pre/post study belong to the grant's later phases.
+
+## 3. So the actual goal is
+
+> **A Socratic AI tutor that develops a learner's critical thinking, measures it against a framework, and adapts to the learner's gaps.**
+
+It has three parts: teach (the question ladder), assess (the framework scores) and adapt (support and difficulty). This matches the three objectives and three deliverables in the official listing, and Goal 1 from Meeting 2 (show attainment by reasoning type, knowledge type and quality). Quant is only the first topic, and the framework is meant to work for any topic.
+
+## 4. Dr Ho's feedback on 20 October 2026
+
+- "Problem statement is not clear enough."
+- "Too many objectives, try to aim at 3, some can be combined."
+- "For objectives try to focus on the desired end state or outcome, not descriptions of capability or tasks."
+- "Evaluating the prototype is a task, not objective."
+
+## 5. New problem statement (used in the slides, the script and the thesis)
+
+> Students increasingly hand their thinking to generative AI, and studies link this to weaker critical thinking. AI tutors that use Socratic questioning can refuse to give answers, but they share three gaps. Their questions do not climb a principled ladder toward deeper thinking, so learners are never pushed to ask whether they are asking the right question. They do not measure the learner's critical thinking against any framework. They do not adapt to what each learner is missing. As a result, neither the learner nor the lecturer can tell whether critical thinking is actually improving.
+
+## 6. New objectives (3, written as end states)
+
+1. **Teach:** Undergraduates new to a topic build their own reasoning, guided step by step up Paul's six levels of Socratic questioning, without being given the answers.
+2. **Assess:** Each learner's critical thinking attainment is measured from the conversation against the Paul-Elder framework (the nine intellectual standards, plus the type of reasoning and knowledge used), with marks that agree with human markers.
+3. **Adapt:** The support and difficulty match each learner's gaps, and the learner can see what they have mastered and what to work on next.
+
+The old objective "evaluate the prototype against the baseline tutors" is now part of the methodology (the evaluation plan), because Dr Ho said it is a task, not an objective.
+
+## 7. How each objective is checked (methodology, not objectives)
+
+| Objective | Evidence of success |
+|---|---|
+| 1. Teach | Learners move up the levels during sessions; the tutor never gives the answer; design requirements R1 to R9 are met, compared with the baseline Gem tutors |
+| 2. Assess | Agreement with human markers on the 61-answer test set (percent agreement and Cohen's kappa per standard; the grant's target is 0.8) |
+| 3. Adapt | Frustrated or weak learners get easier questions and hints, strong learners move up; the dashboard shows each learner's attainment; a short learner questionnaire (after ethics approval) |

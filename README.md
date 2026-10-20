@@ -4,7 +4,7 @@ A tutor app that helps university students new to quant think for themselves
 instead of being handed answers. It asks Socratic questions, marks each answer
 for the quality of the reasoning, and shows the learner how they did.
 
-Final year project 26S004 at UTP, "Agentic AI for Fostering Critical Thinking
+Final year project 26S005 at UTP, "Agentic AI for Fostering Critical Thinking
 Education", supervised by Dr Ho Tatt Wei.
 
 Live prototype: https://socratic-ai-qlk6.onrender.com (free hosting, so the
