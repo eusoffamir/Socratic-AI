@@ -1,4 +1,4 @@
-// Proposal defence deck for Socratic AI (26S004), in the UTP style of the senior's deck.
+// Proposal defence deck for Socratic AI (26S005), in the UTP style of the senior's deck.
 // Run: node build.js <figDir> <shotDir> <out.pptx>
 const fs = require("fs");
 const path = require("path");
@@ -6,6 +6,8 @@ const pptxgen = require("pptxgenjs");
 
 const [FIG, SHOT, OUT] = process.argv.slice(2);
 const HERE = __dirname;
+// Speaker notes come from script.json (the defence script), so the notes and the script stay in step.
+const SCRIPT = JSON.parse(fs.readFileSync(path.join(HERE, "script.json"), "utf8"));
 const C = {
   navy: "07517A", navyDark: "053A58", navyLight: "DCEAF2", gold: "7A6E3C", goldLight: "F3EEDC",
   ink: "111827", grey: "4B5563", line: "CBD5E1", white: "FFFFFF", bg: "F7F9FB", green: "166534",
@@ -85,10 +87,10 @@ function table(s, hdr, rows, opts) {
   s.addText("A multi-agent tutor that asks instead of answers, and measures how well the learner reasons", { x: 3.6, y: 2.65, w: 9.2, h: 0.5, fontFace: F, fontSize: 16, italic: true, color: C.gold, margin: 0 });
   s.addShape(pres.shapes.RECTANGLE, { x: 3.6, y: 3.45, w: 9.2, h: 3.55, fill: { color: C.navy }, line: { color: C.navy } });
   const rows = ["Presented by : Muhammad Eusoff Amir bin Hazri (22010491)", "Supervised by : Dr Ho Tatt Wei", "Department : Electrical and Electronics Engineering",
-    "Course : EFB4042 Final Year Project I", "Project code : 26S004", "Date : 21st October 2026"];
+    "Course : EFB4042 Final Year Project I", "Project code : 26S005", "Date : 21st October 2026"];
   s.addText(rows.map((t, i) => ({ text: t, options: { breakLine: i < rows.length - 1 } })),
     { x: 3.9, y: 3.6, w: 8.7, h: 3.25, fontFace: F, fontSize: 15, color: C.white, valign: "middle", paraSpaceAfter: 9, margin: 0 });
-  s.addNotes("Good afternoon. My name is Eusoff, and my supervisor is Dr Ho Tatt Wei. My project is Socratic AI, an AI tutor that does not give answers. It asks questions step by step and measures how well the student reasons.");
+  s.addNotes(SCRIPT[n].text || "Good afternoon. My name is Eusoff, and my supervisor is Dr Ho Tatt Wei. My project is Socratic AI, an AI tutor that does not give answers. It asks questions step by step and measures how well the student reasons.");
 }
 
 // 2. Outline
@@ -103,7 +105,7 @@ function table(s, hdr, rows, opts) {
   });
   shot(s, "01_home.png", 8.1, 1.45, 4.7, 4.6);
   s.addText("The working prototype, live online", { x: 8.1, y: 4.35, w: 4.7, h: 0.35, fontFace: F, fontSize: 12, italic: true, color: C.grey, align: "center", margin: 0 });
-  s.addNotes("This is my outline. I will cover the introduction, the problem, objectives and scope, the literature, my methodology, the timeline, my first results and the conclusion. On the right is the working app, which is already online.");
+  s.addNotes(SCRIPT[n].text || "This is my outline. I will cover the introduction, the problem, objectives and scope, the literature, my methodology, the timeline, my first results and the conclusion. On the right is the working app, which is already online.");
 }
 
 // 3. Introduction
@@ -124,50 +126,51 @@ function table(s, hdr, rows, opts) {
     { text: "The idea of this project", options: { bold: true, color: C.gold, breakLine: true } },
     { text: "Turn the same AI around. Instead of an answer machine, build a tutor that asks Socratic questions in a set order, so the learner builds the understanding, and then measure the quality of the learner's reasoning against a framework.", options: {} },
   ], { x: M + 0.3, y: 4.85, w: W - 2 * M - 0.6, h: 1.9, fontFace: F, fontSize: 17, color: C.ink, valign: "middle", margin: 0, paraSpaceAfter: 6 });
-  s.addNotes("Students can now ask an AI for a finished answer and copy it. A QS report found 62 percent of students use generative AI every week, and a study of 319 workers found that people who trust AI more think less critically. My idea is to use the same AI the other way round: a tutor that asks questions in a set order, and that measures how well the student reasons.");
+  s.addNotes(SCRIPT[n].text || "Students can now ask an AI for a finished answer and copy it. A QS report found 62 percent of students use generative AI every week, and a study of 319 workers found that people who trust AI more think less critically. My idea is to use the same AI the other way round: a tutor that asks questions in a set order, and that measures how well the student reasons.");
 }
 
 // 4. Problem statement
 {
   const s = base("Problem Statement");
-  s.addText("Two Gemini Gem tutors were tested (an online Socratic Tutor and the first project prompt). Three problems were found.",
-    { x: M, y: 1.15, w: W - 2 * M, h: 0.45, fontFace: F, fontSize: 15, color: C.grey, margin: 0 });
-  const probs = [["No structure", "Questions do not climb step by step from clarifying to questioning the question itself."],
-    ["No assessment", "The tutor cannot say how well the learner reasoned against any framework."],
-    ["Poor experience", "It repeated questions, forgot answers, ignored frustration and never said when it would end."]];
+  s.addText("Students increasingly hand their thinking to generative AI, and studies link this to weaker critical thinking [10]. Socratic AI tutors can refuse to give answers, but they share three gaps.",
+    { x: M, y: 1.1, w: W - 2 * M, h: 0.65, fontFace: F, fontSize: 16, color: C.ink, margin: 0 });
+  const probs = [["No ladder", "Questions only lead toward an answer, so learners are never pushed to ask whether they are asking the right question."],
+    ["No measurement", "They do not measure the learner's critical thinking against any framework."],
+    ["No adaptation", "They do not adapt to what each learner is missing."]];
   probs.forEach(([h, t], i) => {
     const x = M + i * 4.12;
-    card(s, x, 1.8, 3.88, 2.75);
-    circle(s, x + 0.25, 2.0, 0.58, String(i + 1), C.gold);
-    s.addText(h, { x: x + 0.25, y: 2.75, w: 3.4, h: 0.5, fontFace: F, fontSize: 20, bold: true, color: C.navy, margin: 0 });
-    s.addText(t, { x: x + 0.25, y: 3.3, w: 3.4, h: 1.15, fontFace: F, fontSize: 15, color: C.ink, valign: "top", margin: 0 });
+    card(s, x, 1.9, 3.88, 2.65);
+    circle(s, x + 0.25, 2.1, 0.58, String(i + 1), C.gold);
+    s.addText(h, { x: x + 0.25, y: 2.8, w: 3.4, h: 0.5, fontFace: F, fontSize: 20, bold: true, color: C.navy, margin: 0 });
+    s.addText(t, { x: x + 0.25, y: 3.35, w: 3.4, h: 1.15, fontFace: F, fontSize: 15, color: C.ink, valign: "top", margin: 0 });
   });
   s.addShape(pres.shapes.RECTANGLE, { x: M, y: 4.85, w: W - 2 * M, h: 1.95, fill: { color: C.navy }, line: { color: C.navy } });
   s.addText([
-    { text: "Real tester messages:  ", options: { bold: true, color: "BFD7E6" } },
-    { text: "\"bro i explained this before\"  and  \"you are asking way too much follow up questions\"", options: { italic: true, color: C.white, breakLine: true } },
-    { text: "So a single Socratic prompt is not enough. The tutor needs a structured ladder, a separate assessor, memory, and a clear goal, progress and end.", options: { color: C.white } },
-  ], { x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 1.75, fontFace: F, fontSize: 16, valign: "middle", margin: 0, paraSpaceAfter: 8 });
-  s.addNotes("Some tools already refuse to give answers, like Gemini Gems. I tested two of them and found three problems. The questions have no structure, there is no real assessment of reasoning, and the experience is poor. My tester wrote: bro I explained this before. So one prompt is not enough.");
+    { text: "Seen in early testing of two Gemini Gem tutors:  ", options: { bold: true, color: "BFD7E6" } },
+    { text: "\"bro i explained this before\"", options: { italic: true, color: C.white, breakLine: true } },
+    { text: "As a result, neither the learner nor the lecturer can tell whether critical thinking is actually improving.", options: { bold: true, color: C.white } },
+  ], { x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 1.75, fontFace: F, fontSize: 17, valign: "middle", margin: 0, paraSpaceAfter: 8 });
+  s.addNotes(SCRIPT[n].text || "");
 }
 
-// 5. Objectives
+// 5. Objectives (3, written as end states)
 {
   const s = base("Objectives");
   const obj = [
-    "To design and build Socratic AI, a multi-agent tutoring prototype that teaches beginners one quant topic through Socratic dialogue.",
-    "To guide the tutor through six levels of Socratic questioning, and to assess the learner with the nine intellectual standards.",
-    "To show which type of reasoning (inductive, deductive, abductive) and which types of knowledge the learner used, measured over many questions.",
-    "To adapt the difficulty and support to each learner, with a clear goal, feedback after each answer and a progress view.",
-    "To evaluate the prototype against the baseline tutors from early testing.",
+    ["Teach", "Undergraduates new to a topic build their own reasoning, guided step by step up Paul's six levels of Socratic questioning, without being given the answers."],
+    ["Assess", "Each learner's critical thinking attainment is measured from the conversation against the Paul-Elder framework (the nine standards, plus the type of reasoning and knowledge used), with marks that agree with human markers."],
+    ["Adapt", "The support and difficulty match each learner's gaps, and the learner can see what they have mastered and what to work on next."],
   ];
-  obj.forEach((t, i) => {
-    const y = 1.2 + i * 1.12;
-    circle(s, M + 0.1, y + 0.08, 0.66, String(i + 1), i === 2 ? C.gold : C.navy, C.white, 20);
-    card(s, M + 1.0, y, W - 2 * M - 1.0, 0.86, i === 2 ? C.goldLight : C.bg, i === 2 ? C.goldLight : C.line);
-    s.addText(t, { x: M + 1.25, y, w: W - 2 * M - 1.5, h: 0.86, fontFace: F, fontSize: 16, color: C.ink, valign: "middle", margin: 0 });
+  obj.forEach(([h, t], i) => {
+    const y = 1.2 + i * 1.6;
+    circle(s, M + 0.1, y + 0.3, 0.75, String(i + 1), C.navy, C.white, 22);
+    card(s, M + 1.1, y, W - 2 * M - 1.1, 1.38);
+    s.addText(h, { x: M + 1.35, y, w: 1.6, h: 1.38, fontFace: F, fontSize: 20, bold: true, color: C.navy, valign: "middle", margin: 0 });
+    s.addText(t, { x: M + 3.0, y, w: W - 2 * M - 3.25, h: 1.38, fontFace: F, fontSize: 16, color: C.ink, valign: "middle", margin: 0 });
   });
-  s.addNotes("I have five objectives. Build the multi-agent tutor. Use the six Socratic levels and the nine standards. Objective three, in gold, is new from my latest meeting with Dr Ho: show which type of reasoning and knowledge the learner used, over many questions. Then adapt to each learner, and evaluate against the baseline tutors.");
+  s.addText("These match the three objectives and deliverables in the official project listing (26S005).",
+    { x: M, y: 6.1, w: W - 2 * M, h: 0.4, fontFace: F, fontSize: 13, italic: true, color: C.grey, margin: 0 });
+  s.addNotes(SCRIPT[n].text || "");
 }
 
 // 6. Scope
@@ -191,7 +194,7 @@ function table(s, hdr, rows, opts) {
     { text: "Target learners: ", options: { bold: true } }, { text: "university students new to quant (early testers are Dr Ho's students).", options: { breakLine: true } },
     { text: "Future work, outside FYP: ", options: { bold: true } }, { text: "a second topic, real reading material with retrieval (RAG) [15], knowledge graphs, and a full class study (needs a paid key and ethics approval)." },
   ], { x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 1.75, fontFace: F, fontSize: 16, color: C.ink, valign: "middle", margin: 0, paraSpaceAfter: 8 });
-  s.addNotes("To keep it small, the prototype covers one quant topic: is a pattern in data real, or just luck. It uses four AI agents guarded by code, and it assesses reasoning against a framework. A second topic, real reading material and knowledge graphs are future work.");
+  s.addNotes(SCRIPT[n].text || "To keep it small, the prototype covers one quant topic: is a pattern in data real, or just luck. It uses four AI agents guarded by code, and it assesses reasoning against a framework. A second topic, real reading material and knowledge graphs are future work.");
 }
 
 // 6b. Literature review: agentic AI building blocks (Dr Ho's course modules)
@@ -208,7 +211,7 @@ function table(s, hdr, rows, opts) {
   ], { x: M, y: 1.65, w: W - 2 * M, colW: [2.3, 0.75, 4.2, 4.0, 0.98], rowH: 0.64, size: 12, center: [1, 4] });
   s.addText("Based on the supervisor's course slides [16], [23] and the DeepLearning.AI short courses he recommended [24].",
     { x: M, y: 6.7, w: W - 2 * M, h: 0.32, fontFace: F, fontSize: 12, italic: true, color: C.grey, margin: 0 });
-  s.addNotes("The agentic AI building blocks come from Dr Ho's course modules. Each technique maps to a part of my system: Chain of Thought in the Planner, ReAct in the Tutor's simulation loop, and multi-agent systems in the four agent roles. RAG and MCP are future work.");
+  s.addNotes(SCRIPT[n].text || "The agentic AI building blocks come from Dr Ho's course modules. Each technique maps to a part of my system: Chain of Thought in the Planner, ReAct in the Tutor's simulation loop, and multi-agent systems in the four agent roles. RAG and MCP are future work.");
 }
 
 // 7. Literature review 1: frameworks
@@ -222,7 +225,7 @@ function table(s, hdr, rows, opts) {
     ["Revised Bloom's taxonomy", "2001", "Knowledge dimension: factual, conceptual, procedural, metacognitive", "Types of knowledge used (planned)", "No causal or relational type", "[2]"],
     ["SOLO taxonomy", "1982", "Prestructural to extended abstract outcomes", "Complexity: how many knowledge types are joined", "Needs adapting to dialogue", "[3]"],
   ], { x: M, y: 1.65, w: W - 2 * M, colW: [2.45, 0.65, 3.35, 2.6, 2.6, 0.58], rowH: 0.86, size: 12, center: [1, 5] });
-  s.addNotes("The literature gives several frameworks. From Paul and Elder, the six question levels tell the tutor what to ask, and the nine standards tell the assessor how good the answer is. The eight elements of thought, the revised Bloom's taxonomy and the SOLO taxonomy will add the type of knowledge and the complexity, in the next stage.");
+  s.addNotes(SCRIPT[n].text || "The literature gives several frameworks. From Paul and Elder, the six question levels tell the tutor what to ask, and the nine standards tell the assessor how good the answer is. The eight elements of thought, the revised Bloom's taxonomy and the SOLO taxonomy will add the type of knowledge and the complexity, in the next stage.");
 }
 
 // 8. Literature review 2: empirical studies
@@ -238,7 +241,7 @@ function table(s, hdr, rows, opts) {
     ["Lee, Ang and Lai", "2025", "Bloom labels on chatbot dialogues", "Dialogue logs reveal thinking processes", "Descriptive only", "[9]"],
     ["Lee et al. (CHI)", "2025", "319 knowledge workers", "More AI trust, less critical thinking", "Survey, self-reported", "[10]"],
   ], { x: M, y: 1.65, w: W - 2 * M, colW: [2.1, 0.7, 2.9, 3.6, 2.35, 0.58], rowH: 0.68, size: 12, center: [1, 5] });
-  s.addNotes("Studies in education, nursing and healthcare show that Socratic questioning improves reasoning, but a human tutor cannot do it for every student. AI can do it at scale. Degen and Asanov in 2025 found a Socratic AI tutor gave more support for reflective thinking than a plain chatbot, and they argue for multi-agent systems. But most of this work is self-reported, and it does not measure the reasoning directly.");
+  s.addNotes(SCRIPT[n].text || "Studies in education, nursing and healthcare show that Socratic questioning improves reasoning, but a human tutor cannot do it for every student. AI can do it at scale. Degen and Asanov in 2025 found a Socratic AI tutor gave more support for reflective thinking than a plain chatbot, and they argue for multi-agent systems. But most of this work is self-reported, and it does not measure the reasoning directly.");
 }
 
 // 9. Literature review 3: existing tools
@@ -254,7 +257,7 @@ function table(s, hdr, rows, opts) {
   s.addText("* From public descriptions, not tested in this project.", { x: M, y: 5.95, w: 9, h: 0.35, fontFace: F, fontSize: 12, italic: true, color: C.grey, margin: 0 });
   s.addText("No tested tool combines a question ladder, framework assessment and a clear session, and none shows which type of reasoning a learner used.",
     { x: M, y: 6.35, w: W - 2 * M, h: 0.7, fontFace: F, fontSize: 16, bold: true, color: C.navy, margin: 0 });
-  s.addNotes("Here is the comparison of existing tutors. They refuse to give answers, but none combine a principled question ladder, assessment against a framework, and a clear goal with progress and an end. None show which type of reasoning the learner used. Socratic AI covers these, and the last column is the next stage.");
+  s.addNotes(SCRIPT[n].text || "Here is the comparison of existing tutors. They refuse to give answers, but none combine a principled question ladder, assessment against a framework, and a clear goal with progress and an end. None show which type of reasoning the learner used. Socratic AI covers these, and the last column is the next stage.");
 }
 
 // 10. Research gap and justification
@@ -278,7 +281,7 @@ function table(s, hdr, rows, opts) {
     "Plain-code rules guard every AI decision, so steps are fair and testable (\"agents decide, rules guard\").",
     "Next, new agents add reasoning type and knowledge type, measured over many questions.",
   ], x2 + 0.3, 1.95, colW - 0.6, 4.7, 16, C.white);
-  s.addNotes("So the gap is this. AI can reduce thinking, Socratic tutors have no principled ladder, reasoning is rarely measured against a framework, and no tool shows which type of reasoning a learner used. My project answers each point: a tutor that follows the six levels, a separate assessor marking the nine standards, code rules guarding the AI, and next, reasoning and knowledge types.");
+  s.addNotes(SCRIPT[n].text || "So the gap is this. AI can reduce thinking, Socratic tutors have no principled ladder, reasoning is rarely measured against a framework, and no tool shows which type of reasoning a learner used. My project answers each point: a tutor that follows the six levels, a separate assessor marking the nine standards, code rules guarding the AI, and next, reasoning and knowledge types.");
 }
 
 // 11. Methodology: phases + environment
@@ -316,7 +319,7 @@ function table(s, hdr, rows, opts) {
     { text: "Hardware", options: { bold: true, color: C.navy, breakLine: true } },
     { text: "A normal laptop; the AI runs in the cloud, so no GPU is needed", options: { bullet: true } },
   ], { x: ex + 0.2, y: 1.4, w: ew - 0.35, h: 5.3, fontFace: F, fontSize: 13, color: C.ink, valign: "top", paraSpaceAfter: 6, margin: 0 });
-  s.addNotes("My method is iterative prototyping in five phases. I tested existing tutors, turned what failed into nine design requirements, built the prototype, tested it with real sessions and fixed what broke, and next I evaluate it. It uses Python, FastAPI, LangGraph and the free Gemini model, and it is hosted for free. No GPU is needed, because the AI runs in the cloud.");
+  s.addNotes(SCRIPT[n].text || "My method is iterative prototyping in five phases. I tested existing tutors, turned what failed into nine design requirements, built the prototype, tested it with real sessions and fixed what broke, and next I evaluate it. It uses Python, FastAPI, LangGraph and the free Gemini model, and it is hosted for free. No GPU is needed, because the AI runs in the cloud.");
 }
 
 // 12. Methodology: architecture
@@ -340,7 +343,7 @@ function table(s, hdr, rows, opts) {
   });
   s.addText("Each agent gets a small JSON payload built by code and must reply in a fixed JSON shape. About 25 AI calls per 6-round session.",
     { x: x2, y: 6.5, w: w2, h: 0.5, fontFace: F, fontSize: 12, italic: true, color: C.grey, margin: 0 });
-  s.addNotes("This is the heart of the system. Every answer goes through these steps. The Assessor marks it. The Planner proposes the next move. Then plain code rules check the plan, so the AI cannot break important rules. The Tutor writes the reply and may run a small simulation, and the Checker reviews it before the learner sees it. So the agents decide, and the rules guard.");
+  s.addNotes(SCRIPT[n].text || "This is the heart of the system. Every answer goes through these steps. The Assessor marks it. The Planner proposes the next move. Then plain code rules check the plan, so the AI cannot break important rules. The Tutor writes the reply and may run a small simulation, and the Checker reviews it before the learner sees it. So the agents decide, and the rules guard.");
 }
 
 // 13. Methodology: session design with screenshots
@@ -353,7 +356,7 @@ function table(s, hdr, rows, opts) {
   s.addText("2. Feedback, one question, a hidden hint, and a simulation result", { x: M + 6.25, y: 1.7 + a.h, w: 6.0, h: 0.35, fontFace: F, fontSize: 12, italic: true, color: C.grey, margin: 0 });
   const feats = ["3, 6 or no-limit rounds", "Round and level shown", "4 question formats", "\"I'm not sure\" button", "Status panel", "Tutorial"];
   feats.forEach((t, i) => pill(s, M + i * 2.06, 6.35, 1.95, t, C.navyLight, C.navy, 11));
-  s.addNotes("This is what the learner sees. On the left, each case starts with a short reading. On the right, a real session: the tutor gives short feedback, one question, a hint that stays hidden until the learner opens it, and here it ran a simulation: out of 500 random stocks, 15 went up every day by luck. Underneath are the other features from the design requirements.");
+  s.addNotes(SCRIPT[n].text || "This is what the learner sees. On the left, each case starts with a short reading. On the right, a real session: the tutor gives short feedback, one question, a hint that stays hidden until the learner opens it, and here it ran a simulation: out of 500 random stocks, 15 went up every day by luck. Underneath are the other features from the design requirements.");
 }
 
 // 14. Methodology: planned framework
@@ -372,25 +375,26 @@ function table(s, hdr, rows, opts) {
   ], x2, 1.7, w2, 4.6, 14);
   s.addText("Example: \"All the regional banks fell, not just CIMB\" is inductive reasoning on relational knowledge.",
     { x: M, y: 6.5, w: W - 2 * M, h: 0.4, fontFace: F, fontSize: 13, italic: true, color: C.gold, margin: 0 });
-  s.addNotes("From my last meeting, Dr Ho and I widened the framework. Navy parts are built, gold parts are planned. Besides quality, we want to know which type of reasoning the student used, like inductive or deductive, and which type of knowledge, like causal or relational. New agents will do this, without rebuilding the old ones. Each skill is measured over several questions, then simple statistics. For example, noticing that all regional banks fell, not just one bank, is inductive reasoning.");
+  s.addNotes(SCRIPT[n].text || "From my last meeting, Dr Ho and I widened the framework. Navy parts are built, gold parts are planned. Besides quality, we want to know which type of reasoning the student used, like inductive or deductive, and which type of knowledge, like causal or relational. New agents will do this, without rebuilding the old ones. Each skill is measured over several questions, then simple statistics. For example, noticing that all regional banks fell, not just one bank, is inductive reasoning.");
 }
 
 // 15. Evaluation plan
 {
   const s = base("Proposed Methodology");
   pill(s, M, 1.05, 3.2, "Evaluation Plan");
-  const ev = [["Requirement check", "Run the same scenarios on the baseline Gem tutors and on Socratic AI, and mark R1 to R9 as met or not."],
-    ["Assessor vs human markers", "Mark 61 test answers by hand with a marking guide. Compare using percent agreement and Cohen's kappa per standard (parent grant target 0.8)."],
-    ["With and without agents", "Switch the Planner, simulations or Checker off, and compare the same sessions."],
-    ["Learner experience", "A short questionnaire with Dr Ho's students, after ethics approval."]];
-  ev.forEach(([h, t], i) => {
+  const ev = [["Requirement check", "Objective 1", "Run the same scenarios on the baseline Gem tutors and on Socratic AI, and mark R1 to R9 as met or not."],
+    ["Assessor vs human markers", "Objective 2", "Mark 61 test answers by hand with a marking guide. Compare using percent agreement and Cohen's kappa per standard (parent grant target 0.8)."],
+    ["With and without agents", "All objectives", "Switch the Planner, simulations or Checker off, and compare the same sessions."],
+    ["Learner experience", "Objective 3", "A short questionnaire with Dr Ho's students, after ethics approval."]];
+  ev.forEach(([h, tag, t], i) => {
     const x = M + (i % 2) * 6.2, y = 1.7 + Math.floor(i / 2) * 2.6;
     card(s, x, y, 5.95, 2.35);
     circle(s, x + 0.25, y + 0.25, 0.58, String(i + 1));
-    s.addText(h, { x: x + 1.0, y: y + 0.25, w: 4.7, h: 0.58, fontFace: F, fontSize: 18, bold: true, color: C.navy, valign: "middle", margin: 0 });
+    pill(s, x + 4.15, y + 0.33, 1.6, tag, C.goldLight, C.gold, 11);
+    s.addText(h, { x: x + 1.0, y: y + 0.25, w: 3.1, h: 0.58, fontFace: F, fontSize: 18, bold: true, color: C.navy, valign: "middle", margin: 0 });
     s.addText(t, { x: x + 0.25, y: y + 1.0, w: 5.45, h: 1.2, fontFace: F, fontSize: 15, color: C.ink, valign: "top", margin: 0 });
   });
-  s.addNotes("I will evaluate in four ways. A requirement check against the baseline tutors. The Assessor against human markers using Cohen's kappa, where the parent grant targets 0.8. Switching agents on and off to see what each one adds. And a short questionnaire with real learners after ethics approval.");
+  s.addNotes(SCRIPT[n].text || "I will evaluate in four ways. A requirement check against the baseline tutors. The Assessor against human markers using Cohen's kappa, where the parent grant targets 0.8. Switching agents on and off to see what each one adds. And a short questionnaire with real learners after ethics approval.");
 }
 
 // 16. Gantt (week by week, FYP 1 and FYP 2)
@@ -407,7 +411,7 @@ function table(s, hdr, rows, opts) {
     s.addText(d, { x: x + 0.32, y: y0, w: cw - 0.4, h: 0.38, fontFace: F, fontSize: 12, bold: true, color: C.gold, margin: 0 });
     s.addText(t, { x: x + 0.32, y: y0 + 0.38, w: cw - 0.4, h: 0.5, fontFace: F, fontSize: 12, color: C.ink, valign: "top", margin: 0 });
   });
-  s.addNotes("This is my timeline, week by week. The green bars are done: the literature review, the Gem tests and the working prototype. This week is the proposal defence. By mid November I add the reasoning and knowledge layer and show a demo, then the interim report. In FYP 2 I validate the Assessor against human markers, build the question bank and statistics, try a second topic, test with learners, and finish with the technical paper and dissertation.");
+  s.addNotes(SCRIPT[n].text || "This is my timeline, week by week. The green bars are done: the literature review, the Gem tests and the working prototype. This week is the proposal defence. By mid November I add the reasoning and knowledge layer and show a demo, then the interim report. In FYP 2 I validate the Assessor against human markers, build the question bank and statistics, try a second topic, test with learners, and finish with the technical paper and dissertation.");
 }
 
 // 17. Preliminary results: a real session
@@ -425,7 +429,7 @@ function table(s, hdr, rows, opts) {
     s.addText(big, { x: x2 + 0.25, y, w: 1.9, h: 1.4, fontFace: F, fontSize: 34, bold: true, color: C.navy, valign: "middle", margin: 0 });
     s.addText(t, { x: x2 + 2.15, y, w: w2 - 2.35, h: 1.4, fontFace: F, fontSize: 14, color: C.ink, valign: "middle", margin: 0 });
   });
-  s.addNotes("These are results from real sessions with Gemini. On the left is the end profile from a real 3-round session: the level reached, the nine standards and the Coach's comment. In my two full test sessions, the tutor never gave the answer away, even when I asked it to ignore its rules. I found five problems and fixed all five, and a session uses about 24 AI calls, which fits the free tier.");
+  s.addNotes(SCRIPT[n].text || "These are results from real sessions with Gemini. On the left is the end profile from a real 3-round session: the level reached, the nine standards and the Coach's comment. In my two full test sessions, the tutor never gave the answer away, even when I asked it to ignore its rules. I found five problems and fixed all five, and a session uses about 24 AI calls, which fits the free tier.");
 }
 
 // 18. Preliminary results: assessor
@@ -452,19 +456,19 @@ function table(s, hdr, rows, opts) {
   card(s, x2, 5.75, w2, 0.95, C.goldLight, C.goldLight);
   s.addText("Next: keyword-only answers still score about 4 of 9, so the Assessor prompt is tightened again.",
     { x: x2 + 0.2, y: 5.75, w: w2 - 0.4, h: 0.95, fontFace: F, fontSize: 14, bold: true, color: C.gold, valign: "middle", margin: 0 });
-  s.addNotes("I then ran the Assessor on 61 test answers. Strong answers met about 8 or 9 standards and trick answers about 1 or 2, which is the right direction. But answers that only repeat keywords still score about 4, so that is the next fix. These numbers are approximate and not yet compared with human markers. On the right are the five problems I found in testing and how each was fixed.");
+  s.addNotes(SCRIPT[n].text || "I then ran the Assessor on 61 test answers. Strong answers met about 8 or 9 standards and trick answers about 1 or 2, which is the right direction. But answers that only repeat keywords still score about 4, so that is the next fix. These numbers are approximate and not yet compared with human markers. On the right are the five problems I found in testing and how each was fixed.");
 }
 
 // 19. Conclusion
 {
   const s = base("Conclusions");
   card(s, 1.0, 1.5, W - 2.0, 2.7, C.navyLight, C.navyLight);
-  s.addText("Existing Socratic AI tutors have no question ladder and no real assessment. Socratic AI is a working multi-agent tutor that follows Paul's six levels, marks every answer against the nine standards, and never gives the answer away. Next, it will show which type of reasoning and knowledge a learner used, and be checked against human markers.",
+  s.addText("Existing Socratic AI tutors have no question ladder, no measurement and no adaptation. Socratic AI is a working multi-agent tutor that follows Paul's six levels, marks every answer against the nine standards, adapts to the learner, and never gives the answer away. Next, it will show which type of reasoning and knowledge a learner used, and be checked against human markers.",
     { x: 1.35, y: 1.6, w: W - 2.7, h: 2.5, fontFace: F, fontSize: 20, color: C.ink, align: "center", valign: "middle", margin: 0 });
   s.addText("Take-home message", { x: 1.0, y: 4.75, w: W - 2.0, h: 0.4, fontFace: F, fontSize: 15, bold: true, color: C.gold, align: "center", margin: 0 });
   s.addText("This is a reasoning trainer, not an answer machine, built in a new way: many prompted agents working together, guarded by code.",
     { x: 1.0, y: 5.2, w: W - 2.0, h: 0.9, fontFace: F, fontSize: 19, bold: true, color: C.navy, align: "center", valign: "top", margin: 0 });
-  s.addNotes("To conclude. Current tutors have no question ladder and no real assessment. Socratic AI follows the six levels, marks the nine standards and never gives the answer away. Next, it will show which type of reasoning and knowledge a learner used, checked against human markers. It is a reasoning trainer, not an answer machine.");
+  s.addNotes(SCRIPT[n].text || "To conclude. Current tutors have no question ladder and no real assessment. Socratic AI follows the six levels, marks the nine standards and never gives the answer away. Next, it will show which type of reasoning and knowledge a learner used, checked against human markers. It is a reasoning trainer, not an answer machine.");
 }
 
 // 20. References (two slides, like the senior's deck)
@@ -499,7 +503,7 @@ function table(s, hdr, rows, opts) {
     const s = base("References");
     s.addText(part.map((t, i) => ({ text: t, options: { breakLine: i < part.length - 1 } })),
       { x: M, y: 1.15, w: W - 2 * M, h: 5.85, fontFace: F, fontSize: 12, color: C.ink, valign: "top", paraSpaceAfter: 6, margin: 0 });
-    s.addNotes(k === 0 ? "These are my references. The full list is in my thesis." : "These are the rest of my references.");
+    s.addNotes(SCRIPT[n].text || (k === 0 ? "These are my references. The full list is in my thesis." : "These are the rest of my references."));
   });
 }
 
@@ -512,7 +516,7 @@ function table(s, hdr, rows, opts) {
   s.addText("THANK YOU", { x: 0, y: 3.55, w: W, h: 0.9, fontFace: F, fontSize: 44, bold: true, color: C.navy, align: "center", margin: 0 });
   s.addText("Q & A", { x: 0, y: 4.45, w: W, h: 0.7, fontFace: F, fontSize: 28, color: C.gold, align: "center", margin: 0 });
   stripes(s, 7.2);
-  s.addNotes("Thank you. I am happy to take your questions.");
+  s.addNotes(SCRIPT[n].text || "Thank you. I am happy to take your questions.");
 }
 
 pres.writeFile({ fileName: OUT }).then(() => console.log("wrote", OUT, n, "slides"));
