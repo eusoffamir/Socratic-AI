@@ -41,6 +41,10 @@ The FYP sits under a SoTL grant project led by the supervisor: "Elevating Critic
 
 ## Supervisor feedback (from the student's messages)
 
+Full text and dates: `docs/supervisor/dr-ho-messages.md`. Two messages matter most:
+- **15 September 2026: the literature review sources.** Six DeepLearning.AI courses (agentic knowledge graph construction, long-term agentic memory with LangGraph, RAG, building and evaluating advanced RAG, knowledge graphs for RAG, agentic RAG with LlamaIndex), plus Dr Ho's own CAPE course slides *Foundations of Modern Deep Neural Networks*, Module 7 (Foundation Models and Generative AI) and Module 8 (Towards Agentic AI). Thesis sections 2.2 to 2.4 follow Module 8, so cite the modules. **The module PDFs are copyright Institute of Technology PETRONAS, all rights reserved, so they are blocked from the public GitHub repo by `.gitignore`.** Copy them to the other laptop by hand.
+- **17 September 2026: the reply about the Gemini Gem video** (the source of the points below).
+
 - Gemini Gems as a Socratic tutor partly does what the project wants. Use it as literature review and compare with similar tools from other AI providers.
 - Gaps: no principled way to move the learner up a critical thinking ladder (questions only lead toward an answer, and do not push the learner to ask "is this the right question?"), and no evaluation of the learner's critical thinking against a framework.
 - The potential innovation is in the prompts that guide the AI.
