@@ -4,7 +4,7 @@ Read this first. It holds everything decided so far in earlier chat sessions.
 
 ## About the student and how to write for them
 
-- Student: **Muhammad Eusoff Amir bin Hazri, student ID 22010491** (given by the student, 20 October 2026). Goes by Eusoff. Use the full name and ID on the title page, slides and forms.
+- Student: **Muhammad Eusoff Amir bin Hazri, student ID 22010491** (given by the student, 20 October 2026). Goes by Eusoff. Course code **EFB4042** (Final Year Project I). Use the full name, ID and course code on the title page, slides and forms.
 - Final year student (UTP). Project: "Agentic AI for Fostering Critical Thinking Education", code 26S004 (confirmed by the student, 14 October 2026), supervisor Dr Ho Tatt Wei. Difficulty level 4, RTG project.
 - **Writing style for anything student-facing or thesis text: easy English, short and straightforward sentences. Do not use the double dash sign ("--") or em dashes.**
 - The student has **no money for APIs**. Default to free options (Gemini free tier, mock mode, local tools). Do not suggest paid services as the main path.
