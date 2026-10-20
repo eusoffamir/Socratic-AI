@@ -219,9 +219,9 @@ function table(s, hdr, rows, opts) {
   const s = base("Literature Review");
   pill(s, M, 1.05, 4.6, "Frameworks for Critical Thinking");
   table(s, ["Framework", "Year", "Core idea", "Role in this project", "Limitation", "Ref"], [
-    ["Paul's 6 Socratic question levels", "-", "Clarify, assumptions, evidence, viewpoints, implications, question the question", "The ladder: what the Tutor asks next", "Says what to ask, not how good the answer is", "[1]"],
-    ["Paul-Elder 9 intellectual standards", "-", "Clarity, accuracy, precision, relevance, depth, breadth, logic, significance, fairness", "The Assessor marks each as 1 or 0", "Does not say which type of reasoning was used", "[1]"],
-    ["Paul-Elder 8 elements of thought", "-", "Purpose, question, information, inference, concepts, assumptions, implications, point of view", "Prerequisites before reasoning (planned)", "Links to reasoning types still open", "[1]"],
+    ["Paul's 6 Socratic question levels", "2006", "Clarify, assumptions, evidence, viewpoints, implications, question the question", "The ladder: what the Tutor asks next", "Says what to ask, not how good the answer is", "[1]"],
+    ["Paul-Elder 9 intellectual standards", "2019", "Clarity, accuracy, precision, relevance, depth, breadth, logic, significance, fairness", "The Assessor marks each as 1 or 0", "Does not say which type of reasoning was used", "[1]"],
+    ["Paul-Elder 8 elements of thought", "2019", "Purpose, question, information, inference, concepts, assumptions, implications, point of view", "Prerequisites before reasoning (planned)", "Links to reasoning types still open", "[1]"],
     ["Revised Bloom's taxonomy", "2001", "Knowledge dimension: factual, conceptual, procedural, metacognitive", "Types of knowledge used (planned)", "No causal or relational type", "[2]"],
     ["SOLO taxonomy", "1982", "Prestructural to extended abstract outcomes", "Complexity: how many knowledge types are joined", "Needs adapting to dialogue", "[3]"],
   ], { x: M, y: 1.65, w: W - 2 * M, colW: [2.45, 0.65, 3.35, 2.6, 2.6, 0.58], rowH: 0.86, size: 12, center: [1, 5] });
