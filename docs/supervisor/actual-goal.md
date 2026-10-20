@@ -31,7 +31,11 @@ It has three parts: teach (the question ladder), assess (the framework scores) a
 
 ## 5. New problem statement (used in the slides, the script and the thesis)
 
-> Students increasingly hand their thinking to generative AI, and studies link this to weaker critical thinking. AI tutors that use Socratic questioning can refuse to give answers, but they share three gaps. Their questions do not climb a principled ladder toward deeper thinking, so learners are never pushed to ask whether they are asking the right question. They do not measure the learner's critical thinking against any framework. They do not adapt to what each learner is missing. As a result, neither the learner nor the lecturer can tell whether critical thinking is actually improving.
+Updated on 20 October 2026 (evening) so that it starts from the official listing in section 1, which the student set as the baseline.
+
+> Generative AI can now do much of the analysis and software work that engineers used to do, so engineering undergraduates need strong critical thinking for complex decisions and design, and they must use AI well instead of handing their thinking to it. Socratic AI tutors such as Gemini Gems already refuse to give answers, but they have three gaps. Their questions do not climb a clear ladder toward deeper thinking, they do not measure the learner's critical thinking against any framework, and they do not adapt to what each learner is missing. So there is a need for an agentic AI tool that helps engineering undergraduates build their critical thinking.
+
+Other alignments with the listing made at the same time: RAG with a knowledge graph is "planned for FYP2" (a listed deliverable), not "future work"; the tools say Claude AI is supported and the free Gemini tier is used for now; the quant topic is marked as set by the supervisor.
 
 ## 6. New objectives (3, written as end states)
 

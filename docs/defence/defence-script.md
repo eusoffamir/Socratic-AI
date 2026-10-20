@@ -1,6 +1,6 @@
 # Proposal defence script (word for word)
 
-About 1588 words, about 14 min 20 s at a calm pace. The limit is 15 minutes of talking, then 5 minutes of questions.
+About 1669 words, about 14 min 35 s at a calm pace. The limit is 15 minutes of talking, then 5 minutes of questions.
 
 Speak slowly. If you run short of time, shorten slides 9, 10 and 14 first.
 
@@ -16,17 +16,17 @@ I will start with the problem and my three objectives, then the literature revie
 
 Today a student can ask an AI for a finished answer and copy it in seconds. A QS report found that 62 percent of students use generative AI every week. A study of 319 knowledge workers found that the more people trust AI, the less critical thinking they do. Advait Sarkar from Microsoft Research calls this outsourced reasoning, and it costs us ideas, effort, memory and reflection. My idea is to turn the same AI around. Instead of an answer machine, I build a tutor that asks Socratic questions in a set order, so the student builds the understanding, and then I measure the quality of that reasoning.
 
-## Slide 4: Problem Statement (65 s)
+## Slide 4: Problem Statement (75 s)
 
-So what exactly is the problem? AI tutors that use Socratic questioning already exist, for example Gemini Gems, and they do refuse to give answers. But when I tested two of them, I found three gaps. First, there is no ladder. Their questions only lead toward an answer, and they never push the learner to ask whether it is the right question. Second, there is no measurement. They cannot say how well the learner reasoned against any framework. Third, there is no adaptation. They do not notice what the learner is missing. My tester even wrote, bro, I explained this before. The result is that neither the learner nor the lecturer can tell whether critical thinking is actually improving. That is the problem this project solves.
+So what exactly is the problem? Generative AI can now do much of the analysis and software work that engineers used to do. So engineering undergraduates need strong critical thinking for complex decisions and design, so that they use AI well instead of handing their thinking to it. Socratic AI tutors such as Gemini Gems already refuse to give answers, but when I tested two of them, I found three gaps. First, there is no ladder. Their questions only lead toward an answer, and they never push the learner to ask whether it is the right question. Second, there is no measurement. They cannot say how well the learner reasoned against any framework. Third, there is no adaptation. They do not notice what the learner is missing. My tester even wrote, bro, I explained this before. So there is a need for an agentic AI tool that helps engineering undergraduates build their critical thinking, and that is what this project does.
 
 ## Slide 5: Objectives (60 s)
 
 From this problem come my three objectives, each written as the end state I want to reach. One, teach. Undergraduates build their own reasoning, guided step by step up the six levels of Socratic questioning, without being given the answer. Two, assess. Each learner's critical thinking is measured from the conversation against the Paul and Elder framework, with marks that agree with human markers. Three, adapt. The support and the difficulty match each learner's gaps, and the learner can see what they have mastered and what to work on next. These three match the objectives and deliverables in the official project listing.
 
-## Slide 6: Scope of Study (35 s)
+## Slide 6: Scope of Study (40 s)
 
-To keep the scope realistic, the prototype covers one quant topic, which is whether a pattern in data is real or just luck, with no complex machine learning. It has three short cases and four AI agents guarded by plain code, and it targets university students who are new to quant, starting with Dr Ho's students. A second topic, real reading material with RAG, and knowledge graphs are future work.
+To keep the scope realistic, the prototype covers one quant topic, set by Dr Ho, which is whether a pattern in data is real or just luck, with no complex machine learning. It has three short cases and four AI agents guarded by plain code, and it targets university students who are new to quant, starting with Dr Ho's students. Real reading material with RAG and a knowledge graph is planned for FYP2, as in the project listing.
 
 ## Slide 7: Literature Review: Agentic AI Building Blocks (45 s)
 
@@ -50,7 +50,7 @@ So the gap is clear. AI can weaken thinking, Socratic tutors have no principled 
 
 ## Slide 12: Methodology: Phases (40 s)
 
-My method is iterative prototyping in five phases. I tested existing tutors and wrote down what failed. That gave me nine design requirements, for example, remember what the learner said and never ask it again. Then I built the prototype, tested it with real sessions, fixed what broke, and next I evaluate it. It runs on Python, LangGraph and the free Gemini model, so it needs no GPU and no paid key.
+My method is iterative prototyping in five phases. I tested existing tutors and wrote down what failed. That gave me nine design requirements, for example, remember what the learner said and never ask it again. Then I built the prototype, tested it with real sessions, fixed what broke, and next I evaluate it. It runs on Python and LangGraph. The project listing names Claude AI, and the code supports it, but for now I use the free Gemini model, so it needs no GPU and no paid key.
 
 ## Slide 13: Methodology: System Architecture (70 s)
 

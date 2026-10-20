@@ -132,23 +132,23 @@ function table(s, hdr, rows, opts) {
 // 4. Problem statement
 {
   const s = base("Problem Statement");
-  s.addText("Students increasingly hand their thinking to generative AI, and studies link this to weaker critical thinking [10]. Socratic AI tutors can refuse to give answers, but they share three gaps.",
-    { x: M, y: 1.1, w: W - 2 * M, h: 0.65, fontFace: F, fontSize: 16, color: C.ink, margin: 0 });
+  s.addText("Generative AI can now do much of the analysis and software work, so engineering undergraduates need strong critical thinking for complex decisions and design, and must use AI well instead of handing their thinking to it [10]. Socratic AI tutors already refuse to give answers, but they share three gaps.",
+    { x: M, y: 1.0, w: W - 2 * M, h: 0.95, fontFace: F, fontSize: 15, color: C.ink, margin: 0 });
   const probs = [["No ladder", "Questions only lead toward an answer, so learners are never pushed to ask whether they are asking the right question."],
     ["No measurement", "They do not measure the learner's critical thinking against any framework."],
     ["No adaptation", "They do not adapt to what each learner is missing."]];
   probs.forEach(([h, t], i) => {
     const x = M + i * 4.12;
-    card(s, x, 1.9, 3.88, 2.65);
-    circle(s, x + 0.25, 2.1, 0.58, String(i + 1), C.gold);
-    s.addText(h, { x: x + 0.25, y: 2.8, w: 3.4, h: 0.5, fontFace: F, fontSize: 20, bold: true, color: C.navy, margin: 0 });
-    s.addText(t, { x: x + 0.25, y: 3.35, w: 3.4, h: 1.15, fontFace: F, fontSize: 15, color: C.ink, valign: "top", margin: 0 });
+    card(s, x, 2.05, 3.88, 2.6);
+    circle(s, x + 0.25, 2.2, 0.58, String(i + 1), C.gold);
+    s.addText(h, { x: x + 0.25, y: 2.88, w: 3.4, h: 0.5, fontFace: F, fontSize: 20, bold: true, color: C.navy, margin: 0 });
+    s.addText(t, { x: x + 0.25, y: 3.42, w: 3.4, h: 1.15, fontFace: F, fontSize: 15, color: C.ink, valign: "top", margin: 0 });
   });
   s.addShape(pres.shapes.RECTANGLE, { x: M, y: 4.85, w: W - 2 * M, h: 1.95, fill: { color: C.navy }, line: { color: C.navy } });
   s.addText([
     { text: "Seen in early testing of two Gemini Gem tutors:  ", options: { bold: true, color: "BFD7E6" } },
     { text: "\"bro i explained this before\"", options: { italic: true, color: C.white, breakLine: true } },
-    { text: "As a result, neither the learner nor the lecturer can tell whether critical thinking is actually improving.", options: { bold: true, color: C.white } },
+    { text: "So there is a need for an agentic AI tool that helps engineering undergraduates build their critical thinking.", options: { bold: true, color: C.white } },
   ], { x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 1.75, fontFace: F, fontSize: 17, valign: "middle", margin: 0, paraSpaceAfter: 8 });
   s.addNotes(SCRIPT[n].text || "");
 }
@@ -168,7 +168,7 @@ function table(s, hdr, rows, opts) {
     s.addText(h, { x: M + 1.35, y, w: 1.6, h: 1.38, fontFace: F, fontSize: 20, bold: true, color: C.navy, valign: "middle", margin: 0 });
     s.addText(t, { x: M + 3.0, y, w: W - 2 * M - 3.25, h: 1.38, fontFace: F, fontSize: 16, color: C.ink, valign: "middle", margin: 0 });
   });
-  s.addText("These match the three objectives and deliverables in the official project listing (26S005).",
+  s.addText("These match the three objectives and deliverables in the official project listing (26S005). The topic (quant) was set by the supervisor.",
     { x: M, y: 6.1, w: W - 2 * M, h: 0.4, fontFace: F, fontSize: 13, italic: true, color: C.grey, margin: 0 });
   s.addNotes(SCRIPT[n].text || "");
 }
@@ -177,8 +177,8 @@ function table(s, hdr, rows, opts) {
 {
   const s = base("Scope of Study");
   const items = [
-    ["One quant topic", "Telling a real pattern in data from luck, for beginners, with no complex machine learning. Three short cases."],
-    ["Multi-agent tutor", "Four AI agents (Assessor, Planner, Tutor, Checker) guarded by plain-code rules, on the free Gemini model."],
+    ["One quant topic", "Set by the supervisor. Telling a real pattern in data from luck, for beginners, with no complex machine learning. Three short cases."],
+    ["Multi-agent tutor", "Four AI agents (Assessor, Planner, Tutor, Checker) guarded by plain-code rules, built with LangGraph. Claude AI is supported, and the free Gemini model is used for now."],
     ["Framework assessment", "6 Socratic levels and 9 standards now, then reasoning type and knowledge type, with a learner dashboard."],
   ];
   items.forEach(([h, t], i) => {
@@ -192,7 +192,7 @@ function table(s, hdr, rows, opts) {
   card(s, M, 4.85, W - 2 * M, 1.95, C.goldLight, C.goldLight);
   s.addText([
     { text: "Target learners: ", options: { bold: true } }, { text: "university students new to quant (early testers are Dr Ho's students).", options: { breakLine: true } },
-    { text: "Future work, outside FYP: ", options: { bold: true } }, { text: "a second topic, real reading material with retrieval (RAG) [15], knowledge graphs, and a full class study (needs a paid key and ethics approval)." },
+    { text: "Planned for FYP2: ", options: { bold: true } }, { text: "real reading material with retrieval (RAG) and a knowledge graph [15], as in the project listing. Later, a second topic and a full class study (needs a paid key and ethics approval)." },
   ], { x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 1.75, fontFace: F, fontSize: 16, color: C.ink, valign: "middle", margin: 0, paraSpaceAfter: 8 });
   s.addNotes(SCRIPT[n].text || "To keep it small, the prototype covers one quant topic: is a pattern in data real, or just luck. It uses four AI agents guarded by code, and it assesses reasoning against a framework. A second topic, real reading material and knowledge graphs are future work.");
 }
@@ -205,7 +205,7 @@ function table(s, hdr, rows, opts) {
     ["Prompting", "2025", "A prompt is an instruction plus context; output depends on how the context is built", "Every agent gets a structured JSON prompt", "[16]"],
     ["Chain of Thought", "2022", "Break a task into intermediate reasoning steps", "The Planner reasons before choosing the next move", "[17]"],
     ["ReAct", "2023", "Reason, act, observe, then repeat", "The Tutor runs a simulation, reads the result, then replies", "[18]"],
-    ["RAG", "2023", "Ground answers in retrieved knowledge (naive, advanced, modular)", "Case notes now; real RAG and knowledge graphs are future work", "[15], [19]"],
+    ["RAG", "2023", "Ground answers in retrieved knowledge (naive, advanced, modular)", "Case notes now; RAG with a knowledge graph planned for FYP2", "[15], [19]"],
     ["Model Context Protocol", "2024", "A standard way to give an LLM tools, resources and prompts", "Future: query a knowledge graph and learner records", "[20]"],
     ["Multi-agent systems", "2024", "Specialised agents collaborate (MetaGPT, AgileCoder)", "Assessor, Planner, Tutor and Checker roles", "[21], [22]"],
   ], { x: M, y: 1.65, w: W - 2 * M, colW: [2.3, 0.75, 4.2, 4.0, 0.98], rowH: 0.64, size: 12, center: [1, 4] });
@@ -312,7 +312,7 @@ function table(s, hdr, rows, opts) {
   s.addText([
     { text: "Software", options: { bold: true, color: C.navy, breakLine: true } },
     { text: "Python 3.13, FastAPI, LangGraph", options: { bullet: true, breakLine: true } },
-    { text: "Gemini 3.5 Flash Lite (free tier)", options: { bullet: true, breakLine: true } },
+    { text: "Claude AI (as listed) is supported; Gemini 3.5 Flash Lite (free tier) is used for now", options: { bullet: true, breakLine: true } },
     { text: "HTML and JavaScript front end", options: { bullet: true, breakLine: true } },
     { text: "Supabase database, Render hosting (free)", options: { bullet: true, breakLine: true } },
     { text: "pytest: 94 automatic tests", options: { bullet: true, breakLine: true } },
