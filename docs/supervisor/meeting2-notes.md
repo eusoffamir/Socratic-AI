@@ -1,6 +1,6 @@
 # Meeting 2 with Dr Ho (19 October 2026)
 
-Sources: the meeting recording (`docs/Meeting2.txt`, made by Whisper, so some words and names are misheard), Dr Ho's handwritten page (`docs/Critical Thinking.pdf`) and his written message after the meeting. Written by Claude on 20 October 2026. Anything marked **[unclear]** could not be read or heard well, so check it with Dr Ho.
+Sources: the meeting recording (`docs/supervisor/Meeting2.txt`, made by Whisper, so some words and names are misheard), Dr Ho's handwritten page (`docs/supervisor/Critical Thinking.pdf`) and his written message after the meeting. Written by Claude on 20 October 2026. Anything marked **[unclear]** could not be read or heard well, so check it with Dr Ho.
 
 ## 1. The big picture: three goals
 
@@ -106,7 +106,7 @@ Dr Ho's analogy from the meeting: the framework is a bit like a neural network. 
 - **Remind Dr Ho to submit the requests for a Claude subscription and a Render subscription** (about USD 25 a month was mentioned for Render **[check the amount]**). He asked to be reminded and said approval may come late, so keep using the free tiers until then. Dr Ho said the move to a "real prototype" is planned for December onwards.
 - Product declaration to the Innovation Office, for the next exhibition or competition.
 
-## 6. FYP rules that matter now (from `docs/FYP Guidelines 2024.pdf` and the interim report template)
+## 6. FYP rules that matter now (from `docs/utp-rules/FYP Guidelines 2024.pdf` and the interim report template)
 
 **Interim report structure (guidelines, section 6.1):** title page, abstract, Chapter 1 Introduction (background, problem statement, objectives and scope), Chapter 2 Literature Review, Chapter 3 Methodology, **Chapter 4 Conclusion and Future Work**, references and appendices. The template file shows 5 chapters, with Results and Discussion as Chapter 4, so ask Dr Ho which layout he wants.
 
@@ -123,7 +123,7 @@ Dr Ho's analogy from the meeting: the framework is a bit like a neural network. 
 
 **Interim report marking (Form 08), with weights:** literature review and critical analysis **x4** (the biggest), background and problem statement x2, objectives x2, quality of references x2, methodology and project activities x2, abstract x1, scope x1, project milestones and timeline x1, plus the conclusion and future work. Part B covers the format, English and referencing.
 
-**What `docs/FYP1.docx` is still missing (checked 20 October 2026):**
+**What `docs/thesis/FYP1.docx` is still missing (checked 20 October 2026):**
 - an abstract
 - Chapter 4, Conclusion and Future Work. "Testing and Results" is not a numbered chapter yet.
 - a project timeline, such as a Gantt chart, for FYP 1 and FYP 2 (it carries marks)

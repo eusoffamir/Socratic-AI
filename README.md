@@ -60,7 +60,7 @@ app/          the server: agents, prompts, rules, simulations, saving
 static/       the web page (index.html) and images
 tests/        automatic tests (run with pytest)
 deploy/       supabase.sql, the database tables for the online version
-docs/         thesis draft and the assessor evaluation plan and marking guide
+docs/         thesis, defence slides, supervisor notes, evaluation plan, UTP rules (see docs/README.md)
 eval/         the test set of answers for checking the Assessor against humans
 render.yaml   settings for the free Render hosting
 ```
@@ -138,7 +138,7 @@ The tests check everything that should behave the same every time: the rules,
 the guard, the simulations, the code checks, saving, the daily limit and whole
 sessions in mock mode. They never call the real AI or the real database. How
 good the AI agents are is judged from real transcripts and from the Assessor
-evaluation (see `docs/assessor-evaluation-plan.md`).
+evaluation (see `docs/evaluation/assessor-evaluation-plan.md`).
 
 ## Known gaps
 

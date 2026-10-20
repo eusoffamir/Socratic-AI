@@ -21,7 +21,7 @@ From the 46 answers marked by Gemini in `transcripts/` (8 October 2026):
 
 | File | What it is |
 |---|---|
-| `docs/assessor-marking-guide.md` | Yes/no rules and examples for each standard and level. For the human markers. |
+| `docs/evaluation/assessor-marking-guide.md` | Yes/no rules and examples for each standard and level. For the human markers. |
 | `eval/test_set.csv` | 61 answers: 37 real (from transcripts, 11 repeats of the "I'm stuck" button removed) and 24 constructed on purpose. Each row is `tune` (may be used as prompt examples) or `test` (never shown to the prompt). The `purpose` column says why a constructed answer was written. |
 | `eval/marks_template.csv` | The same 61 answers in a mixed order, with empty columns to mark. Each marker saves a copy as `marks_<name>.csv`. |
 | `eval/old_ai_marks.csv` | The marks Gemini gave the real answers at the time (prompt v1). Markers must not look at it until they finish. |

@@ -11,9 +11,8 @@ __pycache__/
 sessions/
 transcripts/
 
-# supervisor's grant proposal: private, never upload
-docs/2026_EdEx SoTL Grant Proposal*.docx
+# supervisor's grant proposal (Word and PDF, any folder): private, never upload
+**/2026_EdEx SoTL Grant Proposal*
 
 # data exports hold real learner answers: never upload them
 eval/exports/
-docs/2026_EdEx SoTL Grant Proposal*.pdf
