@@ -149,6 +149,8 @@ Folders (organised 20 October 2026, see `docs/README.md`): `thesis/` (FYP1.docx,
 
 ## Open items (do not forget)
 
+- **Thesis format and citations (20 October 2026):** `docs/thesis/FYP1.docx` now follows the UTP guidelines and template (Times New Roman 12, 1.5 spacing, left margin 4 cm and others 2.5 cm, chapter headings 14 pt bold capitals starting about 5 cm down, page numbers centred: none on the title page, i, ii for front matter, 1, 2 from Chapter 1; title page as in the template; abstract, contents, list of figures, list of tables; Chapter 4 headings numbered 4.1 to 4.3; references in APA, alphabetical, before the appendices). Content changes (about 30 citations, figure sources, title page, headings, the new 48-entry reference list) are tracked changes by "Claude" for the student to accept; the formatting was applied directly. Still open: the title page placeholders `[Department name]` and `[Month Year]`; four figures marked `[SOURCE NEEDED]` or `[IMAGE SOURCE NEEDED]` (Figures 2, 7, 13, 14: the student must say where they came from); ask Dr Ho for permission to reuse the figures from his Module 7 and 8 slides (guidelines 6.2 h); confirm the Paul and Elder editions (2006 and 2019 used); **the main text is about 50 pages but the interim report limit is 20 pages without appendices**, so it must be cut (ask the student and Dr Ho before cutting).
+
 - **Remind Dr Ho about the Claude and Render subscription requests** (he asked for this at Meeting 2, 19 October 2026).
 - Ask Dr Ho: interim report layout (4 chapters with Conclusion and Future Work, or the template's 5 chapters), how per-learner mastery should be measured before there are enough learners for factor analysis, and the correct name of the pedagogy expert (heard as "Dr Chong Suli").
 
