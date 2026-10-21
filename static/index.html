@@ -179,14 +179,18 @@
   .am-ai p{margin:0 0 12px;}
   .am-ai .am-words{display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 12px; font-family:var(--sans); font-size:14px; color:var(--ink-soft);}
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
-  .am-more{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); margin:0 0 14px;}
-  .am-more summary{cursor:pointer; color:var(--signal); font-weight:600; width:max-content;}
-  .am-more p{margin:4px 0 0;}
-  .am-more-body{display:flex; flex-direction:column; gap:18px; margin:12px 0 0 4px; padding-left:16px; border-left:2px solid var(--rule);}
+  details.am-case summary{list-style:none; cursor:pointer;}
+  details.am-case summary::-webkit-details-marker{display:none;}
+  details.am-case:hover{border-color:var(--signal);}
+  .am-case-more{display:inline-flex; align-items:center; gap:4px; margin-top:10px; font-size:13.5px; font-weight:600; color:var(--signal);}
+  .am-case-more svg{width:13px; height:13px; transition:transform .15s;}
+  details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
+  .am-more-body p{margin:4px 0 0; font-size:14.5px; color:var(--ink-soft);}
+  .am-more-body{display:flex; flex-direction:column; gap:18px; margin:16px 0 4px; padding-top:16px; border-top:1px solid var(--rule);}
   .am-more-body section{margin:0;}
   .am-more-body .am-words, .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
   .am-ai .am-more-body .am-words{flex-direction:column; gap:4px; margin-top:6px;}
-  .am-more a{color:var(--signal);}
+  .am-more-body a{color:var(--signal);}
   .am-case{font-family:var(--sans); background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--signal);
            border-radius:12px; padding:14px 18px; margin:4px 0 16px;}
   .am-case .t{font-weight:600; font-size:15.5px; margin:6px 0 4px;}
@@ -1897,21 +1901,22 @@ function askMapHTML(c){
     <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div></div>`;
 }
 
-// The first message: a short lesson (the case reading), the case story. The key words,
-// the map and the rest sit under "Read more", so the first look stays short.
+// The first message: a short lesson (the case reading), the case story. Tapping the case
+// card opens the rest (idea, example, key words, map), so the first look stays short.
 function askCaseHTML(c){
   const r = c.reading || {}, ideas = r.idea || [], words = r.key_words || [];
   const src = c.source ? sourceHTML(c.source) : '', map = askMapHTML(c);
-  return `${ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : ''}
-    ${words.length || map || ideas.length > 3 || r.example || r.think || src ? `<details class="am-more"><summary>Read more</summary>
+  const lesson = ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : '';
+  const card = `<span class="tag">${esc(c.tag || 'Case')}</span><p class="t">${esc(c.title)}</p><p class="s">${esc(c.scenario)}</p>`;
+  if(!(words.length || map || ideas.length > 3 || r.example || r.think || src)) return `${lesson}<div class="am-case">${card}</div>`;
+  return `${lesson}<details class="am-case"><summary>${card}<span class="am-case-more">Read more
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
       <div class="am-more-body">
       ${ideas.length > 3 ? `<section><span class="mono-label">The idea</span><p>${esc(ideas.slice(3).join(' '))}</p></section>` : ''}
       ${r.example ? `<section><span class="mono-label">Example</span><p>${esc(r.example)}</p></section>` : ''}
       ${r.think ? `<section><span class="mono-label">Think about</span><p>${esc(r.think)}</p></section>` : ''}
       ${words.length ? `<section><span class="mono-label">Key words</span><div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div></section>` : ''}
-      ${map}${src}</div></details>` : ''}
-    <div class="am-case"><span class="tag">${esc(c.tag || 'Case')}</span>
-      <p class="t">${esc(c.title)}</p><p class="s">${esc(c.scenario)}</p></div>`;
+      ${map}${src}</div></details>`;
 }
 
 // One tutor turn inside a Socratic message: feedback, question, A/B choices, hint.
