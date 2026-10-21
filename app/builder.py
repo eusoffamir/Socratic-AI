@@ -13,7 +13,7 @@ import json
 import re
 import threading
 
-from . import limits, llm_client
+from . import limits, llm_client, sources
 from .knowledge import KNOWLEDGE_TYPES, RELATIONS
 from .llm_client import LLMError
 from .reasoning import CORE_KNOWLEDGE, KNOWLEDGE_SIGNS, REASONING_TYPES
@@ -49,7 +49,9 @@ SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps u
 Write 3 cases about the topic. Each case is one short, real situation where a person makes a claim or a choice that is worth questioning, so the learner can practise clarifying, finding assumptions, weighing evidence, seeing other viewpoints and thinking about consequences. The 3 cases should test different ideas from the topic, from easier to harder.
 
 Facts:
-- Use only well known, widely agreed facts that a good textbook would state. If the REQUEST is a reading, take the facts from it.
+- If SOURCE is given, take every fact and number from SOURCE only, and add nothing that SOURCE does not say. Pick the clearest, most important ideas in it for a beginner.
+- If the REQUEST is a reading, take the facts from it in the same way.
+- With neither, use only well known, widely agreed facts that a good textbook would state.
 - Never invent studies, quotes, names of real people or exact numbers you are not sure of. Round numbers are fine when they are well known.
 - Write chances as percentages, never fractions, and write numbers as digits inside normal sentences, not with symbols like →, = or ≠.
 
@@ -123,7 +125,23 @@ def _type(value):
     return value if value in KNOWLEDGE_TYPES else None
 
 
-def clean_case(raw, topic, case_id):
+def clean_source(source):
+    """Where the facts came from, kept with each case so the page can show it:
+    {"kind": "wikipedia", "articles": [{"title", "url"}]}, {"kind": "reading"}
+    or None (the model's own knowledge). Anything else becomes None."""
+    if not isinstance(source, dict):
+        return None
+    if source.get("kind") == "reading":
+        return {"kind": "reading"}
+    if source.get("kind") != "wikipedia":
+        return None
+    articles = [{"title": str(a.get("title"))[:120], "url": a["url"]} for a in source.get("articles") or []
+                if isinstance(a, dict) and a.get("title") and isinstance(a.get("url"), str)
+                and re.fullmatch(r"https://en\.wikipedia\.org/wiki/[^\s\"'<>]+", a["url"])][:sources.MAX_ARTICLES]
+    return {"kind": "wikipedia", "articles": articles} if articles else None
+
+
+def clean_case(raw, topic, case_id, source=None):
     """The case in the same shape as a content.CONCEPTS case, with its graph
     under "knowledge" in the same shape as knowledge.KNOWLEDGE. Raises
     TopicError when something important is missing or broken."""
@@ -175,10 +193,11 @@ def clean_case(raw, topic, case_id):
                     "key_words": words, "think": _text(r.get("think"), WORDS["think"], "reading question")},
         "knowledge": {"nodes": nodes, "edges": edges},
         "generated": True,  # a DRAFT no expert has checked
+        "source": clean_source(source),
     }
 
 
-def clean_topic(data, request):
+def clean_topic(data, request, source=None):
     """The whole topic from the model reply, or TopicError."""
     if not isinstance(data, dict):
         raise TopicError("The topic could not be built, so please try again.")
@@ -190,7 +209,7 @@ def clean_topic(data, request):
     cases = []
     for i, raw in enumerate(raw_cases):
         try:
-            cases.append(clean_case(raw, topic, f"{tid}-{i + 1}"))
+            cases.append(clean_case(raw, topic, f"{tid}-{i + 1}", source))
         except TopicError:
             continue  # keep the good cases if one is broken
     if not cases:
@@ -298,7 +317,7 @@ def recheck(case):
     case_id = str(case.get("id") or "")
     if not re.fullmatch(r"t[0-9a-f]{10}-[1-9]", case_id):
         raise TopicError("This case is broken, so please build the topic again.")
-    return clean_case(raw, _text(case.get("topic"), WORDS["topic"], "topic name"), case_id)
+    return clean_case(raw, _text(case.get("topic"), WORDS["topic"], "topic name"), case_id, case.get("source"))
 
 
 def _mock(request):
@@ -320,7 +339,9 @@ def _mock(request):
 
 
 def build(request):
-    """3 cases for any topic. Raises TopicError (or LLMError if the model fails)."""
+    """3 cases for any topic, written from 1 or 2 Wikipedia articles when they
+    can be found (sources.py), or from the learner's own reading. Raises
+    TopicError (or LLMError if the model fails)."""
     request = (request or "").strip()[:MAX_REQUEST_CHARS]
     if len(request) < 2:
         raise TopicError("Please type a topic first.")
@@ -328,15 +349,19 @@ def build(request):
     with _lock:
         if key in _CACHE:
             return _CACHE[key]
+    source = {"kind": "reading"} if len(request) >= sources.READING_CHARS else None
     if llm_client.PROVIDER == "mock":
         data = _mock(request)
     else:
         if not limits.budget_left():
             raise TopicError(limits.FULL_MESSAGE)
-        text = llm_client._generate(SYSTEM, json.dumps({"REQUEST": request}, ensure_ascii=False),
-                                    max_tokens=6000, json_mode=True)
+        found = None if source else sources.find(request)
+        payload = {"REQUEST": request, **({"SOURCE": found["text"]} if found else {})}
+        text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000, json_mode=True)
         data = llm_client._parse_json(text)
-    topic = clean_topic(data, request)
+        source = source or found
+    topic = clean_topic(data, request, source)
+    topic["source"] = topic["cases"][0]["source"]
     with _lock:
         _CACHE[key] = topic
     return topic

@@ -216,6 +216,8 @@
   .ov-menu .topic-item .x:hover{color:var(--ink);}
   #topicStatus{margin-top:10px;}
   .cases-head{flex-wrap:wrap; row-gap:8px;}
+  .rm-source{margin:18px 0 0; font-size:13.5px; color:var(--ink-soft); display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;}
+  .rm-source a{color:var(--signal);}
   .draft-note{padding:4px 12px; border-radius:999px; background:var(--caution-soft); color:var(--caution); font-size:12.5px; font-weight:500;}
   .cases{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;}
   .case-row{
@@ -1423,6 +1425,10 @@ function renderTopics(){
         ${t.id === 'quant' ? '' : `<button type="button" class="x" data-remove="${esc(t.id)}" aria-label="Remove ${esc(t.topic)}">×</button>`}
       </div>`).join('')}
     </div>`;
+  const src = mine && active.cases[0] && active.cases[0].source;
+  $('draftNote').textContent = !src ? 'AI wrote these cases for your topic, and no expert has checked them yet, so question them too.'
+    : src.kind === 'reading' ? 'AI wrote these cases from your reading, and no expert has checked them yet, so question them too.'
+    : `AI wrote these cases from Wikipedia (${src.articles.map(a => a.title).join(' and ')}), and no expert has checked them yet, so question them too.`;
   $('draftNote').classList.toggle('hidden', !mine);
   renderCases();
 }
@@ -1630,6 +1636,14 @@ function thinkHTML(text){
   return parts.map(t => `<span class="think-part">${esc(t)}</span>`).join('');
 }
 
+// Where a built case got its facts (Goal 2): Wikipedia articles or the learner's own reading.
+function sourceHTML(src){
+  if(!src) return '';
+  if(src.kind === 'reading') return '<p class="rm-source"><span class="mono-label">Source</span> Your own reading</p>';
+  return `<p class="rm-source"><span class="mono-label">Source</span> ${src.articles.map(a =>
+    `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">Wikipedia, ${esc(a.title)}</a>`).join(' and ')}</p>`;
+}
+
 function openReading(id, mode){
   const isTut = id === 'tutorial';  // the tutorial opens the same pop-up as a case
   const idx = isTut ? 0 : concepts.findIndex(c => c.id === id);
@@ -1652,7 +1666,7 @@ function openReading(id, mode){
       <section><h3 class="mono-label">Key words</h3>
         <dl class="rm-words">${r.key_words.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl></section>
       <div class="rm-think"><span class="mono-label">Think about</span><p>${thinkHTML(r.think)}</p></div>
-    </div>`;
+    </div>${sourceHTML(c.source)}`;
   wirePriceHover($('rmBody').querySelector('.rm-chart') || $('rmBody'));
   $('rmBody').scrollTop = 0;
   $('rmStatus').innerHTML = '';
