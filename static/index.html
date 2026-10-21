@@ -190,20 +190,12 @@
   .am-q{font-weight:600;}
   .am-ai .am-opts{display:flex; flex-direction:column; gap:8px; margin:4px 0 10px; font-family:var(--sans);}
   .am-hint{font-family:var(--sans); font-size:14px; background:none; border:none; padding:0; color:var(--signal); font-weight:600;}
-  .ask-strip{width:100%; max-width:760px; margin:0 auto; display:flex; align-items:center; gap:12px; padding:9px 14px;
-             border:1px solid var(--rule); border-radius:999px; background:var(--panel); color:var(--ink-soft);
-             font:inherit; font-size:13.5px; text-align:left;}
-  .ask-strip:hover:not(:disabled){border-color:var(--signal); opacity:1;}
-  .ask-strip .dots6{display:flex; gap:4px; flex:none;}
-  .ask-strip .dots6 i{width:9px; height:9px; border-radius:50%; background:var(--rule);}
-  .ask-strip .dots6 i.on{background:var(--signal);}
-  .ask-strip b{color:var(--ink); font-weight:600;}
-  .ask-strip .grow{flex:1;}
-  .ask-strip svg{width:12px; height:12px; flex:none; transition:transform .15s;}
-  .ask-strip[aria-expanded="true"] svg{transform:rotate(180deg);}
-  .ask-top{width:100%; padding:12px 24px 0; flex:none; position:relative; z-index:5;}
+  .ask-top{width:100%; flex:none; position:relative; z-index:5;}
   .ask-main.empty .ask-top{display:none;}
-  .ask-stats{position:absolute; left:24px; right:24px; top:calc(100% + 8px); max-width:760px; margin:0 auto;
+  #askStrip svg{color:var(--signal);}
+  #askStrip[aria-expanded="true"]{border-color:var(--signal); color:var(--signal);}
+  #askLevel{margin-right:14px;}
+  .ask-stats{position:absolute; right:20px; top:calc(100% + 8px); width:min(760px, calc(100% - 40px));
              box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.12); background:var(--panel); border:1px solid var(--rule); border-radius:16px;
              padding:18px 22px; display:grid; grid-template-columns:1fr 1fr; gap:24px; max-height:60vh; overflow:auto;}
   .ask-stats .ladder{margin-top:8px;}
@@ -242,11 +234,11 @@
              font-family:var(--serif); font-weight:500; font-size:clamp(28px, 4vw, 42px); line-height:1.15; text-align:center;}
   .ask-greet img{width:46px; height:46px; border-radius:50%; object-fit:cover; flex:none;}
   .ask-box{background:var(--panel); border:1px solid var(--rule); border-radius:18px; box-shadow:var(--shadow);
-           padding:12px 12px 10px; transition:border-color .15s ease, background .15s ease;}
+           padding:10px 10px 8px; transition:border-color .15s ease, background .15s ease;}
   .ask-box:focus-within{border-color:var(--signal);}
   .ask-box.drop{border-color:var(--signal); border-style:dashed; background:var(--signal-soft);}
   .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:16px; line-height:1.5; color:var(--ink);
-                    background:transparent; border:none; outline:none; padding:6px 6px 10px; min-height:54px; max-height:240px;}
+                    background:transparent; border:none; outline:none; padding:4px 6px 4px; min-height:28px; max-height:240px;}
   .ask-box textarea::placeholder{color:var(--ink-faint);}
   .ask-tools{display:flex; align-items:center; gap:6px;}
   .ask-tools .spacer{flex:1;}
@@ -903,10 +895,8 @@
     .sn-label{margin-top:24px;}
     .ask-main{padding:24px 16px 10vh;}
     .ask-greet{flex-direction:column; gap:12px;}
-    .ask-top{padding:10px 16px 0;}
-    .ask-stats{left:16px; right:16px;}
-    .ask-stats{grid-template-columns:1fr;}
-    .ask-strip .grow{display:none;}
+    .ask-stats{right:16px; width:calc(100% - 32px); grid-template-columns:1fr;}
+    .ask-top .ticks{display:none;}
     .ask-greet img{width:44px; height:44px;}
     .topbar{padding:0 16px; height:56px;}
     .home-scroll{padding:16px 16px 32px;}
@@ -980,6 +970,7 @@
     .end-word{display:none;}  /* "End session" becomes "End", so the level name keeps its room */
     #hudLevel{flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; margin-right:0;}
     body:has(#statsToggle.hidden) .chat-top, body:has(#statsToggle[aria-pressed="true"]) .chat-top{padding-right:12px;}
+    #askMain .chat-top{padding-right:12px;}  /* the chat has its Status button in the bar */
     .stats-tab{
       writing-mode:horizontal-tb; top:8px; right:12px; transform:none; width:40px; height:40px;
       padding:0; gap:0; font-size:0; justify-content:center; border-radius:50%; border:1px solid var(--rule);
@@ -1097,7 +1088,15 @@
 
   <div class="ask-main empty hidden" id="askMain">
     <div class="ask-top">
-      <button type="button" class="ask-strip" id="askStrip" aria-expanded="false" aria-controls="askStats" title="Your progress in this chat"></button>
+      <header class="chat-top">
+        <div class="hud-progress">
+          <span class="status" id="askRound"></span>
+          <div class="ticks" id="askTicks" aria-hidden="true"></div>
+        </div>
+        <div class="spacer"></div>
+        <span class="status" id="askLevel"></span>
+        <button type="button" class="top-home" id="askStrip" aria-expanded="false" aria-controls="askStats" title="Your progress in this case"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.5 7.3v9.4L12 21.5 3.5 16.7V7.3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 6.5 16.5 10l-1.6 6.2-4.9-.9L7.8 10.3z" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Status</button>
+      </header>
       <div class="ask-stats hidden" id="askStats"></div>
     </div>
     <div class="ask-scroll" id="askScroll">
@@ -1107,7 +1106,7 @@
       <h2 class="ask-greet"><img src="/static/img/socrates.png" alt="">What shall we think through?</h2>
       <form class="ask-box" id="askForm" autocomplete="off">
         <div class="tb-files hidden" id="askFiles"></div>
-        <textarea id="askInput" rows="2" maxlength="4000" aria-label="Any topic"
+        <textarea id="askInput" rows="1" maxlength="4000" aria-label="Any topic"
                   placeholder="Type any topic, a question or a short reading"></textarea>
         <div class="ask-tools">
           <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
@@ -1683,7 +1682,11 @@ function showPage(name){
   $('homeView').classList.remove('nav-open');  // phones: close the drawer
   if(name === 'ask') $('askInput').focus();
 }
-$('homeBtn').addEventListener('click', () => showPage('home'));
+// The Home tour points at Home, so it starts the first time Home is shown.
+function homeTourOnce(){
+  if(!tourSeen('home') && !document.querySelector(PAGES.home).classList.contains('hidden')) setTimeout(() => startTour('home'), 300);
+}
+$('homeBtn').addEventListener('click', () => { showPage('home'); homeTourOnce(); });
 $('askBtn').addEventListener('click', () => { askReset(); showPage('ask'); });
 $('navOpen').addEventListener('click', () => $('homeView').classList.add('nav-open'));
 $('navBackdrop').addEventListener('click', () => $('homeView').classList.remove('nav-open'));
@@ -1906,15 +1909,14 @@ function askThoughtHTML(t){
   return `<details class="am-thought"><summary>Thought process</summary><ul>${items.join('')}</ul></details>`;
 }
 
+// The top bar, the same as a case session: the round, 6 dashes for the 6 levels
+// (done in teal, the current one in orange) and the level name.
 const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implications', 'Question the question'];
-function askStrip(levelIdx, thought){
+function askStrip(levelIdx, round){
   if(levelIdx == null) return;
-  ask.levelIdx = levelIdx;
-  if(thought) ask.lastMet = thought.standards_met.length;
-  $('askStrip').innerHTML = `<span class="dots6" aria-hidden="true">${ASK_LEVELS.map((_, i) => `<i class="${i <= levelIdx ? 'on' : ''}"></i>`).join('')}</span>
-    <span>Level ${levelIdx + 1} of 6, <b>${esc(ASK_LEVELS[levelIdx] || '')}</b></span><span class="grow"></span>
-    <span>${ask.lastMet == null ? 'No answers yet' : `<b>${ask.lastMet} of 9</b> standards in your last answer`}</span>
-    <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  $('askRound').textContent = round ? `ROUND ${round}` : '';
+  $('askTicks').innerHTML = ASK_LEVELS.map((_, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}"></div>`).join('');
+  $('askLevel').innerHTML = `<span class="lv-label">LEVEL:</span> <span class="lv">${esc((ASK_LEVELS[levelIdx] || '').toUpperCase())}</span>`;
   if(!$('askStats').classList.contains('hidden')) askStatsLoad();
 }
 
@@ -1939,7 +1941,7 @@ $('askStrip').addEventListener('click', () => {
 function askShowTurn(data, intro){
   const parts = {...(data.parts || {question: data.reply})};
   if(intro) delete parts.feedback;  // the opening "welcome" line is for the case screen; the lesson replaces it
-  askStrip(data.level_idx, data.thought);
+  askStrip(data.level_idx, data.round);
   ask.options = parts.options && parts.options.length === 2 ? parts.options : [];
   ask.picked = null;
   $('askThread').querySelectorAll('.am-opts .choice').forEach(c => c.disabled = true);  // old choices are done
@@ -1989,7 +1991,7 @@ async function askStart(c, name){
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
       case: c.generated ? c : undefined, ab_only: false, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
-    Object.assign(ask, {sid: data.session_id, hintOpened: false, lastMet: null});
+    Object.assign(ask, {sid: data.session_id, hintOpened: false});
     ask.chatId = ask.chatId || data.session_id;
     ask.sids.push(data.session_id);
     ask.cases.push(c);
@@ -2133,10 +2135,10 @@ $('askForm').addEventListener('submit', e => {
 
 function askReset(){
   if(ask.busy) return;
-  Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false, lastMet: null,
+  Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false,
                      chatId: null, sids: [], request: null, answers: 0, offered: []});
   $('askThread').innerHTML = '';
-  $('askStrip').innerHTML = $('askStats').innerHTML = '';
+  $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
   $('askStrip').setAttribute('aria-expanded', false);
   askChatting(false);
@@ -2166,7 +2168,9 @@ async function askOpen(id){
       ask.sids.push(sid);
       d.turns.forEach((t, i) => {
         if(i){ askAdd('am-user', esc(t.answer || '')); ask.answers++; }
-        askShowTurn({parts: t.parts, thought: t.thought, level_idx: i === d.turns.length - 1 ? d.level_idx : null}, i ? null : askCaseHTML(c));
+        const lastTurn = i === d.turns.length - 1;
+        askShowTurn({parts: t.parts, thought: t.thought, level_idx: lastTurn ? d.level_idx : null, round: lastTurn ? d.round : null},
+                    i ? null : askCaseHTML(c));
       });
       last = sid;
       ended = d.ended;
@@ -2520,7 +2524,9 @@ $('openSide').addEventListener('click', () => {
 });
 $('backdrop').addEventListener('click', () => $('sessionView').classList.remove('drawer-open'));
 // Progress is saved after every answer, so going Home needs no warning.
-$('topHome').addEventListener('click', () => location.reload());
+// Back to Home: a fresh load (the simplest clean state), opened on Home, not the chat
+const goHome = () => location.assign('/?page=home');
+$('topHome').addEventListener('click', goHome);
 
 // ---------- conversation ----------
 
@@ -3075,7 +3081,7 @@ async function showFinalReport(){
   const panel = $('report');
   panel.className = 'report';
   panel.innerHTML = reportHTML(data, true);
-  $('againBtn').addEventListener('click', () => location.reload());
+  $('againBtn').addEventListener('click', goHome);
   $('reviewBtn').addEventListener('click', () => $('chatScroll').scrollTo({top: 0, behavior: 'smooth'}));
   panel.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
@@ -3439,7 +3445,7 @@ function showTutorialEnd(res){
       <span class="stars" role="img" aria-label="${res.stars} of 3 stars">${stars}</span></div>
     ${reportHTML(res.stats, true)}`;
   $('againBtn').textContent = 'Start a real case';
-  $('againBtn').addEventListener('click', () => location.reload());
+  $('againBtn').addEventListener('click', goHome);
   $('reviewBtn').textContent = 'Try round 3 again';
   $('reviewBtn').addEventListener('click', tutRetry);
   panel.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -3665,7 +3671,7 @@ $('studyGo').addEventListener('click', async () => {
   study.code = code;
   try { localStorage.setItem('study', JSON.stringify({code, consentAt: new Date().toISOString()})); } catch(e){}
   $('studyModal').classList.add('hidden');
-  if(!tourSeen('home')) setTimeout(() => startTour('home'), 300);
+  homeTourOnce();
 });
 async function initStudy(){
   try {
@@ -3680,8 +3686,11 @@ async function initStudy(){
   return false;
 }
 
+// The chat is the first page (the student's choice, 21 October 2026); a case's Home button comes back with ?page=home.
+showPage(new URLSearchParams(location.search).get('page') === 'home' ? 'home' : 'ask');
+if(location.search) history.replaceState(null, '', '/');
 Promise.all([loadConcepts(), initStudy()])
-  .then(([, ready]) => { if(ready && !tourSeen('home')) setTimeout(() => startTour('home'), 400); })
+  .then(([, ready]) => { if(ready) homeTourOnce(); })
   .catch(e => note('error', e.message, $('homeStatus')));
 </script>
 </body>
