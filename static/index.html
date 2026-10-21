@@ -463,7 +463,8 @@
   .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
   /* mastery estimate per skill (Goal 1 step 5): a 90% range bar, the most likely value and the mastery line */
   .ms-rows{display:grid; gap:4px;}
-  .ms-row{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; align-items:center; gap:10px; padding:6px 0; cursor:help;}
+  .ms-row{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; align-items:center; gap:10px; padding:6px 8px; margin:0 -8px; border-radius:8px; cursor:help;}
+  .ms-row:hover{background:var(--signal-soft);}
   .ms-row .nm{font-size:13px; font-weight:500;}
   .ms-row .nm small{display:block; font-size:11px; color:var(--ink-faint); font-weight:400;}
   .ms-track{position:relative; height:14px; border-radius:7px; background:var(--panel-2);}
@@ -1869,12 +1870,13 @@ function standardsRadarSVG(standards, counts, n){
     ${rings}${spokes}<polygon class="shape" points="${poly(val)}"/>${dots}${labels}</svg>`;
 }
 
-// Instant tooltip for the standards graph. The browser's own tooltip waits
-// about a second, so this one shows straight away and follows the pointer.
+// Instant tooltip for the standards graph and the Goal 1 grids and mastery
+// rows (anything with data-tip). The browser's own tooltip waits about a
+// second, so this one shows straight away and follows the pointer.
 const stip = el('div', 'stip hidden');
 document.body.appendChild(stip);
 function standardTip(e){
-  const t = e.target.closest?.('.sradar .sl');
+  const t = e.target.closest?.('[data-tip]');
   if(!t){ stip.classList.add('hidden'); return; }
   stip.textContent = t.dataset.tip;
   stip.classList.remove('hidden');
@@ -1891,12 +1893,15 @@ function skillGridHTML(r, title){
   if(!r || !r.answers) return '';
   const types = Object.keys(r.reasoning_types), kinds = Object.keys(r.knowledge_types);
   const cap = w => w[0].toUpperCase() + w.slice(1);
-  const head = types.map(t => `<th title="${esc(cap(r.reasoning_types[t]))}">${cap(t)}</th>`).join('');
+  const head = types.map(t => `<th data-tip="${esc(`${cap(t)} reasoning goes ${r.reasoning_types[t]}.`)}">${cap(t)}</th>`).join('');
   const cell = (c, t, k) => {
-    const pair = k ? ` data-r="${t}" data-k="${k}" title="Why this matters"` : '';
-    return c.asked ? `<td style="--a:${(c.attained / c.asked).toFixed(2)}"${pair}>${c.attained} of ${c.asked}</td>` : `<td class="unasked"${pair}>·</td>`;
+    const tip = c.asked ? `You showed ${t} reasoning${k ? ` on ${k} knowledge` : ''} in ${c.attained} of ${c.asked} questions.` : 'Not asked yet.';
+    const pair = k ? ` data-r="${t}" data-k="${k}"` : '';
+    const more = k ? ' Click to see why it matters.' : '';
+    return c.asked ? `<td style="--a:${(c.attained / c.asked).toFixed(2)}"${pair} data-tip="${esc(tip + more)}">${c.attained} of ${c.asked}</td>`
+                   : `<td class="unasked"${pair} data-tip="${esc(tip + more)}">·</td>`;
   };
-  const rows = kinds.map(k => `<tr><th class="row" title="${esc(r.knowledge_types[k])}">${cap(k)}</th>`
+  const rows = kinds.map(k => `<tr><th class="row" data-tip="${esc(`${cap(k)} knowledge answers ${r.knowledge_types[k].toLowerCase()}`)}">${cap(k)}</th>`
     + types.map(t => cell(r.grid[k][t], t, k)).join('') + '</tr>').join('');
   const foot = types.map(t => cell(r.reasoning[t])).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
@@ -1912,7 +1917,7 @@ function skillGridHTML(r, title){
 function masteryHTML(m){
   if(!m || !m.answers) return '';
   const cap = w => w[0].toUpperCase() + w.slice(1);
-  const rows = m.skills.map(r => `<div class="ms-row" title="${esc(`Shown in ${r.attained} of ${r.asked} questions. Most likely ${r.mean}%, and 90% sure it is between ${r.low}% and ${r.high}%. The chance you have mastered it is ${r.chance_mastered}%.`)}">
+  const rows = m.skills.map(r => `<div class="ms-row" data-tip="${esc(`Shown in ${r.attained} of ${r.asked} questions. Most likely ${r.mean}%, and 90% sure it is between ${r.low}% and ${r.high}%. The chance you have mastered it is ${r.chance_mastered}%.`)}">
       <span class="nm">${cap(r.skill)}<small>${r.kind}</small></span>
       <span class="ms-track"><span class="ms-band" style="left:${r.low}%; width:${r.high - r.low}%"></span>
         <span class="ms-line" style="left:${m.mastery_level}%"></span><span class="ms-dot" style="left:${r.mean}%"></span></span>
@@ -2096,10 +2101,11 @@ function reasoningGridHTML(r){
   const types = Object.keys(r.reasoning_types), kinds = Object.keys(r.knowledge_types);
   const top = Math.max(1, ...kinds.flatMap(k => types.map(t => r.grid[k][t])));
   const cap = w => w[0].toUpperCase() + w.slice(1);
-  const head = types.map(t => `<th title="${esc(cap(r.reasoning_types[t]))}">${cap(t)}</th>`).join('');
-  const rows = kinds.map((k, i) => `<tr class="${i >= 5 ? 'derived' : ''}"><th class="row" title="${esc(r.knowledge_types[k])}">${cap(k)}</th>`
+  const head = types.map(t => `<th data-tip="${esc(`${cap(t)} reasoning goes ${r.reasoning_types[t]}.`)}">${cap(t)}</th>`).join('');
+  const rows = kinds.map((k, i) => `<tr class="${i >= 5 ? 'derived' : ''}"><th class="row" data-tip="${esc(`${cap(k)} knowledge answers ${r.knowledge_types[k].toLowerCase()}`)}">${cap(k)}</th>`
     + types.map(t => { const v = r.grid[k][t];
-        return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}" data-r="${t}" data-k="${k}" title="Why this matters">${v}</td>`; }).join('') + '</tr>').join('');
+        return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}" data-r="${t}" data-k="${k}"
+          data-tip="${esc(`${v} of your answers used ${t} reasoning on ${k} knowledge. Click to see why it matters.`)}">${v}</td>`; }).join('') + '</tr>').join('');
   const quality = types.map(t => `<td>${r.quality[t] === null ? 'none yet' : `${r.quality[t]} of 9`}</td>`).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Reasoning × Knowledge</span>${msgs}
