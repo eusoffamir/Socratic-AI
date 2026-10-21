@@ -8,6 +8,7 @@ Two ways to pick the next move:
   apply_plan()  the guard: takes the Planner agent's proposal and enforces the
                 fixed rules on it. "Agents decide, rules guard."
 """
+from . import reasoning
 from .content import CONCEPTS, FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
 
 GOOD_STANDARDS_THRESHOLD = 2  # standards met to count an answer as "good"
@@ -285,6 +286,7 @@ def summarize(session):
         "reasoning_move_count": move_counts,
         "strongest_standard": strongest,
         "weakest_standard": weakest,
+        "reasoning": reasoning.summarize([t["assessment"] for t in session["history"]]),
     }
 
 

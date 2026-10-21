@@ -108,3 +108,50 @@ def mock(answer):
     hit = {k: int(bool(re.search(p, text))) for k, p in _MOCK_SIGNS.items()}
     return {"types": {k: hit[k] for k in REASONING_TYPES},
             "knowledge": {k: hit[k] for k in KNOWLEDGE_TYPES}, "evidence": answer[:80]}
+
+
+# The first five knowledge types are "knowing". A gap there is the most useful to point out.
+CORE_KNOWLEDGE = list(KNOWLEDGE_TYPES)[:5]
+
+
+def summarize(assessments):
+    """Counts for the dashboard. grid[knowledge][reasoning] is how many answers
+    showed both. quality[reasoning] is the average number of the 9 standards met
+    in the answers that showed that reasoning type. Answers saved before the
+    Reasoning agent existed have no marks and are left out."""
+    marked = [a for a in assessments if a and a.get("reasoning")]
+    grid = {k: {r: 0 for r in REASONING_TYPES} for k in KNOWLEDGE_TYPES}
+    met = {r: [] for r in REASONING_TYPES}
+    for a in marked:
+        rt, kn = a["reasoning"]["types"], a["reasoning"]["knowledge"]
+        for r in REASONING_TYPES:
+            if rt.get(r):
+                met[r].append(sum(a["standards"].values()))
+                for k in KNOWLEDGE_TYPES:
+                    grid[k][r] += kn.get(k, 0)
+    return {"answers": len(marked),
+            "types": {r: len(met[r]) for r in REASONING_TYPES},
+            "knowledge": {k: sum(a["reasoning"]["knowledge"].get(k, 0) for a in marked) for k in KNOWLEDGE_TYPES},
+            "grid": grid,
+            "quality": {r: round(sum(v) / len(v), 1) if v else None for r, v in met.items()},
+            "messages": _messages(grid, len(marked)),
+            # for the page's labels and hover tips
+            "reasoning_types": REASONING_TYPES, "knowledge_types": KNOWLEDGE_TYPES}
+
+
+def _messages(grid, n):
+    """Up to 2 plain sentences for the learner: the strongest pair and one gap."""
+    if not n:
+        return []
+    cells = [(grid[k][r], k, r) for k in KNOWLEDGE_TYPES for r in REASONING_TYPES]
+    out = []
+    best = max(cells, key=lambda c: c[0])
+    if best[0]:
+        out.append(f"You used {best[2]} reasoning on {best[1]} knowledge most often.")
+    # A gap is most useful where the learner already uses that knowledge with another reasoning type.
+    gaps = [(k, r) for k in CORE_KNOWLEDGE for r in REASONING_TYPES if not grid[k][r]]
+    used = [g for g in gaps if any(grid[g[0]].values())]
+    if used or gaps:
+        k, r = (used or gaps)[0]
+        out.append(f"You have not shown {r} reasoning on {k} knowledge yet.")
+    return out

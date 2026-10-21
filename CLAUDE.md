@@ -54,7 +54,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
 - Live: https://socratic-ai-qlk6.onrender.com (deploys from `main`).
-- Run: `uvicorn app.main:app --reload`. Tests: `pytest`.
+- Run: `uvicorn app.main:app --reload`. Tests: `pytest`. For a no-cost test server use `PROVIDER=mock` (`MOCK=1` is ignored when `.env` sets `PROVIDER`).
 
 Design requirements R1 to R9 and honest status: see history file.
 

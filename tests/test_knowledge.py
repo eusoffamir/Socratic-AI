@@ -90,3 +90,31 @@ def test_assessor_adds_reasoning_and_can_be_switched_off(monkeypatch):
     assert copycheck.copied_assessment()["reasoning"] is None
     monkeypatch.delenv("AGENT_REASONING")
     assert copycheck.copied_assessment()["reasoning"] == reasoning.empty()
+
+
+# ---------- dashboard counts (step 3) ----------
+
+def _marked(types, knowledge, met=3):
+    std = {k: int(i < met) for i, k in enumerate(llm_client.STANDARDS)}
+    return {"standards": std, "reasoning_move": "none", "reasoning": {"types": {r: int(r in types) for r in reasoning.REASONING_TYPES},
+                                            "knowledge": {k: int(k in knowledge) for k in KNOWLEDGE_TYPES},
+                                            "evidence": ""}}
+
+
+def test_summarize_counts_pairs_and_quality():
+    old = {"standards": {k: 1 for k in llm_client.STANDARDS}, "reasoning_move": "none"}  # saved before step 2
+    d = reasoning.summarize([_marked(["deductive"], ["procedural", "causal"], met=4),
+                             _marked(["deductive", "abductive"], ["causal"], met=2), old, None])
+    assert d["answers"] == 2
+    assert d["grid"]["causal"] == {"inductive": 0, "deductive": 2, "abductive": 1}
+    assert d["grid"]["procedural"]["deductive"] == 1
+    assert d["quality"] == {"inductive": None, "deductive": 3.0, "abductive": 2.0}
+    assert d["messages"] == ["You used deductive reasoning on causal knowledge most often.",
+                             "You have not shown inductive reasoning on procedural knowledge yet."]
+    assert reasoning.summarize([])["messages"] == []
+
+
+def test_session_summary_includes_reasoning():
+    s = orc.new_session("pattern_or_luck", total_rounds=8)
+    s["history"] = [{"assessment": _marked(["inductive"], ["factual"])}]
+    assert orc.summarize(s)["reasoning"]["grid"]["factual"]["inductive"] == 1
