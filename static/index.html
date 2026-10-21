@@ -128,7 +128,7 @@
 
   /* the wide sidebar (like Claude): New chat, Home, Overall status, Recents. Folds back to icons. */
   .nav{align-items:stretch; gap:6px; padding:14px 12px; min-height:0; overflow:hidden;}
-  .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px; margin-bottom:22px;}
+  .nav .sn-head{display:flex; align-items:center; gap:10px; padding:4px 4px 0 12px; margin-bottom:22px; min-height:38px;}
   .nav .logo{margin:0; flex:none;}
   .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1;}
   .nav .sn-fold{width:34px; height:34px; flex:none;}
@@ -317,7 +317,7 @@
     display:grid; place-items:center;
   }
   .hero-art{overflow:hidden;}
-  .hero-art img{width:100%; height:100%; object-fit:cover; object-position:35% center; display:block;}
+  .hero-art img{width:100%; height:100%; object-fit:cover; object-position:center; display:block;}
   .hero-text{min-width:0;}
   .hero h2{
     font-family:var(--serif); font-weight:600; font-size:clamp(22px, 1.8vw, 30px); line-height:1.15;
@@ -1020,7 +1020,6 @@
   <button class="icon-btn nav-unfold" id="navUnfold" title="Open the sidebar" aria-label="Open the sidebar"><svg><use href="#i-side"/></svg></button>
   <nav class="rail nav" aria-label="Main">
     <div class="sn-head">
-      <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
       <span class="sn-name">Socratic AI</span>
       <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
     </div>
@@ -1041,7 +1040,7 @@
       <div class="home-inner">
         <section class="hero">
           <div class="hero-art" aria-hidden="true">
-            <img src="/static/img/hero.png" alt="">
+            <img src="/static/img/socrates.png" alt="">
           </div>
           <div class="hero-text">
             <h2>Think critically about any topic</h2>
