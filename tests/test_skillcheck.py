@@ -127,3 +127,14 @@ def test_api_refuses_long_answers(monkeypatch, tmp_path):
     assert r.status_code == 400 and "under 100 words" in r.json()["detail"]
     ok = c.post(f"/api/check/{cid}/answer", json={"answer": HUMAN_ANSWERS[0], "seconds": 40})
     assert ok.status_code == 200 and main.SESSIONS[cid]["turns"][0]["seconds"] == 40
+
+
+def test_ai_guard_switch(monkeypatch, tmp_path):
+    from app import copycheck
+    c = client(monkeypatch, tmp_path)
+    monkeypatch.delenv("AI_GUARD", raising=False)
+    assert c.get("/api/config").json()["ai_guard"] is True and copycheck.ai_reason(AI_ANSWERS[0])
+    monkeypatch.setenv("AI_GUARD", "0")
+    assert c.get("/api/config").json()["ai_guard"] is False and copycheck.ai_reason(AI_ANSWERS[0]) is None
+    turn = skillcheck.answer(skillcheck.new_check(), AI_ANSWERS[0])
+    assert turn["ai_like"] is None  # marked by the agents as usual

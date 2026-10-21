@@ -14,14 +14,14 @@ def client(monkeypatch, codes=""):
 
 def test_study_mode_is_off_by_default(monkeypatch):
     c = client(monkeypatch)
-    assert c.get("/api/config").json() == {"study_mode": False}
+    assert c.get("/api/config").json()["study_mode"] is False
     r = c.post("/api/session", json={})
     assert r.status_code == 200 and main.SESSIONS[r.json()["session_id"]].get("participant_code") is None
 
 
 def test_study_mode_needs_a_listed_code_and_consent(monkeypatch):
     c = client(monkeypatch, "P001, p002")
-    assert c.get("/api/config").json() == {"study_mode": True}
+    assert c.get("/api/config").json()["study_mode"] is True
     assert c.post("/api/participant/check", json={"code": " p002 "}).json() == {"ok": True}
     assert c.post("/api/participant/check", json={"code": "P999"}).json() == {"ok": False}
     assert c.post("/api/session", json={"participant_code": "P999", "consent": True}).status_code == 403

@@ -171,7 +171,7 @@ def answer(check, text, seconds=None):
     item = ITEMS[check["items"][check["round"]]]
     asked = f'{item["situation"]} {item["question"]}'
     as_session = {"concept_id": item["case"], "last_tutor": asked}
-    ai_reason = copycheck.ai_like(text)
+    ai_reason = copycheck.ai_reason(text)
     if ai_reason:
         a = copycheck.ai_assessment(ai_reason)
     elif copycheck.is_copied(text, copycheck.session_sources(as_session), item["situation"]):

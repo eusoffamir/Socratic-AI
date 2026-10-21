@@ -1998,9 +1998,9 @@ function rememberCheck(id){
 
 const check = {id: null, busy: false, ended: false, shownAt: 0};
 const CHECK_MAX_WORDS = 100;  // same as skillcheck.MAX_WORDS
-// TEMPORARY: paste is allowed so Eusoff can test the skill check (21 October 2026).
-// Set this back to false BEFORE THE PILOT (see CLAUDE.md, Open items).
-const CHECK_ALLOW_PASTE = true;
+// Paste in the skill check follows AI_GUARD in .env (read from /api/config at
+// start): 1 = paste off and the AI-style check on, 0 = both off for testing.
+let CHECK_ALLOW_PASTE = false;
 const countText = n => `${n} of ${CHECK_MAX_WORDS} words` + (CHECK_ALLOW_PASTE ? '' : ' · paste is off, so type your own answer');
 const wordCount = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const checkOpen = () => !$('checkModal').classList.contains('hidden');
@@ -2760,7 +2760,11 @@ $('studyGo').addEventListener('click', async () => {
   if(!tourSeen('home')) setTimeout(() => startTour('home'), 300);
 });
 async function initStudy(){
-  try { study.on = (await api('/api/config')).study_mode; } catch(e){ study.on = false; }
+  try {
+    const cfg = await api('/api/config');
+    study.on = cfg.study_mode;
+    CHECK_ALLOW_PASTE = cfg.ai_guard === false;
+  } catch(e){ study.on = false; }
   if(!study.on) return true;
   try { study.code = (JSON.parse(localStorage.getItem('study')) || {}).code || null; } catch(e){}
   if(study.code) return true;

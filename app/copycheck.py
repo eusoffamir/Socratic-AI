@@ -2,6 +2,7 @@
 the case notes, the reading, a tool result) instead of their own thinking.
 Plain code, no AI: it is free, instant and gives the same result every time.
 A rule guards; the agents never see a copied answer as real reasoning."""
+import os
 import re
 
 from . import reasoning
@@ -106,6 +107,18 @@ _AI_LAYOUT = [
     re.compile(r"(?m)^\s*•\s*[A-Z][\w ,'()&-]{2,60}:"),  # "• Random Luck (Most Common): ..." bullet titles
     re.compile(r"\u2014"),                # an em dash, which keyboards do not type easily
 ]
+
+
+def ai_guard_on():
+    """AI_GUARD in .env: 1 (the default) turns on this check AND turns paste off
+    in the skill check, 0 turns both off for testing. Read each time, so tests
+    and a restart can switch it."""
+    return os.getenv("AI_GUARD", "1") != "0"
+
+
+def ai_reason(answer):
+    """ai_like(), but only when the guard is on. The agents call this one."""
+    return ai_like(answer) if ai_guard_on() else None
 
 
 def ai_like(answer):

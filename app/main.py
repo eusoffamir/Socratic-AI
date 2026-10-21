@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
+from . import copycheck, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
@@ -179,8 +179,9 @@ def health():
 
 @app.get("/api/config")
 def config():
-    """What the page needs to know at start: is study mode on (consent and code first)?"""
-    return {"study_mode": bool(study_codes())}
+    """What the page needs to know at start: is study mode on (consent and code
+    first), and is the AI guard on (then paste is off in the skill check)?"""
+    return {"study_mode": bool(study_codes()), "ai_guard": copycheck.ai_guard_on()}
 
 
 @app.post("/api/participant/check")

@@ -51,7 +51,7 @@ def _assess_node(state: TurnState) -> TurnState:
         # Rule first: an answer copied from a hint or the notes is not the
         # learner's thinking, so it scores 0 and the Assessor is not called.
         s = state["session"]
-        ai_reason = copycheck.ai_like(state["answer"])
+        ai_reason = copycheck.ai_reason(state["answer"])
         if ai_reason:  # rule: a chatbot-style answer is not the learner's thinking either
             state["assessment"] = copycheck.ai_assessment(ai_reason)
         elif copycheck.is_copied(state["answer"], copycheck.session_sources(s), copycheck.session_story(s)):

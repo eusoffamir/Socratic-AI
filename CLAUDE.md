@@ -49,7 +49,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 "Agents decide, rules guard." `app/graph.py` (LangGraph): assess, plan, guard, tutor (may run a tool), check, rewrite once, finish.
 
-- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Mastery stats `app/stats.py`, class model `eval/dina.py`, Explainer agent `app/explainer.py`. Goal 1 summary for Dr Ho: `docs/supervisor/goal1-summary.md`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`.
+- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Mastery stats `app/stats.py`, class model `eval/dina.py`, Explainer agent `app/explainer.py`. Goal 1 summary for Dr Ho: `docs/supervisor/goal1-summary.md`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`, and `AI_GUARD` (AI-style answer check plus paste off in the skill check, default 1).
 - Rules: `app/orchestrator.py` (`apply_plan()` guard, `decide()` fallback). Copy check `app/copycheck.py`. Tools `app/tools.py`. Limits `app/limits.py`. Saving `app/storage.py` (Supabase; local `.env` writes to the live DB, so set `SUPABASE_URL=" "` for test servers).
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
@@ -73,7 +73,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## Open items
 
-- **BEFORE THE PILOT: turn paste off again in the skill check.** In `static/index.html` set `CHECK_ALLOW_PASTE = false`. It was turned on for testing on 21 October 2026. Remind Eusoff whenever the pilot, the study or study mode comes up.
+- **BEFORE THE PILOT: `AI_GUARD=1`** in `.env` and on Render (it turns the AI-style answer check on and paste off). Eusoff sets it to 0 for testing. Remind Eusoff whenever the pilot, the study or study mode comes up.
 
 - Remind Dr Ho about the Claude and Render subscription requests.
 - Full list of questions for Dr Ho and things to verify: history file, "Open items".
