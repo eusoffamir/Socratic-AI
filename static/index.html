@@ -160,6 +160,7 @@
   .status-main{display:flex; flex-direction:column; min-width:0; min-height:0;}
   .status-scroll{flex:1; overflow-y:auto; padding:28px 32px 40px;}
   .status-inner{max-width:1080px; margin:0 auto;}
+  .status-inner .report{background:none; border:0; box-shadow:none; padding:0; margin-top:4px;}  /* no card box, it sits on the page */
   .status-inner .report h2{margin:12px 0 14px; line-height:1.3;}
   .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
   .status-inner .report-grid{gap:36px;}
@@ -325,6 +326,9 @@
     box-shadow:0 4px 16px rgba(47,90,168,.35);
   }
   .mode-btn[aria-pressed="true"]:hover:not(:disabled){color:#fff;}
+  /* the same switch, small, beside ROUND in the Ask chat's top bar */
+  .mode-btn.ask-mode{height:30px; min-width:0; padding:0 12px; font-size:13px; border-radius:999px; border-width:1.5px; margin-left:6px;}
+  .mode-btn.ask-mode[aria-pressed="true"]{box-shadow:0 2px 8px rgba(47,90,168,.3);}
   .home-scroll{flex:1; overflow:auto; padding:28px 32px 40px;}
   .home-inner{width:100%;}
   /* rotating thinking tips, pinned to the bottom of Home (subtle, changes every 8 s, pauses on hover) */
@@ -1140,6 +1144,10 @@
       <header class="chat-top" id="askStrip" role="button" tabindex="0" aria-expanded="false" aria-controls="askStats" title="Show your progress in this case">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
+          <button type="button" class="mode-btn ask-mode" id="askAb" aria-pressed="false"
+                  title="A or B?: from the next question, every question gives you 2 choices to pick from">
+            <span class="off-text">Normal</span><span class="on-text">A or B?</span>
+          </button>
         </div>
         <div class="spacer"></div>
         <span class="status ask-lv-label"><span class="lv-label">LEVEL:</span></span>
@@ -2012,6 +2020,15 @@ $('askStrip').addEventListener('click', () => {
   $('askStrip').setAttribute('aria-expanded', open);
   if(open) askStatsLoad();
 });
+// A or B mode for this chat: kept for later cases in the same chat, sent to the server at once.
+$('askAb').addEventListener('click', async e => {
+  e.stopPropagation();  // the button sits in the top bar, which opens Status
+  const b = e.currentTarget, on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', String(on));
+  if(!ask.sid) return;
+  try { await postJSON(`/api/session/${encodeURIComponent(ask.sid)}/mode`, {ab_only: on}); }
+  catch(err){ b.setAttribute('aria-pressed', String(!on)); }  // not saved, so show it as it really is
+});
 $('askStrip').addEventListener('keydown', e => {
   if(e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); e.currentTarget.click(); }
 });
@@ -2078,7 +2095,7 @@ async function askStart(c, name){
   const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
   try {
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
-      case: c.generated ? c : undefined, ab_only: false, reading_seconds: 0,
+      case: c.generated ? c : undefined, ab_only: $('askAb').getAttribute('aria-pressed') === 'true', reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
     if(!askLive(gen)) return;
     Object.assign(ask, {sid: data.session_id, hintOpened: false});
@@ -2237,6 +2254,7 @@ function askReset(){
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
   $('askStrip').setAttribute('aria-expanded', false);
+  $('askAb').setAttribute('aria-pressed', 'false');
   askChatting(false);
   setAskFile(null);
 }
@@ -2272,6 +2290,7 @@ async function askOpen(id){
       });
       last = sid;
       ended = d.ended;
+      $('askAb').setAttribute('aria-pressed', String(!!d.ab_only));  // the last case's A or B mode
     } catch(err){
       if(!askLive(gen)) return;
       if(!/could not be found/i.test(err.message)){ note('error', err.message, $('askThread')); }  // 404: that case is no longer saved

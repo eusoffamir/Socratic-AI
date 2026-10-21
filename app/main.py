@@ -355,6 +355,20 @@ def end_session(sid: str):
     return {"ended": True, "rounds_answered": len(session["history"])}
 
 
+class ModeRequest(BaseModel):
+    ab_only: bool
+
+
+@app.post("/api/session/{sid}/mode")
+def set_mode(sid: str, req: ModeRequest):
+    """The Ask chat's A or B switch: turns "every question is A or B" on or
+    off for this session. It counts from the next question the Tutor writes."""
+    sid, session = _get_session(sid)
+    session["ab_only"] = req.ab_only
+    _persist(sid, session)
+    return {"ab_only": session["ab_only"]}
+
+
 # ---------- skill check (Goal 1): set questions, each tagged with one skill ----------
 
 class CheckAnswerRequest(AnswerRequest):
