@@ -199,16 +199,19 @@
   .topic-box input::placeholder{color:var(--ink-faint);}
   .topic-box input:focus{outline:2px solid var(--signal); outline-offset:1px; border-color:var(--signal);}
   .topic-box button{border-radius:12px; flex:none;}
-  .topic-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
-  .topic-chip{display:inline-flex; align-items:center; max-width:100%; border:1px solid var(--rule); border-radius:999px; background:var(--panel);}
-  .topic-chip button{
-    background:transparent; color:var(--ink-soft); border:0; border-radius:999px; padding:6px 14px; font-size:13px; font-weight:500;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+  .topic-suggest{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px;}
+  .topic-suggest .mono-label{margin-right:2px;}
+  .topic-suggest button{
+    background:var(--panel-2); color:var(--ink-soft); border:none; border-radius:999px; padding:6px 14px;
+    font-size:13px; font-weight:500;
   }
-  .topic-chip button:hover:not(:disabled){color:var(--ink); opacity:1;}
-  .topic-chip .x{padding:6px 12px 6px 0; color:var(--ink-faint); flex:none;}
-  .topic-chip.on{background:var(--ink); border-color:var(--ink);}
-  .topic-chip.on button, .topic-chip.on button:hover:not(:disabled){color:var(--paper);}
+  .topic-suggest button:hover:not(:disabled){color:var(--ink); background:var(--rule); opacity:1;}
+  .section-head .ov-filter{min-width:0;}
+  .section-head .ov-filter > button span{max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ov-menu .topic-item{display:flex; align-items:center; gap:2px;}
+  .ov-menu .topic-item [data-topic]{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;}
+  .ov-menu .topic-item .x{flex:none; color:var(--ink-faint); padding:8px 10px;}
+  .ov-menu .topic-item .x:hover{color:var(--ink);}
   #topicStatus{margin-top:10px;}
   .draft-note{margin:-4px 0 14px; padding:10px 14px; border-radius:10px; background:var(--caution-soft); color:var(--caution); font-size:13.5px;}
   .cases{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;}
@@ -878,10 +881,10 @@
                  placeholder="Type any topic, like photosynthesis or the French Revolution">
           <button type="submit" id="topicBuild">Build cases</button>
         </form>
-        <div class="topic-chips" id="topicChips" aria-label="Your topics"></div>
+        <div class="topic-suggest" id="topicSuggest"><span class="mono-label">Try</span></div>
         <div id="topicStatus" aria-live="polite"></div>
 
-        <div class="section-head"><h3 id="casesHead">Cases</h3></div>
+        <div class="section-head"><h3>Cases</h3><div class="ov-filter" id="topicFilter"></div></div>
         <p class="draft-note hidden" id="draftNote">AI wrote these cases for your topic, and no expert has checked them yet, so question them too.</p>
         <div class="cases" id="cases"></div>
 
@@ -1352,28 +1355,63 @@ function setActiveTopic(id){
   try { localStorage.setItem('active-topic', id); } catch(e){}
 }
 
+// Topics the learner can try with one click. A click only fills the box, so
+// nothing is built (and no AI call is made) until they press Build cases.
+const SUGGESTED_TOPICS = ['Photosynthesis', 'The French Revolution', 'How vaccines work', 'Climate change', 'Why we need sleep'];
+$('topicSuggest').insertAdjacentHTML('beforeend',
+  SUGGESTED_TOPICS.map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join(''));
+$('topicSuggest').addEventListener('click', e => {
+  const b = e.target.closest('[data-fill]');
+  if(!b) return;
+  $('topicInput').value = b.dataset.fill;
+  $('topicInput').focus();
+});
+
+// The topic filter beside "Cases": the same teal pill as the "All cases" filter.
 function renderTopics(){
   const active = activeTopic(), mine = active.id !== 'quant';
   concepts = mine ? active.cases : quantCases;
-  $('topicChips').innerHTML = [QUANT_TOPIC, ...myTopics()].map(t => `
-    <span class="topic-chip${t.id === active.id ? ' on' : ''}">
-      <button type="button" data-topic="${esc(t.id)}" aria-pressed="${t.id === active.id}" title="${esc(t.topic)}">${esc(t.topic)}</button>
-      ${t.id === 'quant' ? '' : `<button type="button" class="x" data-remove="${esc(t.id)}" aria-label="Remove ${esc(t.topic)}">×</button>`}
-    </span>`).join('');
-  $('casesHead').textContent = mine ? `Cases on ${active.topic}` : 'Cases';
+  $('topicFilter').innerHTML = `
+    <button type="button" aria-haspopup="menu" aria-expanded="false" title="${esc(active.topic)}"><span>${esc(active.topic)}</span>
+      <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="ov-menu" role="menu">
+      ${[QUANT_TOPIC, ...myTopics()].map(t => `<div class="topic-item">
+        <button type="button" role="menuitemradio" aria-checked="${t.id === active.id}" data-topic="${esc(t.id)}">${esc(t.topic)}</button>
+        ${t.id === 'quant' ? '' : `<button type="button" class="x" data-remove="${esc(t.id)}" aria-label="Remove ${esc(t.topic)}">×</button>`}
+      </div>`).join('')}
+    </div>`;
   $('draftNote').classList.toggle('hidden', !mine);
   renderCases();
 }
 
-$('topicChips').addEventListener('click', e => {
+$('topicFilter').addEventListener('click', e => {
+  e.stopPropagation();
+  const f = $('topicFilter'), toggle = f.querySelector(':scope > button');
   const pick = e.target.closest('[data-topic]'), drop = e.target.closest('[data-remove]');
   if(drop){
     saveTopics(myTopics().filter(t => t.id !== drop.dataset.remove));
     if(activeTopic().id === drop.dataset.remove) setActiveTopic('quant');
-  } else if(pick) setActiveTopic(pick.dataset.topic);
-  else return;
-  $('topicStatus').innerHTML = '';
-  renderTopics();
+    renderTopics();
+    $('topicFilter').classList.add('open');  // keep the menu open while removing
+    $('topicFilter').querySelector(':scope > button').setAttribute('aria-expanded', true);
+  } else if(pick){
+    setActiveTopic(pick.dataset.topic);
+    $('topicStatus').innerHTML = '';
+    renderTopics();
+    $('topicFilter').querySelector(':scope > button').focus();
+  } else if(e.target.closest(':scope > button') === toggle){
+    const open = !f.classList.contains('open');
+    document.querySelectorAll('.ov-filter.open').forEach(o => o.classList.remove('open'));  // one menu at a time
+    f.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', open);
+  }
+});
+$('topicFilter').addEventListener('keydown', e => {
+  if(e.key === 'Escape' && $('topicFilter').classList.contains('open')){
+    e.stopPropagation();
+    $('topicFilter').classList.remove('open');
+    $('topicFilter').querySelector(':scope > button').focus();
+  }
 });
 
 $('topicForm').addEventListener('submit', async e => {
