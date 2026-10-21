@@ -138,7 +138,6 @@
   .sn-item svg{width:20px; height:20px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
-  .sn-new{background:rgba(255,255,255,.1); opacity:1;}
   .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   .sn-chat{display:flex; align-items:center; border-radius:8px;}
@@ -214,6 +213,29 @@
   .am-thought ul{margin:8px 0 0; padding:0 0 0 14px; border-left:2px solid var(--rule); list-style:none; color:var(--ink-soft);}
   .am-thought li{margin:0 0 6px;}
   .am-thought li b{color:var(--ink); font-weight:600;}
+  .am-divider{display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+              text-transform:uppercase; color:var(--ink-faint); margin:10px 0 0;}
+  .am-divider::before, .am-divider::after{content:""; flex:1; height:1px; background:var(--rule);}
+  .am-card{font-family:var(--sans); font-size:14.5px; line-height:1.55; background:var(--panel); border:1px solid var(--rule);
+           border-radius:14px; padding:14px 18px; color:var(--ink-soft);}
+  .am-card b{color:var(--ink);}
+  .am-card .mono-label{display:block; margin-bottom:6px;}
+  .am-card .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .am-card .row button{font-size:13.5px; padding:7px 14px; border-radius:999px;}
+  .am-card .row .ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--rule);}
+  .ask-next{font-size:13px; padding:6px 12px; border-radius:999px; background:var(--panel); border:1px solid var(--rule); color:var(--ink-soft);}
+  .ask-next:hover:not(:disabled){color:var(--ink); border-color:var(--signal); opacity:1;}
+  /* the knowledge map of a case: boxes coloured by knowledge type, arrows for the links */
+  .am-map{font-family:var(--sans); margin:2px 0 14px; background:var(--panel); border:1px solid var(--rule); border-radius:14px; padding:12px 14px 10px;}
+  .am-map svg{display:block; width:100%; height:auto;}
+  .am-map .nd{cursor:pointer;}
+  .am-map .nd rect{fill:var(--panel); stroke-width:1.5;}
+  .am-map .nd.on rect{stroke-width:2.6;}
+  .am-map .nd text{font-size:11.5px; fill:var(--ink);}
+  .am-map .ed{fill:none; stroke:var(--ink-faint); stroke-width:1.3; opacity:.7;}
+  .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
+  .am-map .legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-faint); margin:6px 2px 0;}
+  .am-map .legend i{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
           border-radius:10px; padding:10px 14px; margin:8px 0 0;}
   .ask-greet{display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 28px;
@@ -297,8 +319,6 @@
   .hero-art{overflow:hidden;}
   .hero-art img{width:100%; height:100%; object-fit:cover; object-position:35% center; display:block;}
   .hero-text{min-width:0;}
-  .credit-line{margin:28px 0 0; text-align:center; font-size:13px; color:var(--ink-faint);}
-  .credit-line b{color:var(--ink-soft); font-weight:600;}
   .hero h2{
     font-family:var(--serif); font-weight:600; font-size:clamp(22px, 1.8vw, 30px); line-height:1.15;
     margin:0 0 8px; letter-spacing:-.01em;
@@ -310,19 +330,6 @@
   .section-head h3{font-size:16px; font-weight:600; margin:0;}
 
   /* Goal 2: any topic */
-  .topic-box{
-    background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:var(--shadow);
-    padding:8px; transition:border-color .15s ease, background .15s ease;
-  }
-  .topic-box:focus-within{border-color:var(--signal);}
-  .topic-box.drop{border-color:var(--signal); border-style:dashed; background:var(--signal-soft);}
-  .tb-row{display:flex; align-items:center; gap:6px;}
-  .topic-box input[type=text]{
-    flex:1; min-width:0; font:inherit; font-size:15px; color:var(--ink); background:transparent;
-    border:none; padding:8px 8px; outline:none;
-  }
-  .topic-box input::placeholder{color:var(--ink-faint);}
-  .topic-box button[type=submit]{border-radius:10px; flex:none;}
   .tb-add{
     flex:none; width:38px; height:38px; padding:0; display:grid; place-items:center; border-radius:10px;
     background:transparent; color:var(--ink-soft); border:1px solid transparent;
@@ -342,22 +349,12 @@
   }
   .tb-file button:hover:not(:disabled){color:var(--ink); background:var(--rule); opacity:1;}
   .tb-privacy{margin:8px 2px 0; font-size:12.5px; color:var(--ink-faint);}
-  .topic-head{flex-wrap:wrap; row-gap:8px;}
-  .topic-head h3{margin-right:6px;}
-  .topic-suggest{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; margin-left:auto;}
-  .topic-suggest .mono-label{margin-right:2px;}
-  .topic-suggest button{
-    background:var(--panel-2); color:var(--ink-soft); border:none; border-radius:999px; padding:6px 14px;
-    font-size:13px; font-weight:500;
-  }
-  .topic-suggest button:hover:not(:disabled){color:var(--ink); background:var(--rule); opacity:1;}
   .section-head .ov-filter{min-width:0;}
   .section-head .ov-filter > button span{max-width:min(520px, 70vw); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ov-menu .topic-item{display:flex; align-items:center; gap:2px;}
   .ov-menu .topic-item [data-topic]{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;}
   .ov-menu .topic-item .x{flex:none; color:var(--ink-faint); padding:8px 10px;}
   .ov-menu .topic-item .x:hover{color:var(--ink);}
-  #topicStatus{margin-top:10px;}
   .cases-head{flex-wrap:wrap; row-gap:8px;}
   .rm-source{margin:18px 0 0; font-size:13.5px; color:var(--ink-soft); display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;}
   .rm-source a{color:var(--signal);}
@@ -1068,22 +1065,6 @@
         </section>
         <div id="homeStatus" aria-live="polite"></div>
 
-        <div class="section-head topic-head"><h3>Topic</h3>
-          <div class="topic-suggest" id="topicSuggest"><span class="mono-label">Try</span></div></div>
-        <form class="topic-box" id="topicForm" autocomplete="off">
-          <div class="tb-files hidden" id="topicFiles"></div>
-          <div class="tb-row">
-            <button type="button" class="tb-add" id="topicAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
-              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-            <input id="topicInput" type="text" maxlength="4000" aria-label="Any topic"
-                   placeholder="Type any topic, or drop in a file">
-            <button type="submit" id="topicBuild">Build cases</button>
-          </div>
-          <input type="file" id="topicFile" accept=".pdf,.docx,.txt,.md" hidden>
-        </form>
-        <p class="tb-privacy hidden" id="topicPrivacy">The file is read by the AI and not saved. Please do not upload private or confidential files.</p>
-        <div id="topicStatus" aria-live="polite"></div>
-
         <div class="section-head"><h3>Start here</h3></div>
         <div class="cases" id="startRow">
           <button class="case-row chk" id="checkBtn">
@@ -1101,7 +1082,6 @@
           <span class="draft-note hidden" id="draftNote">These cases were generated by AI and have not been reviewed by an expert. Please verify important facts.</span></div>
         <div class="cases three" id="cases"></div>
 
-        <p class="credit-line">Created by <b>Eusoff Amir</b></p>
       </div>
     </div>
 
@@ -1133,6 +1113,7 @@
         <div class="ask-tools">
           <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button type="button" class="ask-next hidden" id="askNext" title="A new case on the same topic">New case</button>
           <span class="spacer"></span>
           <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
         </div>
@@ -1612,17 +1593,9 @@ function setActiveTopic(id){
   try { localStorage.setItem('active-topic', id); } catch(e){}
 }
 
-// Topics the learner can try with one click. A click only fills the box, so
-// nothing is built (and no AI call is made) until they press Build cases.
+// Topics the Ask chat offers with one click. A click only fills the box, so
+// nothing is built (and no AI call is made) until the learner presses Enter.
 const SUGGESTED_TOPICS = ['Photosynthesis', 'The French Revolution', 'How vaccines work', 'Climate change', 'Why we need sleep'];
-$('topicSuggest').insertAdjacentHTML('beforeend',
-  SUGGESTED_TOPICS.map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join(''));
-$('topicSuggest').addEventListener('click', e => {
-  const b = e.target.closest('[data-fill]');
-  if(!b) return;
-  $('topicInput').value = b.dataset.fill;
-  $('topicInput').focus();
-});
 
 // The topic filter beside "Cases": the same teal pill as the "All cases" filter.
 function renderTopics(){
@@ -1657,7 +1630,6 @@ $('topicFilter').addEventListener('click', e => {
     $('topicFilter').querySelector(':scope > button').setAttribute('aria-expanded', true);
   } else if(pick){
     setActiveTopic(pick.dataset.topic);
-    $('topicStatus').innerHTML = '';
     renderTopics();
     $('topicFilter').querySelector(':scope > button').focus();
   } else if(toggle.contains(e.target)){
@@ -1675,49 +1647,11 @@ $('topicFilter').addEventListener('keydown', e => {
   }
 });
 
-// The learner's own file (Goal 2): attach with +, drop it on the box or paste it.
+// The learner's own file (Goal 2): attach with + in the Ask box, drop it on the box or paste it.
 const FILE_MAX_MB = 25, FILE_TYPES = /\.(pdf|docx|txt|md)$/i;
-let topicFile = null;
-
 function fileSize(n){
   return n < 1024 * 1024 ? `${Math.max(1, Math.round(n / 1024))} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
-
-function setTopicFile(file){
-  $('topicStatus').innerHTML = '';
-  if(file && !FILE_TYPES.test(file.name)){ note('error', 'Please upload a PDF, a Word file (.docx) or a text file.', $('topicStatus')); return; }
-  if(file && file.size > FILE_MAX_MB * 1024 * 1024){ note('error', `This file is larger than ${FILE_MAX_MB} MB, so please upload a smaller one.`, $('topicStatus')); return; }
-  topicFile = file || null;
-  $('topicFiles').innerHTML = topicFile ? `<span class="tb-file">
-      <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      <b>${esc(topicFile.name)}</b><span class="size">${fileSize(topicFile.size)}</span>
-      <button type="button" id="topicFileX" aria-label="Remove the file">×</button></span>` : '';
-  $('topicFiles').classList.toggle('hidden', !topicFile);
-  $('topicPrivacy').classList.toggle('hidden', !topicFile);
-  $('topicInput').placeholder = topicFile ? 'Optional: which part of the file to focus on' : 'Type any topic, or drop in a file';
-  $('topicInput').focus();
-}
-
-$('topicAdd').addEventListener('click', () => $('topicFile').click());
-$('topicFile').addEventListener('change', e => { setTopicFile(e.target.files[0]); e.target.value = ''; });
-$('topicFiles').addEventListener('click', e => { if(e.target.closest('#topicFileX')) setTopicFile(null); });
-$('topicForm').addEventListener('dragover', e => {
-  if(![...e.dataTransfer.types].includes('Files')) return;
-  e.preventDefault();
-  $('topicForm').classList.add('drop');
-});
-$('topicForm').addEventListener('dragleave', e => {
-  if(!$('topicForm').contains(e.relatedTarget)) $('topicForm').classList.remove('drop');
-});
-$('topicForm').addEventListener('drop', e => {
-  e.preventDefault();
-  $('topicForm').classList.remove('drop');
-  if(e.dataTransfer.files[0]) setTopicFile(e.dataTransfer.files[0]);
-});
-$('topicInput').addEventListener('paste', e => {
-  const f = [...(e.clipboardData?.files || [])][0];
-  if(f){ e.preventDefault(); setTopicFile(f); }
-});
 
 function fileBase64(file){
   return new Promise((resolve, reject) => {
@@ -1728,34 +1662,6 @@ function fileBase64(file){
   });
 }
 
-$('topicForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const text = $('topicInput').value.trim();
-  if(!text && !topicFile){ $('topicInput').focus(); return; }
-  const btn = $('topicBuild');
-  btn.disabled = $('topicInput').disabled = $('topicAdd').disabled = true;
-  $('topicStatus').innerHTML = `<div class="thinking">${DOTS}Writing 3 cases on your ${topicFile ? 'file' : 'topic'}. This takes about 20 seconds.</div>`;
-  const slow = setTimeout(() => $('topicStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`, 40000);
-  try {
-    const body = {text};
-    if(topicFile) body.file = {name: topicFile.name, data: await fileBase64(topicFile)};
-    const t = await postJSON('/api/topic', body);
-    saveTopics([...myTopics().filter(x => x.id !== t.id), t]);
-    setActiveTopic(t.id);
-    setTopicFile(null);
-    $('topicInput').value = '';
-    $('topicStatus').innerHTML = '';
-    renderTopics();
-    $('cases').scrollIntoView({behavior: 'smooth', block: 'nearest'});
-  } catch(err){
-    $('topicStatus').innerHTML = '';
-    note('error', err.message, $('topicStatus'));
-  } finally {
-    clearTimeout(slow);
-    btn.disabled = $('topicInput').disabled = $('topicAdd').disabled = false;
-  }
-});
-
 // ---------- Ask: a Claude-style start page (chat icon in the rail) ----------
 // Everything happens inside one chat, like Claude, but Socratic AI asks
 // instead of tells. The learner types a topic, the Builder writes ONE case (a
@@ -1763,7 +1669,8 @@ $('topicForm').addEventListener('submit', async e => {
 // case and asks the first question. The session has no round limit. Home is
 // not changed; the topic also shows there, the same as one built on Home.
 let askFile = null;
-const ask = {sid: null, busy: false, options: [], picked: null, topic: null, cases: [], hintOpened: false};
+const ask = {sid: null, busy: false, options: [], picked: null, cases: [], hintOpened: false,
+             chatId: null, sids: [], request: null, answers: 0, offered: []};
 
 // The pages beside the sidebar: Home, the Ask chat and Overall status.
 const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain'};
@@ -1792,26 +1699,32 @@ try { if(localStorage.getItem('nav-folded')) setFolded(true); } catch(e){}
 // Recents: the Ask chats played in this browser, newest first. Only the session
 // id and a name are kept here; the chat itself is read back from the server.
 const MAX_RECENTS = 30;
+// A record is {id, sid, sids, name, request}: id is the chat's first session,
+// sid its newest, sids every case in order, request the topic text for a new case.
 function askChats(){
-  try { return JSON.parse(localStorage.getItem('ask-chats') || '[]').filter(c => c && c.sid && c.name); } catch(e){ return []; }
+  try {
+    return JSON.parse(localStorage.getItem('ask-chats') || '[]').filter(c => c && c.sid && c.name)
+      .map(c => ({...c, id: c.id || c.sid, sids: c.sids || [c.sid]}));
+  } catch(e){ return []; }
 }
 function saveAskChats(list){ try { localStorage.setItem('ask-chats', JSON.stringify(list.slice(0, MAX_RECENTS))); } catch(e){} }
-function rememberAskChat(sid, name){
-  saveAskChats([{sid, name: String(name).slice(0, 80)}, ...askChats().filter(c => c.sid !== sid)]);
+function rememberAskChat(name){
+  const rec = {id: ask.chatId, sid: ask.sid, sids: ask.sids, name: String(name).slice(0, 80), request: ask.request};
+  saveAskChats([rec, ...askChats().filter(c => c.id !== rec.id)]);
   renderRecents();
 }
 function renderRecents(){
   const list = askChats(), onAsk = !$('askMain').classList.contains('hidden');
-  $('recents').innerHTML = list.length ? list.map(c => `<div class="sn-chat${onAsk && c.sid === ask.sid ? ' on' : ''}">
-      <button type="button" data-chat="${esc(c.sid)}" title="${esc(c.name)}">${esc(c.name)}</button>
-      <button type="button" class="x" data-forget="${esc(c.sid)}" aria-label="Remove ${esc(c.name)} from Recents">×</button></div>`).join('')
+  $('recents').innerHTML = list.length ? list.map(c => `<div class="sn-chat${onAsk && c.id === ask.chatId ? ' on' : ''}">
+      <button type="button" data-chat="${esc(c.id)}" title="${esc(c.name)}">${esc(c.name)}</button>
+      <button type="button" class="x" data-forget="${esc(c.id)}" aria-label="Remove ${esc(c.name)} from Recents">×</button></div>`).join('')
     : '<p class="sn-empty">Your chats will show here.</p>';
 }
 $('recents').addEventListener('click', e => {
   const open = e.target.closest('[data-chat]'), forget = e.target.closest('[data-forget]');
   if(forget){
-    saveAskChats(askChats().filter(c => c.sid !== forget.dataset.forget));
-    if(ask.sid === forget.dataset.forget && !$('askMain').classList.contains('hidden')){ askReset(); showPage('ask'); }
+    saveAskChats(askChats().filter(c => c.id !== forget.dataset.forget));
+    if(ask.chatId === forget.dataset.forget && !$('askMain').classList.contains('hidden')){ askReset(); showPage('ask'); }
     renderRecents();
   } else if(open && !ask.busy) askOpen(open.dataset.chat);
 });
@@ -1826,7 +1739,7 @@ $('askChips').addEventListener('click', e => {
     if(!quantCases[0]) return;
     askChatting(true);
     askAdd('am-user', esc(QUANT_TOPIC.topic));
-    askStart(quantCases[0], null);
+    askStart(quantCases[0], QUANT_TOPIC.topic);
     return;
   }
   $('askInput').value = b.dataset.fill;  // fills only, so no AI call until they press Enter
@@ -1891,16 +1804,77 @@ function askLock(on){
 }
 function askChatting(on){
   $('askMain').classList.toggle('empty', !on);
+  askNextButton();
   $('askAdd').classList.toggle('hidden', on);  // a file starts a topic, so it is not needed mid-chat
   $('askInput').placeholder = on ? 'Your answer...' : 'Type any topic, a question or a short reading';
 }
 
-// The first message: a short lesson (the case reading), "Read more", the case story.
+// The knowledge map: one box per piece of knowledge, placed in columns by how
+// far down the links it sits, so arrows run left to right. Plain SVG, no AI call.
+const MAP_COLORS = {factual: 'var(--blue)', conceptual: 'var(--signal)', procedural: 'var(--caution)', causal: '#c0504d',
+                    relational: '#8a63b8', strategic: '#6b7f8e', metacognitive: '#6b7f8e', epistemic: '#6b7f8e'};
+function mapLabel(n, text){
+  if(n.label) return n.label;
+  if(!/^n\d+$/.test(n.id)) return (n.id.charAt(0).toUpperCase() + n.id.slice(1)).replace(/_/g, ' ');
+  return text.split(/\s+/).slice(0, 4).join(' ').replace(/[,.]$/, '');
+}
+function wrap2(label, max = 17){
+  const words = label.split(' '), lines = [''];
+  for(const w of words){
+    const line = lines[lines.length - 1];
+    if((line + ' ' + w).trim().length > max && line && lines.length < 2) lines.push(w);
+    else lines[lines.length - 1] = (line + ' ' + w).trim();
+  }
+  return lines.map(l => l.length > max + 3 ? l.slice(0, max + 1) + '...' : l);
+}
+function askMapHTML(c){
+  const g = c.knowledge;
+  if(!g || !(g.nodes || []).length) return '';
+  const nodes = g.nodes.map(n => ({...n, text: n.text || (c.notes || [])[n.note] || ''}));
+  const ids = new Set(nodes.map(n => n.id)), edges = (g.edges || []).filter(([a, , b]) => ids.has(a) && ids.has(b));
+  const depth = Object.fromEntries(nodes.map(n => [n.id, 0]));
+  for(let k = 0; k < nodes.length; k++)  // longest path from a start; a loop stops after nodes.length rounds
+    for(const [a, , b] of edges) if(depth[b] < depth[a] + 1) depth[b] = Math.min(depth[a] + 1, 4);
+  const cols = [];
+  nodes.forEach(n => (cols[depth[n.id]] = cols[depth[n.id]] || []).push(n));
+  const W = 136, H = 42, CX = 172, RY = 56, used = cols.filter(Boolean);
+  const rows = Math.max(...used.map(col => col.length));
+  const pos = {};
+  used.forEach((col, x) => col.forEach((n, y) => {
+    pos[n.id] = {x: 8 + x * CX, y: 8 + y * RY + (rows - col.length) * RY / 2};
+  }));
+  const width = 16 + (used.length - 1) * CX + W, height = 16 + (rows - 1) * RY + H;
+  const lines = edges.map(([a, rel, b]) => {
+    const p = pos[a], q = pos[b];
+    const x1 = p.x + W, y1 = p.y + H / 2, x2 = q.x, y2 = q.y + H / 2;
+    const d = x2 > x1 ? `M${x1} ${y1} C${x1 + 30} ${y1} ${x2 - 30} ${y2} ${x2 - 2} ${y2}`
+                      : `M${p.x + W / 2} ${p.y + H} C${p.x + W / 2} ${p.y + H + 30} ${q.x + W / 2} ${q.y - 30} ${q.x + W / 2} ${q.y - 2}`;
+    return `<path class="ed" d="${d}" marker-end="url(#mapArrow)"><title>${esc(rel.replace('_', ' '))}</title></path>`;
+  }).join('');
+  const boxes = nodes.map((n, i) => {
+    const {x, y} = pos[n.id], color = MAP_COLORS[n.type] || 'var(--ink-faint)', label = wrap2(mapLabel(n, n.text));
+    return `<g class="nd" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}">
+      <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="9" stroke="${color}"/>
+      <rect x="${x}" y="${y}" width="5" height="${H}" rx="2" fill="${color}" stroke="none"/>
+      ${label.map((l, k) => `<text x="${x + 14}" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
+  }).join('');
+  const types = [...new Set(nodes.map(n => n.type))];
+  return `<div class="am-map" data-texts="${esc(JSON.stringify(nodes.map(n => `${n.type}. ${n.text}`)))}">
+    <span class="mono-label">Map of the ideas</span>
+    <svg viewBox="0 0 ${width} ${height}" style="max-width:${width}px" aria-label="A map of how the ideas in this case link">
+      <defs><marker id="mapArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg>
+    <p class="cap">Tap a box to read it.</p>
+    <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div></div>`;
+}
+
+// The first message: a short lesson (the case reading), the map, "Read more", the case story.
 function askCaseHTML(c){
   const r = c.reading || {}, ideas = r.idea || [], words = r.key_words || [];
   const src = c.source ? sourceHTML(c.source) : '';
   return `${ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : ''}
     ${words.length ? `<div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div>` : ''}
+    ${askMapHTML(c)}
     ${ideas.length > 3 || r.example || r.think || src ? `<details class="am-more"><summary>Read more</summary>
       ${ideas.length > 3 ? `<p>${esc(ideas.slice(3).join(' '))}</p>` : ''}
       ${r.example ? `<p><b>Example.</b> ${esc(r.example)}</p>` : ''}
@@ -1971,10 +1945,30 @@ function askShowTurn(data, intro){
   ask.picked = null;
   $('askThread').querySelectorAll('.am-opts .choice').forEach(c => c.disabled = true);  // old choices are done
   askAdd('am-ai', askThoughtHTML(data.thought) + (intro || '') + askTurnHTML(parts));
+  if(data.level_idx === ASK_LEVELS.length - 1 && data.thought && askCanNext() && !ask.offered.includes(ask.sid)){
+    ask.offered.push(ask.sid);
+    askAdd('am-card', `<span class="mono-label">Top level reached</span>You reached the last level, Question the question.
+      You can keep going on this case, or try a new case on the same topic.
+      <div class="row"><button type="button" data-next>New case</button><button type="button" class="ghost" data-stay>Keep going</button></div>`);
+  }
   $('askInput').placeholder = ask.options.length ? 'Pick A or B, then say why...' : 'Your answer...';
 }
 
+function mapPick(nd){
+  const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts);
+  map.querySelectorAll('.nd').forEach(g => g.classList.toggle('on', g === nd));
+  const t = texts[Number(nd.dataset.i)] || '';
+  map.querySelector('.cap').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+}
+$('askThread').addEventListener('keydown', e => {
+  const nd = e.target.closest('.am-map .nd');
+  if(nd && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); mapPick(nd); }
+});
 $('askThread').addEventListener('click', e => {
+  const nd = e.target.closest('.am-map .nd');
+  if(nd){ mapPick(nd); return; }
+  if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
+  if(e.target.closest('[data-stay]')){ e.target.closest('.am-card').remove(); $('askInput').focus(); return; }
   const hint = e.target.closest('.am-hint');
   if(hint){ hint.nextElementSibling.classList.toggle('hidden'); ask.hintOpened = true; return; }
   const b = e.target.closest('.am-opts .choice');
@@ -1986,18 +1980,22 @@ $('askThread').addEventListener('click', e => {
   $('askInput').focus();
 });
 
-// Start the chat on one case: the lesson and the first question in one message.
-async function askStart(c, topic){
+// Start one case in the chat: the lesson, the map and the first question in one message.
+async function askStart(c, name){
   askLock(true);
+  if(ask.cases.length) askAdd('am-divider', `Case ${ask.cases.length + 1}`);
   const wait = askStatus('Reading the case and writing the first question...');
   const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
   try {
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
       case: c.generated ? c : undefined, ab_only: false, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
-    Object.assign(ask, {sid: data.session_id, topic, cases: [c], hintOpened: false});
+    Object.assign(ask, {sid: data.session_id, hintOpened: false, lastMet: null});
+    ask.chatId = ask.chatId || data.session_id;
+    ask.sids.push(data.session_id);
+    ask.cases.push(c);
     rememberSession(data.session_id);
-    rememberAskChat(data.session_id, topic ? topic.topic : QUANT_TOPIC.topic);
+    rememberAskChat(name || (askChats().find(x => x.id === ask.chatId) || {}).name || c.title);
     $('askBtn').removeAttribute('aria-current');
     wait.remove();
     askShowTurn(data, askCaseHTML(c));
@@ -2007,8 +2005,58 @@ async function askStart(c, topic){
   } finally {
     clearTimeout(slow);
     askLock(false);
+    askNextButton();
     $('askInput').focus();
   }
+}
+
+// "New case": another case on the same topic, in the same chat. The quant
+// topic has 3 checked cases; a typed topic asks the Builder for 1 more that
+// tests a new idea (avoid lists the cases already done). A file topic cannot,
+// because the file is never kept.
+function askCanNext(){
+  if(!ask.sid) return false;
+  if(ask.cases[0] && !ask.cases[0].generated) return quantCases.some(q => !ask.cases.some(c => c.id === q.id));
+  return !!ask.request;
+}
+function askNextButton(){ $('askNext').classList.toggle('hidden', !askCanNext()); }
+$('askNext').addEventListener('click', () => { if(!ask.busy) askNext(); });
+
+async function askNext(){
+  if(ask.busy || !askCanNext()) return;
+  if(!ask.cases[0].generated) return askStart(quantCases.find(q => !ask.cases.some(c => c.id === q.id)));
+  askLock(true);
+  const wait = askStatus('Writing a new case on the same topic. This takes about 20 to 40 seconds.');
+  let t;
+  try {
+    t = await postJSON('/api/topic', {text: ask.request, count: 1, avoid: ask.cases.map(c => c.title)});
+  } catch(err){
+    wait.remove();
+    note('error', err.message, $('askThread'));
+    askLock(false);
+    return;
+  }
+  wait.remove();
+  // Home keeps the topic too, now with this case added
+  const mine = myTopics(), had = mine.find(x => x.id === t.id);
+  if(had) had.cases = [...had.cases.filter(c => c.id !== t.cases[0].id), t.cases[0]];
+  saveTopics(had ? mine : [...mine, t]);
+  renderTopics();
+  askLock(false);
+  await askStart(t.cases[0]);
+}
+
+// Every 5 answers, a short progress card from this case's marks (plain code, no AI call).
+async function askProgress(){
+  try {
+    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats`);
+    const s = d.summary, cap = k => k ? k.charAt(0).toUpperCase() + k.slice(1) : '';
+    if(!s.rounds_completed) return;
+    askAdd('am-card', `<span class="mono-label">Progress check, ${ask.answers} answers</span>
+      In this case your highest level is <b>${esc(s.highest_level_reached)}</b>. Your strongest standard is
+      <b>${esc(cap(s.strongest_standard))}</b>, and the one to work on is <b>${esc(cap(s.weakest_standard))}</b>.
+      ${d.tip ? esc(d.tip) : ''}`);
+  } catch(e){}  // the card is extra, so a failed call shows nothing
 }
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
@@ -2019,6 +2067,7 @@ async function askTopic(text){
   const wait = askStatus(askFile ? `Reading ${askFile.name} and writing a case...`
                                   : 'Finding a source and writing a case. This takes about 20 to 40 seconds.');
   let t;
+  const askFileUsed = !!askFile;
   try {
     const body = {text, count: 1};
     if(askFile) body.file = {name: askFile.name, data: await fileBase64(askFile)};
@@ -2035,7 +2084,8 @@ async function askTopic(text){
   saveTopics([...myTopics().filter(x => x.id !== t.id), t]);  // it also shows on Home
   setActiveTopic(t.id);
   renderTopics();
-  await askStart(t.cases[0], t);
+  ask.request = askFileUsed ? null : text;  // a file is not kept, so it cannot make another case
+  await askStart(t.cases[0], t.topic);
 }
 
 async function askAnswer(typed){
@@ -2056,6 +2106,8 @@ async function askAnswer(typed){
     ask.hintOpened = false;
     wait.remove();
     askShowTurn(data);
+    ask.answers++;
+    if(ask.answers % 5 === 0) askProgress();
   } catch(err){
     // the server leaves the session as it was, so the answer goes back in the box
     wait.remove();
@@ -2082,7 +2134,8 @@ $('askForm').addEventListener('submit', e => {
 
 function askReset(){
   if(ask.busy) return;
-  Object.assign(ask, {sid: null, options: [], picked: null, topic: null, cases: [], hintOpened: false, lastMet: null});
+  Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false, lastMet: null,
+                     chatId: null, sids: [], request: null, answers: 0, offered: []});
   $('askThread').innerHTML = '';
   $('askStrip').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
@@ -2091,37 +2144,51 @@ function askReset(){
   setAskFile(null);
 }
 
-// Open a chat from Recents: read the session back and draw every turn again.
-async function askOpen(sid){
+// Open a chat from Recents: read each case's session back and draw every turn again.
+async function askOpen(id){
+  const rec = askChats().find(x => x.id === id);
+  if(!rec) return;
   askReset();
   askChatting(true);
   showPage('ask');
-  ask.sid = sid;
+  Object.assign(ask, {chatId: rec.id, request: rec.request || null});
   renderRecents();
   askLock(true);
   const wait = askStatus('Opening the chat...');
-  try {
-    const d = await api(`/api/session/${encodeURIComponent(sid)}`);
-    const c = d.case || quantCases.find(q => q.id === d.concept_id);
-    if(!c) throw new Error('This chat could not be opened.');
-    wait.remove();
-    ask.cases = [c];
-    const name = (askChats().find(x => x.sid === sid) || {}).name;
-    askAdd('am-user', esc(name || c.topic || c.title));
-    d.turns.forEach((t, i) => {
-      if(i) askAdd('am-user', esc(t.answer || ''));
-      askShowTurn({parts: t.parts, thought: t.thought, level_idx: i === d.turns.length - 1 ? d.level_idx : null}, i ? null : askCaseHTML(c));
-    });
-    if(d.ended){ askLock(true); $('askInput').placeholder = 'This chat has ended.'; return; }
-  } catch(err){
-    wait.remove();
-    const gone = /could not be found/i.test(err.message);  // the server's 404 text
-    note('error', gone ? 'This chat is no longer saved, so it was removed from Recents.' : err.message, $('askThread'));
-    if(gone) saveAskChats(askChats().filter(c => c.sid !== sid));
-    ask.sid = null;
-    renderRecents();
+  let last = null, ended = false;
+  for(const sid of rec.sids){
+    try {
+      const d = await api(`/api/session/${encodeURIComponent(sid)}`);
+      const c = d.case || quantCases.find(q => q.id === d.concept_id);
+      if(!c) continue;
+      if(!ask.cases.length) askAdd('am-user', esc(rec.name));
+      else askAdd('am-divider', `Case ${ask.cases.length + 1}`);
+      ask.cases.push(c);
+      ask.sids.push(sid);
+      d.turns.forEach((t, i) => {
+        if(i){ askAdd('am-user', esc(t.answer || '')); ask.answers++; }
+        askShowTurn({parts: t.parts, thought: t.thought, level_idx: i === d.turns.length - 1 ? d.level_idx : null}, i ? null : askCaseHTML(c));
+      });
+      last = sid;
+      ended = d.ended;
+    } catch(err){
+      if(!/could not be found/i.test(err.message)){ note('error', err.message, $('askThread')); }  // 404: that case is no longer saved
+    }
   }
+  wait.remove();
+  ask.offered = [...ask.sids];  // no new offer cards for cases already played
+  if(!last){
+    note('error', 'This chat is no longer saved, so it was removed from Recents.', $('askThread'));
+    saveAskChats(askChats().filter(c => c.id !== id));
+    ask.chatId = null;
+    renderRecents();
+    askLock(false);
+    return;
+  }
+  ask.sid = last;
   askLock(false);
+  askNextButton();
+  if(ended){ askLock(true); $('askInput').placeholder = 'This chat has ended.'; return; }
   $('askInput').focus();
 }
 
