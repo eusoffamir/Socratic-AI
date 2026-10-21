@@ -226,7 +226,8 @@
   .am-qrow{display:flex; align-items:center; gap:16px; margin:4px 0 14px;}
   /* the last thing in a Socratic message adds no space of its own, so the learner's answer sits closer */
   .am-ai > :last-child, .am-ai > :has(+ .am-key.hidden:last-child){margin-bottom:0;}
-  .am-ai + .am-user{margin-top:-8px;}
+  .am-ai > .am-qrow:not(:has(~ :not(.hidden))){margin-bottom:0;}  /* the A and B choices hide once answered */
+  .am-ai + .am-user{margin-top:-16px;}
   .am-qrow .am-q{flex:1; margin:0;}
   .ask-top{width:100%; flex:none; position:relative; z-index:5;}
   .ask-main.empty .ask-top{display:none;}
