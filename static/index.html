@@ -458,8 +458,15 @@
   .status .lv-label{color:var(--ink-faint);}
   #hudLevel{margin-right:14px;}
   .ticks{display:flex; gap:5px; width:200px; flex:none;}
-  .ticks-label{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint);
-               margin:0 -6px 0 10px; flex:none;}  /* says the dashes are the 6 levels, not rounds */
+  /* the Ask chat shows the 6 levels as a small stepper: dots joined by a line, "Level 3 of 6" in front */
+  .ticks-label{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint);
+               margin-left:10px; flex:none; white-space:nowrap;}
+  #askTicks{width:auto; gap:0; align-items:center;}
+  #askTicks .tick{flex:none; position:relative; width:9px; height:9px; border-radius:50%; background:var(--rule);}
+  #askTicks .tick + .tick{margin-left:16px;}
+  #askTicks .tick + .tick::before{content:""; position:absolute; right:100%; top:50%; width:16px; height:2px; margin-top:-1px; background:var(--rule);}
+  #askTicks .tick.done, #askTicks .tick.done::before, #askTicks .tick.now::before{background:var(--signal);}
+  #askTicks .tick.now{background:var(--caution); box-shadow:0 0 0 3px var(--caution-soft);}
   .tick{flex:1; height:7px; background:var(--rule); border-radius:3px;}
   .tick.done{background:var(--signal);}
   .tick.now{background:var(--caution);}
@@ -1122,7 +1129,7 @@
       <header class="chat-top">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
-          <span class="ticks-label" aria-hidden="true">Level</span>
+          <span class="ticks-label" id="askTicksLabel" aria-hidden="true"></span>
           <div class="ticks" id="askTicks" aria-hidden="true"></div>
         </div>
         <div class="spacer"></div>
@@ -1964,7 +1971,8 @@ const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implica
 function askStrip(levelIdx, round){
   if(levelIdx == null) return;
   $('askRound').textContent = round ? `ROUND ${round}` : '';
-  $('askTicks').innerHTML = ASK_LEVELS.map((_, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}"></div>`).join('');
+  $('askTicksLabel').textContent = `Level ${levelIdx + 1} of ${ASK_LEVELS.length}`;
+  $('askTicks').innerHTML = ASK_LEVELS.map((name, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}" title="${esc(name)}"></div>`).join('');
   $('askLevel').innerHTML = `<span class="lv-label">LEVEL:</span> <span class="lv">${esc((ASK_LEVELS[levelIdx] || '').toUpperCase())}</span>`;
   if(!$('askStats').classList.contains('hidden')) askStatsLoad();
 }
