@@ -15,9 +15,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import copycheck, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
+from . import builder, copycheck, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
-from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
+from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL, case_of
 
 app = FastAPI(title="Socratic AI")
 
@@ -34,6 +34,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 class StartRequest(BaseModel):
     concept_id: str = "pattern_or_luck"
+    case: dict | None = None  # a case from /api/topic (any topic); then concept_id is its id
     total_rounds: int = 6  # 3, 6, or 0 for no limit (the "∞" option)
     ab_only: bool = False
     reading_seconds: int = 0  # seconds the reading pop-up was open before "Start this case"
@@ -50,6 +51,10 @@ def study_codes():
     supervisor and the ethics approval agree. Read each time, so tests can
     switch it."""
     return {c.strip().upper() for c in os.getenv("STUDY_CODES", "").split(",") if c.strip()}
+
+
+class TopicRequest(BaseModel):
+    text: str = ""  # a topic name, a question or a short reading
 
 
 class CodeRequest(BaseModel):
@@ -197,6 +202,19 @@ def list_concepts():
             for k, v in CONCEPTS.items()]
 
 
+@app.post("/api/topic")
+def make_topic(req: TopicRequest):
+    """Goal 2: 3 new cases on any topic the learner types, from the Topic
+    Builder agent (one model call, then cached). The page keeps the cases and
+    sends one back to /api/session to start it."""
+    try:
+        return builder.build(req.text)
+    except builder.TopicError as e:
+        raise HTTPException(400, str(e))
+    except LLMError as e:
+        raise HTTPException(503, str(e))
+
+
 # The tutorial is a fixed script. Only round 3 calls a model (the Assessor,
 # once). Nothing is saved to disk: it is practice, not thesis data.
 @app.get("/api/tutorial")
@@ -212,10 +230,19 @@ def score_tutorial(req: TutorialScoreRequest):
 
 @app.post("/api/session")
 def start_session(req: StartRequest):
-    if req.concept_id not in CONCEPTS:
+    case = None
+    if req.case is not None:
+        try:
+            case = builder.recheck(req.case)
+        except builder.TopicError as e:
+            raise HTTPException(400, str(e))
+        req.concept_id = case["id"]
+    elif req.concept_id not in CONCEPTS:
         raise HTTPException(400, f"Unknown concept_id. Choose one of {list(CONCEPTS)}")
     new = orchestrator.new_session(req.concept_id, max(req.total_rounds, 0), req.ab_only,
                                    max(0, min(req.reading_seconds, 3600)))
+    if case:
+        new["case"] = case  # kept inside the session, so it survives a restart
     codes = study_codes()
     if codes:
         code = req.participant_code.strip().upper()
@@ -242,6 +269,7 @@ def get_session(sid: str):
     return {
         "session_id": sid,
         "concept_id": session["concept_id"],
+        "case": session.get("case"),  # a generated case, so the page can show it again (None for quant)
         "round": session["round"],
         "total_rounds": session["total_rounds"],
         "level": LEVELS[session["level_idx"]][1],
@@ -380,7 +408,7 @@ def overview(req: OverviewRequest):
         history += s["history"]
         reached = orchestrator.best_level_idx(s)
         best_idx = max(best_idx, reached)
-        c = per_case.setdefault(s["concept_id"], {"sessions": 0, "level_idx": 0, "rounds": 0, "history": []})
+        c = per_case.setdefault(s["concept_id"], {"title": case_of(s)["title"], "sessions": 0, "level_idx": 0, "rounds": 0, "history": []})
         c["sessions"] += 1
         c["rounds"] += len(s["history"])
         c["history"] += s["history"]
@@ -393,7 +421,7 @@ def overview(req: OverviewRequest):
         "sessions_played": played, "sessions_finished": finished,
         "skill_check": skillcheck.summarize([t for c in checks for t in c]) if checks else None,
         "mastery": stats.mastery(checks) if checks else None,
-        "cases": [{"id": cid, "title": CONCEPTS[cid]["title"], "sessions": v["sessions"], "rounds": v["rounds"],
+        "cases": [{"id": cid, "title": v["title"], "sessions": v["sessions"], "rounds": v["rounds"],
                    "level": LEVELS[v["level_idx"]][1],
                    # for the standards filter in the overall status panel
                    "standards_met_count": orchestrator.summarize(

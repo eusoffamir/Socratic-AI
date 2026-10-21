@@ -189,6 +189,28 @@
 
   .section-head{display:flex; align-items:center; gap:10px; margin:32px 0 14px;}
   .section-head h3{font-size:16px; font-weight:600; margin:0;}
+
+  /* Goal 2: any topic */
+  .topic-box{display:flex; gap:10px;}
+  .topic-box input{
+    flex:1; min-width:0; font:inherit; font-size:15px; color:var(--ink); background:var(--panel);
+    border:1px solid var(--rule); border-radius:12px; padding:12px 16px; box-shadow:var(--shadow);
+  }
+  .topic-box input::placeholder{color:var(--ink-faint);}
+  .topic-box input:focus{outline:2px solid var(--signal); outline-offset:1px; border-color:var(--signal);}
+  .topic-box button{border-radius:12px; flex:none;}
+  .topic-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .topic-chip{display:inline-flex; align-items:center; max-width:100%; border:1px solid var(--rule); border-radius:999px; background:var(--panel);}
+  .topic-chip button{
+    background:transparent; color:var(--ink-soft); border:0; border-radius:999px; padding:6px 14px; font-size:13px; font-weight:500;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+  }
+  .topic-chip button:hover:not(:disabled){color:var(--ink); opacity:1;}
+  .topic-chip .x{padding:6px 12px 6px 0; color:var(--ink-faint); flex:none;}
+  .topic-chip.on{background:var(--ink); border-color:var(--ink);}
+  .topic-chip.on button, .topic-chip.on button:hover:not(:disabled){color:var(--paper);}
+  #topicStatus{margin-top:10px;}
+  .draft-note{margin:-4px 0 14px; padding:10px 14px; border-radius:10px; background:var(--caution-soft); color:var(--caution); font-size:13.5px;}
   .cases{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;}
   .case-row{
     display:flex; align-items:center; gap:20px; text-align:left; width:100%;
@@ -829,7 +851,7 @@
             <img src="/static/img/hero.png" alt="">
           </div>
           <div class="hero-text">
-            <h2>Learn to think like a quant</h2>
+            <h2>Think critically about any topic</h2>
             <p>Agentic AI for Fostering Critical Thinking Education</p>
           </div>
           <div class="rounds">
@@ -850,7 +872,17 @@
         </section>
         <div id="homeStatus" aria-live="polite"></div>
 
-        <div class="section-head"><h3>Cases</h3></div>
+        <div class="section-head"><h3>Topic</h3></div>
+        <form class="topic-box" id="topicForm" autocomplete="off">
+          <input id="topicInput" type="text" maxlength="4000" aria-label="Any topic"
+                 placeholder="Type any topic, like photosynthesis or the French Revolution">
+          <button type="submit" id="topicBuild">Build cases</button>
+        </form>
+        <div class="topic-chips" id="topicChips" aria-label="Your topics"></div>
+        <div id="topicStatus" aria-live="polite"></div>
+
+        <div class="section-head"><h3 id="casesHead">Cases</h3></div>
+        <p class="draft-note hidden" id="draftNote">AI wrote these cases for your topic, and no expert has checked them yet, so question them too.</p>
         <div class="cases" id="cases"></div>
 
         <div class="section-head"><h3>Skill check</h3></div>
@@ -1298,8 +1330,78 @@ async function loadProgress(){
   });
 }
 
-async function loadConcepts(){
-  [concepts, tut.data] = await Promise.all([api('/api/concepts'), api('/api/tutorial')]);
+// ---------- topics (Goal 2: any topic) ----------
+// The quant cases are built in and checked by the supervisor. Any other topic
+// is written by the Topic Builder agent and kept in this browser, and a case
+// is sent back with its session start, so nothing needs to be stored online.
+let quantCases = [];
+const QUANT_TOPIC = {id: 'quant', topic: 'How quants find patterns'};
+
+function myTopics(){
+  try { return JSON.parse(localStorage.getItem('my-topics')) || []; } catch(e){ return []; }
+}
+function saveTopics(list){
+  try { localStorage.setItem('my-topics', JSON.stringify(list.slice(-12))); } catch(e){}
+}
+function activeTopic(){
+  let id = 'quant';
+  try { id = localStorage.getItem('active-topic') || 'quant'; } catch(e){}
+  return myTopics().find(t => t.id === id) || QUANT_TOPIC;
+}
+function setActiveTopic(id){
+  try { localStorage.setItem('active-topic', id); } catch(e){}
+}
+
+function renderTopics(){
+  const active = activeTopic(), mine = active.id !== 'quant';
+  concepts = mine ? active.cases : quantCases;
+  $('topicChips').innerHTML = [QUANT_TOPIC, ...myTopics()].map(t => `
+    <span class="topic-chip${t.id === active.id ? ' on' : ''}">
+      <button type="button" data-topic="${esc(t.id)}" aria-pressed="${t.id === active.id}" title="${esc(t.topic)}">${esc(t.topic)}</button>
+      ${t.id === 'quant' ? '' : `<button type="button" class="x" data-remove="${esc(t.id)}" aria-label="Remove ${esc(t.topic)}">×</button>`}
+    </span>`).join('');
+  $('casesHead').textContent = mine ? `Cases on ${active.topic}` : 'Cases';
+  $('draftNote').classList.toggle('hidden', !mine);
+  renderCases();
+}
+
+$('topicChips').addEventListener('click', e => {
+  const pick = e.target.closest('[data-topic]'), drop = e.target.closest('[data-remove]');
+  if(drop){
+    saveTopics(myTopics().filter(t => t.id !== drop.dataset.remove));
+    if(activeTopic().id === drop.dataset.remove) setActiveTopic('quant');
+  } else if(pick) setActiveTopic(pick.dataset.topic);
+  else return;
+  $('topicStatus').innerHTML = '';
+  renderTopics();
+});
+
+$('topicForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = $('topicInput').value.trim();
+  if(!text){ $('topicInput').focus(); return; }
+  const btn = $('topicBuild');
+  btn.disabled = $('topicInput').disabled = true;
+  $('topicStatus').innerHTML = `<div class="thinking">${DOTS}Writing 3 cases on your topic. This takes about 20 seconds.</div>`;
+  const slow = setTimeout(() => $('topicStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`, 40000);
+  try {
+    const t = await postJSON('/api/topic', {text});
+    saveTopics([...myTopics().filter(x => x.id !== t.id), t]);
+    setActiveTopic(t.id);
+    $('topicInput').value = '';
+    $('topicStatus').innerHTML = '';
+    renderTopics();
+    $('cases').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  } catch(err){
+    $('topicStatus').innerHTML = '';
+    note('error', err.message, $('topicStatus'));
+  } finally {
+    clearTimeout(slow);
+    btn.disabled = $('topicInput').disabled = false;
+  }
+});
+
+function renderCases(){
   $('cases').innerHTML = tutorialRow() + concepts.map((c, i) => `
     <button class="case-row" data-id="${esc(c.id)}">
       <span class="thumb" aria-hidden="true">${CASE_PICTURES[c.id] ? CASE_PICTURES[c.id].svg(true) : ''}</span>
@@ -1310,7 +1412,12 @@ async function loadConcepts(){
       </span>
       <span class="go" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
     </button>`).join('');
-  await loadProgress();
+  loadProgress();
+}
+
+async function loadConcepts(){
+  [quantCases, tut.data] = await Promise.all([api('/api/concepts'), api('/api/tutorial')]);
+  renderTopics();
 }
 
 $('abOnly').addEventListener('click', e => {
@@ -1515,7 +1622,9 @@ async function startSession(conceptId, readingSeconds = 0){
   const slow = whenSlow(() => status.innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
   let data;
   try {
+    const picked = concepts.find(c => c.id === conceptId);
     data = await postJSON('/api/session', {concept_id: conceptId, total_rounds: rounds,
+                                           case: picked && picked.generated ? picked : undefined,
                                            ab_only: $('abOnly').getAttribute('aria-pressed') === 'true',
                                            reading_seconds: readingSeconds,
                                            participant_code: study.code || '', consent: !!study.code});
