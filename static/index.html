@@ -700,6 +700,7 @@
   .ov-case .meta{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
   .ov-case .lvl{font-size:12.5px; font-weight:600; color:var(--signal); background:var(--signal-soft); padding:2px 10px; border-radius:999px;}
   .ov-by{display:block; margin-top:28px;}
+  .ov-cases + .report-grid{margin-top:36px;}
   /* skill check pop-up (Goal 1) */
   .ck-card{width:min(680px, 94vw);}
   .ck-situation{font-size:16px; line-height:1.55; margin:0 0 14px;}
@@ -2573,6 +2574,7 @@ function overallHTML(d){
       <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></div>`).join('');
   return `<div class="report" data-ex-general>
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
+    <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <div class="report-grid ov-three">
       <div><div class="ov-std-head"><span class="mono-label">6 Socratic Question Categories</span>${caseFilterHTML(d.cases, 'ovLevelFilter')}</div>
         <div id="ovLadder">${ladderHTML(d.levels, reachedIdx, 'Highest level')}</div></div>
@@ -2581,7 +2583,6 @@ function overallHTML(d){
       <div class="coach-comment" id="ovCoach"><div class="mono-label">Coach</div>
         <div class="thinking">${DOTS}Reading all your answers...</div></div>
     </div>
-    <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
     ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
       <small>How you reasoned in the case chats. This counts chat answers, not skill checks, so it can differ from the grid above.</small></summary>
