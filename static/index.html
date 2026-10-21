@@ -181,8 +181,11 @@
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
   .am-more{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); margin:0 0 14px;}
   .am-more summary{cursor:pointer; color:var(--signal); font-weight:600; width:max-content;}
-  .am-more p{margin:8px 0 0;}
-  .am-more .am-words, .am-more .am-map{margin:12px 0 0;}
+  .am-more p{margin:4px 0 0;}
+  .am-more-body{display:flex; flex-direction:column; gap:18px; margin:12px 0 0 4px; padding-left:16px; border-left:2px solid var(--rule);}
+  .am-more-body section{margin:0;}
+  .am-more-body .am-words, .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
+  .am-ai .am-more-body .am-words{flex-direction:column; gap:4px; margin-top:6px;}
   .am-more a{color:var(--signal);}
   .am-case{font-family:var(--sans); background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--signal);
            border-radius:12px; padding:14px 18px; margin:4px 0 16px;}
@@ -1901,11 +1904,12 @@ function askCaseHTML(c){
   const src = c.source ? sourceHTML(c.source) : '', map = askMapHTML(c);
   return `${ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : ''}
     ${words.length || map || ideas.length > 3 || r.example || r.think || src ? `<details class="am-more"><summary>Read more</summary>
-      ${words.length ? `<div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div>` : ''}
-      ${map}
-      ${ideas.length > 3 ? `<p>${esc(ideas.slice(3).join(' '))}</p>` : ''}
-      ${r.example ? `<p><b>Example.</b> ${esc(r.example)}</p>` : ''}
-      ${r.think ? `<p><b>Think about.</b> ${esc(r.think)}</p>` : ''}${src}</details>` : ''}
+      <div class="am-more-body">
+      ${ideas.length > 3 ? `<section><span class="mono-label">The idea</span><p>${esc(ideas.slice(3).join(' '))}</p></section>` : ''}
+      ${r.example ? `<section><span class="mono-label">Example</span><p>${esc(r.example)}</p></section>` : ''}
+      ${r.think ? `<section><span class="mono-label">Think about</span><p>${esc(r.think)}</p></section>` : ''}
+      ${words.length ? `<section><span class="mono-label">Key words</span><div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div></section>` : ''}
+      ${map}${src}</div></details>` : ''}
     <div class="am-case"><span class="tag">${esc(c.tag || 'Case')}</span>
       <p class="t">${esc(c.title)}</p><p class="s">${esc(c.scenario)}</p></div>`;
 }
