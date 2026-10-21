@@ -40,7 +40,13 @@ def test_quota_moves_to_the_next_model(fake):
 def test_busy_and_missing_fallbacks_are_skipped(fake):
     models = fake({"main": 503, "second": 404})
     assert llm_client._generate_gemini("s", "u", 50, False) == "reply from third"
-    assert models.asked == ["main", "second", "third"]
+    assert models.asked == ["main", "main", "second", "third"]  # a busy model gets one quick retry
+
+
+def test_busy_everywhere_gives_the_busy_message(fake):
+    fake({"main": 429, "second": 503, "third": 503})
+    with pytest.raises(llm_client.LLMError, match="overloaded"):
+        llm_client._generate_gemini("s", "u", 50, False)
 
 
 def test_all_used_up_gives_the_quota_message(fake):

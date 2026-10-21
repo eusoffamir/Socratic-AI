@@ -120,9 +120,10 @@ def _gemini_call(model, user, config, last):
         except httpx.TransportError as e:
             raise LLMError("Couldn't reach the Gemini API. Check your internet connection.") from e
         except errors.APIError as e:
-            # only the last model waits and retries when overloaded; the others hand over at once
-            if e.code == 503 and last and attempt < OVERLOAD_RETRIES:
-                time.sleep(2 ** (attempt + 1))
+            # a busy model is often free again a second later (seen 22 October 2026), so each
+            # model gets one quick retry, and the last model gets the full retries
+            if e.code == 503 and attempt < (OVERLOAD_RETRIES if last else 1):
+                time.sleep(2 ** attempt if not last else 2 ** (attempt + 1))
                 continue
             if e.code == 429:
                 _gemini_resting[model] = time.time() + GEMINI_COOLDOWN_SECONDS
@@ -146,7 +147,7 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
     )
     models = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
     awake = [m for m in models if _gemini_resting.get(m, 0) <= time.time()] or models
-    problem = None
+    problems = {}
     for model in awake:
         try:
             resp = _gemini_call(model, user, config, last=model == awake[-1])
@@ -154,9 +155,12 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
                 logging.getLogger(__name__).warning("Gemini fallback: %s answered for %s", model, GEMINI_MODEL)
             break
         except _GeminiBusy as e:
-            problem = e  # used up or overloaded: try the next model
+            problems[model] = e  # used up or overloaded: try the next model
     else:
-        if problem.code == 429:
+        logging.getLogger(__name__).warning("Gemini: no model answered %s",
+                                            {m: e.code for m, e in problems.items()})
+        problem = next(iter(problems.values()))
+        if any(e.code == 429 for e in problems.values()) and all(e.code != 503 for e in problems.values()):
             raise LLMError(f"Gemini quota used up for {GEMINI_MODEL} and its fallback models. Wait a minute "
                            f"(or until tomorrow for the daily limit).") from problem
         raise LLMError(f"Gemini is overloaded right now. Wait a moment and try again.") from problem
