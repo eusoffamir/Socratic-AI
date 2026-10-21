@@ -199,7 +199,9 @@
   .topic-box input::placeholder{color:var(--ink-faint);}
   .topic-box input:focus{outline:2px solid var(--signal); outline-offset:1px; border-color:var(--signal);}
   .topic-box button{border-radius:12px; flex:none;}
-  .topic-suggest{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px;}
+  .topic-head{flex-wrap:wrap; row-gap:8px;}
+  .topic-head h3{margin-right:6px;}
+  .topic-suggest{display:flex; flex-wrap:wrap; align-items:center; gap:8px;}
   .topic-suggest .mono-label{margin-right:2px;}
   .topic-suggest button{
     background:var(--panel-2); color:var(--ink-soft); border:none; border-radius:999px; padding:6px 14px;
@@ -875,13 +877,13 @@
         </section>
         <div id="homeStatus" aria-live="polite"></div>
 
-        <div class="section-head"><h3>Topic</h3></div>
+        <div class="section-head topic-head"><h3>Topic</h3>
+          <div class="topic-suggest" id="topicSuggest"><span class="mono-label">Try</span></div></div>
         <form class="topic-box" id="topicForm" autocomplete="off">
           <input id="topicInput" type="text" maxlength="4000" aria-label="Any topic"
                  placeholder="Type any topic, like photosynthesis or the French Revolution">
           <button type="submit" id="topicBuild">Build cases</button>
         </form>
-        <div class="topic-suggest" id="topicSuggest"><span class="mono-label">Try</span></div>
         <div id="topicStatus" aria-live="polite"></div>
 
         <div class="section-head"><h3>Cases</h3><div class="ov-filter" id="topicFilter"></div></div>
