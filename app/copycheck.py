@@ -104,7 +104,7 @@ _AI_LAYOUT = [
     re.compile(r"(?m)^\s*\+\d+\s*$|\s\+\d+\s*$"),      # search result source counts like "+3"
     re.compile(r"(?m)^[A-Z][\w ,'()&-]{2,60}:\s+\S"),  # "Shared Sector Risk: Because ..." title lines
     re.compile(r"(?m)^\s*•\s*[A-Z][\w ,'()&-]{2,60}:"),  # "• Random Luck (Most Common): ..." bullet titles
-    re.compile("—"),                   # an em dash, which keyboards do not type easily
+    re.compile(r"\u2014"),                # an em dash, which keyboards do not type easily
 ]
 
 

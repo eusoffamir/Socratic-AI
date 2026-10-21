@@ -99,6 +99,7 @@ HUMAN_ANSWERS = [
     "Both banks follow interest rates, so when rates move they both move. I would check if it holds on new years.",
     "First I would split the data. Then I test the rule on the second half to see if it still works.",
     "idk",
+    "In 2014 many stocks fell together, so I think a hidden cause hit them all.",  # a year is not an em dash
 ]
 
 
