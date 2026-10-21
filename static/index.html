@@ -127,15 +127,15 @@
   .rail .spacer{flex:1;}
 
   /* the wide sidebar (like Claude): New chat, Home, Overall status, Recents. Folds back to icons. */
-  .nav{align-items:stretch; gap:6px; padding:14px 12px; min-height:0; overflow:hidden;}
+  .nav{align-items:stretch; gap:3px; padding:14px 12px; min-height:0; overflow:hidden;}
   .nav .sn-head{display:flex; align-items:center; gap:10px; padding:4px 4px 0 12px; margin-bottom:22px; min-height:38px;}
   .nav .logo{margin:0; flex:none;}
   .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1;}
   .nav .sn-fold{width:34px; height:34px; flex:none;}
-  .sn-item{display:flex; align-items:center; gap:12px; width:100%; height:42px; padding:0 12px; border-radius:10px;
-           background:transparent; border:none; color:var(--rail-ink); font:inherit; font-size:14.5px; font-weight:500;
+  .sn-item{display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 10px; border-radius:8px;  /* the same size as a Recents row */
+           background:transparent; border:none; color:var(--rail-ink); font:inherit; font-size:13.5px; font-weight:500;
            opacity:.82; text-align:left; white-space:nowrap;}
-  .sn-item svg{width:20px; height:20px; flex:none;}
+  .sn-item svg{width:18px; height:18px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
   .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
