@@ -1831,7 +1831,18 @@ function askCtx(){ return {gen: ask.gen, chatId: ask.chatId, rounds: ask.rounds,
 
 // The pages beside the sidebar: Home, the Ask chat and Overall status.
 const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain'};
+// Browser back and forward: each page (and each chat) is one history step.
+// navRestoring is on while a back or forward press redraws a page, so it adds no new step.
+let navRestoring = false;
+function navPush(state){
+  if(navRestoring) return;
+  const cur = history.state || {};
+  if(cur.page === state.page && (cur.chat || null) === (state.chat || null)) return;
+  history.pushState(state, '');
+}
+const navSetChat = id => history.replaceState({page: 'ask', chat: id}, '');
 function showPage(name){
+  navPush({page: name});
   if(tour.name && name !== 'home') endTour(false);  // the Home tour points at Home, so it is not left over another page
   for(const [k, sel] of Object.entries(PAGES)) document.querySelector(sel).classList.toggle('hidden', k !== name);
   // aria-current="page" marks the open page (the highlight style matches that value)
@@ -2299,6 +2310,7 @@ async function askStart(c, name, ctx = askCtx()){
     Object.assign(ask, {sid: data.session_id, hintOpened: false, total: data.total_rounds || 0, done: false, caseAnswers: 0});
     $('askInput').placeholder = 'Your answer...';
     ask.chatId = rec.id;
+    if(history.state?.page === 'ask' && !history.state.chat) navSetChat(rec.id);
     ask.sids.push(data.session_id);
     ask.cases.push(c);
     $('askBtn').removeAttribute('aria-current');
@@ -2480,6 +2492,7 @@ async function askOpen(id){
   askChatting(true);
   showPage('ask');
   Object.assign(ask, {chatId: rec.id, request: rec.request || null});
+  navSetChat(rec.id);
   const gen = ask.gen;
   renderRecents();
   askLock(true);
@@ -2852,6 +2865,7 @@ function enterSession(conceptId, data){
 
   $('homeView').classList.add('hidden');
   $('sessionView').classList.remove('hidden');
+  navPush({page: 'case'});
   $('cfNum').textContent = `Case 0${caseNo(state.concept) + 1}`;
   $('cfTitle').textContent = state.concept.title;
   $('cfScenario').textContent = state.concept.scenario;
@@ -3717,6 +3731,7 @@ async function startTutorial(){
   Object.assign(state, {sessionId: null, totalRounds: tut.data.rounds.length, ended: false});
   $('homeView').classList.add('hidden');
   $('sessionView').classList.remove('hidden');
+  navPush({page: 'case'});
   $('sessionView').classList.add('tut-mode');
   $('cfNum').textContent = 'Example';  // where cases say CASE 01
   $('cfTitle').textContent = tut.data.title;
@@ -4066,8 +4081,21 @@ async function initStudy(){
 }
 
 // The chat is the first page (the student's choice, 21 October 2026); a case's Home button comes back with ?page=home.
-showPage(new URLSearchParams(location.search).get('page') === 'home' ? 'home' : 'ask');
-if(location.search) history.replaceState(null, '', '/');
+const firstPage = new URLSearchParams(location.search).get('page') === 'home' ? 'home' : 'ask';
+history.replaceState({page: firstPage}, '', '/');
+showPage(firstPage);
+addEventListener('popstate', e => {
+  const s = e.state || {page: 'ask'};
+  // a case or the tutorial has its own screen, so going back from it reloads Home
+  if(!$('sessionView').classList.contains('hidden') || s.page === 'case') return location.replace('/?page=home');
+  navRestoring = true;
+  try {
+    if(s.page === 'status') openOverall();
+    else if(s.page === 'home') showPage('home');
+    else if(s.chat && askChats().some(x => x.id === s.chat)) askOpen(s.chat);
+    else { askReset(); showPage('ask'); }
+  } finally { navRestoring = false; }
+});
 Promise.all([loadConcepts(), initStudy()])
   .then(([, ready]) => { if(ready) homeTourOnce(); })
   .catch(e => note('error', e.message, $('homeStatus')));
