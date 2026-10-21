@@ -1919,6 +1919,7 @@ function askChatting(on){
   $('askMain').classList.toggle('empty', !on);
   askNextButton();
   $('askAdd').classList.toggle('hidden', on);  // a file starts a topic, so it is not needed mid-chat
+  $('askRoundsMenu').parentElement.classList.toggle('hidden', on);  // a case's length is set when the chat starts
   $('askInput').placeholder = on ? 'Your answer...' : 'Type any topic, a question or a short reading';
 }
 
