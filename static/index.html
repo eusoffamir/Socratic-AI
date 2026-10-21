@@ -2356,11 +2356,12 @@ async function askNext(){
   await askStart(t.cases[0], null, ctx);
 }
 
-// Every 5 answers, a short card that points to Status, where the Coach has a new comment.
+// Every 5 answers, a short card, and the Status panel opens to show the Coach's new comment.
 function askProgress(){
   askAdd('am-card', `<span class="mono-label">Progress check, ${ask.caseAnswers} answers</span>
     The coach has a new comment on how you are answering.
     <div class="row"><button type="button" data-status>See status</button></div>`);
+  if($('askStats').classList.contains('hidden')) $('askStrip').click();  // opens the Status panel by itself
 }
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
