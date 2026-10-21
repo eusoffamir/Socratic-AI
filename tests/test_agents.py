@@ -425,6 +425,7 @@ CASE_AI_ANSWERS = [  # shortened from the Gemini replies Eusoff pasted into "Pat
 
 
 def test_case_ai_answer_scores_zero_and_is_called_out(monkeypatch):
+    monkeypatch.setenv("AI_GUARD", "1")  # a local .env may set 0 for testing
     from app import copycheck
     def no_call(*a):
         raise AssertionError("the Assessor must not be called")

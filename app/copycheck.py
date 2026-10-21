@@ -6,7 +6,7 @@ import os
 import re
 
 from . import reasoning
-from .content import CONCEPTS, STANDARDS
+from .content import STANDARDS, case_of
 
 # Most of the answer copied = not the learner's own thinking.
 COPY_LIMIT = 0.6
@@ -73,7 +73,7 @@ def session_sources(session):
     """The hints and facts the learner of a real case has been shown so far.
     Not the case story: it is the question itself, and learners must repeat
     its facts to answer it."""
-    c = CONCEPTS[session["concept_id"]]
+    c = case_of(session)
     r = c["reading"]
     sources = [*c["notes"], r["example"], r["think"], *r["idea"]]
     for t in session.get("turns", []):
@@ -84,7 +84,7 @@ def session_sources(session):
 
 def session_story(session):
     """The case story. Repeating its facts is answering, not copying."""
-    return CONCEPTS[session["concept_id"]]["scenario"]
+    return case_of(session)["scenario"]
 
 
 # ---------- answers that look like they came from an AI chatbot (cases and skill check) ----------

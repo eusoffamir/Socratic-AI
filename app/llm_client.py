@@ -14,7 +14,7 @@ import random
 import time
 
 from . import limits, reasoning, tools
-from .content import CONCEPTS, FORMATS, MOVES, STANDARDS
+from .content import FORMATS, MOVES, STANDARDS, case_of
 from .prompts import (AB_FORMAT, ASSESSOR_REASONING_SYSTEM, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
                       assessor_user, checker_user, coach_user, planner_user, tutor_user)
 
@@ -201,7 +201,7 @@ def call_tutor(session, instruction, answer, assessment, use_tools=True, tool_ru
             text = _generate(TUTOR_SYSTEM, payload, max_tokens=400, json_mode=True)
             data = _parse_json(text) or {"question": text}  # plain text still works as a reply
         if data.get("tool"):
-            if tools_left > 0 and data["tool"] == CONCEPTS[session["concept_id"]]["tool"]:
+            if tools_left > 0 and data["tool"] == case_of(session).get("tool"):
                 tool_runs.append(tools.run_tool(data["tool"], data.get("args")))
                 continue
             if nudge is None:
@@ -324,7 +324,7 @@ def _mock_planner(session, assessment):
         "level_change": "up" if good else "stay",
         "format": FORMATS[-1] if assessment["confused_or_frustrated"] else FORMATS[i % len(FORMATS)],
         "hint": not good,
-        "suggest_tool": CONCEPTS[session["concept_id"]]["tool"] if session["round"] == 1 else None,
+        "suggest_tool": case_of(session).get("tool") if session["round"] == 1 else None,
         "reason": "[mock] Good answer, push up." if good else "[mock] Weak answer, stay and help.",
     }
 

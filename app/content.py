@@ -215,3 +215,16 @@ CONCEPTS = {
         },
     },
 }
+
+# Goal 2: the engine works on any topic. The quant cases above are the built-in
+# topic, checked by the supervisor. A case made for a learner's own topic (see
+# builder.py) has the same shape plus its own "knowledge" graph and no tool.
+QUANT_TOPIC = "How quants find real patterns in data"
+for _id, _case in CONCEPTS.items():
+    _case.update(id=_id, topic=QUANT_TOPIC)
+
+
+def case_of(session):
+    """The case a session is about. A generated case is kept inside the
+    session, so it survives a server restart. A built-in case is found by id."""
+    return session.get("case") or CONCEPTS[session["concept_id"]]

@@ -110,6 +110,7 @@ def test_ai_like_catches_chatbot_replies_but_not_learners():
 
 
 def test_ai_answer_scores_zero_without_a_model_call(monkeypatch):
+    monkeypatch.setenv("AI_GUARD", "1")  # a local .env may set 0 for testing
     def no_call(*a):
         raise AssertionError("the model must not be called")
     monkeypatch.setattr(llm_client, "call_assessor", no_call)

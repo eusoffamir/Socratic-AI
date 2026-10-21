@@ -11,7 +11,7 @@ AGENT_REASONING=0 in .env, and the Assessor then runs exactly as before.
 import os
 import re
 
-from .knowledge import KNOWLEDGE, KNOWLEDGE_TYPES
+from .knowledge import KNOWLEDGE_TYPES, case_graph
 
 # Dr Ho's top three. Analogic, counterfactual and triangulation are a bonus for later.
 REASONING_TYPES = {
@@ -58,9 +58,10 @@ def enabled():
     return os.getenv("AGENT_REASONING", "1") != "0"
 
 
-def note_types(case_id):
-    """The knowledge type of each case note, in note order, for the prompt."""
-    nodes = sorted((n for n in KNOWLEDGE[case_id]["nodes"] if "note" in n), key=lambda n: n["note"])
+def note_types(case):
+    """The knowledge type of each case note, in note order, for the prompt.
+    Takes a built-in case id or a generated case."""
+    nodes = sorted((n for n in case_graph(case)["nodes"] if "note" in n), key=lambda n: n["note"])
     return [n["type"] for n in nodes]
 
 

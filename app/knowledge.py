@@ -130,21 +130,32 @@ KNOWLEDGE = {
 }
 
 
-def node_text(case_id, node):
+def _case(case):
+    """A case dict, from a built-in case id or a generated case itself."""
+    return CONCEPTS[case] if isinstance(case, str) else case
+
+
+def case_graph(case):
+    """The raw graph of a case. A generated case carries its own."""
+    case = _case(case)
+    return case.get("knowledge") or KNOWLEDGE[case["id"]]
+
+
+def node_text(case, node):
     """The text of a node. Note nodes read the case note, so the two never drift apart."""
     if "note" in node:
-        return CONCEPTS[case_id]["notes"][node["note"]]
+        return _case(case)["notes"][node["note"]]
     return node["text"]
 
 
-def graph(case_id):
+def graph(case):
     """The case graph with every node's text filled in, ready for an agent or the page."""
-    g = KNOWLEDGE[case_id]
-    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case_id, n)} for n in g["nodes"]]
+    g = case_graph(case)
+    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case, n)} for n in g["nodes"]]
     return {"nodes": nodes, "edges": [list(e) for e in g["edges"]]}
 
 
-def types_in(case_id):
+def types_in(case):
     """Which knowledge types a case covers, in Dr Ho's order."""
-    used = {n["type"] for n in KNOWLEDGE[case_id]["nodes"]}
+    used = {n["type"] for n in case_graph(case)["nodes"]}
     return [t for t in KNOWLEDGE_TYPES if t in used]

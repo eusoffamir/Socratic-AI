@@ -9,7 +9,7 @@ Two ways to pick the next move:
                 fixed rules on it. "Agents decide, rules guard."
 """
 from . import reasoning
-from .content import CONCEPTS, FORMATS, LEVELS, STANDARD_TIPS, STANDARDS
+from .content import FORMATS, LEVELS, STANDARD_TIPS, STANDARDS, case_of
 
 GOOD_STANDARDS_THRESHOLD = 2  # standards met to count an answer as "good"
 STREAK_TO_ADVANCE = 2         # good answers in a row to move up a level
@@ -159,8 +159,8 @@ def _finish(session, instruction):
 
 
 def case_tool(session):
-    """The one simulation that belongs to this case."""
-    return CONCEPTS[session["concept_id"]]["tool"]
+    """The one simulation that belongs to this case, or None (a generated case has none)."""
+    return case_of(session).get("tool")
 
 
 def welcome(total_rounds):

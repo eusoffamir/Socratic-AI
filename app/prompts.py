@@ -1,7 +1,7 @@
 import json
 
 from . import reasoning
-from .content import CONCEPTS, FORMATS, LEVELS, STANDARDS
+from .content import FORMATS, LEVELS, STANDARDS, case_of
 from .tools import TOOLS
 
 AB_FORMAT = FORMATS[-1]  # "choose A or B and defend the choice"
@@ -16,15 +16,15 @@ ASSESSOR_VERSION = "2026-10-21"
 # (see checker.py) so a reply one word over does not cost a rewrite call.
 WORD_LIMITS = {"feedback": 15, "key_idea": 15, "question": 20}
 
-TUTOR_SYSTEM = """You are Socratic AI, a calm and helpful tutor, like a smart assistant in a film. You help university students who are new to quant learn to reason for themselves. You are not an answer machine.
+TUTOR_SYSTEM = """You are Socratic AI, a calm and helpful tutor, like a smart assistant in a film. You help university students who are new to a topic learn to reason for themselves. You are not an answer machine.
 
 Voice:
 - Plain, friendly English in smooth, natural sentences that are easy to read. Keep them short, but join related ideas with simple words like "because", "so", "and" or "but" instead of chopping them into fragments. Write "Each flip is still 50%, because a coin has no memory.", not "Each flip = 50%. No memory."
-- The learners like numbers. Use digits (3%, 15 of 500, +32%), but write them inside normal sentences, not with symbols like →, = or ≠.
+- When you use numbers, use digits (3%, 15 of 500, +32%), but write them inside normal sentences, not with symbols like →, = or ≠.
 - Write chances as percentages, never fractions: 50%, not 1/2, and about 3%, not 1/32.
 - Never join two parts of a sentence with a colon, as in "Pattern or luck: which is it?" or "Do not do that: use the hint". It does not sound like natural speech. Use two sentences, or words like "and" or "so".
 - No emoji, no exclamation marks, no slang, no jokes.
-- If you use a finance word, explain it in a few simple words the first time.
+- If you use a specialist word, explain it in a few simple words the first time.
 - Praise only something specific the learner said, such as "You used the 3% number." Never say "Great job".
 
 Reply with ONLY one JSON object and nothing else:
@@ -48,7 +48,7 @@ Rules:
 - If REVISE_PROBLEMS is given, DRAFT is your earlier reply. Write a fixed version that solves every problem. Keep the same format: if the DRAFT had 2 options, your fixed reply must also have 2 options.
 
 Tools:
-You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0, and only the tool named in case_tool, since the others belong to other cases. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If TOOL_RESULTS already has a result when you start, the app ran it for you because the planner suggested it, so use its summary in key_idea and ask about it.
+You can run a small simulation when real numbers would let the learner test their own claim. Only when tools_left is more than 0, and only the tool named in case_tool, since the others belong to other cases. If case_tool is null, this case has no tool, so never run one. To run one, reply with ONLY {"tool": "<name>", "args": {...}} and nothing else. You will then get the result in TOOL_RESULTS. Use its summary in key_idea, and ask the learner what it means. Do not run the same tool twice in a turn. If TOOL_RESULTS already has a result when you start, the app ran it for you because the planner suggested it, so use its summary in key_idea and ask about it.
 Available tools:
 """ + "\n".join(f"- {desc}" for _, desc in TOOLS.values())
 
@@ -115,7 +115,7 @@ Return ONLY this JSON and nothing else:
 Each problem is 12 words or fewer and tells the tutor what to fix. If everything is fine, ok is true and problems is []."""
 
 
-COACH_SYSTEM = """You are the coach for Socratic AI. A learner has just finished a short Socratic session on a quant topic. Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.
+COACH_SYSTEM = """You are the coach for Socratic AI. A learner has just finished a short Socratic session on a topic. Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.
 
 Look at the answers for:
 - length: too short to show their thinking, or long and unfocused
@@ -152,15 +152,15 @@ def coach_user(session):
                       "standards_met": _met(a) if a.get("standards") else [],
                       "move": a.get("reasoning_move"), "stuck": bool(a.get("confused_or_frustrated")),
                       "copied_hint": bool(a.get("copied_hint")), "ai_like": bool(a.get("ai_like"))})
-    return json.dumps({"topic": CONCEPTS[session["concept_id"]]["title"], "answers": pairs},
+    return json.dumps({"topic": case_of(session)["title"], "answers": pairs},
                       indent=1, ensure_ascii=False)
 
 
 def assessor_user(session, answer, with_reasoning=False):
     payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
     if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
-        c = CONCEPTS[session["concept_id"]]
-        extra = {"NOTE_TYPES": reasoning.note_types(session["concept_id"])} if with_reasoning else {}
+        c = case_of(session)
+        extra = {"NOTE_TYPES": reasoning.note_types(c)} if with_reasoning else {}
         payload = {"case_story": c["scenario"], "NOTES": c["notes"], **extra, **payload}
     return json.dumps(payload, indent=1, ensure_ascii=False)
 
@@ -170,9 +170,10 @@ def _met(assessment):
 
 
 def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, draft=None, problems=None):
-    c = CONCEPTS[session["concept_id"]]
+    c = case_of(session)
     payload = {
         "action": ins["action"],
+        "topic": c["topic"],
         "concept": c["title"],
         "mission": c["mission"],
         "scenario": c["scenario"],
@@ -189,7 +190,7 @@ def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, dra
         "ASKED_QUESTIONS": session["questions"],
         "LEARNER_SAID": session["said"],
         "tools_left": tools_left,
-        "case_tool": c["tool"],
+        "case_tool": c.get("tool"),
         "suggest_tool": ins.get("suggest_tool"),
         "TOOL_RESULTS": [{"tool": r["tool"], "args": r["args"], "summary": r["summary"]} for r in tool_runs],
     }
@@ -212,7 +213,8 @@ def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, dra
 def planner_user(session, assessment):
     level_key, level_name, _ = LEVELS[session["level_idx"]]
     return json.dumps({
-        "concept": CONCEPTS[session["concept_id"]]["title"],
+        "topic": case_of(session)["topic"],
+        "concept": case_of(session)["title"],
         "round": session["round"],
         "total_rounds": session["total_rounds"] or "no limit",
         "current_level": level_name,
@@ -228,7 +230,7 @@ def planner_user(session, assessment):
             "learner_points": assessment.get("learner_points", []),
         },
         "LEARNER_SAID": session["said"],
-        "tools": [CONCEPTS[session["concept_id"]]["tool"]],  # only this case's own simulation
+        "tools": [t for t in [case_of(session).get("tool")] if t],  # only this case's own simulation, if it has one
         "tools_used_so_far": [r["tool"] for t in session["turns"] for r in t.get("tool_runs", [])],
     }, indent=1, ensure_ascii=False)
 
