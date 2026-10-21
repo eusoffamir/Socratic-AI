@@ -2138,15 +2138,26 @@ async function askStatsLoad(){
   const box = $('askStats');
   if(!box.innerHTML) box.innerHTML = `<div class="thinking">${DOTS}Loading...</div>`;
   try {
-    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats?coach=1`);
+    const sid = ask.sid, url = `/api/session/${encodeURIComponent(sid)}/stats`;
+    const d = await api(url);
     const reached = d.levels.findIndex(l => l.name === d.summary.highest_level_reached);
     // the Coach's comment, written again every few answers (one AI call each time)
     const every = d.coach_every || 2, left = every - d.history.length % every;
+    const coachHTML = (comment, due) => `<div class="mono-label">Coach</div>${comment ? `<p>${esc(comment)}</p>` : ''}
+        <p class="wait">${due ? `${DOTS}The coach is writing a new comment...`
+          : comment ? `The next comment comes in ${left} answer${left === 1 ? '' : 's'}.`
+          : `The coach comments after ${every} answers, so ${left} more to go.`}</p>`;
     box.innerHTML = `<section><span class="mono-label">6 Socratic Question Categories</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
       <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>
-      <div class="coach-comment"><div class="mono-label">Coach</div>${d.comment ? `<p>${esc(d.comment)}</p>` : ''}
-        <p class="wait">${d.comment ? `The next comment comes in ${left} answer${left === 1 ? '' : 's'}.`
-          : `The coach comments after ${every} answers, so ${left} more to go.`}</p></div>`;
+      <div class="coach-comment">${coachHTML(d.comment, d.coach_due)}</div>`;
+    // the charts are drawn, so the Coach's AI call no longer holds up the panel
+    if(d.coach_due) api(`${url}?coach=1`).then(c => {
+      const el = box.querySelector('.coach-comment');
+      if(el && ask.sid === sid) el.innerHTML = coachHTML(c.comment, false);
+    }).catch(() => {
+      const el = box.querySelector('.coach-comment .wait');
+      if(el && ask.sid === sid) el.textContent = 'The coach could not write a comment just now.';
+    });
     // trim the empty space around the chart, so the panel is no taller than it needs to be
     const svg = box.querySelector('.sradar'), b = svg && svg.getBBox();
     if(b && b.width) svg.setAttribute('viewBox', `${b.x - 6} ${b.y - 6} ${b.width + 12} ${b.height + 12}`);

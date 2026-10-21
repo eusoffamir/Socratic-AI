@@ -593,8 +593,15 @@ def _progress_comment(sid, session):
 def get_stats(sid: str, coach: bool = False):
     sid, session = _get_session(sid)
     comment = _final_comment(sid, session)
+    # Without coach=1 nothing waits for the AI: the last saved comment is sent, and
+    # coach_due says a new one is due, so the page draws the charts first and asks
+    # for the comment after (seen 22 October 2026: the panel sat on Loading).
+    step = len(session["history"]) // COACH_EVERY
+    coach_due = comment is None and step > 0 and session.get("progress_comment_step") != step
     if comment is None and coach:
-        comment = _progress_comment(sid, session)
+        comment, coach_due = _progress_comment(sid, session), False
+    elif comment is None:
+        comment = session.get("progress_comment")
     return {
         "round": session["round"],
         "total_rounds": session["total_rounds"],
@@ -602,9 +609,10 @@ def get_stats(sid: str, coach: bool = False):
         "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],
         "standards": STANDARDS,
         "summary": (summary := orchestrator.summarize(session)),
-        "tip": STANDARD_TIPS.get(summary["weakest_standard"]),
-        "coach_every": COACH_EVERY,  # the Ask chat's progress card
+        "tip": STANDARD_TIPS.get(summary["weakest_standard"]),  # the Ask chat's progress card
+        "coach_every": COACH_EVERY,
         "comment": comment,
+        "coach_due": coach_due,
         "history": session["history"],
         "topic": (session.get("case") or {}).get("topic"),  # a built topic (Goal 2), None for quant and the tutorial
     }
