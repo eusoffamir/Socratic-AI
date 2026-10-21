@@ -635,7 +635,7 @@
   .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
   /* mastery estimate per skill (Goal 1 step 5): a 90% range bar, the most likely value and the mastery line */
   .ms-rows{display:grid; gap:4px;}
-  .ms-row{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; align-items:center; gap:10px; padding:6px 8px; margin:0 -8px; border-radius:8px; cursor:help;}
+  .ms-row{display:grid; grid-template-columns:96px minmax(0, 1fr) 128px; align-items:center; gap:10px; padding:6px 8px; margin:0 -8px; border-radius:8px; cursor:help;}
   .ms-row:hover{background:var(--signal-soft);}
   .ms-row .nm{font-size:13px; font-weight:500;}
   .ms-row .nm small{display:block; font-size:11px; color:var(--ink-faint); font-weight:400;}
@@ -643,9 +643,9 @@
   .ms-band{position:absolute; top:0; bottom:0; border-radius:7px; background:color-mix(in srgb, var(--signal) 30%, var(--panel-2));}
   .ms-dot{position:absolute; top:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--signal); box-shadow:0 0 0 2px var(--panel);}
   .ms-line{position:absolute; top:-3px; bottom:-3px; width:0; border-left:1.5px dashed var(--ink-faint);}
-  .ms-row .st{font-size:12px; color:var(--ink-soft); text-align:right;}
+  .ms-row .st{font-size:12px; color:var(--ink-soft); text-align:right; white-space:nowrap;}
   .ms-row .st.ok{color:var(--signal); font-weight:600;}
-  .ms-axis{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; gap:10px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint);}
+  .ms-axis{display:grid; grid-template-columns:96px minmax(0, 1fr) 128px; gap:10px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint);}
   .ms-axis span{display:flex; justify-content:space-between;} .ms-axis i{font-style:normal;}
   /* Explainer pop-up (Goal 1 step 6) */
   .rk td[data-r]{cursor:pointer;}
