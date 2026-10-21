@@ -902,7 +902,9 @@
     #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:16px;}
     .status-scroll{padding:16px 16px 32px;}
     .sn-label{margin-top:24px;}
-    .ask-main{padding:24px 16px 10vh;}
+    .ask-main.empty{padding:24px 16px 10vh;}  /* only the start page; a chat uses the full height */
+    .ask-scroll{padding:20px 16px 28px;}
+    .ask-main:not(.empty) .ask-dock{padding:6px 16px calc(10px + env(safe-area-inset-bottom));}
     .ask-greet{flex-direction:column; gap:12px;}
     .ask-stats{right:16px; width:calc(100% - 32px); grid-template-columns:1fr;}
     .ask-top .ticks{display:none;}
