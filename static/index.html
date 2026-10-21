@@ -713,6 +713,18 @@
   .case-row.tut:hover .go{background:#fff; color:#1f6f5c;}
   /* white coins on the teal card */
   .case-row.tut .thumb{background:rgba(255,255,255,.14); --signal:#fff; --signal-soft:rgba(255,255,255,.2); --caution:#ffd08a; --panel:transparent;}
+  /* the skill check: a blue card beside the teal tutorial */
+  .case-row.chk{
+    background:linear-gradient(120deg, #2f5aa8, #4f7fd0); color:#fff; border-color:transparent;
+    box-shadow:0 6px 22px rgba(47,90,168,.32);
+  }
+  .case-row.chk:hover:not(:disabled){border-color:#fff;}
+  .case-row.chk .m{color:rgba(255,255,255,.88);}
+  .case-row.chk .num{color:rgba(255,255,255,.72);}
+  .case-row.chk .tag{background:#fff; color:#2f5aa8;}
+  .case-row.chk .go{border-color:#fff; color:#fff;}
+  .case-row.chk:hover .go{background:#fff; color:#2f5aa8;}
+  .case-row.chk .thumb{background:rgba(255,255,255,.14);}
   .tut-mode #stuckBtn{display:none !important;}
   .tut-mode .composer-row{justify-content:flex-end;}
   /* Socrates's example answer, on the learner side: what a good answer looks like */
@@ -933,11 +945,8 @@
 
         <div class="section-head"><h3>Start here</h3></div>
         <div class="cases" id="startRow">
-          <button class="case-row" id="checkBtn">
-            <span class="thumb" aria-hidden="true"><svg viewBox="0 0 96 64"><g fill="var(--signal)">
-              <rect x="8" y="10" width="24" height="12" rx="3" opacity=".35"/><rect x="36" y="10" width="24" height="12" rx="3"/><rect x="64" y="10" width="24" height="12" rx="3" opacity=".6"/>
-              <rect x="8" y="26" width="24" height="12" rx="3"/><rect x="36" y="26" width="24" height="12" rx="3" opacity=".2"/><rect x="64" y="26" width="24" height="12" rx="3" opacity=".35"/>
-              <rect x="8" y="42" width="24" height="12" rx="3" opacity=".6"/><rect x="36" y="42" width="24" height="12" rx="3" opacity=".35"/><rect x="64" y="42" width="24" height="12" rx="3"/></g></svg></span>
+          <button class="case-row chk" id="checkBtn">
+            <span class="thumb" aria-hidden="true"><svg viewBox="0 0 96 64"><rect x="8" y="10" width="24" height="12" rx="3" fill="#8fe0c4" opacity="0.5"/><rect x="8" y="26" width="24" height="12" rx="3" fill="#8fe0c4" opacity="1"/><rect x="8" y="42" width="24" height="12" rx="3" fill="#8fe0c4" opacity="0.7"/><rect x="36" y="10" width="24" height="12" rx="3" fill="#ffffff" opacity="1"/><rect x="36" y="26" width="24" height="12" rx="3" fill="#ffffff" opacity="0.45"/><rect x="36" y="42" width="24" height="12" rx="3" fill="#ffffff" opacity="0.8"/><rect x="64" y="10" width="24" height="12" rx="3" fill="#ffd08a" opacity="0.7"/><rect x="64" y="26" width="24" height="12" rx="3" fill="#ffd08a" opacity="0.5"/><rect x="64" y="42" width="24" height="12" rx="3" fill="#ffd08a" opacity="1"/></svg></span>
             <span class="info">
               <span class="tag t1">Check</span><span class="num">6 QUESTIONS</span>
               <span class="t">What kind of thinker are you?</span>
