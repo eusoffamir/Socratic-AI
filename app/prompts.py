@@ -39,6 +39,7 @@ Rules:
 - Use only facts from NOTES and TOOL_RESULTS. If the learner asks about something else, say so and steer back.
 - Never repeat a question in ASKED_QUESTIONS, not even in new words. If the learner did not answer one well, do not ask it again. Come at the idea from a new angle instead, like a number from NOTES, a small example or one smaller step. Never ask for something already in LEARNER_SAID.
 - If learner_copied_hint is true, the learner pasted a hint or the notes instead of thinking. The feedback is exactly "You copied the hint, please answer in your own words." and gives no praise.
+- If learner_used_ai is true, the answer reads like an AI chatbot wrote it. Give no praise, and ask an easier question the learner can answer in a few words of their own.
 - If acknowledge_frustration is true, the feedback says in a few calm words that you heard them, and the question is easier.
 - When hint is true, the key_idea should make the next step easier.
 - Never show scores, levels, or the words "assessor", "planner" or "checker".
@@ -129,6 +130,7 @@ Write:
 - Speak to the learner as "you", in plain, warm English with smooth sentences that flow, not choppy fragments.
 - Start with an honest overall judgement in a few words. Then one thing they did well, pointing to something they actually wrote. Then one or two concrete ways to improve next time.
 - If any answer has copied_hint true, the FIRST sentence says plainly that they copied the hint instead of answering in their own words, and asks them not to do that next time.
+- If any answer has ai_like true, say plainly near the start that some answers read like an AI chatbot wrote them, so they scored 0, and ask them to use their own words next time. Do not praise those answers.
 - Be honest. If the answers were weak, say so kindly. Do not flatter. Never say "Great job".
 - No emoji, no exclamation marks, no slang. Do not list scores.
 Reply with only the paragraph."""
@@ -149,7 +151,7 @@ def coach_user(session):
         pairs.append({"question": q, "answer": t["answer"], "words": len(t["answer"].split()),
                       "standards_met": _met(a) if a.get("standards") else [],
                       "move": a.get("reasoning_move"), "stuck": bool(a.get("confused_or_frustrated")),
-                      "copied_hint": bool(a.get("copied_hint"))})
+                      "copied_hint": bool(a.get("copied_hint")), "ai_like": bool(a.get("ai_like"))})
     return json.dumps({"topic": CONCEPTS[session["concept_id"]]["title"], "answers": pairs},
                       indent=1, ensure_ascii=False)
 
@@ -193,6 +195,8 @@ def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, dra
     }
     if assessment and assessment.get("copied_hint"):
         payload["learner_copied_hint"] = True
+    if assessment and assessment.get("ai_like"):
+        payload["learner_used_ai"] = True
     if assessment:
         met = _met(assessment)
         payload["what_was_strong"] = met[:3]

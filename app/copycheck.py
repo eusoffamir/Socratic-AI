@@ -18,6 +18,7 @@ RUN = 6
 
 # The exact words the Tutor's feedback uses after a copied answer (set by code, so it never varies).
 CALL_OUT = "You copied the hint, please answer in your own words."
+AI_CALL_OUT = "That answer reads like an AI chatbot wrote it, so please answer in your own words."
 
 
 def _words(text):
@@ -85,7 +86,7 @@ def session_story(session):
     return CONCEPTS[session["concept_id"]]["scenario"]
 
 
-# ---------- answers that look like they came from an AI chatbot (skill check) ----------
+# ---------- answers that look like they came from an AI chatbot (cases and skill check) ----------
 # A free code check, no model call. It looks for things chatbots write and
 # learners almost never do. It cannot catch an AI answer that was retyped by
 # hand, so it is one guard among several (paste is off and answers are short).
@@ -94,7 +95,7 @@ AI_PHRASES = [
     "would you like to", "would you like me to", "let me know if", "ai responses may include mistakes",
     "ai can make mistakes", "double-check responses", "for financial advice, consult", "here is the breakdown",
     "here's the breakdown", "great question", "as an ai", "i hope this helps", "in summary,", "key takeaway",
-    "source preferences", "skip to main content",
+    "source preferences", "skip to main content", "here is exactly why", "here's exactly why",
 ]
 _AI_LAYOUT = [
     re.compile(r"(?m)^\s*(?:[-*•]|\d+\.)\s+\S"),      # bullet or numbered list lines
@@ -102,6 +103,8 @@ _AI_LAYOUT = [
     re.compile(r"\*\*[^*]+\*\*"),                      # **bold**
     re.compile(r"(?m)^\s*\+\d+\s*$|\s\+\d+\s*$"),      # search result source counts like "+3"
     re.compile(r"(?m)^[A-Z][\w ,'()&-]{2,60}:\s+\S"),  # "Shared Sector Risk: Because ..." title lines
+    re.compile(r"(?m)^\s*•\s*[A-Z][\w ,'()&-]{2,60}:"),  # "• Random Luck (Most Common): ..." bullet titles
+    re.compile("—"),                   # an em dash, which keyboards do not type easily
 ]
 
 

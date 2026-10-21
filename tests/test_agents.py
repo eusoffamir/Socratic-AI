@@ -411,3 +411,31 @@ def test_pasting_a_note_or_reading_line_is_still_copying(cid):
     for pasted in [*c["notes"], *c["reading"]["idea"]]:
         if len(pasted.split()) >= copycheck.RUN:  # a line shorter than one run cannot be caught
             assert copycheck.is_copied(pasted, copycheck.session_sources(s), copycheck.session_story(s)), pasted
+
+
+# ---------- AI chatbot answers in a case (found by Eusoff on 21 October 2026) ----------
+
+CASE_AI_ANSWERS = [  # shortened from the Gemini replies Eusoff pasted into "Pattern or luck?"
+    "In the market, a short streak can happen for two different reasons.\n• Random Luck (Most Common): Stock prices "
+    "move like coin flips.\n• A Real Fundamental Cause: Sometimes a streak happens because of a big, lasting catalyst"
+    "—like good earnings news.\nWithout any big news, the streak is likely luck.",
+    "B: Just random luck. Why: Here is exactly why a skeptic would take this view:\n• The Law of Large Numbers: "
+    "Out of thousands of stocks, a few must go up 5 days in a row.\n• Lack of Evidence: Price alone is just noise.",
+]
+
+
+def test_case_ai_answer_scores_zero_and_is_called_out(monkeypatch):
+    from app import copycheck
+    def no_call(*a):
+        raise AssertionError("the Assessor must not be called")
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setattr(llm_client, "call_assessor", no_call)
+    s = opened()
+    for answer in CASE_AI_ANSWERS:
+        r = graph.run_turn(s, answer=answer)
+        a = s["turns"][-1]["assessment"]
+        assert a["ai_like"] and sum(a["standards"].values()) == 0 and a["reasoning"]["types"]["deductive"] == 0
+        assert s["turns"][-1]["parts"]["feedback"] == copycheck.AI_CALL_OUT
+    assert orc.fallback_comment(s).startswith("2 answers read like an AI chatbot wrote them, so they scored 0.")
+    from app import prompts
+    assert '"ai_like": true' in prompts.coach_user(s)

@@ -306,6 +306,7 @@ def fallback_comment(session):
     worst = min(met, key=met.get)
 
     copied = sum(bool(a.get("copied_hint")) for a in history)
+    ai = sum(bool(a.get("ai_like")) for a in history)
     if good / n >= 0.7:
         text = f"This was solid work, with {good} of {n} answers showing clear reasoning."
     elif good / n >= 0.4:
@@ -326,4 +327,8 @@ def fallback_comment(session):
         times = "once" if copied == 1 else f"{copied} times"
         text = (f"You copied the hint instead of answering in your own words {times}, so those answers scored 0. "
                 "Please do not do that next time. " + text)
+    if ai:  # called out first too
+        times = "1 answer" if ai == 1 else f"{ai} answers"
+        text = (f"{times} read like an AI chatbot wrote {'it' if ai == 1 else 'them'}, so {'it' if ai == 1 else 'they'} scored 0. "
+                "Please answer in your own words next time. " + text)
     return text

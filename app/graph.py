@@ -51,7 +51,10 @@ def _assess_node(state: TurnState) -> TurnState:
         # Rule first: an answer copied from a hint or the notes is not the
         # learner's thinking, so it scores 0 and the Assessor is not called.
         s = state["session"]
-        if copycheck.is_copied(state["answer"], copycheck.session_sources(s), copycheck.session_story(s)):
+        ai_reason = copycheck.ai_like(state["answer"])
+        if ai_reason:  # rule: a chatbot-style answer is not the learner's thinking either
+            state["assessment"] = copycheck.ai_assessment(ai_reason)
+        elif copycheck.is_copied(state["answer"], copycheck.session_sources(s), copycheck.session_story(s)):
             state["assessment"] = copycheck.copied_assessment()
         else:
             state["assessment"] = llm_client.call_assessor(state["session"], state["answer"])
@@ -148,6 +151,8 @@ def _finish_node(state: TurnState) -> TurnState:
     s, parts = state["session"], state["parts"]
     if (state.get("assessment") or {}).get("copied_hint") and state["instruction"]["action"] != "end":
         parts["feedback"] = copycheck.CALL_OUT  # rule: always these exact words
+    if (state.get("assessment") or {}).get("ai_like") and state["instruction"]["action"] != "end":
+        parts["feedback"] = copycheck.AI_CALL_OUT
     if state["instruction"]["action"] == "open":
         parts["feedback"] = orchestrator.welcome(s["total_rounds"])  # rule: the right number of rounds
     state["reply"] = llm_client.parts_text(parts)
