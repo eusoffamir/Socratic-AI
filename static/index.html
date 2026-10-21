@@ -2070,6 +2070,7 @@ function setAskMode(on){
   $('askModeBtn').classList.toggle('on', on);
   $('askModeMenu').querySelectorAll('[data-ab]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.ab === '1') === on)));
 }
+setAskMode(true);
 function askModeOpen(open){
   $('askModeMenu').classList.toggle('hidden', !open);
   $('askModeBtn').setAttribute('aria-expanded', open);
@@ -2362,7 +2363,7 @@ function askReset(){
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
   $('askStrip').setAttribute('aria-expanded', false);
-  setAskMode(false);
+  setAskMode(true);  // A or B? is the default, because picking is more fun
   askModeOpen(false);
   askChatting(false);
   setAskFile(null);
