@@ -124,7 +124,8 @@ def real_responses():
             continue
         key = s.get("participant_code") or sid
         for t in s.get("turns", []):
-            by.setdefault(key, {})[t["item"]] = t["attained"]
+            if t["item"] in ITEMS:  # the fixed quant bank only; generated topics (Goal 2) have one-off questions
+                by.setdefault(key, {})[t["item"]] = t["attained"]
     return by
 
 

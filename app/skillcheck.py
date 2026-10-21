@@ -127,14 +127,16 @@ for _r, _k, _case, _situation, _question in _BANK:
                   "situation": _situation, "question": _question}
 
 
-def pick(seen=(), n=QUESTIONS_PER_CHECK, rng=random):
+def pick(seen=(), n=QUESTIONS_PER_CHECK, rng=random, items=None):
     """n questions, the same number per reasoning type, each with a different
-    knowledge type where possible. Questions not answered before come first."""
+    knowledge type where possible. Questions not answered before come first.
+    items: a generated topic's bank (Goal 2), else the quant bank."""
     seen = set(seen)
+    items = items or ITEMS
     per_type = n // len(REASONING_TYPES)
     chosen = []
     for r in REASONING_TYPES:
-        pool = [i for i in ITEMS.values() if i["reasoning"] == r]
+        pool = [i for i in items.values() if i["reasoning"] == r]
         rng.shuffle(pool)
         pool.sort(key=lambda i: i["id"] in seen)  # stable, so unseen ones first, still shuffled
         kinds = set()
@@ -148,29 +150,42 @@ def pick(seen=(), n=QUESTIONS_PER_CHECK, rng=random):
     return [i["id"] for i in chosen]
 
 
-def new_check(seen=()):
-    """Saved in the same table as the cases, marked by its mode."""
-    items = pick(seen)
-    return {"mode": "skill_check", "concept_id": None, "items": items, "round": 0,
-            "total_rounds": len(items), "ended": False, "history": [], "turns": []}
+def new_check(seen=(), cases=None, bank=None):
+    """Saved in the same table as the cases, marked by its mode. For a
+    generated topic (Goal 2), its cases and question bank are kept inside the
+    check, like a generated case is kept inside a session."""
+    items = pick(seen, items=bank)
+    check = {"mode": "skill_check", "concept_id": None, "items": items, "round": 0,
+             "total_rounds": len(items), "ended": False, "history": [], "turns": []}
+    if bank:
+        check.update(topic=cases[0]["topic"], bank=bank, cases={c["id"]: c for c in cases})
+    return check
+
+
+def _item(check):
+    return (check.get("bank") or ITEMS)[check["items"][check["round"]]]
+
+
+def _case(check, item):
+    return (check.get("cases") or {}).get(item["case"]) or CONCEPTS[item["case"]]
 
 
 def current(check):
     """The question to show now, or None when the check is finished."""
     if check["ended"]:
         return None
-    i = ITEMS[check["items"][check["round"]]]
+    i = _item(check)
     return {"id": i["id"], "number": check["round"] + 1, "total": check["total_rounds"],
-            "case": CONCEPTS[i["case"]]["title"], "situation": i["situation"], "question": i["question"]}
+            "case": _case(check, i)["title"], "situation": i["situation"], "question": i["question"]}
 
 
 def answer(check, text, seconds=None):
     """Mark one answer (one model call) and move to the next question.
     Rules first: an answer copied from the notes, or one that looks like an AI
     chatbot wrote it, scores 0 with no model call."""
-    item = ITEMS[check["items"][check["round"]]]
+    item = _item(check)
     asked = f'{item["situation"]} {item["question"]}'
-    as_session = {"concept_id": item["case"], "last_tutor": asked}
+    as_session = {"concept_id": item["case"], "case": _case(check, item), "last_tutor": asked}
     ai_reason = copycheck.ai_reason(text)
     if ai_reason:
         a = copycheck.ai_assessment(ai_reason)

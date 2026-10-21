@@ -66,6 +66,18 @@ Full notes: `docs/supervisor/meeting2-notes.md` (read it before any Goal 1 work)
 - **Thesis and defence:** add an agent flow diagram with the information passed between agents, show how agents are prompted, make the talk easy for examiners outside the field, prepare 1 or 2 product slides, and do a mock presentation with Dr Ho around mid November 2026.
 - **Remind Dr Ho** to submit the requests for a Claude subscription and a Render subscription (about USD 25 a month mentioned, not checked). He asked to be reminded. Until approved, stay on free tiers.
 
+## Goal 2: any topic (built 21 October 2026)
+
+Eusoff wants it to work like ChatGPT: the learner types ANY topic and practises critical thinking on it. Built in 4 steps:
+
+- **A. Topic out of the engine.** Every agent reads the case with `content.case_of(session)`. A generated case is stored inside the session (and a generated skill check bank inside the check), so nothing new is needed in Supabase and it survives a Render restart. Tutor and Coach prompts no longer say quant. A case may have no tool.
+- **B. Topic Builder agent** (`app/builder.py`). One model call turns a topic name or a short reading into 3 cases in the quant case shape: story, 5 notes, reading pop-up and a knowledge graph per case. Plain code then checks it (word limits, dashes become commas, known knowledge types and relations, unlinked facts dropped) and refuses harmful topics. Cached per topic while the server runs. `POST /api/topic`.
+- **C. Page.** Home has a topic box and topic chips. Quant stays the default, checked topic. Built topics are kept in the browser (`my-topics` in localStorage), and the page sends the case back with `POST /api/session`, where `builder.recheck()` checks it again by the same rules.
+- **D. Skill check and Explainer.** For a built topic, the skill check asks the Builder for 15 questions (3 reasoning types x 5 core knowledge types, 1 call, cached) and marks them the same way. The DINA script uses only the fixed quant bank. The Explainer gets the topic name and has everyday fallback examples.
+- **Cost:** about 2 extra free Gemini calls per new topic (cases and skill check questions). Real runs took 4 to 20 seconds.
+- **Honest limits:** generated cases are drafts no expert checked (the page says so and asks the learner to question them). Facts come from the model, so one test topic had an overstated fact. Simulation tools exist only for quant. Some generated "inductive" questions gave only one case, so the skill check prompt can be tightened from real use.
+- **For the paper (Goals 1 and 2):** the same agents, scoring and dashboards ran unchanged on vaccines, the French Revolution and climate change. A fair test still to do is to compare Assessor marks on quant and on a generated topic against a human marker.
+
 ## Findings from the student's own testing (Gemini Gem, September 2026)
 
 - Test #1, online "Socratic Tutor" gem: refused answers, but asked the learner to invent the tracking method with no teaching first (learner said "i dont know" twice), lost context, no purpose or end.

@@ -318,10 +318,11 @@ class CheckAnswerRequest(AnswerRequest):
 
 class CheckRequest(BaseModel):
     past_check_ids: list[str] = []  # earlier checks from this browser, so new questions come first
+    cases: list[dict] = []  # a generated topic's cases (Goal 2); empty for the quant questions
 
 
 def _check_view(check):
-    return {"question": skillcheck.current(check), "ended": check["ended"],
+    return {"question": skillcheck.current(check), "ended": check["ended"], "topic": check.get("topic"),
             "results": skillcheck.summarize(check["turns"]) if check["ended"] else None}
 
 
@@ -337,7 +338,18 @@ def start_check(req: CheckRequest):
     SESSIONS.update(storage.load_sessions([i for i in ids if i not in SESSIONS]))
     seen = [t["item"] for i in ids for t in (SESSIONS.get(i) or {}).get("turns", [])
             if (SESSIONS.get(i) or {}).get("mode") == "skill_check"]
-    check = skillcheck.new_check(seen)
+    bank, cases = None, None
+    if req.cases:
+        try:
+            cases = [builder.recheck(c) for c in req.cases[:builder.CASES_PER_TOPIC]]
+            if len({c["id"].split("-")[0] for c in cases}) != 1:
+                raise builder.TopicError("These cases are from different topics.")
+            bank = builder.skill_items(cases)
+        except builder.TopicError as e:
+            raise HTTPException(400, str(e))
+        except LLMError as e:
+            raise HTTPException(503, str(e))
+    check = skillcheck.new_check(seen, cases, bank)
     sid = str(uuid.uuid4())
     SESSIONS[sid] = check
     _persist(sid, check)
@@ -375,11 +387,12 @@ def answer_check(sid: str, req: CheckAnswerRequest):
 
 
 @app.get("/api/explain")
-def explain(reasoning: str, knowledge: list[str] = Query(default=[])):
-    """The Explainer agent: why a reasoning type matters with 1 or 2 knowledge types."""
+def explain(reasoning: str, knowledge: list[str] = Query(default=[]), topic: str = ""):
+    """The Explainer agent: why a reasoning type matters with 1 or 2 knowledge
+    types. topic: the learner's own topic (Goal 2), empty for quant."""
     if not explainer.valid(reasoning, knowledge):
         raise HTTPException(400, "Choose 1 reasoning type and 1 or 2 knowledge types.")
-    return explainer.explain(reasoning, knowledge)
+    return explainer.explain(reasoning, knowledge, topic)
 
 
 @app.post("/api/overview")

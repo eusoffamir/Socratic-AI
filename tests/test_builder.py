@@ -128,3 +128,47 @@ def test_whole_session_on_any_topic_through_the_api(monkeypatch):
     tampered = {**case, "id": "pattern_or_luck"}
     assert c.post("/api/session", json={"case": tampered}).status_code == 400
 
+
+
+# ---------- step D: skill check and Explainer on any topic ----------
+
+from app import explainer, skillcheck  # noqa: E402
+
+
+def test_clean_items_needs_two_per_reasoning_type():
+    ids = ["t0123456789-1", "t0123456789-2"]
+    good = {"questions": [{"reasoning": r, "knowledge": k, "case": 2, "situation": "Some facts.", "question": "Why?"}
+                          for r in ["inductive", "deductive", "abductive"] for k in ["factual", "causal"]]}
+    good["questions"].append({"reasoning": "inductive", "knowledge": "factual", "situation": "Repeat.", "question": "Again?"})
+    good["questions"].append({"reasoning": "magic", "knowledge": "factual", "situation": "x", "question": "x?"})
+    items = builder.clean_items(good, "t0123456789", ids)
+    assert len(items) == 6 and all(i["case"] == ids[1] for i in items.values())
+    assert items["t0123456789:ind-fact"]["situation"] == "Some facts."  # the first of a repeated pair is kept
+    with pytest.raises(builder.TopicError):
+        builder.clean_items({"questions": good["questions"][:2]}, "t0123456789", ids)
+
+
+def test_skill_check_on_any_topic_through_the_api(monkeypatch):
+    monkeypatch.setenv("STUDY_CODES", "")
+    c = TestClient(main.app)
+    topic = c.post("/api/topic", json={"text": "Volcanoes"}).json()
+    d = c.post("/api/check", json={"cases": topic["cases"]}).json()
+    assert d["topic"] == topic["topic"] and topic["topic"] in d["question"]["situation"]
+    assert d["question"]["case"] in [x["title"] for x in topic["cases"]]
+    for _ in range(skillcheck.QUESTIONS_PER_CHECK):
+        d = c.post(f"/api/check/{d['check_id']}/answer",
+                   json={"answer": "Because the evidence shows a pattern, I would test it on new cases."}).json()
+    assert d["ended"] and d["results"]["answers"] == skillcheck.QUESTIONS_PER_CHECK
+    quant = c.post("/api/check", json={}).json()
+    assert quant["topic"] is None and quant["question"]["id"] in skillcheck.ITEMS
+    mixed = [topic["cases"][0], c.post("/api/topic", json={"text": "Rivers"}).json()["cases"][0]]
+    assert c.post("/api/check", json={"cases": mixed}).status_code == 400
+
+
+def test_explainer_uses_the_learners_topic():
+    import json
+    quant = json.loads(explainer.user_payload("deductive", ["procedural"]))
+    mine = json.loads(explainer.user_payload("deductive", ["procedural"], "Volcanoes"))
+    assert quant["BACKGROUND"] and not mine["BACKGROUND"] and mine["TOPIC"] == "Volcanoes"
+    assert "quant" not in explainer.SYSTEM.lower()
+    assert "stock" not in explainer.explain("inductive", ["causal"], "Volcanoes")["scenario"]

@@ -16,6 +16,7 @@ import threading
 from . import limits, llm_client
 from .knowledge import KNOWLEDGE_TYPES, RELATIONS
 from .llm_client import LLMError
+from .reasoning import CORE_KNOWLEDGE, KNOWLEDGE_SIGNS, REASONING_TYPES
 
 MAX_REQUEST_CHARS = 4000  # a topic name or a short reading
 CASES_PER_TOPIC = 3
@@ -24,7 +25,7 @@ NOTES_PER_CASE = 5
 # Word limits for each part, a little above what the prompt asks, so one extra
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
-         "idea": 35, "example": 40, "think": 30, "key_word": 4, "meaning": 12, "node": 35}
+         "idea": 35, "example": 40, "think": 30, "question": 25, "key_word": 4, "meaning": 12, "node": 35}
 
 SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps university beginners practise critical thinking on any topic. A learner gives you a REQUEST: a topic name, a question, or a short reading. You write the material the tutor will use. You never write the questions; the tutor does that.
 
@@ -174,6 +175,90 @@ def clean_topic(data, request):
     return {"id": tid, "topic": topic, "cases": cases}
 
 
+# ---------- skill check questions for a generated topic ----------
+
+SKILL_SYSTEM = """You write skill check questions for Socratic AI, a tutor that helps university beginners practise critical thinking on any topic. You get a TOPIC and its CASES. Write 1 question for EACH pair in PAIRS, so """ + str(len(REASONING_TYPES) * len(CORE_KNOWLEDGE)) + """ questions in all.
+
+Each question invites the learner to use ONE type of reasoning on ONE type of knowledge, in a few sentences of their own. Never name the reasoning type or the knowledge type in the question.
+
+Reasoning types:
+""" + "\n".join(f"- {k}: {v}" for k, v in REASONING_TYPES.items()) + """
+
+Knowledge types, and what using them looks like:
+""" + "\n".join(f"- {k}: the learner {KNOWLEDGE_SIGNS[k]}" for k in CORE_KNOWLEDGE) + """
+
+Examples from another topic:
+- inductive, factual. situation "Over 4 weeks you count how many of 500 stocks went up 5 days in a row, and you get 14, 17, 15 and 16." question "What general idea do these counts suggest about 5 day streaks?"
+- deductive, causal. situation "Hot weather makes people buy more ice cream and also makes more people swim." question "If a town has a heatwave next week, what should happen to both, and why?"
+- abductive, relational. situation "Two bank stocks have moved together almost every day for 5 years." question "What is the most likely explanation for this link?"
+
+Rules:
+- situation: at most 35 words, concrete, giving the facts the learner needs. Inductive gives several cases, deductive gives a rule and a new case, abductive gives a surprising observation with information missing.
+- question: at most 20 words, exactly one question, ending with "?".
+- Use only well known facts about the topic. Easy English, short smooth sentences, no colons joining parts, no dashes, no emoji. Chances as percentages, never fractions.
+- case: the number (1, 2 or 3) of the case it fits best.
+
+Reply with ONLY this JSON:
+{"questions": [{"reasoning": "", "knowledge": "", "case": 1, "situation": "", "question": ""}]}"""
+
+_SKILL_CACHE: dict[str, dict] = {}
+
+
+def clean_items(data, tid, case_ids):
+    """{item id: item} with at most 1 question per pair, in the same shape as
+    skillcheck.ITEMS. Raises TopicError if too few pairs are covered."""
+    items = {}
+    questions = data.get("questions") if isinstance(data, dict) else None
+    for q in questions if isinstance(questions, list) else []:
+        if not isinstance(q, dict):
+            continue
+        r, k = str(q.get("reasoning", "")).strip().lower(), str(q.get("knowledge", "")).strip().lower()
+        iid = f"{tid}:{r[:3]}-{k[:4]}"
+        if r not in REASONING_TYPES or k not in CORE_KNOWLEDGE or iid in items:
+            continue
+        try:
+            situation = _text(q.get("situation"), WORDS["scenario"], "situation")
+            question = _text(q.get("question"), WORDS["question"], "question")
+        except TopicError:
+            continue
+        if not question.endswith("?"):
+            continue
+        n = q.get("case")
+        n = n if isinstance(n, int) and 1 <= n <= len(case_ids) else 1
+        items[iid] = {"id": iid, "reasoning": r, "knowledge": k, "case": case_ids[n - 1],
+                      "situation": situation, "question": question}
+    # a check asks 2 questions per reasoning type, each on a different knowledge type
+    if any(sum(i["reasoning"] == r for i in items.values()) < 2 for r in REASONING_TYPES):
+        raise TopicError("The skill check questions could not be written, so please try again.")
+    return items
+
+
+def skill_items(cases):
+    """The skill check bank for a generated topic (one model call, then cached)."""
+    tid = cases[0]["id"].split("-")[0]
+    with _lock:
+        if tid in _SKILL_CACHE:
+            return _SKILL_CACHE[tid]
+    if llm_client.PROVIDER == "mock":
+        data = {"questions": [{"reasoning": r, "knowledge": k, "case": 1,
+                               "situation": f"[mock] A situation about {cases[0]['topic']}.",
+                               "question": f"[mock] What {r} idea about this {k} fact can you give?"}
+                              for r in REASONING_TYPES for k in CORE_KNOWLEDGE]}
+    else:
+        if not limits.budget_left():
+            raise TopicError(limits.FULL_MESSAGE)
+        payload = {"TOPIC": cases[0]["topic"],
+                   "CASES": [{"case": i + 1, "title": c["title"], "scenario": c["scenario"], "notes": c["notes"]}
+                             for i, c in enumerate(cases)],
+                   "PAIRS": [[r, k] for r in REASONING_TYPES for k in CORE_KNOWLEDGE]}
+        text = llm_client._generate(SKILL_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=4000, json_mode=True)
+        data = llm_client._parse_json(text)
+    items = clean_items(data, tid, [c["id"] for c in cases])
+    with _lock:
+        _SKILL_CACHE[tid] = items
+    return items
+
+
 def recheck(case):
     """A generated case the page sends back to start a session, checked again
     by the same rules, so the page cannot slip in anything the Builder could
@@ -233,4 +318,4 @@ def build(request):
     return topic
 
 
-__all__ = ["build", "clean_case", "clean_topic", "TopicError", "LLMError"]
+__all__ = ["build", "clean_case", "clean_topic", "clean_items", "recheck", "skill_items", "TopicError", "LLMError"]

@@ -2056,6 +2056,7 @@ async function loadExplain(){
   const ask = ++explain.ask;  // a slow older reply never replaces a newer one
   const q = new URLSearchParams({reasoning: explain.reasoning});
   explain.knowledge.forEach(k => q.append('knowledge', k));
+  if(activeTopic().id !== 'quant') q.append('topic', activeTopic().topic);
   try {
     const d = await api(`/api/explain?${q}`);
     if(ask !== explain.ask) return;
@@ -2151,7 +2152,13 @@ async function openCheck(){
   try {
     let d = null;
     if(last){ try { d = await api(`/api/check/${last}`); } catch(e){} }  // continue an unfinished check
-    if(!d || d.ended){ d = await postJSON('/api/check', {past_check_ids: myChecks()}); rememberCheck(d.check_id); }
+    // a check on another topic than the one picked on Home is not continued
+    const topic = activeTopic(), mine = topic.id !== 'quant';
+    if(!d || d.ended || (d.topic || null) !== (mine ? topic.topic : null)){
+      if(mine) $('ckBody').innerHTML = `<div class="thinking">${DOTS}Writing questions on your topic...</div>`;
+      d = await postJSON('/api/check', {past_check_ids: myChecks(), cases: mine ? topic.cases : []});
+      rememberCheck(d.check_id);
+    }
     showCheck(d);
   } catch(e){ $('ckBody').innerHTML = ''; note('error', e.message, $('ckBody')); }
 }
@@ -2163,10 +2170,10 @@ async function sendCheck(){
   if(!box) return;
   const answer = box.value.trim();
   if(!answer){ $('ckStatus').textContent = 'Please type an answer first.'; return; }
+  if(wordCount(answer) > CHECK_MAX_WORDS){ $('ckStatus').textContent = `Please keep it under ${CHECK_MAX_WORDS} words.`; return; }
   check.busy = true; $('ckSend').disabled = true;
   $('ckStatus').innerHTML = `<div class="thinking">${DOTS}Reading your answer...</div>`;
   const slow = whenSlow(() => $('ckStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
-  if(wordCount(answer) > CHECK_MAX_WORDS){ $('ckStatus').textContent = `Please keep it under ${CHECK_MAX_WORDS} words.`; return; }
   const seconds = Math.round((Date.now() - check.shownAt) / 1000);
   try { showCheck(await postJSON(`/api/check/${check.id}/answer`, {answer, seconds})); }
   catch(e){ $('ckStatus').innerHTML = ''; note('error', e.message, $('ckStatus')); }

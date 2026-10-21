@@ -32,7 +32,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 - Tutor asks questions up Paul's 6 levels (clarify, assumptions, evidence, viewpoints, implications, question the question).
 - Assessor scores on Paul and Elder's 9 standards plus which of the 6 moves were shown.
-- Topic (quant only): how quants find predictable patterns in data, for beginners, no complex ML. 3 cases in `app/content.py`.
+- Topic: **any topic** (Goal 2). The built-in, checked topic is quant (how quants find predictable patterns in data, for beginners, no complex ML; 3 cases in `app/content.py`). Any other topic is drafted by the Topic Builder agent `app/builder.py`.
 
 ### App text rules
 
@@ -49,7 +49,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 "Agents decide, rules guard." `app/graph.py` (LangGraph): assess, plan, guard, tutor (may run a tool), check, rewrite once, finish.
 
-- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Mastery stats `app/stats.py`, class model `eval/dina.py`, Explainer agent `app/explainer.py`. Goal 1 summary for Dr Ho: `docs/supervisor/goal1-summary.md`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`, and `AI_GUARD` (AI-style answer check plus paste off in the skill check, default 1).
+- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Mastery stats `app/stats.py`, class model `eval/dina.py`, Explainer agent `app/explainer.py`. Topic Builder agent `app/builder.py` (Goal 2: 3 cases plus skill check questions for any topic, kept inside the session; look cases up with `content.case_of(session)`, never `CONCEPTS[...]`). Goal 1 summary for Dr Ho: `docs/supervisor/goal1-summary.md`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`, and `AI_GUARD` (AI-style answer check plus paste off in the skill check, default 1).
 - Rules: `app/orchestrator.py` (`apply_plan()` guard, `decide()` fallback). Copy check `app/copycheck.py`. Tools `app/tools.py`. Limits `app/limits.py`. Saving `app/storage.py` (Supabase; local `.env` writes to the live DB, so set `SUPABASE_URL=" "` for test servers).
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
@@ -67,6 +67,7 @@ Design requirements R1 to R9 and honest status: see history file.
 ## Next steps
 
 1. Goal 1 is built (21 October 2026). Next, Dr Ho checks the drafts (see `docs/supervisor/goal1-summary.md`), then check the Reasoning agent against a human marker.
+1. Goal 2 (any topic) is built (21 October 2026, see history file "Goal 2"). Next, try many topics on Gemini, tighten the Builder prompts from what goes wrong, and show Dr Ho.
 2. Improve prompts from real transcripts, keep every transcript.
 3. Real quant reading with Dr Ho, then simple RAG.
 4. Evaluation in FYP2 (R1 to R9, Assessor against human markers).
