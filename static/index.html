@@ -458,7 +458,7 @@
   .status .lv-label{color:var(--ink-faint);}
   #hudLevel{margin-right:14px;}
   .ticks{display:flex; gap:5px; width:200px; flex:none;}
-  /* the Ask chat shows the 6 levels as a small stepper: dots joined by a line, "Level 3 of 6" in front */
+  /* the Ask chat shows the 6 levels as a small stepper: dots joined by a line, "Level" in front */
   .ticks-label{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint);
                margin-left:10px; flex:none; white-space:nowrap;}
   #askTicks{width:auto; gap:0; align-items:center;}
@@ -1129,7 +1129,7 @@
       <header class="chat-top">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
-          <span class="ticks-label" id="askTicksLabel" aria-hidden="true"></span>
+          <span class="ticks-label" aria-hidden="true">Level</span>
           <div class="ticks" id="askTicks" aria-hidden="true"></div>
         </div>
         <div class="spacer"></div>
@@ -1971,7 +1971,6 @@ const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implica
 function askStrip(levelIdx, round){
   if(levelIdx == null) return;
   $('askRound').textContent = round ? `ROUND ${round}` : '';
-  $('askTicksLabel').textContent = `Level ${levelIdx + 1} of ${ASK_LEVELS.length}`;
   $('askTicks').innerHTML = ASK_LEVELS.map((name, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}" title="${esc(name)}"></div>`).join('');
   $('askLevel').innerHTML = `<span class="lv-label">LEVEL:</span> <span class="lv">${esc((ASK_LEVELS[levelIdx] || '').toUpperCase())}</span>`;
   if(!$('askStats').classList.contains('hidden')) askStatsLoad();
