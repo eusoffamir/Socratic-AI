@@ -37,11 +37,13 @@ PROVIDER = _pick_provider()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 # Each Gemini model has its own free quota. When GEMINI_MODEL is used up (429)
-# or overloaded (503), the call moves on to these, in order. All three were
-# checked with the same settings on 22 October 2026 (3.1-flash-lite was busy
-# that day, so only its name was checked). Empty means no fallback.
+# or overloaded (503), the call moves on to these, in order. All were checked
+# with the same settings on 22 October 2026 (3.1-flash-lite was busy that day,
+# so only its name was checked). 3.6-flash and 3.5-flash ran out the same
+# evening, so their daily limits are small. Empty means no fallback.
 GEMINI_FALLBACK_MODELS = [m.strip() for m in os.getenv(
-    "GEMINI_FALLBACK_MODELS", "gemini-3.6-flash,gemini-3.5-flash,gemini-3.1-flash-lite").split(",") if m.strip()]
+    "GEMINI_FALLBACK_MODELS",
+    "gemini-3.6-flash,gemini-3.5-flash,gemini-3-flash-preview,gemini-3.1-flash-lite").split(",") if m.strip()]
 # A model that said "quota used up" is skipped for this many seconds, so each
 # call does not ask it again first. The per-minute limit is back by then.
 GEMINI_COOLDOWN_SECONDS = 60
@@ -163,7 +165,10 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
         if any(e.code == 429 for e in problems.values()) and all(e.code != 503 for e in problems.values()):
             raise LLMError(f"Gemini quota used up for {GEMINI_MODEL} and its fallback models. Wait a minute "
                            f"(or until tomorrow for the daily limit).") from problem
-        raise LLMError(f"Gemini is overloaded right now. Wait a moment and try again.") from problem
+        if any(e.code == 429 for e in problems.values()):
+            raise LLMError("The free Gemini models are used up or busy right now. Wait a few minutes "
+                           "and try again.") from problem
+        raise LLMError("Gemini is overloaded right now. Wait a moment and try again.") from problem
     if not resp.text:
         reason = resp.candidates[0].finish_reason if resp.candidates else "no candidates"
         raise LLMError(f"Gemini returned an empty reply (finish reason: {reason}). Try again.")
