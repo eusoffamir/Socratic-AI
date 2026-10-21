@@ -9,8 +9,15 @@ It only runs when asked, and each answer is kept in memory, so the same pair
 costs one model call per server start. In mock mode, when the daily budget is
 used up, or when the call fails, a hand-written explanation is used instead,
 so the pop-up never breaks.
+
+The Overall status page mixes skill checks from every topic, so it has no one
+topic. There it shows the saved BANK instead: every mix explained once on
+everyday life, written ahead by this agent (eval/build_explain_bank.py), so it
+shows at once, costs no call, and can be checked by a person first.
 """
+import itertools
 import json
+import pathlib
 import threading
 
 from . import limits, llm_client
@@ -70,6 +77,30 @@ _TRY = {
 _cache = {}
 _lock = threading.Lock()
 
+GENERAL_TOPIC = "everyday life"
+BANK_PATH = pathlib.Path(__file__).with_name("explain_bank.json")
+
+
+def bank_key(reasoning, knowledge):
+    return reasoning + "|" + ",".join(sorted(set(knowledge), key=list(KNOWLEDGE_TYPES).index))
+
+
+def all_mixes():
+    """Every reasoning type with 1 or 2 knowledge types: 3 x (8 + 28) = 108."""
+    kinds = list(KNOWLEDGE_TYPES)
+    return [(r, list(ks)) for r in REASONING_TYPES
+            for n in range(1, MAX_KNOWLEDGE + 1) for ks in itertools.combinations(kinds, n)]
+
+
+def load_bank():
+    try:
+        return json.loads(BANK_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+BANK = load_bank()
+
 
 def _key(reasoning, knowledge, topic=None):
     return reasoning, tuple(sorted(set(knowledge))), topic
@@ -118,9 +149,24 @@ def clean(data):
     return out
 
 
-def explain(reasoning, knowledge, topic=None):
-    """topic: the learner's own topic name (Goal 2), or None for quant."""
+def write(reasoning, knowledge, topic=None):
+    """One agent call. The cleaned explanation, or None if it failed."""
+    try:
+        text = llm_client._generate(SYSTEM, user_payload(reasoning, knowledge, topic), max_tokens=500, json_mode=True)
+        return clean(llm_client._parse_json(text))
+    except Exception:  # any model problem: the caller uses the hand-written one
+        return None
+
+
+def explain(reasoning, knowledge, topic=None, general=False):
+    """topic: the learner's own topic name (Goal 2), or None for quant.
+    general: the Overall status page, which uses the saved BANK."""
     knowledge = sorted(set(knowledge), key=list(KNOWLEDGE_TYPES).index)
+    if general:
+        saved = BANK.get(bank_key(reasoning, knowledge))
+        if saved:
+            return {"reasoning": reasoning, "knowledge": knowledge, **saved, "source": "bank"}
+        topic = GENERAL_TOPIC  # not in the bank yet, so the agent writes it live
     topic = " ".join(str(topic or "").split())[:80] or None
     key = _key(reasoning, knowledge, topic)
     with _lock:
@@ -128,11 +174,7 @@ def explain(reasoning, knowledge, topic=None):
             return _cache[key]
     result = None
     if llm_client.PROVIDER != "mock" and limits.budget_left():
-        try:
-            text = llm_client._generate(SYSTEM, user_payload(reasoning, knowledge, topic), max_tokens=500, json_mode=True)
-            result = clean(llm_client._parse_json(text))
-        except Exception:  # any model problem: use the hand-written one, never break the pop-up
-            result = None
+        result = write(reasoning, knowledge, topic)
     if result is None:
         return {"reasoning": reasoning, "knowledge": knowledge, **fallback(reasoning, knowledge, topic)}  # not cached, so a later call can still use the agent
     result = {"reasoning": reasoning, "knowledge": knowledge, **result}

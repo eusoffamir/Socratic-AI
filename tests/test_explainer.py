@@ -55,3 +55,18 @@ def test_api(monkeypatch):
     assert c.get("/api/explain", params={"reasoning": "guessing", "knowledge": ["causal"]}).status_code == 400
     assert c.get("/api/explain", params={"reasoning": "deductive",
                                          "knowledge": ["causal", "factual", "procedural"]}).status_code == 400
+
+
+def test_overall_status_uses_the_saved_bank(monkeypatch):
+    """Overall status mixes topics, so it shows the bank, with no model call."""
+    assert len(explainer.all_mixes()) == 108
+    assert explainer.bank_key("inductive", ["strategic", "factual"]) == "inductive|factual,strategic"
+    saved = {"why": "Why.", "scenario": "A story.", "steps": ["One.", "Two."], "try": "What next?"}
+    monkeypatch.setattr(explainer, "BANK", {"inductive|factual,strategic": saved})
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    c = TestClient(main.app)
+    r = c.get("/api/explain", params={"reasoning": "inductive", "knowledge": ["strategic", "factual"], "general": 1}).json()
+    assert r["source"] == "bank" and r["why"] == "Why."
+    # not in the bank: the everyday fallback, not a quant story
+    r = c.get("/api/explain", params={"reasoning": "inductive", "knowledge": ["causal"], "general": 1}).json()
+    assert r["source"] == "fallback" and "stock" not in r["scenario"]

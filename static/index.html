@@ -2561,7 +2561,7 @@ const SKILL_GRID_TITLE = 'Where you are strong', SKILL_GRID_SUB = 'From your ski
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
-    ? `<div class="report"><h2>Your skill checks</h2>
+    ? `<div class="report" data-ex-general><h2>Your skill checks</h2>
       <p class="lead">Play a case too, and your Socratic levels will show here.</p><div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div></div>`
     : `<div class="report"><h2>Nothing yet</h2>
       <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
@@ -2571,7 +2571,7 @@ function overallHTML(d){
   const cases = d.cases.map(c => `<div class="ov-case"><span class="t">${esc(c.title)}</span>
       <span class="meta">${plural(c.rounds, 'round')}</span>
       <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></div>`).join('');
-  return `<div class="report">
+  return `<div class="report" data-ex-general>
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
     <p class="lead">${plural(d.sessions_played, 'case')} · ${plural(n, 'round')}</p>
     <div class="report-grid ov-three">
@@ -3172,7 +3172,8 @@ function masteryHTML(m){
 
 // Explainer agent: why a reasoning type matters with 1 or 2 knowledge types.
 const KNOWLEDGE_NAMES = ['factual', 'conceptual', 'procedural', 'causal', 'relational', 'strategic', 'metacognitive', 'epistemic'];
-const explain = {reasoning: null, knowledge: [], opener: null, ask: 0};
+// where: {general: true} on Overall status, which mixes topics, or {topic} (empty for quant)
+const explain = {reasoning: null, knowledge: [], opener: null, ask: 0, where: {}};
 const explainOpen = () => !$('explainModal').classList.contains('hidden');
 
 function explainTitle(){
@@ -3188,7 +3189,8 @@ async function loadExplain(){
   const ask = ++explain.ask;  // a slow older reply never replaces a newer one
   const q = new URLSearchParams({reasoning: explain.reasoning});
   explain.knowledge.forEach(k => q.append('knowledge', k));
-  if(activeTopic().id !== 'quant') q.append('topic', activeTopic().topic);
+  if(explain.where.general) q.append('general', '1');
+  else if(explain.where.topic) q.append('topic', explain.where.topic);
   try {
     const d = await api(`/api/explain?${q}`);
     if(ask !== explain.ask) return;
@@ -3200,8 +3202,8 @@ async function loadExplain(){
   } catch(e){ if(ask === explain.ask){ $('exBody').innerHTML = ''; note('error', e.message, $('exBody')); } }
 }
 
-function openExplain(reasoning, knowledge){
-  Object.assign(explain, {reasoning, knowledge: [knowledge], opener: document.activeElement});
+function openExplain(reasoning, knowledge, where){
+  Object.assign(explain, {reasoning, knowledge: [knowledge], opener: document.activeElement, where});
   $('explainModal').classList.remove('hidden');
   $('explainModal').querySelector('.rm-x').focus();
   loadExplain();
@@ -3214,7 +3216,11 @@ function closeExplain(){
 
 document.addEventListener('click', e => {
   const td = e.target.closest('.rk td[data-r]');
-  if(td){ e.stopPropagation(); openExplain(td.dataset.r, td.dataset.k); }
+  if(td){
+    e.stopPropagation();
+    const box = td.closest('[data-ex-general], [data-ex-topic]');
+    openExplain(td.dataset.r, td.dataset.k, !box ? {} : box.hasAttribute('data-ex-general') ? {general: true} : {topic: box.dataset.exTopic});
+  }
 });
 $('exChips').addEventListener('click', e => {
   const b = e.target.closest('button[data-k]');
@@ -3254,7 +3260,7 @@ function showCheck(d){
     $('ckNum').textContent = 'DONE';
     $('ckTitle').textContent = 'Your results';
     $('ckSub').textContent = 'Based on the questions you just answered.';
-    $('ckBody').innerHTML = skillGridHTML(d.results, 'This check') + '<div id="ckMastery"></div>';
+    $('ckBody').innerHTML = `<div data-ex-topic="${esc(d.topic || '')}">${skillGridHTML(d.results, 'This check')}</div><div id="ckMastery"></div>`;
     $('ckSend').innerHTML = 'Done';
     $('ckSend').focus();
     // mastery uses every check from this browser, not only this one
@@ -3394,7 +3400,7 @@ function reportHTML(data, final){
       </div>
     </div>
 
-    ${reasoningGridHTML(s.reasoning)}
+    <div data-ex-topic="${esc(data.topic || '')}">${reasoningGridHTML(s.reasoning)}</div>
 
     ${comment}
 

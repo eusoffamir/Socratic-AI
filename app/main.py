@@ -446,12 +446,13 @@ def answer_check(sid: str, req: CheckAnswerRequest):
 
 
 @app.get("/api/explain")
-def explain(reasoning: str, knowledge: list[str] = Query(default=[]), topic: str = ""):
+def explain(reasoning: str, knowledge: list[str] = Query(default=[]), topic: str = "", general: bool = False):
     """The Explainer agent: why a reasoning type matters with 1 or 2 knowledge
-    types. topic: the learner's own topic (Goal 2), empty for quant."""
+    types. topic: the learner's own topic (Goal 2), empty for quant.
+    general: the Overall status page, which mixes topics, so the saved bank."""
     if not explainer.valid(reasoning, knowledge):
         raise HTTPException(400, "Choose 1 reasoning type and 1 or 2 knowledge types.")
-    return explainer.explain(reasoning, knowledge, topic)
+    return explainer.explain(reasoning, knowledge, topic, general)
 
 
 @app.post("/api/overview")
@@ -589,4 +590,5 @@ def get_stats(sid: str, coach: bool = False):
         "tip": STANDARD_TIPS.get(summary["weakest_standard"]),  # the Ask chat's progress card
         "comment": comment,
         "history": session["history"],
+        "topic": (session.get("case") or {}).get("topic"),  # a built topic (Goal 2), None for quant and the tutorial
     }
