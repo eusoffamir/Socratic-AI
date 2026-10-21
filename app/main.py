@@ -283,6 +283,10 @@ def end_session(sid: str):
 
 # ---------- skill check (Goal 1): set questions, each tagged with one skill ----------
 
+class CheckAnswerRequest(AnswerRequest):
+    seconds: int | None = None  # from showing the question to sending it
+
+
 class CheckRequest(BaseModel):
     past_check_ids: list[str] = []  # earlier checks from this browser, so new questions come first
 
@@ -318,17 +322,20 @@ def get_check(sid: str):
 
 
 @app.post("/api/check/{sid}/answer")
-def answer_check(sid: str, req: AnswerRequest):
+def answer_check(sid: str, req: CheckAnswerRequest):
     sid, check = _get_check(sid)
     if check["ended"]:
         raise HTTPException(400, "This skill check has already ended.")
     if not req.answer.strip():
         raise HTTPException(400, "Please type an answer first.")
+    if len(req.answer.split()) > skillcheck.MAX_WORDS:
+        raise HTTPException(400, f"Please keep your answer to a few sentences, under {skillcheck.MAX_WORDS} words.")
     if not limits.budget_left():
         raise HTTPException(429, limits.FULL_MESSAGE)
     working = copy.deepcopy(check)  # a failed model call leaves the saved check as it was
     try:
-        turn = skillcheck.answer(working, req.answer[:MAX_ANSWER_CHARS])
+        seconds = None if req.seconds is None else max(0, min(req.seconds, 86400))
+        turn = skillcheck.answer(working, req.answer[:MAX_ANSWER_CHARS], seconds)
     except LLMError as e:
         raise HTTPException(503, str(e)) from e
     SESSIONS[sid] = working

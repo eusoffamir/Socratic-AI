@@ -25,7 +25,7 @@ from app.reasoning import REASONING_TYPES  # noqa: E402
 
 COLUMNS = (["check_id", "participant_code", "last_saved", "item", "reasoning", "knowledge", "answer", "attained"]
            + list(STANDARDS) + [f"shows_{r}" for r in REASONING_TYPES] + [f"uses_{k}" for k in KNOWLEDGE_TYPES]
-           + ["copied_hint", "assessor_version"])
+           + ["copied_hint", "ai_like", "seconds", "assessor_version"])
 
 
 def rows_of(sid, check, saved):
@@ -40,7 +40,8 @@ def rows_of(sid, check, saved):
                **{k: int(bool((a.get("standards") or {}).get(k))) for k in STANDARDS},
                **{f"shows_{r}": int(bool((rs.get("types") or {}).get(r))) for r in REASONING_TYPES},
                **{f"uses_{k}": int(bool((rs.get("knowledge") or {}).get(k))) for k in KNOWLEDGE_TYPES},
-               "copied_hint": int(bool(a.get("copied_hint"))), "assessor_version": t.get("assessor_version") or ""}
+               "copied_hint": int(bool(a.get("copied_hint"))), "ai_like": t.get("ai_like") or "",
+               "seconds": "" if t.get("seconds") is None else t["seconds"], "assessor_version": t.get("assessor_version") or ""}
 
 
 def main():

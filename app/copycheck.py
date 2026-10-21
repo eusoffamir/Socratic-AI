@@ -83,3 +83,41 @@ def session_sources(session):
 def session_story(session):
     """The case story. Repeating its facts is answering, not copying."""
     return CONCEPTS[session["concept_id"]]["scenario"]
+
+
+# ---------- answers that look like they came from an AI chatbot (skill check) ----------
+# A free code check, no model call. It looks for things chatbots write and
+# learners almost never do. It cannot catch an AI answer that was retyped by
+# hand, so it is one guard among several (paste is off and answers are short).
+
+AI_PHRASES = [
+    "would you like to", "would you like me to", "let me know if", "ai responses may include mistakes",
+    "ai can make mistakes", "double-check responses", "for financial advice, consult", "here is the breakdown",
+    "here's the breakdown", "great question", "as an ai", "i hope this helps", "in summary,", "key takeaway",
+    "source preferences", "skip to main content",
+]
+_AI_LAYOUT = [
+    re.compile(r"(?m)^\s*(?:[-*•]|\d+\.)\s+\S"),      # bullet or numbered list lines
+    re.compile(r"(?m)^\s*#{1,6}\s"),                   # markdown headings
+    re.compile(r"\*\*[^*]+\*\*"),                      # **bold**
+    re.compile(r"(?m)^\s*\+\d+\s*$|\s\+\d+\s*$"),      # search result source counts like "+3"
+    re.compile(r"(?m)^[A-Z][\w ,'()&-]{2,60}:\s+\S"),  # "Shared Sector Risk: Because ..." title lines
+]
+
+
+def ai_like(answer):
+    """The reason an answer looks AI-written, or None."""
+    low = " ".join(answer.lower().split())
+    for p in AI_PHRASES:
+        if p in low:
+            return f'it contains "{p}"'
+    hits = sum(1 for rx in _AI_LAYOUT if rx.search(answer))
+    lines = [l for l in answer.splitlines() if l.strip()]
+    if hits >= 2 or (hits and len(lines) >= 3):
+        return "it is laid out like a chatbot reply"
+    return None
+
+
+def ai_assessment(reason):
+    """An AI-looking answer scores nothing, like a copied hint."""
+    return {**copied_assessment(), "copied_hint": False, "ai_like": reason}

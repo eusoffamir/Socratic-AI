@@ -81,3 +81,48 @@ def test_api_runs_a_whole_check(monkeypatch, tmp_path):
     # the next check avoids the questions already answered
     nxt = c.post("/api/check", json={"past_check_ids": [cid]}).json()
     assert nxt["question"]["id"] not in main.SESSIONS[cid]["items"]
+
+
+# ---------- answers from an AI chatbot (found by Eusoff on 21 October 2026) ----------
+
+AI_ANSWERS = [  # shortened from the Gemini replies Eusoff pasted into a check
+    "Your friend is mistaking random streaks of luck for real, repeatable patterns. Once that random luck runs out, "
+    "the streak ends.\nWould you like to look at a quick way to test if a streak is real or just a fluke?",
+    "These 3 cases suggest that a great backtest does not guarantee future success.\n"
+    "AI responses may include mistakes. For financial advice, consult a professional. Learn more",
+    "In the context of the case, this co-movement is best explained by:\nCommon Macroeconomic Sensitivities: Both banks "
+    "respond to the same forces.\nShared Sector Risk: Because they operate within the same industry, sentiment moves both.",
+    "The rule overfitted. Here is the breakdown of why:\n- The expected rate is 19.\n- You found 1.",
+]
+HUMAN_ANSWERS = [
+    "I think it is luck, because about 15 out of 500 stocks do this anyway, so one streak is not proof.",
+    "Both banks follow interest rates, so when rates move they both move. I would check if it holds on new years.",
+    "First I would split the data. Then I test the rule on the second half to see if it still works.",
+    "idk",
+]
+
+
+def test_ai_like_catches_chatbot_replies_but_not_learners():
+    from app import copycheck
+    assert all(copycheck.ai_like(a) for a in AI_ANSWERS)
+    assert not any(copycheck.ai_like(a) for a in HUMAN_ANSWERS)
+
+
+def test_ai_answer_scores_zero_without_a_model_call(monkeypatch):
+    def no_call(*a):
+        raise AssertionError("the model must not be called")
+    monkeypatch.setattr(llm_client, "call_assessor", no_call)
+    check = skillcheck.new_check()
+    turn = skillcheck.answer(check, AI_ANSWERS[0], seconds=4)
+    assert turn["attained"] == 0 and turn["ai_like"] and turn["seconds"] == 4
+    d = skillcheck.summarize(check["turns"])
+    assert d["ai_like"] == 1 and d["messages"][0].startswith("1 of your answers looked like it came from an AI chatbot")
+
+
+def test_api_refuses_long_answers(monkeypatch, tmp_path):
+    c = client(monkeypatch, tmp_path)
+    cid = c.post("/api/check", json={}).json()["check_id"]
+    r = c.post(f"/api/check/{cid}/answer", json={"answer": "word " * (skillcheck.MAX_WORDS + 1)})
+    assert r.status_code == 400 and "under 100 words" in r.json()["detail"]
+    ok = c.post(f"/api/check/{cid}/answer", json={"answer": HUMAN_ANSWERS[0], "seconds": 40})
+    assert ok.status_code == 200 and main.SESSIONS[cid]["turns"][0]["seconds"] == 40

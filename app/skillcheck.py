@@ -20,6 +20,7 @@ from .knowledge import KNOWLEDGE_TYPES
 from .reasoning import CORE_KNOWLEDGE, REASONING_TYPES
 
 QUESTIONS_PER_CHECK = 6
+MAX_WORDS = 100  # "a few sentences"; a longer answer is sent back, which also stops most pasted AI replies
 
 # (reasoning, knowledge, case, situation, question). Two per pair of reasoning
 # type and core knowledge type, so 30 in all.
@@ -163,19 +164,25 @@ def current(check):
             "case": CONCEPTS[i["case"]]["title"], "situation": i["situation"], "question": i["question"]}
 
 
-def answer(check, text):
-    """Mark one answer (one model call) and move to the next question."""
+def answer(check, text, seconds=None):
+    """Mark one answer (one model call) and move to the next question.
+    Rules first: an answer copied from the notes, or one that looks like an AI
+    chatbot wrote it, scores 0 with no model call."""
     item = ITEMS[check["items"][check["round"]]]
     asked = f'{item["situation"]} {item["question"]}'
     as_session = {"concept_id": item["case"], "last_tutor": asked}
-    if copycheck.is_copied(text, copycheck.session_sources(as_session), item["situation"]):
+    ai_reason = copycheck.ai_like(text)
+    if ai_reason:
+        a = copycheck.ai_assessment(ai_reason)
+    elif copycheck.is_copied(text, copycheck.session_sources(as_session), item["situation"]):
         a = copycheck.copied_assessment()
     else:
         a = llm_client.call_assessor(as_session, text)
     rs = a.get("reasoning") or {}
     attained = int(bool(rs.get("types", {}).get(item["reasoning"]) and rs.get("knowledge", {}).get(item["knowledge"])))
     turn = {"item": item["id"], "reasoning": item["reasoning"], "knowledge": item["knowledge"],
-            "answer": text, "assessment": a, "assessor_version": prompts.ASSESSOR_VERSION, "attained": attained}
+            "answer": text, "assessment": a, "assessor_version": prompts.ASSESSOR_VERSION, "attained": attained,
+            "ai_like": ai_reason, "seconds": seconds}  # seconds from showing the question to sending, for the research
     check["turns"].append(turn)
     check["history"].append({"assessment": a, "item": item["id"]})
     check["round"] += 1
@@ -198,8 +205,11 @@ def summarize(turns):
 
     by_type = {r: total([grid[k][r] for k in CORE_KNOWLEDGE]) for r in REASONING_TYPES}
     by_kind = {k: total(grid[k].values()) for k in CORE_KNOWLEDGE}
+    flagged = sum(1 for t in turns if t.get("ai_like"))
+    note = ([f"{flagged} of your answers looked like {'they' if flagged > 1 else 'it'} came from an AI chatbot, "
+             f"so {'they' if flagged > 1 else 'it'} scored 0. Answer in your own words."] if flagged else [])
     return {"answers": len(turns), "grid": grid, "reasoning": by_type, "knowledge": by_kind,
-            "messages": _messages(by_type, grid),
+            "messages": note + _messages(by_type, grid), "ai_like": flagged,
             "reasoning_types": REASONING_TYPES,
             "knowledge_types": {k: KNOWLEDGE_TYPES[k] for k in CORE_KNOWLEDGE}}
 

@@ -458,6 +458,8 @@
   .ck-question{font-weight:600; font-size:16.5px; line-height:1.5; margin:0 0 18px; padding:14px 16px; background:var(--signal-soft); border-radius:12px;}
   .ck-body .composer-box{margin-bottom:12px;}
   .ck-body textarea{min-height:90px;}
+  .ck-count{font-size:12px; color:var(--ink-faint); margin-top:-4px;}
+  .ck-count.over{color:var(--caution); font-weight:600;}
   .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
   /* mastery estimate per skill (Goal 1 step 5): a 90% range bar, the most likely value and the mastery line */
   .ms-rows{display:grid; gap:4px;}
@@ -1989,7 +1991,9 @@ function rememberCheck(id){
   try { localStorage.setItem('my-checks', JSON.stringify(ids.slice(-100))); } catch(e){}
 }
 
-const check = {id: null, busy: false, ended: false};
+const check = {id: null, busy: false, ended: false, shownAt: 0};
+const CHECK_MAX_WORDS = 100;  // same as skillcheck.MAX_WORDS
+const wordCount = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const checkOpen = () => !$('checkModal').classList.contains('hidden');
 
 function showCheck(d){
@@ -2014,8 +2018,10 @@ function showCheck(d){
   $('ckSub').textContent = `From the case ${q.case}`;
   $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-situation">${esc(q.situation)}</p>
     <p class="ck-question">${esc(q.question)}</p>
-    <div class="composer-box"><textarea id="ckAnswer" rows="3" placeholder="Explain your thinking in a few sentences"></textarea></div></div>`;
+    <div class="composer-box"><textarea id="ckAnswer" rows="3" placeholder="Explain your thinking in your own words, in a few sentences"></textarea></div>
+    <div class="ck-count" id="ckCount">0 of ${CHECK_MAX_WORDS} words · paste is off, so type your own answer</div></div>`;
   $('ckSend').innerHTML = 'Send <svg><use href="#i-play"/></svg>';
+  check.shownAt = Date.now();
   $('ckAnswer').focus();
 }
 
@@ -2042,7 +2048,9 @@ async function sendCheck(){
   check.busy = true; $('ckSend').disabled = true;
   $('ckStatus').innerHTML = `<div class="thinking">${DOTS}Reading your answer...</div>`;
   const slow = whenSlow(() => $('ckStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
-  try { showCheck(await postJSON(`/api/check/${check.id}/answer`, {answer})); }
+  if(wordCount(answer) > CHECK_MAX_WORDS){ $('ckStatus').textContent = `Please keep it under ${CHECK_MAX_WORDS} words.`; return; }
+  const seconds = Math.round((Date.now() - check.shownAt) / 1000);
+  try { showCheck(await postJSON(`/api/check/${check.id}/answer`, {answer, seconds})); }
   catch(e){ $('ckStatus').innerHTML = ''; note('error', e.message, $('ckStatus')); }
   finally { clearTimeout(slow); check.busy = false; $('ckSend').disabled = false; }
 }
@@ -2054,6 +2062,20 @@ function closeCheck(){
 }
 
 $('checkBtn').addEventListener('click', openCheck);
+// The skill check measures the learner's own reasoning, so pasting (for
+// example from an AI chatbot) is turned off. It does not stop retyping, which
+// is why the server also checks for chatbot-style answers.
+['paste', 'drop'].forEach(type => $('ckBody').addEventListener(type, e => {
+  if(e.target.id !== 'ckAnswer') return;
+  e.preventDefault();
+  $('ckStatus').textContent = 'Paste is off in the skill check, so please type your own answer.';
+}));
+$('ckBody').addEventListener('input', e => {
+  if(e.target.id !== 'ckAnswer') return;
+  const n = wordCount(e.target.value);
+  $('ckCount').textContent = `${n} of ${CHECK_MAX_WORDS} words · paste is off, so type your own answer`;
+  $('ckCount').classList.toggle('over', n > CHECK_MAX_WORDS);
+});
 $('ckSend').addEventListener('click', sendCheck);
 $('checkModal').querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeCheck));
 document.addEventListener('keydown', e => {
