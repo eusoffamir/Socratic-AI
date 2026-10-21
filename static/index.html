@@ -1993,6 +1993,10 @@ function rememberCheck(id){
 
 const check = {id: null, busy: false, ended: false, shownAt: 0};
 const CHECK_MAX_WORDS = 100;  // same as skillcheck.MAX_WORDS
+// TEMPORARY: paste is allowed so Eusoff can test the skill check (21 October 2026).
+// Set this back to false BEFORE THE PILOT (see CLAUDE.md, Open items).
+const CHECK_ALLOW_PASTE = true;
+const countText = n => `${n} of ${CHECK_MAX_WORDS} words` + (CHECK_ALLOW_PASTE ? '' : ' · paste is off, so type your own answer');
 const wordCount = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 const checkOpen = () => !$('checkModal').classList.contains('hidden');
 
@@ -2019,7 +2023,7 @@ function showCheck(d){
   $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-situation">${esc(q.situation)}</p>
     <p class="ck-question">${esc(q.question)}</p>
     <div class="composer-box"><textarea id="ckAnswer" rows="3" placeholder="Explain your thinking in your own words, in a few sentences"></textarea></div>
-    <div class="ck-count" id="ckCount">0 of ${CHECK_MAX_WORDS} words · paste is off, so type your own answer</div></div>`;
+    <div class="ck-count" id="ckCount">${countText(0)}</div></div>`;
   $('ckSend').innerHTML = 'Send <svg><use href="#i-play"/></svg>';
   check.shownAt = Date.now();
   $('ckAnswer').focus();
@@ -2066,14 +2070,14 @@ $('checkBtn').addEventListener('click', openCheck);
 // example from an AI chatbot) is turned off. It does not stop retyping, which
 // is why the server also checks for chatbot-style answers.
 ['paste', 'drop'].forEach(type => $('ckBody').addEventListener(type, e => {
-  if(e.target.id !== 'ckAnswer') return;
+  if(e.target.id !== 'ckAnswer' || CHECK_ALLOW_PASTE) return;
   e.preventDefault();
   $('ckStatus').textContent = 'Paste is off in the skill check, so please type your own answer.';
 }));
 $('ckBody').addEventListener('input', e => {
   if(e.target.id !== 'ckAnswer') return;
   const n = wordCount(e.target.value);
-  $('ckCount').textContent = `${n} of ${CHECK_MAX_WORDS} words · paste is off, so type your own answer`;
+  $('ckCount').textContent = countText(n);
   $('ckCount').classList.toggle('over', n > CHECK_MAX_WORDS);
 });
 $('ckSend').addEventListener('click', sendCheck);

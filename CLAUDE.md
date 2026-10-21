@@ -73,5 +73,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## Open items
 
+- **BEFORE THE PILOT: turn paste off again in the skill check.** In `static/index.html` set `CHECK_ALLOW_PASTE = false`. It was turned on for testing on 21 October 2026. Remind Eusoff whenever the pilot, the study or study mode comes up.
+
 - Remind Dr Ho about the Claude and Render subscription requests.
 - Full list of questions for Dr Ho and things to verify: history file, "Open items".
