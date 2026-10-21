@@ -458,6 +458,8 @@
   .status .lv-label{color:var(--ink-faint);}
   #hudLevel{margin-right:14px;}
   .ticks{display:flex; gap:5px; width:200px; flex:none;}
+  .ticks-label{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint);
+               margin:0 -6px 0 10px; flex:none;}  /* says the dashes are the 6 levels, not rounds */
   .tick{flex:1; height:7px; background:var(--rule); border-radius:3px;}
   .tick.done{background:var(--signal);}
   .tick.now{background:var(--caution);}
@@ -925,7 +927,7 @@
     .ask-main:not(.empty) .ask-dock{padding:6px 16px calc(10px + env(safe-area-inset-bottom));}
     .ask-greet{flex-direction:column; gap:12px;}
     .ask-stats{right:16px; width:calc(100% - 32px); grid-template-columns:1fr;}
-    .ask-top .ticks{display:none;}
+    .ask-top .ticks, .ask-top .ticks-label{display:none;}
     .ask-greet img{width:44px; height:44px;}
     .topbar{padding:0 16px; height:56px;}
     .home-scroll{padding:16px 16px 32px;}
@@ -1120,6 +1122,7 @@
       <header class="chat-top">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
+          <span class="ticks-label" aria-hidden="true">Level</span>
           <div class="ticks" id="askTicks" aria-hidden="true"></div>
         </div>
         <div class="spacer"></div>
