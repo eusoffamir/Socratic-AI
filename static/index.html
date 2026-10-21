@@ -141,6 +141,7 @@
   .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   .sn-chat{display:flex; align-items:center; border-radius:8px;}
+  .sn-chat + .sn-chat{margin-top:6px;}
   .sn-chat:hover, .sn-chat.on{background:rgba(255,255,255,.12);}
   .sn-chat > button:first-child{flex:1; min-width:0; text-align:left; background:none; border:none; color:var(--rail-ink);
            font:inherit; font-size:13.5px; padding:8px 10px; opacity:.85; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -1676,7 +1677,11 @@ function fileBase64(file){
 // not changed; the topic also shows there, the same as one built on Home.
 let askFile = null;
 const ask = {sid: null, busy: false, options: [], picked: null, cases: [], hintOpened: false,
-             chatId: null, sids: [], request: null, answers: 0, offered: []};
+             chatId: null, sids: [], request: null, answers: 0, offered: [], gen: 0};
+// The learner may switch chats while a reply is on its way. Each switch bumps
+// ask.gen, so a late reply sees it belongs to a chat that is no longer shown and
+// is not drawn. What the server saved (an answer, a built topic) is kept.
+const askLive = gen => gen === ask.gen;
 
 // The pages beside the sidebar: Home, the Ask chat and Overall status.
 const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain'};
@@ -1736,7 +1741,7 @@ $('recents').addEventListener('click', e => {
     saveAskChats(askChats().filter(c => c.id !== forget.dataset.forget));
     if(ask.chatId === forget.dataset.forget && !$('askMain').classList.contains('hidden')){ askReset(); showPage('ask'); }
     renderRecents();
-  } else if(open && !ask.busy) askOpen(open.dataset.chat);
+  } else if(open) askOpen(open.dataset.chat);
 });
 renderRecents();
 
@@ -2003,6 +2008,7 @@ $('askThread').addEventListener('click', e => {
 
 // Start one case in the chat: the lesson, the map and the first question in one message.
 async function askStart(c, name){
+  const gen = ask.gen;
   askLock(true);
   if(ask.cases.length) askAdd('am-divider', `Case ${ask.cases.length + 1}`);
   const wait = askStatus('Reading the case and writing the first question...');
@@ -2011,6 +2017,7 @@ async function askStart(c, name){
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
       case: c.generated ? c : undefined, ab_only: false, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
+    if(!askLive(gen)) return;
     Object.assign(ask, {sid: data.session_id, hintOpened: false});
     ask.chatId = ask.chatId || data.session_id;
     ask.sids.push(data.session_id);
@@ -2021,13 +2028,16 @@ async function askStart(c, name){
     wait.remove();
     askShowTurn(data, askCaseHTML(c));
   } catch(err){
+    if(!askLive(gen)) return;
     wait.remove();
     note('error', err.message, $('askThread'));
   } finally {
     clearTimeout(slow);
-    askLock(false);
-    askNextButton();
-    $('askInput').focus();
+    if(askLive(gen)){
+      askLock(false);
+      askNextButton();
+      $('askInput').focus();
+    }
   }
 }
 
@@ -2046,12 +2056,14 @@ $('askNext').addEventListener('click', () => { if(!ask.busy) askNext(); });
 async function askNext(){
   if(ask.busy || !askCanNext()) return;
   if(!ask.cases[0].generated) return askStart(quantCases.find(q => !ask.cases.some(c => c.id === q.id)));
+  const gen = ask.gen;
   askLock(true);
   const wait = askStatus('Writing a new case on the same topic. This takes about 20 to 40 seconds.');
   let t;
   try {
     t = await postJSON('/api/topic', {text: ask.request, count: 1, avoid: ask.cases.map(c => c.title)});
   } catch(err){
+    if(!askLive(gen)) return;
     wait.remove();
     note('error', err.message, $('askThread'));
     askLock(false);
@@ -2063,14 +2075,17 @@ async function askNext(){
   if(had) had.cases = [...had.cases.filter(c => c.id !== t.cases[0].id), t.cases[0]];
   saveTopics(had ? mine : [...mine, t]);
   renderTopics();
+  if(!askLive(gen)) return;
   askLock(false);
   await askStart(t.cases[0]);
 }
 
 // Every 5 answers, a short progress card from this case's marks (plain code, no AI call).
 async function askProgress(){
+  const gen = ask.gen;
   try {
     const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats`);
+    if(!askLive(gen)) return;
     const s = d.summary, cap = k => k ? k.charAt(0).toUpperCase() + k.slice(1) : '';
     if(!s.rounds_completed) return;
     askAdd('am-card', `<span class="mono-label">Progress check, ${ask.answers} answers</span>
@@ -2082,6 +2097,7 @@ async function askProgress(){
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
 async function askTopic(text){
+  const gen = ask.gen;
   askChatting(true);
   askAdd('am-user', esc(text || askFile.name));
   askLock(true);
@@ -2094,6 +2110,7 @@ async function askTopic(text){
     if(askFile) body.file = {name: askFile.name, data: await fileBase64(askFile)};
     t = await postJSON('/api/topic', body);
   } catch(err){
+    if(!askLive(gen)) return;
     wait.remove();
     note('error', err.message, $('askThread'));
     askLock(false);
@@ -2102,7 +2119,9 @@ async function askTopic(text){
   }
   wait.remove();
   setAskFile(null);
-  saveTopics([...myTopics().filter(x => x.id !== t.id), t]);  // it also shows on Home
+  saveTopics([...myTopics().filter(x => x.id !== t.id), t]);  // it also shows on Home, even if the learner moved on
+  renderTopics();
+  if(!askLive(gen)) return;
   setActiveTopic(t.id);
   renderTopics();
   ask.request = askFileUsed ? null : text;  // a file is not kept, so it cannot make another case
@@ -2119,17 +2138,20 @@ async function askAnswer(typed){
   const line = askAdd('am-user', esc(answer));
   $('askInput').value = '';
   $('askInput').style.height = '';
+  const gen = ask.gen;
   askLock(true);
   const wait = askStatus('Thinking...');
   const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
   try {
     const data = await postJSON(`/api/session/${ask.sid}/answer`, {answer, hint_opened: !!ask.hintOpened});
+    if(!askLive(gen)) return;  // saved on the server, so it shows when that chat is opened again
     ask.hintOpened = false;
     wait.remove();
     askShowTurn(data);
     ask.answers++;
     if(ask.answers % 5 === 0) askProgress();
   } catch(err){
+    if(!askLive(gen)) return;
     // the server leaves the session as it was, so the answer goes back in the box
     wait.remove();
     line.remove();
@@ -2137,8 +2159,7 @@ async function askAnswer(typed){
     note('error', err.message + ' This answer was not counted, so please send it again.', $('askThread'));
   } finally {
     clearTimeout(slow);
-    askLock(false);
-    $('askInput').focus();
+    if(askLive(gen)){ askLock(false); $('askInput').focus(); }
   }
 }
 
@@ -2154,9 +2175,9 @@ $('askForm').addEventListener('submit', e => {
 });
 
 function askReset(){
-  if(ask.busy) return;
   Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false,
-                     chatId: null, sids: [], request: null, answers: 0, offered: []});
+                     chatId: null, sids: [], request: null, answers: 0, offered: [], gen: ask.gen + 1});
+  askLock(false);
   $('askThread').innerHTML = '';
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
@@ -2173,6 +2194,7 @@ async function askOpen(id){
   askChatting(true);
   showPage('ask');
   Object.assign(ask, {chatId: rec.id, request: rec.request || null});
+  const gen = ask.gen;
   renderRecents();
   askLock(true);
   const wait = askStatus('Opening the chat...');
@@ -2180,6 +2202,7 @@ async function askOpen(id){
   for(const sid of rec.sids){
     try {
       const d = await api(`/api/session/${encodeURIComponent(sid)}`);
+      if(!askLive(gen)) return;
       const c = d.case || quantCases.find(q => q.id === d.concept_id);
       if(!c) continue;
       if(!ask.cases.length) askAdd('am-user', esc(rec.name));
@@ -2195,6 +2218,7 @@ async function askOpen(id){
       last = sid;
       ended = d.ended;
     } catch(err){
+      if(!askLive(gen)) return;
       if(!/could not be found/i.test(err.message)){ note('error', err.message, $('askThread')); }  // 404: that case is no longer saved
     }
   }
