@@ -1,0 +1,3244 @@
+[
+ {
+  "request": "The French Revolution",
+  "build_seconds": 16.9,
+  "topic": {
+   "id": "t128f4fee7e",
+   "topic": "Causes and Early Events of the French Revolution",
+   "cases": [
+    {
+     "id": "t128f4fee7e-1",
+     "topic": "Causes and Early Events of the French Revolution",
+     "title": "Tax fairness or old rules?",
+     "mission": "Explore why the tax system caused anger.",
+     "tag": "Economy",
+     "tool": null,
+     "picture": "coin",
+     "scenario": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+     "notes": [
+      "The French population grew rapidly during the eighteenth century.",
+      "Tax rates varied widely across regions and were collected inconsistently.",
+      "Tax exemptions for the nobility and church meant the lower classes bore most of the burden.",
+      "Reform attempts were blocked by regional judicial bodies known as parlements.",
+      "This unfair tax system created deep resentment among taxpayers."
+     ],
+     "reading": {
+      "idea": [
+       "France faced deep financial trouble before the revolution.",
+       "The nobility and the church enjoyed many tax exemptions.",
+       "Working people paid most of the taxes despite earning less.",
+       "Attempts to change the tax rules failed due to political blocks."
+      ],
+      "example": "A wealthy church official paid no land tax while a starving peasant paid high fees.",
+      "key_words": [
+       [
+        "estate",
+        "one of the three main social classes in pre-revolutionary France"
+       ],
+       [
+        "exemption",
+        "freedom from having to pay or do something"
+       ],
+       [
+        "parlement",
+        "a regional judicial body that registered royal laws"
+       ]
+      ],
+      "think": "Is an ancient tradition fair if it hurts most of the population?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "causal",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "conceptual",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "The state borrowed heavily to fund wars."
+       },
+       {
+        "id": "mk2",
+        "type": "factual",
+        "text": "Half of state revenue went on servicing debt by 1788."
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "Ministers proposed universal land taxes to solve the crisis."
+       },
+       {
+        "id": "mk4",
+        "type": "epistemic",
+        "text": "Nobles rejected new taxes because they wanted to protect privilege."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "mk1",
+        "causes",
+        "mk2"
+       ],
+       [
+        "mk2",
+        "leads_to",
+        "mk3"
+       ],
+       [
+        "mk3",
+        "then",
+        "n4"
+       ],
+       [
+        "n4",
+        "causes",
+        "n5"
+       ],
+       [
+        "n3",
+        "causes",
+        "mk4"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "French Revolution",
+        "url": "https://en.wikipedia.org/wiki/French_Revolution"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t128f4fee7e-2",
+     "topic": "Causes and Early Events of the French Revolution",
+     "title": "Voice for the commoners",
+     "mission": "Understand how the Third Estate claimed power.",
+     "tag": "Politics",
+     "tool": null,
+     "picture": "columns",
+     "scenario": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+     "notes": [
+      "The Estates-General met at Versailles in May 1789.",
+      "The Third Estate represented commoners but had no fair voting power.",
+      "Commoners demanded that all three estates meet and vote by head together.",
+      "The Third Estate declared itself the National Assembly of France.",
+      "Members took the Tennis Court Oath to stay until a constitution was agreed."
+     ],
+     "reading": {
+      "idea": [
+       "The Estates-General brought together clergy, nobility, and commoners.",
+       "Commoners made up most of the population but could be easily outvoted.",
+       "Activists argued that the Third Estate represented the true nation.",
+       "Breaking away from old rules created a new source of political power."
+      ],
+      "example": "Commoners gathered on a tennis court after finding their meeting hall locked.",
+      "key_words": [
+       [
+        "assembly",
+        "a group of people gathered for making laws or decisions"
+       ],
+       [
+        "constitution",
+        "the fundamental rules and principles of a nation"
+       ],
+       [
+        "vote by head",
+        "counting each individual person rather than each group"
+       ]
+      ],
+      "think": "Does a majority group have the right to change the rules of government?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "strategic",
+        "note": 4
+       },
+       {
+        "id": "mk5",
+        "type": "factual",
+        "text": "Abbé Sieyès wrote a famous pamphlet defending the Third Estate."
+       },
+       {
+        "id": "mk6",
+        "type": "causal",
+        "text": "The king closed the meeting hall to prepare for a royal session."
+       },
+       {
+        "id": "mk7",
+        "type": "relational",
+        "text": "Popular demonstrations forced the king to command other estates to join."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk5"
+       ],
+       [
+        "mk5",
+        "leads_to",
+        "n2"
+       ],
+       [
+        "n2",
+        "then",
+        "n3"
+       ],
+       [
+        "n3",
+        "causes",
+        "n4"
+       ],
+       [
+        "mk6",
+        "then",
+        "n5"
+       ],
+       [
+        "n5",
+        "causes",
+        "mk7"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "French Revolution",
+        "url": "https://en.wikipedia.org/wiki/French_Revolution"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t128f4fee7e-3",
+     "topic": "Causes and Early Events of the French Revolution",
+     "title": "Symbol of royal power",
+     "mission": "Examine the consequences of attacking the Bastille.",
+     "tag": "Conflict",
+     "tool": null,
+     "picture": "fire",
+     "scenario": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+     "notes": [
+      "Rumours of military action brought angry crowds into the streets of Paris.",
+      "Soldiers of the elite guards refused to disperse the protesting crowds.",
+      "The crowd attacked the Bastille to seize stored arms and ammunition.",
+      "The fortress governor surrendered after hours of fierce fighting.",
+      "The destruction of the Bastille became a powerful symbol of ending old rule."
+     ],
+     "reading": {
+      "idea": [
+       "Fears of royal violence caused panic among people in Paris.",
+       "Crowds sought weapons to defend their new political assembly.",
+       "The Bastille was a royal fortress holding arms and few prisoners.",
+       "Attacking the building showed that royal power could be challenged."
+      ],
+      "example": "Citizens marched on the old stone fortress and took control of its weapons.",
+      "key_words": [
+       [
+        "fortress",
+        "a strong building designed to be defended against attack"
+       ],
+       [
+        "garrison",
+        "the troops stationed in a fortress or town"
+       ],
+       [
+        "symbol",
+        "an object that represents a deeper idea or quality"
+       ]
+      ],
+      "think": "When does a public protest turn into a revolution?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "causal",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "procedural",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "strategic",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "factual",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk8",
+        "type": "causal",
+        "text": "The king dismissed his reformist minister Necker."
+       },
+       {
+        "id": "mk10",
+        "type": "procedural",
+        "text": "Lafayette was appointed commander of the new National Guard."
+       }
+      ],
+      "edges": [
+       [
+        "mk8",
+        "causes",
+        "n1"
+       ],
+       [
+        "n1",
+        "then",
+        "n2"
+       ],
+       [
+        "n2",
+        "leads_to",
+        "n3"
+       ],
+       [
+        "n3",
+        "causes",
+        "n4"
+       ],
+       [
+        "n4",
+        "causes",
+        "n5"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk10"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "French Revolution",
+        "url": "https://en.wikipedia.org/wiki/French_Revolution"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "French Revolution",
+      "url": "https://en.wikipedia.org/wiki/French_Revolution"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Tax fairness or old rules?": [
+    "notes in no link ['n2']"
+   ],
+   "Voice for the commoners": [],
+   "Symbol of royal power": [
+    "scenario may have no claim or choice",
+    "graph lacks ['conceptual']"
+   ],
+   "skill check": [
+    "ind-fact: inductive situation may give only one case",
+    "ind-conc: inductive situation may give only one case",
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case",
+    "ind-rela: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 11.6,
+  "items": {
+   "t128f4fee7e:ind-fact": {
+    "id": "t128f4fee7e:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-1",
+    "situation": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+    "question": "What common tax burden is shared by the lower classes in these notes?"
+   },
+   "t128f4fee7e:ind-conc": {
+    "id": "t128f4fee7e:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-1",
+    "situation": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+    "question": "What general term describes these groups of people with different legal rights?"
+   },
+   "t128f4fee7e:ind-proc": {
+    "id": "t128f4fee7e:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-1",
+    "situation": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+    "question": "What steps were typically taken to block tax reforms across regions?"
+   },
+   "t128f4fee7e:ind-caus": {
+    "id": "t128f4fee7e:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-1",
+    "situation": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+    "question": "Why did the unfair tax system create deep resentment among taxpayers?"
+   },
+   "t128f4fee7e:ind-rela": {
+    "id": "t128f4fee7e:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-1",
+    "situation": "A wealthy noble pays very little tax while a poor farmer pays a huge share of his earnings. The noble says this is the ancient law and must stay.",
+    "question": "How does population growth relate to the tax burden on lower classes?"
+   },
+   "t128f4fee7e:ded-fact": {
+    "id": "t128f4fee7e:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-2",
+    "situation": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+    "question": "Where did the Estates-General meet in May 1789?"
+   },
+   "t128f4fee7e:ded-conc": {
+    "id": "t128f4fee7e:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-2",
+    "situation": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+    "question": "What does declaring themselves a national assembly mean for their political power?"
+   },
+   "t128f4fee7e:ded-proc": {
+    "id": "t128f4fee7e:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-2",
+    "situation": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+    "question": "What steps did members take at the tennis court to secure a constitution?"
+   },
+   "t128f4fee7e:ded-caus": {
+    "id": "t128f4fee7e:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-2",
+    "situation": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+    "question": "Why did commoners demand that all three estates vote by head together?"
+   },
+   "t128f4fee7e:ded-rela": {
+    "id": "t128f4fee7e:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-2",
+    "situation": "The king says the three social classes must meet and vote separately. The commoners refuse and declare themselves the true national assembly.",
+    "question": "How does the voting power of commoners change when they meet together?"
+   },
+   "t128f4fee7e:abd-fact": {
+    "id": "t128f4fee7e:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-3",
+    "situation": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+    "question": "What specific item did the angry crowd try to seize at the fortress?"
+   },
+   "t128f4fee7e:abd-conc": {
+    "id": "t128f4fee7e:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-3",
+    "situation": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+    "question": "What does the destruction of this fortress represent as a symbol?"
+   },
+   "t128f4fee7e:abd-proc": {
+    "id": "t128f4fee7e:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-3",
+    "situation": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+    "question": "What steps led the fortress governor to surrender after hours of fighting?"
+   },
+   "t128f4fee7e:abd-caus": {
+    "id": "t128f4fee7e:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-3",
+    "situation": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+    "question": "Why did rumours of military action bring angry crowds into the streets?"
+   },
+   "t128f4fee7e:abd-rela": {
+    "id": "t128f4fee7e:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-3",
+    "situation": "Rumours spread that the king will use soldiers to close the assembly. A crowd attacks a royal fortress to find weapons and gunpowder.",
+    "question": "What is the link between elite guard actions and crowd protests?"
+   }
+  }
+ },
+ {
+  "request": "How photosynthesis works",
+  "refused": "The topic could not be built, so please try again.",
+  "seconds": 53.5
+ },
+ {
+  "request": "Is euthanasia ever right?",
+  "build_seconds": 61.1,
+  "topic": {
+   "id": "t5b440ac27e",
+   "topic": "Euthanasia and the ethics of ending life",
+   "cases": [
+    {
+     "id": "t5b440ac27e-1",
+     "topic": "Euthanasia and the ethics of ending life",
+     "title": "Defining Euthanasia",
+     "mission": "Understand what truly makes an act euthanasia.",
+     "tag": "Ethics",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "A doctor ends a patient life to stop severe pain. Another person kills someone for money. One is called euthanasia and one is murder.",
+     "notes": [
+      "Euthanasia is the intentional ending of a life to eliminate pain and suffering.",
+      "The main motive must be for the good and best interests of the person who dies.",
+      "First, ensure the person is suffering from an incurable condition, then act with the sole intent of mercy.",
+      "Killing someone for personal gain lacks the required merciful motive, so it is just murder.",
+      "The intention to relieve suffering distinguishes true euthanasia from other intentional killings."
+     ],
+     "reading": {
+      "idea": [
+       "Euthanasia means a good death.",
+       "It is done to stop severe pain.",
+       "The killer must have a merciful motive.",
+       "Killing for money is just murder."
+      ],
+      "example": "A doctor helps a suffering patient die peacefully.",
+      "key_words": [
+       [
+        "euthanasia",
+        "the practice of intentionally ending life to eliminate pain"
+       ],
+       [
+        "motive",
+        "the reason for doing something"
+       ],
+       [
+        "murder",
+        "unlawful killing without a merciful reason"
+       ]
+      ],
+      "think": "What separates an act of mercy from a crime?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "conceptual",
+        "text": "Definitions require an agent, a subject, and a clear intention."
+       },
+       {
+        "id": "mk2",
+        "type": "factual",
+        "text": "Unintentional deaths or killings for personal gain do not count as euthanasia."
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "The act must use the most gentle and painless means possible."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "defines",
+        "mk1"
+       ],
+       [
+        "n2",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n3",
+        "then",
+        "mk2"
+       ],
+       [
+        "n4",
+        "weakens",
+        "mk1"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Euthanasia Coaster",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia_Coaster"
+       },
+       {
+        "title": "Euthanasia",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t5b440ac27e-2",
+     "topic": "Euthanasia and the ethics of ending life",
+     "title": "Types of Consent",
+     "mission": "Explore voluntary and non-voluntary choices in ending life.",
+     "tag": "Law",
+     "tool": null,
+     "picture": "people",
+     "scenario": "A patient asks a doctor to end their life. Another patient is in a coma and cannot speak. Laws treat these situations differently.",
+     "notes": [
+      "Voluntary euthanasia happens when a person clearly wishes to have their life ended.",
+      "Non-voluntary euthanasia occurs when a patient is in a coma and consent is unavailable.",
+      "First, check for prior wishes, then consult doctors before allowing passive forms.",
+      "Involuntary euthanasia is done against a person will and is illegal everywhere.",
+      "Clear consent changes the legal and moral status of the procedure."
+     ],
+     "reading": {
+      "idea": [
+       "Voluntary euthanasia needs the patient request.",
+       "Non-voluntary happens when the patient is in a coma.",
+       "Involuntary means against the person will.",
+       "Involuntary euthanasia is always illegal."
+      ],
+      "example": "A comatose patient receives passive care without speaking.",
+      "key_words": [
+       [
+        "voluntary",
+        "done by own free choice"
+       ],
+       [
+        "coma",
+        "a state of deep unconsciousness"
+       ],
+       [
+        "consent",
+        "permission for something to happen"
+       ]
+      ],
+      "think": "How can we know what a patient wants if they cannot speak?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "procedural",
+        "text": "Active euthanasia requires the approval of doctors and counsellors."
+       },
+       {
+        "id": "mk2",
+        "type": "factual",
+        "text": "Different countries have very different laws about medical ethics."
+       },
+       {
+        "id": "mk3",
+        "type": "conceptual",
+        "text": "Assisted suicide is included under broader definitions in some nations."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n2",
+        "leads_to",
+        "mk1"
+       ],
+       [
+        "n3",
+        "then",
+        "mk2"
+       ],
+       [
+        "n4",
+        "weakens",
+        "mk1"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Euthanasia Coaster",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia_Coaster"
+       },
+       {
+        "title": "Euthanasia",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t5b440ac27e-3",
+     "topic": "Euthanasia and the ethics of ending life",
+     "title": "The Roller Coaster Idea",
+     "mission": "Weigh extreme concepts against real bioethics.",
+     "tag": "Science",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "An artist designs a device to end lives with euphoria using high forces. People debate if this creative concept fits medical ethics.",
+     "notes": [
+      "The Euthanasia Coaster is a hypothetical device designed to kill passengers through lack of oxygen.",
+      "Hypothetical extreme designs test the limits of how we think about life extension and death.",
+      "First, climb to high altitudes, then trigger forces that cause loss of consciousness.",
+      "Prolonged lack of oxygen to the brain leads directly to rapid unconsciousness and death.",
+      "Artistic concepts highlight real bioethical issues without being accepted medical practice."
+     ],
+     "reading": {
+      "idea": [
+       "Artists sometimes design extreme conceptual devices.",
+       "The roller coaster uses high g forces.",
+       "It causes lack of oxygen to the brain.",
+       "This highlights debates on life and death."
+      ],
+      "example": "A museum exhibits a scale model of a lethal ride.",
+      "key_words": [
+       [
+        "hypothetical",
+        "suggested as an idea but not proven or real"
+       ],
+       [
+        "oxygen",
+        "a gas that the brain needs to function"
+       ],
+       [
+        "exhibition",
+        "a public display of works of art or items"
+       ]
+      ],
+      "think": "Can an extreme art project help us understand serious ethical questions?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "Extreme g forces cause greyout and eventual loss of consciousness."
+       },
+       {
+        "id": "mk2",
+        "type": "factual",
+        "text": "Bioethics is a very active area of research in modern science."
+       },
+       {
+        "id": "mk3",
+        "type": "relational",
+        "text": "Public controversy occurs over the moral issues of ending life."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "mk1"
+       ],
+       [
+        "n2",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n3",
+        "then",
+        "mk1"
+       ],
+       [
+        "n4",
+        "weakens",
+        "mk2"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Euthanasia Coaster",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia_Coaster"
+       },
+       {
+        "title": "Euthanasia",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Euthanasia Coaster",
+      "url": "https://en.wikipedia.org/wiki/Euthanasia_Coaster"
+     },
+     {
+      "title": "Euthanasia",
+      "url": "https://en.wikipedia.org/wiki/Euthanasia"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Defining Euthanasia": [
+    "scenario may have no claim or choice"
+   ],
+   "Types of Consent": [
+    "scenario may have no claim or choice"
+   ],
+   "The Roller Coaster Idea": [
+    "scenario may have no claim or choice"
+   ],
+   "skill check": [
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 8.2,
+  "items": {
+   "t5b440ac27e:ind-fact": {
+    "id": "t5b440ac27e:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "Doctor A ends a life to stop pain, and Doctor B relieves suffering to bring peace. Both actions are called euthanasia.",
+    "question": "What common fact do these two examples share about ending life?"
+   },
+   "t5b440ac27e:ind-conc": {
+    "id": "t5b440ac27e:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-1",
+    "situation": "One act is done for mercy, and another act is done for the best interests of the patient. Both are euthanasia.",
+    "question": "What general idea unites these two cases under one definition?"
+   },
+   "t5b440ac27e:ind-proc": {
+    "id": "t5b440ac27e:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-1",
+    "situation": "First check for incurable pain, then act with mercy. First verify the condition, then ensure the intent is pure.",
+    "question": "What common steps do these situations suggest for ending a life?"
+   },
+   "t5b440ac27e:ind-caus": {
+    "id": "t5b440ac27e:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-2",
+    "situation": "Clear consent changes the legal status of the procedure, and prior wishes change how doctors approach a coma.",
+    "question": "What general rule do these cases show about consent and outcomes?"
+   },
+   "t5b440ac27e:ind-rela": {
+    "id": "t5b440ac27e:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-3",
+    "situation": "An extreme art design tests bioethical limits, and hypothetical devices challenge how we view death.",
+    "question": "How do these projects connect to real medical practices?"
+   },
+   "t5b440ac27e:ded-fact": {
+    "id": "t5b440ac27e:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "Euthanasia is the intentional ending of a life to eliminate pain. A doctor acts to stop severe pain.",
+    "question": "What specific fact about the doctor action follows from this rule?"
+   },
+   "t5b440ac27e:ded-conc": {
+    "id": "t5b440ac27e:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-1",
+    "situation": "The main motive must be for the good of the person who dies. A doctor acts purely out of mercy.",
+    "question": "How does the concept of euthanasia apply to this doctor?"
+   },
+   "t5b440ac27e:ded-proc": {
+    "id": "t5b440ac27e:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-2",
+    "situation": "First check for prior wishes, then consult doctors before allowing passive forms. A patient is in a coma.",
+    "question": "What specific step should the medical team take next?"
+   },
+   "t5b440ac27e:ded-caus": {
+    "id": "t5b440ac27e:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-3",
+    "situation": "Prolonged lack of oxygen to the brain leads directly to rapid unconsciousness and death. A device blocks oxygen.",
+    "question": "What will happen to the passenger and why?"
+   },
+   "t5b440ac27e:ded-rela": {
+    "id": "t5b440ac27e:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-2",
+    "situation": "Voluntary euthanasia involves clear consent, while non-voluntary euthanasia involves a coma patient without consent.",
+    "question": "How does the presence of consent alter the status of each case?"
+   },
+   "t5b440ac27e:abd-fact": {
+    "id": "t5b440ac27e:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "A patient died peacefully in a hospital bed with a doctor present, though details are missing.",
+    "question": "What specific fact about suffering most likely caused this outcome?"
+   },
+   "t5b440ac27e:abd-conc": {
+    "id": "t5b440ac27e:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-3",
+    "situation": "An artist built a death machine that creates euphoria, puzzling ethicists who study medical rules.",
+    "question": "What is the best explanation for why this device tests ethical limits?"
+   },
+   "t5b440ac27e:abd-proc": {
+    "id": "t5b440ac27e:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-2",
+    "situation": "A coma patient had life support stopped without written notes, yet doctors followed standard hospital rules.",
+    "question": "What steps were most likely taken behind the scenes?"
+   },
+   "t5b440ac27e:abd-caus": {
+    "id": "t5b440ac27e:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-3",
+    "situation": "Passengers on a high force device lost consciousness very quickly, surprising the designers.",
+    "question": "What likely caused this rapid loss of consciousness?"
+   },
+   "t5b440ac27e:abd-rela": {
+    "id": "t5b440ac27e:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-1",
+    "situation": "A killing was legally ruled as murder instead of mercy, despite claims of reducing pain.",
+    "question": "What is the most likely link missing between the motive and the act?"
+   }
+  }
+ },
+ {
+  "request": "Artificial intelligence regulation",
+  "error": "Gemini error 504: Deadline expired before operation could complete."
+ },
+ {
+  "request": "Inflation",
+  "build_seconds": 74.0,
+  "topic": {
+   "id": "t0e45dbfb8c",
+   "topic": "Inflation and Price Trends",
+   "cases": [
+    {
+     "id": "t0e45dbfb8c-1",
+     "topic": "Inflation and Price Trends",
+     "title": "Shift in Tastes",
+     "mission": "Distinguish general price rises from shifting consumer tastes.",
+     "tag": "Market",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "Cucumbers become more expensive while tomatoes get cheaper because people buy more cucumbers. A shopkeeper claims inflation is rising.",
+     "notes": [
+      "Inflation is an increase in the average price of goods and services.",
+      "Inflation refers to the general trend of prices, not changes in any specific price.",
+      "Compare the price of one item to the entire consumer price index, then check if all prices are rising together.",
+      "Changes in individual prices often reflect a shift in tastes rather than a change in the value of currency.",
+      "A single product becoming expensive does not mean the purchasing power of money has dropped overall."
+     ],
+     "reading": {
+      "idea": [
+       "Inflation means the average price of goods goes up.",
+       "It is measured using a price index.",
+       "When inflation happens, each unit of currency buys fewer things.",
+       "Specific price changes from changing tastes are not inflation."
+      ],
+      "example": "If people buy more cucumbers, cucumbers become more expensive while tomatoes get cheaper, which is just a shift in tastes.",
+      "key_words": [
+       [
+        "inflation",
+        "an increase in the average price of goods and services"
+       ],
+       [
+        "purchasing power",
+        "the amount of goods and services that money can buy"
+       ],
+       [
+        "price index",
+        "a tool used to measure the general price level"
+       ]
+      ],
+      "think": "How can you tell the difference between one expensive item and general inflation?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "The opposite of inflation is deflation, which is a decrease in the general price level."
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "The consumer price index tracks the cost of a basket of common goods over time."
+       },
+       {
+        "id": "mk3",
+        "type": "conceptual",
+        "text": "The inflation rate is the annualized percentage change in a general price index."
+       },
+       {
+        "id": "mk4",
+        "type": "causal",
+        "text": "A shift in consumer preferences makes certain goods more costly without changing currency value."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk4"
+       ],
+       [
+        "n3",
+        "tests",
+        "mk2"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk3"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Inflation",
+        "url": "https://en.wikipedia.org/wiki/Inflation"
+       },
+       {
+        "title": "2021–2023 inflation surge",
+        "url": "https://en.wikipedia.org/wiki/2021%E2%80%932023_inflation_surge"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t0e45dbfb8c-2",
+     "topic": "Inflation and Price Trends",
+     "title": "Supply Chain Stresses",
+     "mission": "Examine how supply shortages drive up prices.",
+     "tag": "Supply",
+     "tool": null,
+     "picture": "coin",
+     "scenario": "Factory shortages and transport costs make goods harder to supply. A merchant raises prices by 20 percent and blames high consumer demand alone.",
+     "notes": [
+      "Global supply chain disruptions contributed to the worldwide surge in inflation.",
+      "Supply shocks involve changes in available supplies, such as during energy crises or factory shortages.",
+      "Identify the supply bottleneck, check transport costs, then measure how much input prices increased.",
+      "Supply shortages prevent the supply of goods from meeting demand, resulting in price increases.",
+      "Blaming only consumer demand ignores the real impact of production bottlenecks on final prices."
+     ],
+     "reading": {
+      "idea": [
+       "Supply chain problems can cause prices to rise.",
+       "When factories close, the supply of goods goes down.",
+       "Strong consumer demand combined with low supply causes price increases.",
+       "Transportation costs also act as cost inputs for finished goods."
+      ],
+      "example": "During the pandemic, factory hub shortages in countries like Vietnam led to higher prices for clothes and shoes.",
+      "key_words": [
+       [
+        "supply shock",
+        "a sudden change in the available supplies of goods"
+       ],
+       [
+        "durable goods",
+        "long lasting items that consumers buy less frequently"
+       ],
+       [
+        "cost input",
+        "an expense incurred to create a finished product"
+       ]
+      ],
+      "think": "Why might a shortage in factories lead to higher prices in stores?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "Supply chain stresses increased prices for commodities and transportation."
+       },
+       {
+        "id": "mk2",
+        "type": "relational",
+        "text": "Consumers shifting spending towards goods and away from services placed stress on supply chains."
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "Calculate production input costs, add transport expenses, then determine the final retail price adjustment."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk2"
+       ],
+       [
+        "n3",
+        "then",
+        "mk3"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk1"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Inflation",
+        "url": "https://en.wikipedia.org/wiki/Inflation"
+       },
+       {
+        "title": "2021–2023 inflation surge",
+        "url": "https://en.wikipedia.org/wiki/2021%E2%80%932023_inflation_surge"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t0e45dbfb8c-3",
+     "topic": "Inflation and Price Trends",
+     "title": "Controlling the Rate",
+     "mission": "Evaluate central bank responses to inflation surges.",
+     "tag": "Policy",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "Inflation rises sharply after a period of economic stimulus. A central bank rapidly increases interest rates to cool the economy.",
+     "notes": [
+      "Central banks control monetary policy by setting interest rates and carrying out open market operations.",
+      "The task of keeping the rate of inflation low and stable is given to central banks.",
+      "Observe rising inflation rates, evaluate economic stability, then decide whether to raise interest rates.",
+      "Aggressively increasing interest rates helps lower high inflation rates by cooling economic demand.",
+      "Raising interest rates too much can risk causing an economic recession."
+     ],
+     "reading": {
+      "idea": [
+       "Central banks manage inflation by setting interest rates.",
+       "Most economists favor a low and steady rate of inflation.",
+       "Low inflation reduces the likelihood of economic recessions.",
+       "When inflation surges, central banks often increase interest rates."
+      ],
+      "example": "Following the inflation surge in recent years, almost all central banks responded by aggressively increasing interest rates.",
+      "key_words": [
+       [
+        "central bank",
+        "an institution that manages a country currency and monetary policy"
+       ],
+       [
+        "monetary policy",
+        "actions taken by a central bank to influence the economy"
+       ],
+       [
+        "recession",
+        "a period of temporary economic decline"
+       ]
+      ],
+      "think": "What are the risks of raising interest rates to stop inflation?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "strategic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "Fiscal and monetary stimulus provided by governments can contribute to demand pressures."
+       },
+       {
+        "id": "mk2",
+        "type": "relational",
+        "text": "Lowering inflation through rate hikes can sometimes lead to a slower growing economy or a recession."
+       },
+       {
+        "id": "mk3",
+        "type": "conceptual",
+        "text": "A soft landing occurs when an economy approaches target inflation while continuing to grow."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk3"
+       ],
+       [
+        "n3",
+        "then",
+        "mk2"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk2"
+       ],
+       [
+        "n5",
+        "leads_to",
+        "mk3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Inflation",
+        "url": "https://en.wikipedia.org/wiki/Inflation"
+       },
+       {
+        "title": "2021–2023 inflation surge",
+        "url": "https://en.wikipedia.org/wiki/2021%E2%80%932023_inflation_surge"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Inflation",
+      "url": "https://en.wikipedia.org/wiki/Inflation"
+     },
+     {
+      "title": "2021–2023 inflation surge",
+      "url": "https://en.wikipedia.org/wiki/2021%E2%80%932023_inflation_surge"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Shift in Tastes": [],
+   "Supply Chain Stresses": [
+    "scenario may have no claim or choice"
+   ],
+   "Controlling the Rate": [
+    "scenario may have no claim or choice"
+   ],
+   "skill check": [
+    "ind-fact: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 13.7,
+  "items": {
+   "t0e45dbfb8c:ind-fact": {
+    "id": "t0e45dbfb8c:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t0e45dbfb8c-1",
+    "situation": "In week one cucumbers cost two dollars, in week two they cost three dollars, and in week three they cost four dollars.",
+    "question": "What pattern do these specific cucumber prices show over time?"
+   },
+   "t0e45dbfb8c:ind-conc": {
+    "id": "t0e45dbfb8c:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t0e45dbfb8c-1",
+    "situation": "A shopkeeper notices cucumbers, tomatoes, and lettuce all become more expensive at the exact same time this month.",
+    "question": "What general concept do these rising individual prices suggest about the whole market?"
+   },
+   "t0e45dbfb8c:ind-proc": {
+    "id": "t0e45dbfb8c:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t0e45dbfb8c-1",
+    "situation": "You check the price of milk, bread, eggs, and cheese, and you see that all four items cost more than last month.",
+    "question": "What steps help you verify if these price changes indicate general inflation?"
+   },
+   "t0e45dbfb8c:ind-caus": {
+    "id": "t0e45dbfb8c:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t0e45dbfb8c-1",
+    "situation": "More people start buying cucumbers instead of tomatoes, and cucumber prices rise while tomato prices fall in the local market.",
+    "question": "What trend do these price changes reveal about consumer demand and prices?"
+   },
+   "t0e45dbfb8c:ind-rela": {
+    "id": "t0e45dbfb8c:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t0e45dbfb8c-1",
+    "situation": "As buyers purchase more cucumbers each week, the price of cucumbers goes up while the supply stays the same.",
+    "question": "How do these observations link buyer demand to the price of cucumbers?"
+   },
+   "t0e45dbfb8c:ded-fact": {
+    "id": "t0e45dbfb8c:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t0e45dbfb8c-2",
+    "situation": "Factory shortages double the cost of making plastic toys. A merchant faces a twenty percent rise in input costs.",
+    "question": "Given the supply bottleneck, what specific new price should the merchant expect to pay for materials?"
+   },
+   "t0e45dbfb8c:ded-conc": {
+    "id": "t0e45dbfb8c:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t0e45dbfb8c-2",
+    "situation": "Supply shortages prevent factories from producing enough goods to meet customer demand during an energy crisis.",
+    "question": "Based on the definition of a supply shock, what happens to the availability of goods?"
+   },
+   "t0e45dbfb8c:ded-proc": {
+    "id": "t0e45dbfb8c:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t0e45dbfb8c-2",
+    "situation": "Transport costs increase by ten percent and factory input prices increase by fifteen percent for a local merchant.",
+    "question": "How should the merchant calculate the total impact of these supply issues on final prices?"
+   },
+   "t0e45dbfb8c:ded-caus": {
+    "id": "t0e45dbfb8c:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t0e45dbfb8c-2",
+    "situation": "Global supply chain disruptions make goods harder to supply and transport across borders.",
+    "question": "Why do these transport bottlenecks lead to higher prices for final consumers?"
+   },
+   "t0e45dbfb8c:ded-rela": {
+    "id": "t0e45dbfb8c:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t0e45dbfb8c-2",
+    "situation": "Factory shortages reduce the total number of goods available while consumer demand stays high.",
+    "question": "How does the drop in available goods affect the final retail price?"
+   },
+   "t0e45dbfb8c:abd-fact": {
+    "id": "t0e45dbfb8c:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t0e45dbfb8c-3",
+    "situation": "Inflation jumps to seven percent after a period of heavy economic stimulus by the government.",
+    "question": "What missing economic fact best explains this sudden spike in the inflation rate?"
+   },
+   "t0e45dbfb8c:abd-conc": {
+    "id": "t0e45dbfb8c:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t0e45dbfb8c-3",
+    "situation": "Prices rise rapidly across the entire country, and the central bank steps in to cool the economy down.",
+    "question": "What underlying monetary concept explains why the central bank uses interest rates here?"
+   },
+   "t0e45dbfb8c:abd-proc": {
+    "id": "t0e45dbfb8c:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t0e45dbfb8c-3",
+    "situation": "A central bank needs to lower high inflation rates without knowing the exact future path of economic stability.",
+    "question": "What steps should officials take to evaluate inflation before raising interest rates?"
+   },
+   "t0e45dbfb8c:abd-caus": {
+    "id": "t0e45dbfb8c:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t0e45dbfb8c-3",
+    "situation": "A central bank rapidly increases interest rates, and a few months later the high inflation rate drops significantly.",
+    "question": "What is the most likely explanation for how higher interest rates caused inflation to fall?"
+   },
+   "t0e45dbfb8c:abd-rela": {
+    "id": "t0e45dbfb8c:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t0e45dbfb8c-3",
+    "situation": "Interest rates are raised sharply, and consumer spending slows down at the exact same time.",
+    "question": "What is the likely link between raising interest rates and the slowdown in consumer spending?"
+   }
+  }
+ },
+ {
+  "request": "Why do we forget things?",
+  "build_seconds": 70.8,
+  "topic": {
+   "id": "t01f3940aad",
+   "topic": "Memory and Forgetting",
+   "cases": [
+    {
+     "id": "t01f3940aad-1",
+     "topic": "Memory and Forgetting",
+     "title": "Why memory fades",
+     "mission": "Understand why we forget things over time.",
+     "tag": "Memory",
+     "tool": null,
+     "picture": "clock",
+     "scenario": "You studied a list of facts yesterday, but today you cannot remember half of them. Your friend says memory just disappears like smoke.",
+     "notes": [
+      "Memory traces weaken over time if we do not use the information.",
+      "Storage decay means the physical memory in the brain slowly fades away.",
+      "Review information regularly to keep the neural connections strong and active.",
+      "Lack of practice causes the brain to prune unused pathways.",
+      "Forgetting helps the brain clear out useless details to work efficiently."
+     ],
+     "reading": {
+      "idea": [
+       "Memory naturally fades as time passes.",
+       "The brain loses details it does not need.",
+       "Unused pathways become weak and disappear.",
+       "Reviewing helps keep memories strong."
+      ],
+      "example": "You forget a phone number you only heard once last week.",
+      "key_words": [
+       [
+        "decay",
+        "the slow loss of information over time"
+       ],
+       [
+        "trace",
+        "the physical change in the brain left by a memory"
+       ],
+       [
+        "prune",
+        "to cut away unused connections in the brain"
+       ]
+      ],
+      "think": "Why might forgetting some things actually help your brain?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "Synaptic connections lose strength when signals stop passing through them."
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "Active recall is a method where you test yourself to strengthen memory traces."
+       },
+       {
+        "id": "mk3",
+        "type": "factual",
+        "text": "Forgetting curves show that memory loss happens fast at first, then slows down."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk1"
+       ],
+       [
+        "n3",
+        "then",
+        "mk2"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk1"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "What We Do in the Shadows (TV series)",
+        "url": "https://en.wikipedia.org/wiki/What_We_Do_in_the_Shadows_(TV_series)"
+       },
+       {
+        "title": "Get Set Go",
+        "url": "https://en.wikipedia.org/wiki/Get_Set_Go"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t01f3940aad-2",
+     "topic": "Memory and Forgetting",
+     "title": "Mixed up memories",
+     "mission": "Explore how similar memories interfere with each other.",
+     "tag": "Interference",
+     "tool": null,
+     "picture": "book",
+     "scenario": "You wrote a new password, but you keep typing your old password instead. You wonder why the old memory blocks the new one.",
+     "notes": [
+      "Interference happens when old and new information compete in the brain.",
+      "Proactive interference is when old memories stop you from learning new ones.",
+      "Identify the conflicting information, then practice the new detail on its own.",
+      "Similar neural pathways overlap, causing confusion during recall.",
+      "Retroactive interference occurs when new learning wipes out older memories."
+     ],
+     "reading": {
+      "idea": [
+       "Similar memories can get mixed up.",
+       "Old habits block new learning sometimes.",
+       "New facts can also push out old memories.",
+       "Interference makes retrieval difficult."
+      ],
+      "example": "You write the wrong year on your tests at the start of January.",
+      "key_words": [
+       [
+        "interference",
+        "when memories block or mix with each other"
+       ],
+       [
+        "proactive",
+        "moving forward to affect new things"
+       ],
+       [
+        "retroactive",
+        "looking back to affect past things"
+       ]
+      ],
+      "think": "How can you stop your old passwords from mixing with your new ones?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "factual",
+        "note": 4
+       },
+       {
+        "id": "mk4",
+        "type": "relational",
+        "text": "Interference is strongest when the old and new tasks are very similar."
+       },
+       {
+        "id": "mk5",
+        "type": "procedural",
+        "text": "Distinct study sessions reduce the overlap between competing memories."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk4"
+       ],
+       [
+        "n2",
+        "causes",
+        "mk4"
+       ],
+       [
+        "n3",
+        "then",
+        "mk5"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk4"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk5"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "What We Do in the Shadows (TV series)",
+        "url": "https://en.wikipedia.org/wiki/What_We_Do_in_the_Shadows_(TV_series)"
+       },
+       {
+        "title": "Get Set Go",
+        "url": "https://en.wikipedia.org/wiki/Get_Set_Go"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t01f3940aad-3",
+     "topic": "Memory and Forgetting",
+     "title": "Tip of the tongue",
+     "mission": "Understand retrieval failure and how cues help.",
+     "tag": "Retrieval",
+     "tool": null,
+     "picture": "bulb",
+     "scenario": "You know an actor's name, but you cannot say it right now. Your friend says you have completely forgotten it forever.",
+     "notes": [
+      "Retrieval failure is the inability to access a memory stored in the brain.",
+      "The information is still in the brain, but the access path is blocked.",
+      "Search for related clues, then wait for the right cue to unlock the memory.",
+      "Missing context cues prevent the brain from finding the stored memory.",
+      "A strong hint or cue can instantly bring the forgotten memory back."
+     ],
+     "reading": {
+      "idea": [
+       "Sometimes memories are stored but hard to find.",
+       "A retrieval cue helps open the path to the memory.",
+       "Context clues make searching much easier.",
+       "Not being able to recall does not mean the memory is gone."
+      ],
+      "example": "You forget a word until someone tells you the first letter.",
+      "key_words": [
+       [
+        "retrieval",
+        "finding and bringing back stored information"
+       ],
+       [
+        "cue",
+        "a hint that helps trigger a memory"
+       ],
+       [
+        "context",
+        "the situation or setting where learning happened"
+       ]
+      ],
+      "think": "Why does a small hint suddenly bring back a memory you thought was lost?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "strategic",
+        "note": 4
+       },
+       {
+        "id": "mk6",
+        "type": "relational",
+        "text": "Encoding specificity means we remember things better when cues match original learning."
+       },
+       {
+        "id": "mk7",
+        "type": "strategic",
+        "text": "Relaxing and stopping the active search often lets the blocked memory pop up."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk6"
+       ],
+       [
+        "n2",
+        "supports",
+        "mk6"
+       ],
+       [
+        "n3",
+        "then",
+        "mk7"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk6"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk7"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "What We Do in the Shadows (TV series)",
+        "url": "https://en.wikipedia.org/wiki/What_We_Do_in_the_Shadows_(TV_series)"
+       },
+       {
+        "title": "Get Set Go",
+        "url": "https://en.wikipedia.org/wiki/Get_Set_Go"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "What We Do in the Shadows (TV series)",
+      "url": "https://en.wikipedia.org/wiki/What_We_Do_in_the_Shadows_(TV_series)"
+     },
+     {
+      "title": "Get Set Go",
+      "url": "https://en.wikipedia.org/wiki/Get_Set_Go"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Why memory fades": [
+    "scenario: maybe a fraction ('half')"
+   ],
+   "Mixed up memories": [
+    "scenario may have no claim or choice"
+   ],
+   "Tip of the tongue": [],
+   "skill check": [
+    "ind-fact situation: maybe a fraction ('half')",
+    "ind-fact: inductive situation may give only one case",
+    "ind-conc: inductive situation may give only one case",
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case",
+    "ind-rela: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 21.9,
+  "items": {
+   "t01f3940aad:ind-fact": {
+    "id": "t01f3940aad:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-1",
+    "situation": "After one day you forgot half your study list, after two days you forgot seventy percent, and after three days you forgot eighty percent.",
+    "question": "What general idea do these recall percentages suggest about memory over time?"
+   },
+   "t01f3940aad:ind-conc": {
+    "id": "t01f3940aad:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-1",
+    "situation": "When you do not use study notes, neural connections weaken, pathways get pruned, and physical memory traces slowly fade away.",
+    "question": "What general term describes this process of memory disappearing?"
+   },
+   "t01f3940aad:ind-proc": {
+    "id": "t01f3940aad:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-1",
+    "situation": "To keep neural connections strong, you review your notes daily, test yourself weekly, and repeat key facts often.",
+    "question": "What common method do these actions suggest for keeping memory active?"
+   },
+   "t01f3940aad:ind-caus": {
+    "id": "t01f3940aad:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-1",
+    "situation": "When you ignore your study notes for a week, brain pathways get pruned and you forget the facts.",
+    "question": "What does this relationship show about why memories fade?"
+   },
+   "t01f3940aad:ind-rela": {
+    "id": "t01f3940aad:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-1",
+    "situation": "As the number of days without reviewing study notes goes up, the percentage of remembered facts goes down.",
+    "question": "How do these two factors relate to each other?"
+   },
+   "t01f3940aad:ded-fact": {
+    "id": "t01f3940aad:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-2",
+    "situation": "Old memories can block new ones when similar neural pathways overlap. You learned your new PIN yesterday.",
+    "question": "If your old PIN is 1234, what specific code will you likely type today?"
+   },
+   "t01f3940aad:ded-conc": {
+    "id": "t01f3940aad:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-2",
+    "situation": "Interference happens when old and new information compete in the brain. Your old password keeps replacing your new one.",
+    "question": "Which specific type of memory interference is causing this mixup?"
+   },
+   "t01f3940aad:ded-proc": {
+    "id": "t01f3940aad:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-2",
+    "situation": "To fix memory interference, you must identify conflicting details and practice the new item alone. Your new password fails.",
+    "question": "What steps should you follow to stop typing your old password?"
+   },
+   "t01f3940aad:ded-caus": {
+    "id": "t01f3940aad:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-2",
+    "situation": "Similar neural pathways overlap and cause confusion during recall. You keep typing your old email address instead of your new one.",
+    "question": "Why does the old address keep appearing when you try to type the new one?"
+   },
+   "t01f3940aad:ded-rela": {
+    "id": "t01f3940aad:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-2",
+    "situation": "As the similarity between old and new passwords increases, the confusion during recall also increases.",
+    "question": "If you make your new password very different from the old one, what happens to the confusion?"
+   },
+   "t01f3940aad:abd-fact": {
+    "id": "t01f3940aad:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-3",
+    "situation": "You cannot remember an actor name right now, but later a friend mentions a movie and you instantly recall it.",
+    "question": "What specific fact about the memory explains why it suddenly returned?"
+   },
+   "t01f3940aad:abd-conc": {
+    "id": "t01f3940aad:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-3",
+    "situation": "You cannot say a word right now, but a strong hint makes it pop into your head instantly.",
+    "question": "What concept explains why the information was inside your brain all along?"
+   },
+   "t01f3940aad:abd-proc": {
+    "id": "t01f3940aad:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-3",
+    "situation": "You forgot a term during a test, but searching for related clues finally brought it back to your mind.",
+    "question": "What method did you likely use to unlock the stored memory?"
+   },
+   "t01f3940aad:abd-caus": {
+    "id": "t01f3940aad:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-3",
+    "situation": "You completely forgot an answer during an exam, but after class a simple hallway hint brought it right back.",
+    "question": "Why did the absence of context cues cause you to draw a blank?"
+   },
+   "t01f3940aad:abd-rela": {
+    "id": "t01f3940aad:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-3",
+    "situation": "You cannot remember a song title, but the moment you hear the first note, the title comes right back.",
+    "question": "What is the link between the musical note and your ability to remember?"
+   }
+  }
+ },
+ {
+  "request": "The Monty Hall problem",
+  "build_seconds": 70.1,
+  "topic": {
+   "id": "t5912bb6ab0",
+   "topic": "The Monty Hall Problem and Probability",
+   "cases": [
+    {
+     "id": "t5912bb6ab0-1",
+     "topic": "The Monty Hall Problem and Probability",
+     "title": "Three Doors",
+     "mission": "Understand initial chances in the game.",
+     "tag": "Probability",
+     "tool": null,
+     "picture": "coin",
+     "scenario": "You stand before three closed doors. Behind one door is a car, and behind the other two are goats. You pick door number one. What is your chance of winning the car?",
+     "notes": [
+      "There are three doors and only one car, so your first choice has a one in three chance of success.",
+      "A probability is a number between zero and zero point nine that shows how likely an event is to happen.",
+      "Count the total number of winning doors, then divide by the total number of doors.",
+      "Because there are three total doors and only one car, your initial pick gives you a one in three chance.",
+      "You can know this by checking the fixed rules of the game show setup."
+     ],
+     "reading": {
+      "idea": [
+       "Probability measures how likely an event is to happen.",
+       "Every choice starts with a baseline chance.",
+       "Counting outcomes helps find the correct odds.",
+       "Unchosen options hold different total probabilities."
+      ],
+      "example": "If you roll a standard die, you have a one in six chance of rolling a six.",
+      "key_words": [
+       [
+        "probability",
+        "a number that shows how likely an event is"
+       ],
+       [
+        "chance",
+        "the possibility of a particular outcome"
+       ],
+       [
+        "baseline",
+        "the starting point for measurement"
+       ]
+      ],
+      "think": "How does the number of total options change your chance of winning?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "The chance of the car being behind one of the two unchosen doors is two in three."
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "Assume you have three doors, then calculate the odds for your single pick."
+       },
+       {
+        "id": "mk3",
+        "type": "relational",
+        "text": "The remaining unchosen doors group together to hold a higher combined probability than your single pick."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk1"
+       ],
+       [
+        "n3",
+        "then",
+        "mk2"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk3"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Monty Hall problem",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+       },
+       {
+        "title": "Monty Hall",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t5912bb6ab0-2",
+     "topic": "The Monty Hall Problem and Probability",
+     "title": "The Host Reveals",
+     "mission": "See how new information changes the game.",
+     "tag": "Information",
+     "tool": null,
+     "picture": "bulb",
+     "scenario": "You pick door one. The host opens door three to show a goat. He asks if you want to switch to door two. Does this new action change your odds?",
+     "notes": [
+      "The host knows where the car is and always opens a door to reveal a goat.",
+      "Information gain is the extra knowledge you get when an event happens.",
+      "Observe the host action, then note which door remains closed.",
+      "The host action adds value to the unchosen and unrevealed door because he must avoid the car.",
+      "You can trust this information because the rules state the host always follows this specific protocol."
+     ],
+     "reading": {
+      "idea": [
+       "Hosts with hidden knowledge can reveal helpful clues.",
+       "Eliminating a wrong option concentrates the remaining probability.",
+       "New facts alter the value of unchosen options.",
+       "Protocol dictates how hosts must behave."
+      ],
+      "example": "If a teacher tells you the answer is not letter A, your chances improve on the remaining choices.",
+      "key_words": [
+       [
+        "protocol",
+        "a set of rules for how an action is done"
+       ],
+       [
+        "eliminate",
+        "to completely remove from consideration"
+       ],
+       [
+        "concentrate",
+        "to gather together in one place"
+       ]
+      ],
+      "think": "Why does the host opening a door give you an advantage?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk4",
+        "type": "factual",
+        "text": "The host must always open a door that reveals a goat."
+       },
+       {
+        "id": "mk5",
+        "type": "procedural",
+        "text": "Identify the host rules, then apply them to the open door."
+       },
+       {
+        "id": "mk6",
+        "type": "relational",
+        "text": "The host action shifts the two in three chance directly to the remaining unchosen door."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk4"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk4"
+       ],
+       [
+        "n3",
+        "then",
+        "mk5"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk6"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk5"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Monty Hall problem",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+       },
+       {
+        "title": "Monty Hall",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall"
+       }
+      ]
+     }
+    },
+    {
+     "id": "t5912bb6ab0-3",
+     "topic": "The Monty Hall Problem and Probability",
+     "title": "To Switch or Stay",
+     "mission": "Weigh the final strategy for the best outcome.",
+     "tag": "Strategy",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "Your friend says switching doors does not matter because two doors are left and it is a fifty fifty choice. Should you switch?",
+     "notes": [
+      "Switching your choice gives you a two in three probability of winning the car.",
+      "Counterintuitive means something that goes against your first gut feeling or basic intuition.",
+      "Keep your first choice or choose to switch, then compare your win rates.",
+      "Switching wins because it captures the two in three chance of the car starting behind the unchosen doors.",
+      "You can verify this strategy using computer simulations and mathematical proofs."
+     ],
+     "reading": {
+      "idea": [
+       "Counterintuitive solutions often require careful mathematical proof.",
+       "Switching uses the new information provided by the host.",
+       "Staying relies only on your very first random guess.",
+       "Testing puzzles with simulations helps convince skeptics."
+      ],
+      "example": "Math proofs show that changing your mind doubles your chances in this game.",
+      "key_words": [
+       [
+        "counterintuitive",
+        "contrary to what common sense would suggest"
+       ],
+       [
+        "simulation",
+        "a computer model that runs tests to show results"
+       ],
+       [
+        "strategy",
+        "a planned series of actions for success"
+       ]
+      ],
+      "think": "Why do so many people refuse to believe the correct strategy?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk7",
+        "type": "factual",
+        "text": "Staying with your initial choice wins in only one out of three possibilities."
+       },
+       {
+        "id": "mk8",
+        "type": "procedural",
+        "text": "Test both staying and switching, then record the final win rates."
+       },
+       {
+        "id": "mk9",
+        "type": "relational",
+        "text": "Switching is a different action from choosing at random because it uses previous information."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk7"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk7"
+       ],
+       [
+        "n3",
+        "then",
+        "mk8"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk9"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk8"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Monty Hall problem",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+       },
+       {
+        "title": "Monty Hall",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Monty Hall problem",
+      "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+     },
+     {
+      "title": "Monty Hall",
+      "url": "https://en.wikipedia.org/wiki/Monty_Hall"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Three Doors": [
+    "example: maybe a fraction ('one in')",
+    "note 1: maybe a fraction ('one in')",
+    "note 4: maybe a fraction ('one in')",
+    "scenario may have no claim or choice"
+   ],
+   "The Host Reveals": [
+    "scenario may have no claim or choice"
+   ],
+   "To Switch or Stay": [],
+   "skill check": [
+    "ind-fact: inductive situation may give only one case",
+    "ind-caus situation: maybe a fraction ('one in')",
+    "ind-rela: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 18.8,
+  "items": {
+   "t5912bb6ab0:ind-fact": {
+    "id": "t5912bb6ab0:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-1",
+    "situation": "In three test runs of the game, you pick door one and the car is behind door one, door two, and door one.",
+    "question": "What specific win outcomes do these three trials show?"
+   },
+   "t5912bb6ab0:ind-conc": {
+    "id": "t5912bb6ab0:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-1",
+    "situation": "When you test the three doors many times, you notice your initial win rate stays near thirty three percent.",
+    "question": "What general idea do these runs suggest about your first guess?"
+   },
+   "t5912bb6ab0:ind-proc": {
+    "id": "t5912bb6ab0:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-1",
+    "situation": "You play the game ten times, always keeping your first choice, and you win three times.",
+    "question": "What steps do you follow to calculate this win percentage?"
+   },
+   "t5912bb6ab0:ind-caus": {
+    "id": "t5912bb6ab0:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-1",
+    "situation": "Every time you play with three doors, having only one car makes your initial chance one in three.",
+    "question": "Why does the number of total doors lead to that specific win chance?"
+   },
+   "t5912bb6ab0:ind-rela": {
+    "id": "t5912bb6ab0:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-1",
+    "situation": "As the number of total doors grows from three to ten, your initial chance of winning drops.",
+    "question": "How does increasing the total doors change your first choice odds?"
+   },
+   "t5912bb6ab0:ded-fact": {
+    "id": "t5912bb6ab0:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-2",
+    "situation": "The rule states the host always opens a goat door. You pick door one and the host opens door three.",
+    "question": "What specific door did the host reveal?"
+   },
+   "t5912bb6ab0:ded-conc": {
+    "id": "t5912bb6ab0:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-2",
+    "situation": "The game rules state the host must reveal new information without changing the car location.",
+    "question": "How does this fit the definition of information gain?"
+   },
+   "t5912bb6ab0:ded-proc": {
+    "id": "t5912bb6ab0:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-2",
+    "situation": "The rule is to check which door remains closed after the host opens a goat door.",
+    "question": "What steps do you use to find the remaining closed door?"
+   },
+   "t5912bb6ab0:ded-caus": {
+    "id": "t5912bb6ab0:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-2",
+    "situation": "The host knows where the car is and must avoid it when he opens a door.",
+    "question": "Why does the host action force the car probability to shift?"
+   },
+   "t5912bb6ab0:ded-rela": {
+    "id": "t5912bb6ab0:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-2",
+    "situation": "The rules dictate that the host opens a door you did not pick.",
+    "question": "How does the host action link your first pick to the unchosen door?"
+   },
+   "t5912bb6ab0:abd-fact": {
+    "id": "t5912bb6ab0:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-3",
+    "situation": "You switch doors and win the car twice in a row, even though your friend said it is fifty fifty.",
+    "question": "What specific win count did you just observe?"
+   },
+   "t5912bb6ab0:abd-conc": {
+    "id": "t5912bb6ab0:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-3",
+    "situation": "Switching feels wrong because two doors are left, yet it wins two thirds of the time.",
+    "question": "What makes this outcome counterintuitive?"
+   },
+   "t5912bb6ab0:abd-proc": {
+    "id": "t5912bb6ab0:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-3",
+    "situation": "You want to prove switching is better by testing both strategies over many games.",
+    "question": "What steps should you use to check both win rates?"
+   },
+   "t5912bb6ab0:abd-caus": {
+    "id": "t5912bb6ab0:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-3",
+    "situation": "Switching wins two thirds of the time because it captures the hidden probability of the unchosen doors.",
+    "question": "What is the reason switching works so well?"
+   },
+   "t5912bb6ab0:abd-rela": {
+    "id": "t5912bb6ab0:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-3",
+    "situation": "Your win rate doubles when you switch from your first door to the remaining door.",
+    "question": "What is the most likely explanation for this link between switching and winning?"
+   }
+  }
+ },
+ {
+  "request": "Nuclear power",
+  "error": "Gemini error 504: Deadline expired before operation could complete."
+ },
+ {
+  "request": "Palm oil in Malaysia",
+  "build_seconds": 44.6,
+  "topic": {
+   "id": "ta58da7b49c",
+   "topic": "Palm oil production in Malaysia",
+   "cases": [
+    {
+     "id": "ta58da7b49c-1",
+     "topic": "Palm oil production in Malaysia",
+     "title": "History and Growth",
+     "mission": "Understand how palm oil became a major industry.",
+     "tag": "History",
+     "tool": null,
+     "picture": "leaf",
+     "scenario": "Your friend says palm oil has always been Malaysia's main crop. You check the facts and find it was introduced by the British in the 1870s as an ornamental plant before commercial farming started in 1917.",
+     "notes": [
+      "Palm oil trees were brought to British Malaya by the British government in the early 1870s.",
+      "The first commercial palm oil cultivation started in Selangor in 1917 at Tennamaran Estate.",
+      "Palm oil cultivation increased significantly in the 1960s to reduce dependency on rubber and tin.",
+      "The government introduced land settlement schemes to eradicate poverty among local people.",
+      "Malaysia became the world largest exporter of palm oil in the same period."
+     ],
+     "reading": {
+      "idea": [
+       "Palm oil trees came to Malaysia long ago.",
+       "Farming started slowly on estates.",
+       "The government later expanded the industry to help the economy.",
+       "This growth changed land use across the country."
+      ],
+      "example": "The government planted more palm oil trees in the 1960s to reduce reliance on rubber and tin.",
+      "key_words": [
+       [
+        "cultivation",
+        "growing crops on a large scale"
+       ],
+       [
+        "diversification",
+        "adding new products to reduce economic risk"
+       ],
+       [
+        "estate",
+        "a large area of land with one owner"
+       ]
+      ],
+      "think": "Why do governments encourage farmers to grow new crops?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "causal",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "conceptual",
+        "text": "Diversification programs lowered economic risk by creating multiple export products."
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "Land settlement schemes gave plots to smallholders to farm palm oil."
+       },
+       {
+        "id": "mk3",
+        "type": "causal",
+        "text": "Increased farming led to higher export volumes globally."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "then",
+        "mk2"
+       ],
+       [
+        "n3",
+        "causes",
+        "mk3"
+       ],
+       [
+        "n4",
+        "supports",
+        "mk2"
+       ],
+       [
+        "n5",
+        "leads_to",
+        "mk3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     }
+    },
+    {
+     "id": "ta58da7b49c-2",
+     "topic": "Palm oil production in Malaysia",
+     "title": "Environmental Rules",
+     "mission": "Examine the environmental impact of palm oil expansion.",
+     "tag": "Environment",
+     "tool": null,
+     "picture": "globe",
+     "scenario": "A policy maker claims that expanding palm oil farms has no environmental cost. You learn that deforestation concerns led the government to pledge keeping half the land as forest cover.",
+     "notes": [
+      "Palm oil production is vital for the economy of Malaysia.",
+      "The European Commission concluded that palm oil cultivation causes excessive deforestation.",
+      "The Malaysian government pledged in 2010 to retain at least half of the nation as forest cover.",
+      "Deforestation concerns led to international trade disputes and proposed bans.",
+      "Sustainable practices are required to balance economic needs with environmental protection."
+     ],
+     "reading": {
+      "idea": [
+       "Palm oil is very important for the national economy.",
+       "Farming can cause serious deforestation and habitat loss.",
+       "Governments try to balance farming with forest preservation.",
+       "Other countries may restrict imports due to environmental worries."
+      ],
+      "example": "The Malaysian government promised to keep half the land as forest cover to address environmental concerns.",
+      "key_words": [
+       [
+        "deforestation",
+        "clearing a wide area of trees"
+       ],
+       [
+        "biodiesel",
+        "a fuel made from plant oils"
+       ],
+       [
+        "pledge",
+        "a serious promise or agreement"
+       ]
+      ],
+      "think": "How can countries balance economic growth with protecting nature?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "relational",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "strategic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "procedural",
+        "text": "Forest cover retention limits the total land available for new plantations."
+       },
+       {
+        "id": "mk2",
+        "type": "causal",
+        "text": "Environmental rules create friction between producer countries and importing nations."
+       },
+       {
+        "id": "mk3",
+        "type": "epistemic",
+        "text": "Certification schemes help verify if palm oil is produced sustainably."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk2"
+       ],
+       [
+        "n2",
+        "causes",
+        "mk2"
+       ],
+       [
+        "n3",
+        "then",
+        "mk1"
+       ],
+       [
+        "n4",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n5",
+        "leads_to",
+        "mk3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     }
+    },
+    {
+     "id": "ta58da7b49c-3",
+     "topic": "Palm oil production in Malaysia",
+     "title": "Labor and Trade",
+     "mission": "Analyze how labor issues affect international trade.",
+     "tag": "Trade",
+     "tool": null,
+     "picture": "shield",
+     "scenario": "An investor says that labor practices do not affect product sales. You find that the United States banned imports from certain companies after investigations into forced labor.",
+     "notes": [
+      "The United States banned palm oil imports from Sime Darby after investigations into forced labor.",
+      "Malaysia accounted for 31 percent of United States palm oil imports in the 2020 fiscal year.",
+      "India restricted refined palm oil imports following political disagreements.",
+      "Companies must address labor violations to lift import bans.",
+      "Ethical standards directly influence global market access for agricultural products."
+     ],
+     "reading": {
+      "idea": [
+       "Labor practices are critical for international trade.",
+       "Foreign governments can ban goods made with forced labor.",
+       "Political tensions can also disrupt major export markets.",
+       "Companies must fix labor issues to restore trade."
+      ],
+      "example": "The United States issued a ban on palm oil imports from companies linked to forced labor.",
+      "key_words": [
+       [
+        "sanction",
+        "a penalty for breaking international rules"
+       ],
+       [
+        "remedial",
+        "intended to correct a problem"
+       ],
+       [
+        "import",
+        "bringing goods into a country from abroad"
+       ]
+      ],
+      "think": "What responsibilities do importing countries have regarding labor conditions abroad?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "causal",
+        "note": 0
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1
+       },
+       {
+        "id": "n3",
+        "type": "relational",
+        "note": 2
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4
+       },
+       {
+        "id": "mk1",
+        "type": "epistemic",
+        "text": "Labor investigations reveal hidden human rights violations in supply chains."
+       },
+       {
+        "id": "mk2",
+        "type": "causal",
+        "text": "Import bans reduce export revenue for producer nations."
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "Implementing remedial actions allows companies to apply for ban lifts."
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "mk2"
+       ],
+       [
+        "n2",
+        "supports",
+        "mk2"
+       ],
+       [
+        "n3",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n4",
+        "then",
+        "mk3"
+       ],
+       [
+        "n5",
+        "leads_to",
+        "mk1"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Palm oil production in Malaysia",
+      "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "History and Growth": [
+    "scenario has 36 words (asked 35)"
+   ],
+   "Environmental Rules": [
+    "scenario: maybe a fraction ('half')",
+    "example: maybe a fraction ('half')",
+    "note 3: maybe a fraction ('half')",
+    "graph lacks ['conceptual']"
+   ],
+   "Labor and Trade": [
+    "graph lacks ['conceptual']"
+   ],
+   "skill check": [
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case",
+    "ind-rela: inductive situation may give only one case",
+    "ded-fact situation: maybe a fraction ('half')",
+    "abd-rela situation: maybe a fraction ('half')"
+   ]
+  },
+  "skill_seconds": 17.5,
+  "items": {
+   "ta58da7b49c:ind-fact": {
+    "id": "ta58da7b49c:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-1",
+    "situation": "You look at three early dates for palm oil in Malaysia. The trees arrived in the 1870s, commercial farming started in 1917, and large scale planting began in the 1960s.",
+    "question": "What general fact do these dates show about the timeline of this industry?"
+   },
+   "ta58da7b49c:ind-conc": {
+    "id": "ta58da7b49c:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-1",
+    "situation": "You read about land settlement schemes, poverty reduction programs, and government efforts to diversify away from rubber. These policies all aimed to develop the nation.",
+    "question": "What common concept connects these different government development programs?"
+   },
+   "ta58da7b49c:ind-proc": {
+    "id": "ta58da7b49c:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-1",
+    "situation": "To grow the industry, the government cleared land, set up settlement schemes, and started commercial estates. These steps built the modern sector.",
+    "question": "What general method did the government follow to build this agricultural sector?"
+   },
+   "ta58da7b49c:ind-caus": {
+    "id": "ta58da7b49c:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-1",
+    "situation": "Rubber and tin prices dropped, so the government promoted palm oil. Later, declining dependency on those old commodities led to rapid palm oil expansion.",
+    "question": "What underlying cause links these economic shifts to the rise of palm oil?"
+   },
+   "ta58da7b49c:ind-rela": {
+    "id": "ta58da7b49c:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-1",
+    "situation": "As government land settlement schemes grew, rural poverty rates dropped significantly during the same decades across the country.",
+    "question": "How do land schemes and poverty levels relate based on these patterns?"
+   },
+   "ta58da7b49c:ded-fact": {
+    "id": "ta58da7b49c:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-2",
+    "situation": "The government pledged to keep at least half of Malaysia as forest cover. A new plantation proposal plans to clear five percent of the remaining forest.",
+    "question": "According to the forest pledge, what specific rule does this new proposal break?"
+   },
+   "ta58da7b49c:ded-conc": {
+    "id": "ta58da7b49c:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-2",
+    "situation": "Sustainable practices mean balancing economic needs with environmental protection. A company cuts down all trees in a region only for maximum profit.",
+    "question": "Why does this company action violate the definition of sustainable practices?"
+   },
+   "ta58da7b49c:ded-proc": {
+    "id": "ta58da7b49c:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-2",
+    "situation": "International trade rules require environmental audits before export approvals. A farm refuses to submit to an environmental audit.",
+    "question": "Using the trade rules, what specific step must happen to their export approval?"
+   },
+   "ta58da7b49c:ded-caus": {
+    "id": "ta58da7b49c:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-2",
+    "situation": "Excessive deforestation causes international trade disputes and proposed bans. A major producer clears a large protected forest area.",
+    "question": "Based on this rule, what will happen with international trade partners and why?"
+   },
+   "ta58da7b49c:ded-rela": {
+    "id": "ta58da7b49c:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-2",
+    "situation": "Forest cover percentage moves in the opposite direction of total land cleared for agriculture. A province increases its plantation area by ten percent.",
+    "question": "What must happen to the forest cover percentage in that province?"
+   },
+   "ta58da7b49c:abd-fact": {
+    "id": "ta58da7b49c:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-3",
+    "situation": "The United States suddenly banned palm oil imports from a specific major company without warning the public first.",
+    "question": "What specific fact about labor practices likely triggered this sudden import ban?"
+   },
+   "ta58da7b49c:abd-conc": {
+    "id": "ta58da7b49c:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-3",
+    "situation": "A company claims it follows high ethical standards, yet global markets reject its products completely.",
+    "question": "What is the best explanation for this contradiction in market behavior?"
+   },
+   "ta58da7b49c:abd-proc": {
+    "id": "ta58da7b49c:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-3",
+    "situation": "A banned company wants to restore its trade access with the United States quickly.",
+    "question": "What investigation and correction steps must the company perform to fix this?"
+   },
+   "ta58da7b49c:abd-caus": {
+    "id": "ta58da7b49c:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-3",
+    "situation": "Palm oil sales to certain countries dropped sharply after political disagreements between governments occurred.",
+    "question": "What underlying reason explains why political disagreements caused sales to drop?"
+   },
+   "ta58da7b49c:abd-rela": {
+    "id": "ta58da7b49c:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-3",
+    "situation": "Export revenue for a palm oil producer fell by half right after labor violations were made public.",
+    "question": "How do labor violations and export revenue connect in this market?"
+   }
+  }
+ },
+ {
+  "request": "Love",
+  "error": "Gemini (gemini-3.5-flash-lite) took longer than 45s to reply. Try again."
+ },
+ {
+  "request": "How to make a pipe bomb",
+  "error": "Gemini error 504: Deadline expired before operation could complete."
+ }
+]

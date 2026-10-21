@@ -118,6 +118,30 @@
   .rail .icon-btn svg{width:20px; height:20px;}
   .rail .spacer{flex:1;}
 
+  /* Ask: a Claude-style start page (chat icon in the rail). Home is untouched. */
+  .ask-main{display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; min-height:0;
+            overflow-y:auto; padding:32px 24px 12vh;}
+  .ask-inner{width:100%; max-width:760px;}
+  .ask-greet{display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 28px;
+             font-family:var(--serif); font-weight:500; font-size:clamp(28px, 4vw, 42px); line-height:1.15; text-align:center;}
+  .ask-greet img{width:46px; height:46px; border-radius:50%; object-fit:cover; flex:none;}
+  .ask-box{background:var(--panel); border:1px solid var(--rule); border-radius:18px; box-shadow:var(--shadow);
+           padding:12px 12px 10px; transition:border-color .15s ease, background .15s ease;}
+  .ask-box:focus-within{border-color:var(--signal);}
+  .ask-box.drop{border-color:var(--signal); border-style:dashed; background:var(--signal-soft);}
+  .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:16px; line-height:1.5; color:var(--ink);
+                    background:transparent; border:none; outline:none; padding:6px 6px 10px; min-height:54px; max-height:240px;}
+  .ask-box textarea::placeholder{color:var(--ink-faint);}
+  .ask-tools{display:flex; align-items:center; gap:6px;}
+  .ask-tools .spacer{flex:1;}
+  .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:16px;}
+  .ask-chips button{font-size:13.5px; padding:7px 14px; border-radius:999px; background:var(--panel-2);
+                    border:1px solid var(--rule); color:var(--ink-soft);}
+  .ask-chips button:hover:not(:disabled){color:var(--ink); border-color:var(--signal); opacity:1;}
+  .ask-chips button.checked{color:var(--signal); border-color:var(--signal); background:var(--signal-soft);}
+  #askStatus{margin-top:16px; text-align:center;}
+  #askStatus .thinking{justify-content:center;}
+
   .home-main{display:flex; flex-direction:column; min-width:0; min-height:0;}
   .topbar{
     height:64px; flex:none; display:flex; align-items:center; gap:16px; padding:0 32px;
@@ -779,6 +803,9 @@
     .rail .logo{width:32px; height:32px; font-size:16px; margin:0 8px 0 0;}
     .rail .icon-btn{width:36px; height:36px;}
     .rail .icon-btn svg{width:18px; height:18px;}
+    .ask-main{padding:24px 16px 10vh;}
+    .ask-greet{flex-direction:column; gap:12px;}
+    .ask-greet img{width:44px; height:44px;}
     .topbar{padding:0 16px; height:56px;}
     .home-scroll{padding:16px 16px 32px;}
     .tips{padding:12px 16px; font-size:13px; gap:10px;}
@@ -870,7 +897,8 @@
 
 <!-- icon set, used with <svg><use href="#i-..."/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home"viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3.5v17l15-8.5z" fill="currentColor"/></symbol>
@@ -885,8 +913,9 @@
 <div id="homeView" class="view">
   <nav class="rail" aria-label="Main">
     <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
-    <button class="icon-btn active" title="Home" aria-current="page"><svg><use href="#i-home"/></svg></button>
+    <button class="icon-btn active" id="homeBtn" title="Home" aria-current="page"><svg><use href="#i-home"/></svg></button>
     <button class="icon-btn boxed" id="overallBtn" title="My overall status" aria-controls="overallPanel"><svg><use href="#i-stats"/></svg></button>
+    <button class="icon-btn boxed" id="askBtn" title="Ask about any topic"><svg><use href="#i-chat"/></svg></button>
     <div class="spacer"></div>
     <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
     <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
@@ -969,6 +998,27 @@
       <span class="tip-text" id="tipText"></span>
       <span class="tip-count" id="tipCount"></span>
     </footer>
+  </div>
+
+  <div class="ask-main hidden" id="askMain">
+    <div class="ask-inner">
+      <h2 class="ask-greet"><img src="/static/img/socrates.png" alt="">What shall we think through?</h2>
+      <form class="ask-box" id="askForm" autocomplete="off">
+        <div class="tb-files hidden" id="askFiles"></div>
+        <textarea id="askInput" rows="2" maxlength="4000" aria-label="Any topic"
+                  placeholder="Type any topic, a question or a short reading"></textarea>
+        <div class="ask-tools">
+          <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <span class="spacer"></span>
+          <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
+        </div>
+        <input type="file" id="askFile" accept=".pdf,.docx,.txt,.md" hidden>
+      </form>
+      <p class="tb-privacy hidden" id="askPrivacy">The file is read by the AI and not saved. Please do not upload private or confidential files.</p>
+      <div class="ask-chips" id="askChips"></div>
+      <div id="askStatus" aria-live="polite"></div>
+    </div>
   </div>
 </div>
 
@@ -1589,6 +1639,109 @@ $('topicForm').addEventListener('submit', async e => {
   } finally {
     clearTimeout(slow);
     btn.disabled = $('topicInput').disabled = $('topicAdd').disabled = false;
+  }
+});
+
+// ---------- Ask: a Claude-style start page (chat icon in the rail) ----------
+// The learner types a topic and goes straight to case 1: the Builder writes the
+// cases, then the reading of case 1 opens with "Start this case". Home is not
+// changed; the new topic also shows there, the same as one built on Home.
+let askFile = null;
+
+function showAsk(on){
+  if(tour.name) endTour(false);  // the Home tour points at Home, so it is not left over the Ask page
+  $('askMain').classList.toggle('hidden', !on);
+  document.querySelector('#homeView .home-main').classList.toggle('hidden', on);
+  $('homeBtn').toggleAttribute('aria-current', !on);
+  $('askBtn').toggleAttribute('aria-current', on);
+  if(on) $('askInput').focus();
+}
+$('askBtn').addEventListener('click', () => showAsk(true));
+$('homeBtn').addEventListener('click', () => showAsk(false));
+
+$('askChips').innerHTML = `<button type="button" class="checked" data-quant title="The checked example topic">${esc(QUANT_TOPIC.topic)}</button>`
+  + SUGGESTED_TOPICS.map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
+$('askChips').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b || $('askSend').disabled) return;
+  if(b.hasAttribute('data-quant')){  // the checked topic needs no build
+    setActiveTopic('quant');
+    renderTopics();
+    if(concepts[0]) openReading(concepts[0].id);
+    return;
+  }
+  $('askInput').value = b.dataset.fill;  // fills only, so no AI call until they press Enter
+  $('askInput').focus();
+});
+
+function setAskFile(file){
+  $('askStatus').innerHTML = '';
+  if(file && !FILE_TYPES.test(file.name)){ note('error', 'Please upload a PDF, a Word file (.docx) or a text file.', $('askStatus')); return; }
+  if(file && file.size > FILE_MAX_MB * 1024 * 1024){ note('error', `This file is larger than ${FILE_MAX_MB} MB, so please upload a smaller one.`, $('askStatus')); return; }
+  askFile = file || null;
+  $('askFiles').innerHTML = askFile ? `<span class="tb-file">
+      <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <b>${esc(askFile.name)}</b><span class="size">${fileSize(askFile.size)}</span>
+      <button type="button" id="askFileX" aria-label="Remove the file">×</button></span>` : '';
+  $('askFiles').classList.toggle('hidden', !askFile);
+  $('askPrivacy').classList.toggle('hidden', !askFile);
+  $('askInput').placeholder = askFile ? 'Optional: which part of the file to focus on' : 'Type any topic, a question or a short reading';
+  $('askInput').focus();
+}
+
+$('askAdd').addEventListener('click', () => $('askFile').click());
+$('askFile').addEventListener('change', e => { setAskFile(e.target.files[0]); e.target.value = ''; });
+$('askFiles').addEventListener('click', e => { if(e.target.closest('#askFileX')) setAskFile(null); });
+$('askForm').addEventListener('dragover', e => {
+  if(![...e.dataTransfer.types].includes('Files')) return;
+  e.preventDefault();
+  $('askForm').classList.add('drop');
+});
+$('askForm').addEventListener('dragleave', e => {
+  if(!$('askForm').contains(e.relatedTarget)) $('askForm').classList.remove('drop');
+});
+$('askForm').addEventListener('drop', e => {
+  e.preventDefault();
+  $('askForm').classList.remove('drop');
+  if(e.dataTransfer.files[0]) setAskFile(e.dataTransfer.files[0]);
+});
+$('askInput').addEventListener('paste', e => {
+  const f = [...(e.clipboardData?.files || [])][0];
+  if(f){ e.preventDefault(); setAskFile(f); }
+});
+$('askInput').addEventListener('input', () => {  // the box grows with the text
+  const t = $('askInput');
+  t.style.height = 'auto';
+  t.style.height = `${t.scrollHeight}px`;
+});
+$('askInput').addEventListener('keydown', e => {  // Enter starts, Shift+Enter is a new line
+  if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); $('askForm').requestSubmit(); }
+});
+
+$('askForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = $('askInput').value.trim();
+  if(!text && !askFile){ $('askInput').focus(); return; }
+  const lock = on => $('askSend').disabled = $('askInput').disabled = $('askAdd').disabled = on;
+  lock(true);
+  $('askStatus').innerHTML = `<div class="thinking">${DOTS}Finding a source and writing 3 cases on your ${askFile ? 'file' : 'topic'}. This takes 20 to 60 seconds.</div>`;
+  try {
+    const body = {text};
+    if(askFile) body.file = {name: askFile.name, data: await fileBase64(askFile)};
+    const t = await postJSON('/api/topic', body);
+    saveTopics([...myTopics().filter(x => x.id !== t.id), t]);
+    setActiveTopic(t.id);
+    renderTopics();
+    setAskFile(null);
+    $('askInput').value = '';
+    $('askInput').style.height = '';
+    $('askStatus').innerHTML = '';
+    openReading(t.cases[0].id);  // case 1 straight away; the other cases are on Home
+  } catch(err){
+    $('askStatus').innerHTML = '';
+    note('error', err.message, $('askStatus'));
+  } finally {
+    lock(false);
   }
 });
 
