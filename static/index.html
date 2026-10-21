@@ -1772,7 +1772,7 @@ function fileBase64(file){
 // case and asks the first question. The session has no round limit. Home is
 // not changed; the topic also shows there, the same as one built on Home.
 let askFile = null;
-const ask = {sid: null, busy: false, rounds: 0, total: 0, done: false, options: [], picked: null, cases: [], hintOpened: false,
+const ask = {sid: null, busy: false, rounds: 0, total: 0, done: false, caseAnswers: 0, options: [], picked: null, cases: [], hintOpened: false,
              chatId: null, sids: [], request: null, answers: 0, offered: [], gen: 0};
 // The learner may switch chats while a reply is on its way. Each switch bumps
 // ask.gen, so a late reply sees it belongs to a chat that is no longer shown and
@@ -2200,7 +2200,7 @@ async function askStart(c, name){
       case: c.generated ? c : undefined, ab_only: !!ask.ab, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
     if(!askLive(gen)) return;
-    Object.assign(ask, {sid: data.session_id, hintOpened: false, total: data.total_rounds || 0, done: false});
+    Object.assign(ask, {sid: data.session_id, hintOpened: false, total: data.total_rounds || 0, done: false, caseAnswers: 0});
     $('askInput').placeholder = 'Your answer...';
     ask.chatId = ask.chatId || data.session_id;
     ask.sids.push(data.session_id);
@@ -2265,7 +2265,7 @@ async function askNext(){
 
 // Every 5 answers, a short card that points to Status, where the Coach has a new comment.
 function askProgress(){
-  askAdd('am-card', `<span class="mono-label">Progress check, ${ask.answers} answers</span>
+  askAdd('am-card', `<span class="mono-label">Progress check, ${ask.caseAnswers} answers</span>
     The coach has a new comment on how you are answering.
     <div class="row"><button type="button" data-status>See status</button></div>`);
 }
@@ -2326,7 +2326,8 @@ async function askAnswer(typed){
     wait.remove();
     askShowTurn(data);
     ask.answers++;
-    if(ask.answers % 5 === 0) askProgress();
+    ask.caseAnswers++;  // the Coach counts per case, not per chat
+    if(ask.caseAnswers % 5 === 0) askProgress();
     if(data.ended) ask.done = true;
   } catch(err){
     if(!askLive(gen)) return;
@@ -2391,6 +2392,7 @@ async function askOpen(id){
       ask.cases.push(c);
       ask.sids.push(sid);
       ask.total = d.total_rounds || 0;
+      ask.caseAnswers = d.turns.length - 1;
       d.turns.forEach((t, i) => {
         if(i){ askAdd('am-user', esc(t.answer || '')); ask.answers++; }
         const lastTurn = i === d.turns.length - 1;
