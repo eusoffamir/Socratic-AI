@@ -101,7 +101,8 @@
   .tag.t2{background:var(--blue-soft); color:var(--blue);}
 
   /* ======================= HOME ======================= */
-  #homeView{display:grid; grid-template-columns:72px minmax(0, 1fr);}
+  #homeView{display:grid; grid-template-columns:260px minmax(0, 1fr); transition:grid-template-columns .18s ease;}
+  #homeView.folded{grid-template-columns:72px minmax(0, 1fr);}
   .rail{
     background:var(--rail); color:var(--rail-ink); display:flex; flex-direction:column; align-items:center;
     gap:10px; padding:16px 0;
@@ -118,6 +119,47 @@
   .rail .icon-btn svg{width:20px; height:20px;}
   .rail .spacer{flex:1;}
 
+  /* the wide sidebar (like Claude): New chat, Home, Overall status, Recents. Folds back to icons. */
+  .nav{align-items:stretch; gap:2px; padding:14px 12px; min-height:0; overflow:hidden;}
+  .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px; margin-bottom:14px;}
+  .nav .logo{margin:0; flex:none;}
+  .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1;}
+  .nav .sn-fold{width:34px; height:34px; flex:none;}
+  .sn-item{display:flex; align-items:center; gap:12px; width:100%; height:42px; padding:0 12px; border-radius:10px;
+           background:transparent; border:none; color:var(--rail-ink); font:inherit; font-size:14.5px; font-weight:500;
+           opacity:.82; text-align:left; white-space:nowrap;}
+  .sn-item svg{width:20px; height:20px; flex:none;}
+  .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
+  .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
+  .sn-new{margin-bottom:6px; background:rgba(255,255,255,.1); opacity:1;}
+  .sn-label{font-size:12px; opacity:.6; padding:18px 12px 6px; white-space:nowrap;}
+  .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
+  .sn-chat{display:flex; align-items:center; border-radius:8px;}
+  .sn-chat:hover, .sn-chat.on{background:rgba(255,255,255,.12);}
+  .sn-chat > button:first-child{flex:1; min-width:0; text-align:left; background:none; border:none; color:var(--rail-ink);
+           font:inherit; font-size:13.5px; padding:8px 10px; opacity:.85; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sn-chat.on > button:first-child{opacity:1; font-weight:600;}
+  .sn-chat .x{flex:none; width:28px; height:28px; padding:0; background:none; border:none; color:var(--rail-ink);
+              opacity:0; font-size:16px; border-radius:6px;}
+  .sn-chat:hover .x, .sn-chat .x:focus{opacity:.7;}
+  .sn-chat .x:hover{opacity:1; background:rgba(255,255,255,.14);}
+  .sn-empty{font-size:13px; opacity:.55; padding:4px 12px; white-space:normal;}
+  .sn-foot{display:flex; gap:6px; padding-top:10px;}
+  .nav-menu, .nav-backdrop{display:none;}
+  #homeView.folded .sn-name, #homeView.folded .sn-item span, #homeView.folded .sn-label,
+  #homeView.folded .sn-recents{display:none;}
+  #homeView.folded .sn-head{flex-direction:column; gap:10px; padding:0;}
+  #homeView.folded .sn-item{justify-content:center; padding:0;}
+  #homeView.folded .sn-foot{flex-direction:column; align-items:center;}
+
+  /* Overall status as its own page */
+  .status-main{display:flex; flex-direction:column; min-width:0; min-height:0;}
+  .status-scroll{flex:1; overflow-y:auto; padding:28px 32px 40px;}
+  .status-inner{max-width:1080px; margin:0 auto;}
+  .status-inner .report h2{margin:12px 0 14px; line-height:1.3;}
+  .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
+  .status-inner .report-grid{gap:36px;}
+
   /* Ask: a Claude-style start page (chat icon in the rail). Home is untouched. */
   .ask-main{display:flex; flex-direction:column; align-items:center; min-width:0; min-height:0;}
   .ask-main.empty{justify-content:center; overflow-y:auto; padding:32px 24px 12vh;}
@@ -127,9 +169,6 @@
   .ask-thread{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:22px;}
   .ask-main:not(.empty) .ask-dock{padding:8px 24px 18px; position:relative;}
   .ask-main:not(.empty) .ask-greet, .ask-main:not(.empty) .ask-chips{display:none;}
-  .ask-new{font-size:13px; padding:6px 12px; border-radius:999px;
-           background:var(--panel); border:1px solid var(--rule); color:var(--ink-soft);}
-  .ask-new:hover:not(:disabled){color:var(--ink); border-color:var(--signal); opacity:1;}
   /* messages: the learner on the right in a bubble, Socratic AI as plain text, like Claude */
   .am-user{align-self:flex-end; max-width:80%; background:var(--panel-2); border:1px solid var(--rule);
            border-radius:16px; padding:10px 16px; font-size:15.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
@@ -553,9 +592,6 @@
   .pp-body .report{border:none; box-shadow:none; padding:0; margin:0; background:transparent;}
   .pp-body .report-grid{grid-template-columns:1fr; gap:26px;}
   /* overall status: more breathing room in the heading block */
-  #overallPanel .report h2{margin:12px 0 14px; line-height:1.3;}
-  #overallPanel .report .lead{margin:0 0 32px; line-height:1.6;}
-  #overallPanel .report-grid{gap:36px;}
   @media (prefers-reduced-motion: reduce){ .profile-panel, .pp-backdrop{transition:none;} }
 
   /* ---------- overall status (Home rail button) ---------- */
@@ -828,12 +864,19 @@
     .report-grid{grid-template-columns:1fr;}
   }
   @media (max-width:700px){
-    /* home: rail becomes a slim top bar */
-    #homeView{grid-template-columns:1fr; grid-template-rows:50px minmax(0, 1fr);}
-    .rail{flex-direction:row; padding:0 12px; gap:6px;}
-    .rail .logo{width:32px; height:32px; font-size:16px; margin:0 8px 0 0;}
-    .rail .icon-btn{width:36px; height:36px;}
-    .rail .icon-btn svg{width:18px; height:18px;}
+    /* home: a slim top bar with a menu button; the sidebar is a drawer */
+    #homeView, #homeView.folded{grid-template-columns:1fr; grid-template-rows:50px minmax(0, 1fr);}
+    .nav-menu{display:flex; align-items:center; gap:10px; padding:0 12px; background:var(--rail); color:var(--rail-ink);}
+    .nav-menu .icon-btn{width:38px; height:38px; color:var(--rail-ink);}
+    .nav-menu b{font-family:var(--serif); font-size:17px;}
+    .nav{position:fixed; inset:0 auto 0 0; width:min(290px, 86vw); z-index:30; transform:translateX(-100%);
+         transition:transform .2s; box-shadow:4px 0 24px rgba(0,0,0,.2);}
+    #homeView.nav-open .nav{transform:none;}
+    #homeView.nav-open .nav-backdrop{display:block; position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.35);}
+    .nav .sn-fold{display:none;}
+    #homeView.folded .sn-name, #homeView.folded .sn-item span, #homeView.folded .sn-label{display:revert;}
+    #homeView.folded .sn-recents{display:block;}
+    .status-scroll{padding:16px 16px 32px;}
     .ask-main{padding:24px 16px 10vh;}
     .ask-greet{flex-direction:column; gap:12px;}
     .ask-greet img{width:44px; height:44px;}
@@ -928,6 +971,7 @@
 
 <!-- icon set, used with <svg><use href="#i-..."/></svg> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-home"viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></symbol>
@@ -942,14 +986,26 @@
 
 <!-- ======================= home ======================= -->
 <div id="homeView" class="view">
-  <nav class="rail" aria-label="Main">
-    <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
-    <button class="icon-btn active" id="homeBtn" title="Home" aria-current="page"><svg><use href="#i-home"/></svg></button>
-    <button class="icon-btn boxed" id="overallBtn" title="My overall status" aria-controls="overallPanel"><svg><use href="#i-stats"/></svg></button>
-    <button class="icon-btn boxed" id="askBtn" title="Ask about any topic"><svg><use href="#i-chat"/></svg></button>
-    <div class="spacer"></div>
-    <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
-    <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
+  <div class="nav-menu">  <!-- phones only -->
+    <button class="icon-btn" id="navOpen" title="Menu" aria-label="Open the menu"><svg><use href="#i-side"/></svg></button>
+    <b>Socratic AI</b>
+  </div>
+  <div class="nav-backdrop" id="navBackdrop"></div>
+  <nav class="rail nav" aria-label="Main">
+    <div class="sn-head">
+      <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
+      <span class="sn-name">Socratic AI</span>
+      <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
+    </div>
+    <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
+    <button class="sn-item" id="homeBtn" title="Home" aria-current="page"><svg><use href="#i-home"/></svg><span>Home</span></button>
+    <button class="sn-item" id="overallBtn" title="My overall status"><svg><use href="#i-stats"/></svg><span>Overall status</span></button>
+    <div class="sn-label">Recents</div>
+    <div class="sn-recents" id="recents"></div>
+    <div class="sn-foot">
+      <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
+      <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
+    </div>
   </nav>
 
   <div class="home-main">
@@ -1031,6 +1087,11 @@
     </footer>
   </div>
 
+  <div class="status-main hidden" id="statusMain">
+    <header class="topbar"><h1>Overall status</h1></header>
+    <div class="status-scroll"><div class="status-inner" id="overallBody"></div></div>
+  </div>
+
   <div class="ask-main empty hidden" id="askMain">
     <div class="ask-scroll" id="askScroll">
       <div class="ask-thread" id="askThread" aria-live="polite"></div>
@@ -1044,7 +1105,6 @@
         <div class="ask-tools">
           <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button type="button" class="ask-new hidden" id="askNew" title="Start a new topic">New topic</button>
           <span class="spacer"></span>
           <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
         </div>
@@ -1057,15 +1117,6 @@
   </div>
 </div>
 
-<div class="pp-backdrop" id="overallBackdrop"></div>
-<aside class="profile-panel" id="overallPanel" aria-label="My overall status" inert>
-  <div class="pp-head">
-    <button class="icon-btn" id="closeOverall" title="Close (Esc)" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-  <div class="pp-body" id="overallBody"></div>
-</aside>
 
 <!-- ======================= session ======================= -->
 <div id="sessionView" class="view hidden collapsed">
@@ -1686,16 +1737,57 @@ $('topicForm').addEventListener('submit', async e => {
 let askFile = null;
 const ask = {sid: null, busy: false, options: [], picked: null, topic: null, cases: [], hintOpened: false};
 
-function showAsk(on){
-  if(tour.name) endTour(false);  // the Home tour points at Home, so it is not left over the Ask page
-  $('askMain').classList.toggle('hidden', !on);
-  document.querySelector('#homeView .home-main').classList.toggle('hidden', on);
-  $('homeBtn').toggleAttribute('aria-current', !on);
-  $('askBtn').toggleAttribute('aria-current', on);
-  if(on) $('askInput').focus();
+// The pages beside the sidebar: Home, the Ask chat and Overall status.
+const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain'};
+function showPage(name){
+  if(tour.name && name !== 'home') endTour(false);  // the Home tour points at Home, so it is not left over another page
+  for(const [k, sel] of Object.entries(PAGES)) document.querySelector(sel).classList.toggle('hidden', k !== name);
+  $('homeBtn').toggleAttribute('aria-current', name === 'home');
+  $('overallBtn').toggleAttribute('aria-current', name === 'status');
+  $('askBtn').toggleAttribute('aria-current', name === 'ask' && !ask.sid);
+  renderRecents();
+  $('homeView').classList.remove('nav-open');  // phones: close the drawer
+  if(name === 'ask') $('askInput').focus();
 }
-$('askBtn').addEventListener('click', () => showAsk(true));
-$('homeBtn').addEventListener('click', () => showAsk(false));
+$('homeBtn').addEventListener('click', () => showPage('home'));
+$('askBtn').addEventListener('click', () => { askReset(); showPage('ask'); });
+$('navOpen').addEventListener('click', () => $('homeView').classList.add('nav-open'));
+$('navBackdrop').addEventListener('click', () => $('homeView').classList.remove('nav-open'));
+function setFolded(on){
+  $('homeView').classList.toggle('folded', on);
+  $('navFold').title = $('navFold').ariaLabel = on ? 'Open the sidebar' : 'Fold the sidebar';
+  try { localStorage.setItem('nav-folded', on ? '1' : ''); } catch(e){}
+}
+$('navFold').addEventListener('click', () => setFolded(!$('homeView').classList.contains('folded')));
+try { if(localStorage.getItem('nav-folded')) setFolded(true); } catch(e){}
+
+// Recents: the Ask chats played in this browser, newest first. Only the session
+// id and a name are kept here; the chat itself is read back from the server.
+const MAX_RECENTS = 30;
+function askChats(){
+  try { return JSON.parse(localStorage.getItem('ask-chats') || '[]').filter(c => c && c.sid && c.name); } catch(e){ return []; }
+}
+function saveAskChats(list){ try { localStorage.setItem('ask-chats', JSON.stringify(list.slice(0, MAX_RECENTS))); } catch(e){} }
+function rememberAskChat(sid, name){
+  saveAskChats([{sid, name: String(name).slice(0, 80)}, ...askChats().filter(c => c.sid !== sid)]);
+  renderRecents();
+}
+function renderRecents(){
+  const list = askChats(), onAsk = !$('askMain').classList.contains('hidden');
+  $('recents').innerHTML = list.length ? list.map(c => `<div class="sn-chat${onAsk && c.sid === ask.sid ? ' on' : ''}">
+      <button type="button" data-chat="${esc(c.sid)}" title="${esc(c.name)}">${esc(c.name)}</button>
+      <button type="button" class="x" data-forget="${esc(c.sid)}" aria-label="Remove ${esc(c.name)} from Recents">×</button></div>`).join('')
+    : '<p class="sn-empty">Your chats will show here.</p>';
+}
+$('recents').addEventListener('click', e => {
+  const open = e.target.closest('[data-chat]'), forget = e.target.closest('[data-forget]');
+  if(forget){
+    saveAskChats(askChats().filter(c => c.sid !== forget.dataset.forget));
+    if(ask.sid === forget.dataset.forget && !$('askMain').classList.contains('hidden')){ askReset(); showPage('ask'); }
+    renderRecents();
+  } else if(open && !ask.busy) askOpen(open.dataset.chat);
+});
+renderRecents();
 
 $('askChips').innerHTML = `<button type="button" class="checked" data-quant title="The checked example topic">${esc(QUANT_TOPIC.topic)}</button>`
   + SUGGESTED_TOPICS.map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
@@ -1771,7 +1863,6 @@ function askLock(on){
 }
 function askChatting(on){
   $('askMain').classList.toggle('empty', !on);
-  $('askNew').classList.toggle('hidden', !on);
   $('askAdd').classList.toggle('hidden', on);  // a file starts a topic, so it is not needed mid-chat
   $('askInput').placeholder = on ? 'Your answer...' : 'Type any topic, a question or a short reading';
 }
@@ -1832,6 +1923,8 @@ async function askStart(c, topic){
       participant_code: study.code || '', consent: !!study.code});
     Object.assign(ask, {sid: data.session_id, topic, cases: [c], hintOpened: false});
     rememberSession(data.session_id);
+    rememberAskChat(data.session_id, topic ? topic.topic : QUANT_TOPIC.topic);
+    $('askBtn').removeAttribute('aria-current');
     wait.remove();
     askShowTurn(data, askCaseHTML(c));
   } catch(err){
@@ -1913,13 +2006,47 @@ $('askForm').addEventListener('submit', e => {
   askTopic(text);
 });
 
-$('askNew').addEventListener('click', () => {
+function askReset(){
   if(ask.busy) return;
-  Object.assign(ask, {sid: null, options: [], picked: null, topic: null, cases: []});
+  Object.assign(ask, {sid: null, options: [], picked: null, topic: null, cases: [], hintOpened: false});
   $('askThread').innerHTML = '';
   askChatting(false);
+  setAskFile(null);
+}
+
+// Open a chat from Recents: read the session back and draw every turn again.
+async function askOpen(sid){
+  askReset();
+  askChatting(true);
+  showPage('ask');
+  ask.sid = sid;
+  renderRecents();
+  askLock(true);
+  const wait = askStatus('Opening the chat...');
+  try {
+    const d = await api(`/api/session/${encodeURIComponent(sid)}`);
+    const c = d.case || quantCases.find(q => q.id === d.concept_id);
+    if(!c) throw new Error('This chat could not be opened.');
+    wait.remove();
+    ask.cases = [c];
+    const name = (askChats().find(x => x.sid === sid) || {}).name;
+    askAdd('am-user', esc(name || c.topic || c.title));
+    d.turns.forEach((t, i) => {
+      if(i) askAdd('am-user', esc(t.answer || ''));
+      askShowTurn({parts: t.parts}, i ? null : askCaseHTML(c));
+    });
+    if(d.ended){ askLock(true); $('askInput').placeholder = 'This chat has ended.'; return; }
+  } catch(err){
+    wait.remove();
+    const gone = /could not be found/i.test(err.message);  // the server's 404 text
+    note('error', gone ? 'This chat is no longer saved, so it was removed from Recents.' : err.message, $('askThread'));
+    if(gone) saveAskChats(askChats().filter(c => c.sid !== sid));
+    ask.sid = null;
+    renderRecents();
+  }
+  askLock(false);
   $('askInput').focus();
-});
+}
 
 function renderCases(){
   $('startRow').querySelector('.case-row.tut')?.remove();
@@ -2024,12 +2151,8 @@ document.addEventListener('click', () => document.querySelectorAll('.ov-filter.o
   o.classList.remove('open'); o.querySelector(':scope > button').setAttribute('aria-expanded', false);
 }));
 
-const overallOpen = () => $('overallPanel').classList.contains('open');
-
 async function openOverall(){
-  $('overallPanel').classList.add('open');
-  $('overallPanel').inert = false;
-  $('overallBackdrop').classList.add('open');
+  showPage('status');
   const body = $('overallBody');
   body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
   // also count unfinished cases saved before this list existed
@@ -2051,16 +2174,7 @@ async function openOverall(){
   catch(e){ body.innerHTML = ''; note('error', e.message, body); }
 }
 
-function closeOverall(){
-  $('overallPanel').classList.remove('open');
-  $('overallPanel').inert = true;
-  $('overallBackdrop').classList.remove('open');
-}
-
-$('overallBtn').addEventListener('click', () => overallOpen() ? closeOverall() : openOverall());
-$('closeOverall').addEventListener('click', closeOverall);
-$('overallBackdrop').addEventListener('click', closeOverall);
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && overallOpen()) closeOverall(); });
+$('overallBtn').addEventListener('click', openOverall);
 
 // ---------- reading pop-up ----------
 // Clicking a case opens a short reading first. "Start this case" begins the
