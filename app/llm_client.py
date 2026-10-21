@@ -88,7 +88,7 @@ def _get_gemini():
     return _gemini_client
 
 
-def _generate_gemini(system, user, max_tokens, json_mode, seed=None):
+def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="low"):
     import httpx
     from google.genai import errors, types
     config = types.GenerateContentConfig(
@@ -97,7 +97,7 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None):
         response_mime_type="application/json" if json_mode else "text/plain",
         # Short tutoring replies don't need deep thinking; "low" cuts each call
         # from ~20s to a few seconds.
-        thinking_config=types.ThinkingConfig(thinking_level="low"),
+        thinking_config=types.ThinkingConfig(thinking_level=thinking),
         seed=seed,
     )
     for attempt in range(OVERLOAD_RETRIES + 1):
@@ -141,12 +141,13 @@ def _generate_anthropic(system, user, max_tokens):
     return resp.content[0].text.strip()
 
 
-def _generate(system, user, max_tokens, json_mode=False, seed=None):
+def _generate(system, user, max_tokens, json_mode=False, seed=None, thinking="low"):
     """Dispatch one call to whichever provider is active. Returns raw text.
-    A fixed seed asks the model to give the same reply to the same input."""
+    A fixed seed asks the model to give the same reply to the same input.
+    thinking: Gemini's thinking level ("minimal" for tiny jobs)."""
     limits.count_call()
     if PROVIDER == "gemini":
-        return _generate_gemini(system, user, max_tokens, json_mode, seed)
+        return _generate_gemini(system, user, max_tokens, json_mode, seed, thinking)
     if PROVIDER == "anthropic":
         return _generate_anthropic(system, user, max_tokens)
     raise RuntimeError(f"Unknown PROVIDER: {PROVIDER!r}")  # mock is handled by the callers

@@ -105,3 +105,10 @@ def test_build_asks_once_more_after_a_broken_reply(wiki, monkeypatch):
         builder.build("something harmful")
     assert len(calls) == 1  # a refusal is not asked again
     builder._CACHE.clear()
+
+
+def test_a_plain_topic_name_is_looked_up_with_no_model_call(wiki, monkeypatch):
+    monkeypatch.setattr(sources, "_titles", lambda request: pytest.fail("no model call for a plain name"))
+    assert sources.find("I want to think about Sleep")["articles"][0]["title"] == "Sleep"
+    assert sources._direct("Why we need sleep") is None  # a question goes to the model
+    assert sources._direct("Mercury") is None  # a disambiguation page is not the topic

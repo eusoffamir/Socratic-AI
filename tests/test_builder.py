@@ -93,6 +93,17 @@ def test_build_is_cached_and_needs_a_topic(monkeypatch):
     assert len(first["cases"]) == builder.CASES_PER_TOPIC
 
 
+def test_one_case_at_a_time_for_the_ask_chat():
+    first = builder.build("Photosynthesis", count=1)
+    assert [c["id"] for c in first["cases"]] == [f"{first['id']}-1"]
+    # the next case on the same topic keeps the topic id and carries on the case numbers
+    nxt = builder.build("Photosynthesis", count=1, avoid=[first["cases"][0]["title"]] * 11)
+    assert nxt["id"] == first["id"] and nxt["cases"][0]["id"] == f"{first['id']}-12"
+    assert builder.recheck(nxt["cases"][0])["id"] == nxt["cases"][0]["id"]
+    r = TestClient(main.app).post("/api/topic", json={"text": "Photosynthesis", "count": 1})
+    assert r.status_code == 200 and len(r.json()["cases"]) == 1
+
+
 def test_prompts_use_the_generated_case_and_no_quant_words():
     case = builder.clean_topic({"topic": "Sugar and children", "cases": [raw_case()]}, "sugar")["cases"][0]
     s = orchestrator.new_session(case["id"], 3)

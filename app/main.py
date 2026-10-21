@@ -63,6 +63,8 @@ class TopicFile(BaseModel):
 class TopicRequest(BaseModel):
     text: str = ""  # a topic name, a question or a short reading; with a file, what part to focus on
     file: TopicFile | None = None  # the learner's own PDF, Word or text file (never saved)
+    count: int = 3  # how many cases; the Ask chat asks for 1 at a time
+    avoid: list[str] = []  # titles of the cases already done on this topic (the Ask chat's next case)
 
 
 class CodeRequest(BaseModel):
@@ -224,7 +226,7 @@ def make_topic(req: TopicRequest):
             msg = str(e) if isinstance(e, files.FileError) else "This file could not be read, so please try again."
             raise HTTPException(400, msg)
     try:
-        return builder.build(req.text, file)
+        return builder.build(req.text, file, req.count, req.avoid)
     except builder.TopicError as e:
         raise HTTPException(400, str(e))
     except LLMError as e:

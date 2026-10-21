@@ -21,6 +21,7 @@ from .reasoning import CORE_KNOWLEDGE, KNOWLEDGE_SIGNS, REASONING_TYPES
 MAX_REQUEST_CHARS = 4000  # a topic name or a short reading
 CASES_PER_TOPIC = 3
 NOTES_PER_CASE = 5
+MAX_AVOID = 30  # earlier case titles sent with a request for one more case
 
 # The picture of a generated case is one of these icons, drawn by the page
 # (PICTURE_ICONS in static/index.html), so no image is generated or paid for.
@@ -46,7 +47,7 @@ WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note
 
 SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps university beginners practise critical thinking on any topic. A learner gives you a REQUEST: a topic name, a question, or a short reading. You write the material the tutor will use. You never write the questions; the tutor does that.
 
-Write 3 cases about the topic. Each case is one short, real situation where a person makes a claim or a choice that is worth questioning, so the learner can practise clarifying, finding assumptions, weighing evidence, seeing other viewpoints and thinking about consequences. The 3 cases should test different ideas from the topic, from easier to harder.
+Write COUNT cases about the topic (3 if COUNT is missing). Each case is one short, real situation where a person makes a claim or a choice that is worth questioning, so the learner can practise clarifying, finding assumptions, weighing evidence, seeing other viewpoints and thinking about consequences. Several cases test different ideas from the topic, from easier to harder. If AVOID lists cases the learner has already done, each new case tests a different idea from all of them.
 
 Facts:
 - If SOURCE is given, take every fact and number from SOURCE only, and add nothing that SOURCE does not say. Pick the clearest, most important ideas in it for a beginner.
@@ -54,7 +55,7 @@ Facts:
 - If SOURCE comes from the learner's own file, REQUEST may say which part to focus on. If REQUEST is empty, write about the main ideas of SOURCE.
 - With neither, use only well known, widely agreed facts that a good textbook would state.
 - Never invent studies, quotes, names of real people or exact numbers you are not sure of. Round numbers are fine when they are well known.
-- Write chances as percentages, never fractions, and write numbers as digits inside normal sentences, not with symbols like →, = or ≠.
+- Write chances and shares as percentages, like 50% or 33%, never as fractions or words like "half", "a third" or "one in three". Write numbers as digits inside normal sentences, not with symbols like →, = or ≠.
 
 Voice:
 - Easy English for a beginner. Short, smooth sentences joined with "because", "so", "and" or "but".
@@ -66,7 +67,7 @@ Each case has:
 - mission: at most 8 words, what the learner will learn, like "Tell a real pattern from luck."
 - tag: 1 word
 - picture: the 1 word from PICTURES that best fits the case
-- scenario: at most 35 words, the situation with a claim worth questioning, like "A stock went up 5 days in a row. Your friend says, \\"It is a pattern, so buy it now.\\""
+- scenario: at most 35 words, the situation in which a person SAYS a claim or makes a choice, with their words in quotes, so there is something to question. Never only describe facts. Like "A stock went up 5 days in a row. Your friend says, \\"It is a pattern, so buy it now.\\""
 - notes: exactly 5 facts the tutor may use, at most 25 words each, in teaching order. Each has a knowledge type.
 - reading: what the learner reads before the case
   - idea: 4 short sentences that teach the key idea
@@ -81,7 +82,7 @@ PICTURES (use these names only):
 
 Knowledge types (use these names only):
 """ + "\n".join(f"- {k}: {v}" for k, v in KNOWLEDGE_TYPES.items()) + """
-Across its notes and more_knowledge, each case has at least 1 factual, 1 conceptual, 1 procedural and 1 causal piece. A procedural piece is a step someone does, and steps are joined with "then".
+Across its notes and more_knowledge, EACH case has at least 1 factual, 1 conceptual, 1 procedural and 1 causal piece, so check every case before you reply. A conceptual piece explains what an idea means or how ideas group together. A procedural piece is a step someone does, and steps are joined with "then".
 
 Relations (use these names only):
 """ + "\n".join(f"- {k}: {v}" for k, v in RELATIONS.items()) + """
@@ -201,8 +202,9 @@ def clean_case(raw, topic, case_id, source=None):
     }
 
 
-def clean_topic(data, request, source=None):
-    """The whole topic from the model reply, or TopicError."""
+def clean_topic(data, request, source=None, count=CASES_PER_TOPIC, done=0):
+    """The whole topic from the model reply, or TopicError. done: cases
+    already made on this topic, so the new ids carry on after them."""
     if not isinstance(data, dict):
         raise TopicError("The topic could not be built, so please try again.")
     if data.get("refuse"):
@@ -210,11 +212,11 @@ def clean_topic(data, request, source=None):
     fallback = (source or {}).get("name") if (source or {}).get("kind") == "file" else request[:60]
     topic = _text(data.get("topic") or fallback, WORDS["topic"], "topic name")
     tid = "t" + hashlib.sha1(_key(request).encode()).hexdigest()[:10]
-    raw_cases = [c for c in data.get("cases") or [] if isinstance(c, dict)][:CASES_PER_TOPIC]
+    raw_cases = [c for c in data.get("cases") or [] if isinstance(c, dict)][:count]
     cases = []
     for i, raw in enumerate(raw_cases):
         try:
-            cases.append(clean_case(raw, topic, f"{tid}-{i + 1}", source))
+            cases.append(clean_case(raw, topic, f"{tid}-{done + i + 1}", source))
         except TopicError:
             continue  # keep the good cases if one is broken
     if not cases:
@@ -240,9 +242,9 @@ Examples from another topic:
 - abductive, relational. situation "Two bank stocks have moved together almost every day for 5 years." question "What is the most likely explanation for this link?"
 
 Rules:
-- situation: at most 35 words, concrete, giving the facts the learner needs. Inductive gives several cases, deductive gives a rule and a new case, abductive gives a surprising observation with information missing.
+- situation: at most 35 words, concrete, giving the facts the learner needs. Inductive gives at least 3 separate cases or observations (3 places, 3 years, 3 people or 3 results) and asks what general idea they suggest, so 1 example alone is never inductive. Deductive gives a rule and a new case. Abductive gives a surprising observation with information missing.
 - question: at most 20 words, exactly one question, ending with "?".
-- Use only well known facts about the topic. Easy English, short smooth sentences, no colons joining parts, no dashes, no emoji. Chances as percentages, never fractions.
+- Use only well known facts about the topic. Easy English, short smooth sentences, no colons joining parts, no dashes, no emoji. Chances and shares as percentages, never fractions or words like "half" or "one in three".
 - case: the number (1, 2 or 3) of the case it fits best.
 
 Reply with ONLY this JSON:
@@ -320,17 +322,17 @@ def recheck(case):
            "more_knowledge": [n for n in texts.values() if "text" in n],
            "links": case["knowledge"].get("edges") or []}
     case_id = str(case.get("id") or "")
-    if not re.fullmatch(r"t[0-9a-f]{10}-[1-9]", case_id):
+    if not re.fullmatch(r"t[0-9a-f]{10}-[1-9][0-9]{0,2}", case_id):
         raise TopicError("This case is broken, so please build the topic again.")
     return clean_case(raw, _text(case.get("topic"), WORDS["topic"], "topic name"), case_id, case.get("source"))
 
 
-def _mock(request):
+def _mock(request, count=CASES_PER_TOPIC):
     """A fixed topic with no model call, for PROVIDER=mock and the tests."""
     name = request.strip()[:60]
     def case(i):
         return {
-            "title": f"Case {i} on {name[:20]}", "mission": "Question a claim about this topic.", "tag": "Claims",
+            "title": f"Case {i} on {' '.join(name.split()[-2:])[:20]}", "mission": "Question a claim about this topic.", "tag": "Claims",
             "picture": "book",
             "scenario": f"[mock] A friend makes a bold claim about {name[:30]}, and says everyone agrees.",
             "notes": [{"text": f"[mock] Fact {j} about the topic.", "type": t}
@@ -340,15 +342,20 @@ def _mock(request):
             "more_knowledge": [{"id": "check", "text": "[mock] Then check the evidence.", "type": "procedural"}],
             "links": [["n1", "supports", "n2"], ["n3", "then", "check"], ["n4", "causes", "n1"], ["n5", "weakens", "n2"]],
         }
-    return {"topic": name, "cases": [case(i) for i in range(1, CASES_PER_TOPIC + 1)]}
+    return {"topic": name, "cases": [case(i) for i in range(1, count + 1)]}
 
 
-def build(request, file=None):
+def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
     """3 cases for any topic, written from 1 or 2 Wikipedia articles when they
     can be found (sources.py), from the learner's own reading, or from their
     own file. file: {"name", "text"} from files.read(); then request is
-    optional and says which part to focus on. Raises TopicError (or LLMError
-    if the model fails)."""
+    optional and says which part to focus on. count: how many cases (the
+    Ask chat asks for 1, so the wait is about a third). avoid: titles of the
+    cases already done on this topic, so a new case tests a new idea; the new
+    case ids then carry on after them. Raises TopicError (or LLMError if the
+    model fails)."""
+    count = max(1, min(int(count), CASES_PER_TOPIC))
+    avoid = [str(a)[:80] for a in avoid if isinstance(a, str) and a.strip()][:MAX_AVOID]
     request = (request or "").strip()[:MAX_REQUEST_CHARS]
     if len(request) < 2 and not file:
         raise TopicError("Please type a topic first.")
@@ -360,6 +367,7 @@ def build(request, file=None):
         request_for_id = key
     else:
         key = request_for_id = _key(request)
+    key = f"{key}|{count}|{'|'.join(avoid)}"  # the topic id stays the same for every case on it
     with _lock:
         if key in _CACHE:
             return _CACHE[key]
@@ -368,28 +376,30 @@ def build(request, file=None):
     else:
         source = {"kind": "reading"} if len(request) >= sources.READING_CHARS else None
     if llm_client.PROVIDER == "mock":
-        data = _mock(request or file["name"])
+        data = _mock(request or file["name"], count)
     else:
         if not limits.budget_left():
             raise TopicError(limits.FULL_MESSAGE)
         found = {"text": picked} if file else None if source else sources.find(request)
-        payload = {"REQUEST": request, **({"SOURCE": found["text"]} if found else {})}
+        payload = {"REQUEST": request, "COUNT": count, **({"AVOID": avoid} if avoid else {}),
+                   **({"SOURCE": found["text"]} if found else {})}
         source = source or found
         # Seen 21 October 2026: a long reply now and then comes back as broken
         # JSON, so a reply with no usable case is asked for once more. A
         # refusal is final.
         for attempt in range(2):
-            text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000, json_mode=True)
+            text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False),
+                                        max_tokens=2200 * count, json_mode=True)
             data = llm_client._parse_json(text)
             if isinstance(data, dict) and data.get("refuse"):
                 break
             try:
-                clean_topic(data, request_for_id, source)
+                clean_topic(data, request_for_id, source, count, len(avoid))
                 break
             except TopicError:
                 if attempt or not limits.budget_left():
                     raise
-    topic = clean_topic(data, request_for_id, source)
+    topic = clean_topic(data, request_for_id, source, count, len(avoid))
     topic["source"] = topic["cases"][0]["source"]
     with _lock:
         _CACHE[key] = topic

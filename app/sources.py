@@ -37,6 +37,13 @@ Reply with ONLY this JSON: {"titles": [""]}"""
 
 log = logging.getLogger("socratic.sources")
 
+# Words around a topic name that are not part of it ("i want to think about
+# photosynthesis" is the topic "photosynthesis").
+_FILLER = re.compile(r"^(i\s+(want|would like|wanna)\s+to\s+(think|learn|talk|know)\s+(about|more about)|"
+                     r"(tell|teach)\s+me\s+about|let'?s\s+(think|talk)\s+about|think\s+about|about)\s+", re.I)
+_QUESTION = re.compile(r"\?|^(why|how|what|when|where|who|which|is|are|do|does|can|should)\b", re.I)
+DIRECT_WORDS = 5  # a topic name this short is tried as an article title first
+
 
 def _get(params):
     r = httpx.get(API, params={**params, "format": "json", "formatversion": "2"}, headers=HEADERS,
@@ -85,12 +92,25 @@ def _titles(request):
         return []
     try:
         data = llm_client._parse_json(llm_client._generate(
-            TITLE_SYSTEM, json.dumps({"REQUEST": request[:300]}, ensure_ascii=False), max_tokens=100, json_mode=True))
+            TITLE_SYSTEM, json.dumps({"REQUEST": request[:300]}, ensure_ascii=False), max_tokens=100, json_mode=True,
+            thinking="minimal"))  # a tiny job, so the least thinking
     except Exception as e:  # any model problem: the search below still runs
         log.warning("Naming articles failed: %s", e)
         return []
     titles = data.get("titles") if isinstance(data, dict) else None
     return [t.strip()[:120] for t in titles if isinstance(t, str) and t.strip()][:MAX_ARTICLES] if isinstance(titles, list) else []
+
+
+def _direct(request):
+    """The article whose title is the topic itself ("Photosynthesis", "The
+    water cycle"), so no model call is needed. Seen 21 October 2026: the small
+    title call alone took 7 to 38 seconds on the free tier, while a Wikipedia
+    lookup takes under 1 second. Questions and longer requests still go to
+    the model, because their words are not a title."""
+    name = _FILLER.sub("", request.strip().rstrip(".!")).strip()
+    if not name or _QUESTION.search(name) or len(name.split()) > DIRECT_WORDS:
+        return None
+    return _article(name)
 
 
 def find(request):
@@ -101,8 +121,9 @@ def find(request):
     if len(request) >= READING_CHARS:
         return None
     try:
-        articles = []
-        for title in _titles(request) or _search(request)[:MAX_ARTICLES]:
+        direct = _direct(request)
+        articles = [direct] if direct else []
+        for title in [] if direct else _titles(request) or _search(request)[:MAX_ARTICLES]:
             a = _article(title)
             if a and a["title"] not in [x["title"] for x in articles]:
                 articles.append(a)
