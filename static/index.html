@@ -2141,7 +2141,7 @@ function askShowTurn(data, intro){
   askStrip(data.level_idx, data.round);
   ask.options = parts.options && parts.options.length === 2 ? parts.options : [];
   ask.picked = null;
-  $('askThread').querySelectorAll('.am-opts .choice').forEach(c => c.disabled = true);  // old choices are done
+  $('askThread').querySelectorAll('.am-opts').forEach(o => o.remove());  // old choices are done, the answer shows the pick
   const feedback = parts.feedback;
   delete parts.feedback;  // it is the first line inside "Thought process" instead
   askAdd('am-ai', askThoughtHTML(data.thought, feedback) + (intro || '') + askTurnHTML(parts));
@@ -2311,6 +2311,8 @@ async function askAnswer(typed){
   }
   if(!answer) return;
   const line = askAdd('am-user', esc(answer));
+  const opts = [...$('askThread').querySelectorAll('.am-opts')];
+  opts.forEach(o => o.classList.add('hidden'));  // the answer line shows the pick, so the choices go
   $('askInput').value = '';
   $('askInput').style.height = '';
   const gen = ask.gen;
@@ -2331,6 +2333,7 @@ async function askAnswer(typed){
     // the server leaves the session as it was, so the answer goes back in the box
     wait.remove();
     line.remove();
+    opts.forEach(o => o.classList.remove('hidden'));
     $('askInput').value = typed;
     note('error', err.message + ' This answer was not counted, so please send it again.', $('askThread'));
   } finally {
