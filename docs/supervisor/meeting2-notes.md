@@ -139,7 +139,7 @@ Dr Ho's analogy from the meeting: the framework is a bit like a neural network. 
 
 ## 8. Suggested order for Goal 1 (the student decides before anything is built)
 
-1. **Knowledge layer:** tag each case note with its knowledge type, and let an agent draft a small knowledge graph per case (a DRAFT for Dr Ho to check).
+1. **Knowledge layer:** tag each case note with its knowledge type, and let an agent draft a small knowledge graph per case (a DRAFT for Dr Ho to check). **Done 21 October 2026** in `app/knowledge.py`, drafted by Claude: about 10 nodes per case (the 5 case notes plus extra nodes), 8 knowledge types and 7 link types. Dr Ho still needs to check it. An agent that writes the graph for any new topic is left for Goal 2.
 2. **Reasoning agent:** for each answer, mark 1 or 0 for inductive, deductive and abductive reasoning and for the knowledge types used, with evidence.
 3. **Dashboard:** a grid of reasoning type by knowledge type, plus the quality standards, in the Status panel.
 4. **Question bank:** several questions per skill, so there are enough trials.
