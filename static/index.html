@@ -219,7 +219,7 @@
              padding:18px 22px; display:grid; grid-template-columns:1fr 1fr; gap:24px; max-height:60vh; overflow:auto;}
   .ask-stats .ladder{margin-top:8px;}
   .am-thought{font-family:var(--sans); font-size:13.5px; color:var(--ink-faint); margin:0 0 18px;}
-  /* one row: "Thought process" on the left, the feedback line on the far right */
+  /* one quiet row, "Thought process"; the feedback is the first line inside it */
   .am-thought summary{cursor:pointer; display:flex; align-items:baseline; gap:20px; list-style:none; opacity:.7;}
   .am-thought summary:hover, .am-thought[open] summary{opacity:1;}
   .am-thought summary::-webkit-details-marker{display:none;}
@@ -227,7 +227,6 @@
   .am-thought summary .tp::before{content:"\25B8"; display:inline-block; margin-right:6px; transition:transform .15s;}
   .am-thought[open] summary .tp::before{transform:rotate(90deg);}
   .am-thought summary .tp:hover{color:var(--ink-soft);}
-  .am-thought summary .am-fb{flex:1; margin:0; text-align:right; cursor:text; color:var(--ink-faint);}  /* same quiet sans as "Thought process" */
   .am-thought ul{margin:8px 0 0; padding:0 0 0 14px; border-left:2px solid var(--rule); list-style:none; color:var(--ink-soft);}
   .am-thought li{margin:0 0 6px;}
   .am-thought li b{color:var(--ink); font-weight:600;}
@@ -1943,13 +1942,14 @@ function askThoughtHTML(t, feedback){
   const list = xs => xs.map(x => esc(x.charAt(0).toUpperCase() + x.slice(1))).join(', ');
   const n = t.standards_met.length;
   const items = [
+    feedback ? `<li><b>Feedback.</b> ${inline(feedback)}</li>` : '',
     `<li><b>Assessor.</b> Your answer met ${n} of 9 standards${n ? ` (${list(t.standards_met)})` : ''}${t.move ? `, and it showed the ${esc(t.move)} move` : ''}.</li>`,
     `<li><b>Reasoning agent.</b> ${t.reasoning.length ? `Reasoning shown is ${list(t.reasoning)}` : 'No clear type of reasoning yet'}${t.knowledge.length ? `, using ${list(t.knowledge)} knowledge` : ''}.</li>`,
     t.plan ? `<li><b>Planner.</b> ${esc(t.plan)}</li>` : '',
     t.guard.length ? `<li><b>Rules.</b> ${t.guard.map(esc).join(' ')}</li>` : '',
     `<li><b>Tutor and Checker.</b> The next question is at the ${esc(t.next.level || 'same')} level${t.next.format ? ` as ${esc(t.next.format)}` : ''}, and ${t.rewrites ? `the Checker asked for ${t.rewrites} rewrite${t.rewrites === 1 ? '' : 's'}` : 'the Checker passed the first draft'}.</li>`,
   ];
-  return `<details class="am-thought"><summary><span class="tp">Thought process</span>${feedback ? `<span class="am-fb">${inline(feedback)}</span>` : ''}</summary>
+  return `<details class="am-thought"><summary><span class="tp">Thought process</span></summary>
     <ul>${items.join('')}</ul></details>`;
 }
 
@@ -1990,7 +1990,7 @@ function askShowTurn(data, intro){
   ask.picked = null;
   $('askThread').querySelectorAll('.am-opts .choice').forEach(c => c.disabled = true);  // old choices are done
   const feedback = parts.feedback;
-  delete parts.feedback;  // it sits on the "Thought process" row instead
+  delete parts.feedback;  // it is the first line inside "Thought process" instead
   askAdd('am-ai', askThoughtHTML(data.thought, feedback) + (intro || '') + askTurnHTML(parts));
   if(data.level_idx === ASK_LEVELS.length - 1 && data.thought && askCanNext() && !ask.offered.includes(ask.sid)){
     ask.offered.push(ask.sid);
@@ -2014,7 +2014,6 @@ $('askThread').addEventListener('keydown', e => {
 $('askThread').addEventListener('click', e => {
   const nd = e.target.closest('.am-map .nd');
   if(nd){ mapPick(nd); return; }
-  if(e.target.closest('.am-thought summary .am-fb')){ e.preventDefault(); return; }  // the feedback is text, so only "Thought process" opens the list
   if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
   if(e.target.closest('[data-stay]')){ e.target.closest('.am-card').remove(); $('askInput').focus(); return; }
   const hint = e.target.closest('.hint-btn');
