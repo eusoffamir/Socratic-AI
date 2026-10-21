@@ -309,7 +309,7 @@
   .rounds .mono-label{font-size:12px;}
   .rounds .seg{border-radius:12px;}
   .rounds .seg label{padding:9px 22px; font-size:17px;}
-  /* Mode button: "Open questions" (gray, default) <-> "2 choices" (vibrant A-blue to B-orange, the A/B button colors) */
+  /* Mode button: "Open questions" (gray) <-> "A or B?" (default, (vibrant A-blue to B-orange, the A/B button colors) */
   .mode{display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
     margin-left:16px; padding-left:28px; border-left:1px solid var(--rule);}  /* same spacing + divider as .rounds */
   .mode .mono-label{font-size:12px;}
@@ -1121,7 +1121,7 @@
           </div>
           <div class="mode">
             <span class="mono-label">Mode</span>
-            <button class="mode-btn" id="abOnly" aria-pressed="false"
+            <button class="mode-btn" id="abOnly" aria-pressed="true"
                     title="Press for A or B?: every question gives you 2 choices to pick from">
               <span class="off-text">Open questions</span><span class="on-text">A or B?</span>
             </button>
@@ -1685,16 +1685,16 @@ function saveTopics(list){
 }
 function activeTopic(){
   let id = 'quant';
-  try { id = localStorage.getItem('active-topic') || 'quant'; } catch(e){}
+  try { id = localStorage.getItem('home-topic') || 'all'; } catch(e){}
   return myTopics().find(t => t.id === id) || QUANT_TOPIC;
 }
 // "All topics" shows every case at once; the Explainer and skill check then use quant.
 const ALL_TOPICS = {id: 'all', topic: 'All topics'};
 function showingAll(){
-  try { return localStorage.getItem('active-topic') === 'all'; } catch(e){ return false; }
+  try { return (localStorage.getItem('home-topic') || 'all') === 'all'; } catch(e){ return true; }  // all cases by default
 }
 function setActiveTopic(id){
-  try { localStorage.setItem('active-topic', id); } catch(e){}
+  try { localStorage.setItem('home-topic', id); } catch(e){}
 }
 
 // Topics the Ask chat offers with one click. A click only fills the box, so
@@ -2362,8 +2362,6 @@ async function askTopic(text){
   ctx.request = askFileUsed ? null : text;  // a file is not kept, so it cannot make another case
   if(askLive(gen)){
     setAskFile(null);
-    setActiveTopic(t.id);
-    renderTopics();
     ask.request = ctx.request;
   }
   await askStart(t.cases[0], t.topic, ctx);
