@@ -110,6 +110,7 @@
   .nav-unfold svg{width:20px; height:20px;}
   #homeView.folded .nav-unfold{display:grid;}
   #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:64px;}  /* room for the open button */
+  #homeView.folded #askStrip{padding-left:66px;}  /* the chat's top bar starts after the open button */
   .rail{
     background:var(--rail); color:var(--rail-ink); display:flex; flex-direction:column; align-items:center;
     gap:10px; padding:16px 0;
@@ -936,6 +937,7 @@
     #homeView.folded .nav{visibility:visible; padding:14px 12px;}
     #homeView.folded .nav-unfold{display:none;}
     #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:16px;}
+    #homeView.folded #askStrip{padding-left:12px;}
     .status-scroll{padding:16px 16px 32px;}
     .sn-label{margin-top:24px;}
     .ask-main.empty{padding:24px 16px 10vh;}  /* only the start page; a chat uses the full height */
