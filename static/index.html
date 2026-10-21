@@ -182,6 +182,7 @@
   .am-more{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); margin:0 0 14px;}
   .am-more summary{cursor:pointer; color:var(--signal); font-weight:600; width:max-content;}
   .am-more p{margin:8px 0 0;}
+  .am-more .am-words, .am-more .am-map{margin:12px 0 0;}
   .am-more a{color:var(--signal);}
   .am-case{font-family:var(--sans); background:var(--panel); border:1px solid var(--rule); border-left:4px solid var(--signal);
            border-radius:12px; padding:14px 18px; margin:4px 0 16px;}
@@ -1893,14 +1894,15 @@ function askMapHTML(c){
     <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div></div>`;
 }
 
-// The first message: a short lesson (the case reading), the map, "Read more", the case story.
+// The first message: a short lesson (the case reading), the case story. The key words,
+// the map and the rest sit under "Read more", so the first look stays short.
 function askCaseHTML(c){
   const r = c.reading || {}, ideas = r.idea || [], words = r.key_words || [];
-  const src = c.source ? sourceHTML(c.source) : '';
+  const src = c.source ? sourceHTML(c.source) : '', map = askMapHTML(c);
   return `${ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : ''}
-    ${words.length ? `<div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div>` : ''}
-    ${askMapHTML(c)}
-    ${ideas.length > 3 || r.example || r.think || src ? `<details class="am-more"><summary>Read more</summary>
+    ${words.length || map || ideas.length > 3 || r.example || r.think || src ? `<details class="am-more"><summary>Read more</summary>
+      ${words.length ? `<div class="am-words">${words.map(([w, m]) => `<span><b>${esc(w)}</b> ${esc(m)}</span>`).join('')}</div>` : ''}
+      ${map}
       ${ideas.length > 3 ? `<p>${esc(ideas.slice(3).join(' '))}</p>` : ''}
       ${r.example ? `<p><b>Example.</b> ${esc(r.example)}</p>` : ''}
       ${r.think ? `<p><b>Think about.</b> ${esc(r.think)}</p>` : ''}${src}</details>` : ''}
