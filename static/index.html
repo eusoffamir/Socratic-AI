@@ -459,6 +459,29 @@
   .ck-body .composer-box{margin-bottom:12px;}
   .ck-body textarea{min-height:90px;}
   .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
+  /* mastery estimate per skill (Goal 1 step 5): a 90% range bar, the most likely value and the mastery line */
+  .ms-rows{display:grid; gap:4px;}
+  .ms-row{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; align-items:center; gap:10px; padding:6px 0; cursor:help;}
+  .ms-row .nm{font-size:13px; font-weight:500;}
+  .ms-row .nm small{display:block; font-size:11px; color:var(--ink-faint); font-weight:400;}
+  .ms-track{position:relative; height:14px; border-radius:7px; background:var(--panel-2);}
+  .ms-band{position:absolute; top:0; bottom:0; border-radius:7px; background:color-mix(in srgb, var(--signal) 30%, var(--panel-2));}
+  .ms-dot{position:absolute; top:50%; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--signal); box-shadow:0 0 0 2px var(--panel);}
+  .ms-line{position:absolute; top:-3px; bottom:-3px; width:0; border-left:1.5px dashed var(--ink-faint);}
+  .ms-row .st{font-size:12px; color:var(--ink-soft); text-align:right;}
+  .ms-row .st.ok{color:var(--signal); font-weight:600;}
+  .ms-axis{display:grid; grid-template-columns:96px minmax(0, 1fr) 104px; gap:10px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint);}
+  .ms-axis span{display:flex; justify-content:space-between;} .ms-axis i{font-style:normal;}
+  /* Explainer pop-up (Goal 1 step 6) */
+  .rk td[data-r]{cursor:pointer;}
+  .rk td[data-r]:hover{outline:2px solid var(--signal); outline-offset:-2px;}
+  #explainModal{z-index:45;}  /* above the skill check pop-up */
+  .ex-card{width:min(640px, 94vw);}
+  .ex-chips{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 18px;}
+  .ex-chips button{font:inherit; font-size:12.5px; font-weight:600; padding:4px 12px; border-radius:999px; border:1px solid var(--rule); background:var(--panel-2); color:var(--ink-soft); cursor:pointer;}
+  .ex-chips button[aria-pressed="true"]{background:var(--signal-soft); color:var(--signal); border-color:var(--signal);}
+  .ex-body p{font-size:16px; line-height:1.55; margin:0;}
+  .ex-body ol{margin:0; padding-left:22px; display:grid; gap:6px; font-size:15.5px; line-height:1.5;}
   /* reasoning and knowledge grid (Goal 1) */
   .rk{margin-top:30px;}
   .rk .mono-label{display:block; margin-bottom:12px;}
@@ -955,6 +978,20 @@
   </div>
 </div>
 
+<!-- ======================= Explainer pop-up (Goal 1) ======================= -->
+<div class="read-modal hidden" id="explainModal" role="dialog" aria-modal="true" aria-labelledby="exTitle">
+  <div class="rm-backdrop" data-close></div>
+  <div class="rm-card ex-card">
+    <header class="rm-head">
+      <span class="tag t2">Why this matters</span>
+      <h2 id="exTitle"></h2>
+      <div class="rm-sub">Pick 1 or 2 kinds of knowledge to see how they work together.</div>
+      <button class="icon-btn rm-x" data-close title="Close (Esc)" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="rm-body"><div class="ex-chips" id="exChips"></div><div id="exBody"></div></div>
+  </div>
+</div>
+
 <!-- ======================= reading pop-up ======================= -->
 <div class="read-modal hidden" id="readModal" role="dialog" aria-modal="true" aria-labelledby="rmTitle">
   <div class="rm-backdrop" data-close></div>
@@ -1288,8 +1325,11 @@ $('cases').addEventListener('click', e => {
 
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
-  if(!n) return `<div class="report"><div class="mono-label">Overall status</div><h2>Nothing yet</h2>
-    <p class="lead">Play a case or a skill check, and your overall status will show here.</p>${skillGridHTML(d.skill_check, 'Skill checks')}</div>`;
+  if(!n) return d.mastery
+    ? `<div class="report"><div class="mono-label">Overall status</div><h2>Your skill checks</h2>
+      <p class="lead">Play a case too, and your Socratic levels will show here.</p>${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, 'Skill checks')}</div>`
+    : `<div class="report"><div class="mono-label">Overall status</div><h2>Nothing yet</h2>
+      <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
   const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
   const cases = d.cases.map(c => `<div class="ov-case"><span class="t">${esc(c.title)}</span>
@@ -1304,6 +1344,7 @@ function overallHTML(d){
       <div><div class="ov-std-head"><span class="mono-label">9 Intellectual Standards</span>${caseFilterHTML(d.cases, 'ovFilter')}</div>
         <div id="ovRadar">${standardsRadarSVG(d.standards, s.standards_met_count, n)}</div></div>
     </div>
+    ${masteryHTML(d.mastery)}
     ${skillGridHTML(d.skill_check, 'Skill checks')}
     ${reasoningGridHTML(s.reasoning)}
     <span class="mono-label ov-by">By case</span><div class="ov-cases">${cases}</div>
@@ -1849,16 +1890,95 @@ function skillGridHTML(r, title){
   const types = Object.keys(r.reasoning_types), kinds = Object.keys(r.knowledge_types);
   const cap = w => w[0].toUpperCase() + w.slice(1);
   const head = types.map(t => `<th title="${esc(cap(r.reasoning_types[t]))}">${cap(t)}</th>`).join('');
-  const cell = c => c.asked ? `<td style="--a:${(c.attained / c.asked).toFixed(2)}">${c.attained} of ${c.asked}</td>` : '<td class="unasked">·</td>';
+  const cell = (c, t, k) => {
+    const pair = k ? ` data-r="${t}" data-k="${k}" title="Why this matters"` : '';
+    return c.asked ? `<td style="--a:${(c.attained / c.asked).toFixed(2)}"${pair}>${c.attained} of ${c.asked}</td>` : `<td class="unasked"${pair}>·</td>`;
+  };
   const rows = kinds.map(k => `<tr><th class="row" title="${esc(r.knowledge_types[k])}">${cap(k)}</th>`
-    + types.map(t => cell(r.grid[k][t])).join('') + '</tr>').join('');
+    + types.map(t => cell(r.grid[k][t], t, k)).join('') + '</tr>').join('');
   const foot = types.map(t => cell(r.reasoning[t])).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">${title}</span>${msgs}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
     <tfoot><tr><th class="row">All</th>${foot}</tr></tfoot></table>
-    <div class="note">Each cell shows the questions where you used that reasoning on that knowledge, out of the questions asked. A dot means not asked yet.</div></div>`;
+    <div class="note">Each cell shows the questions where you used that reasoning on that knowledge, out of the questions asked. A dot means not asked yet. Click a cell to see why it matters.</div></div>`;
 }
+
+// Mastery so far, from every skill check in this browser. The bar is the 90%
+// range of the true share, the dot is the most likely share, and the dashed line
+// is the mastery level. Hover a row for the numbers.
+function masteryHTML(m){
+  if(!m || !m.answers) return '';
+  const cap = w => w[0].toUpperCase() + w.slice(1);
+  const rows = m.skills.map(r => `<div class="ms-row" title="${esc(`Shown in ${r.attained} of ${r.asked} questions. Most likely ${r.mean}%, and 90% sure it is between ${r.low}% and ${r.high}%. The chance you have mastered it is ${r.chance_mastered}%.`)}">
+      <span class="nm">${cap(r.skill)}<small>${r.kind}</small></span>
+      <span class="ms-track"><span class="ms-band" style="left:${r.low}%; width:${r.high - r.low}%"></span>
+        <span class="ms-line" style="left:${m.mastery_level}%"></span><span class="ms-dot" style="left:${r.mean}%"></span></span>
+      <span class="st${r.status === 'mastered' ? ' ok' : ''}">${cap(r.status)}</span></div>`).join('');
+  const msgs = m.messages.length ? `<div class="rk-msg">${m.messages.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : '';
+  return `<div class="rk"><span class="mono-label">Mastery so far</span>${msgs}
+    <div class="ms-rows">${rows}</div>
+    <div class="ms-axis"><span></span><span><i>0%</i><i>50%</i><i>100%</i></span><span></span></div>
+    <div class="note">The bar shows where your true score most likely is, and it gets shorter as you answer more. The dashed line is the mastery level of ${m.mastery_level}%.</div></div>`;
+}
+
+// Explainer agent: why a reasoning type matters with 1 or 2 knowledge types.
+const KNOWLEDGE_NAMES = ['factual', 'conceptual', 'procedural', 'causal', 'relational', 'strategic', 'metacognitive', 'epistemic'];
+const explain = {reasoning: null, knowledge: [], opener: null, ask: 0};
+const explainOpen = () => !$('explainModal').classList.contains('hidden');
+
+function explainTitle(){
+  const cap = w => w[0].toUpperCase() + w.slice(1);
+  return `${cap(explain.reasoning)} reasoning on ${explain.knowledge.join(' and ')} knowledge`;
+}
+
+async function loadExplain(){
+  $('exTitle').textContent = explainTitle();
+  $('exChips').innerHTML = KNOWLEDGE_NAMES.map(k =>
+    `<button type="button" data-k="${k}" aria-pressed="${explain.knowledge.includes(k)}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
+  $('exBody').innerHTML = `<div class="thinking">${DOTS}Thinking of an example...</div>`;
+  const ask = ++explain.ask;  // a slow older reply never replaces a newer one
+  const q = new URLSearchParams({reasoning: explain.reasoning});
+  explain.knowledge.forEach(k => q.append('knowledge', k));
+  try {
+    const d = await api(`/api/explain?${q}`);
+    if(ask !== explain.ask) return;
+    $('exBody').innerHTML = `<div class="ex-body">
+      <section><h3 class="mono-label">Why it matters</h3><p>${esc(d.why)}</p></section>
+      <section><h3 class="mono-label">Example</h3><p>${esc(d.scenario)}</p></section>
+      <section><h3 class="mono-label">How to do it</h3><ol>${d.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol></section>
+      <div class="rm-think"><span class="mono-label">Try this</span><p>${esc(d.try)}</p></div></div>`;
+  } catch(e){ if(ask === explain.ask){ $('exBody').innerHTML = ''; note('error', e.message, $('exBody')); } }
+}
+
+function openExplain(reasoning, knowledge){
+  Object.assign(explain, {reasoning, knowledge: [knowledge], opener: document.activeElement});
+  $('explainModal').classList.remove('hidden');
+  $('explainModal').querySelector('.rm-x').focus();
+  loadExplain();
+}
+
+function closeExplain(){
+  $('explainModal').classList.add('hidden');
+  if(explain.opener && explain.opener.focus) explain.opener.focus();
+}
+
+document.addEventListener('click', e => {
+  const td = e.target.closest('.rk td[data-r]');
+  if(td){ e.stopPropagation(); openExplain(td.dataset.r, td.dataset.k); }
+});
+$('exChips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-k]');
+  if(!b) return;
+  const k = b.dataset.k, has = explain.knowledge.includes(k);
+  if(has && explain.knowledge.length === 1) return;  // always keep 1
+  explain.knowledge = has ? explain.knowledge.filter(x => x !== k) : [...explain.knowledge, k].slice(-2);
+  explain.knowledge.sort((a, b) => KNOWLEDGE_NAMES.indexOf(a) - KNOWLEDGE_NAMES.indexOf(b));
+  loadExplain();
+});
+$('explainModal').querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeExplain));
+// capture, so Escape closes only this pop-up and not the panel or check behind it
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && explainOpen()){ e.stopImmediatePropagation(); closeExplain(); } }, true);
 
 function myChecks(){
   try { return JSON.parse(localStorage.getItem('my-checks')) || []; } catch(e){ return []; }
@@ -1879,9 +1999,13 @@ function showCheck(d){
     $('ckNum').textContent = 'DONE';
     $('ckTitle').textContent = 'Your results';
     $('ckSub').textContent = 'Based on the questions you just answered.';
-    $('ckBody').innerHTML = skillGridHTML(d.results, 'This check');
+    $('ckBody').innerHTML = skillGridHTML(d.results, 'This check') + '<div id="ckMastery"></div>';
     $('ckSend').innerHTML = 'Done';
     $('ckSend').focus();
+    // mastery uses every check from this browser, not only this one
+    postJSON('/api/overview', {session_ids: myChecks()})
+      .then(o => { const box = $('ckMastery'); if(box) box.innerHTML = masteryHTML(o.mastery); })
+      .catch(() => {});
     return;
   }
   const q = d.question;
@@ -1949,13 +2073,13 @@ function reasoningGridHTML(r){
   const head = types.map(t => `<th title="${esc(cap(r.reasoning_types[t]))}">${cap(t)}</th>`).join('');
   const rows = kinds.map((k, i) => `<tr class="${i >= 5 ? 'derived' : ''}"><th class="row" title="${esc(r.knowledge_types[k])}">${cap(k)}</th>`
     + types.map(t => { const v = r.grid[k][t];
-        return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}">${v}</td>`; }).join('') + '</tr>').join('');
+        return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}" data-r="${t}" data-k="${k}" title="Why this matters">${v}</td>`; }).join('') + '</tr>').join('');
   const quality = types.map(t => `<td>${r.quality[t] === null ? 'none yet' : `${r.quality[t]} of 9`}</td>`).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Reasoning × Knowledge</span>${msgs}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
     <tfoot><tr><th class="row">Standards met</th>${quality}</tr></tfoot></table>
-    <div class="note">Each number counts your answers that used both, out of ${r.answers} so far. A mastery score comes once you have answered more questions.</div></div>`;
+    <div class="note">Each number counts your answers that used both, out of ${r.answers} so far. A mastery score comes once you have answered more questions. Click a cell to see why it matters.</div></div>`;
 }
 
 // Builds the profile. Used twice: in the right-side panel ("Profile" button,

@@ -10,12 +10,12 @@ from dotenv import load_dotenv
 load_dotenv()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import graph, limits, llm_client, orchestrator, skillcheck, storage, tutorial
+from . import explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
@@ -338,6 +338,14 @@ def answer_check(sid: str, req: AnswerRequest):
     return {"check_id": sid, **_check_view(working)}
 
 
+@app.get("/api/explain")
+def explain(reasoning: str, knowledge: list[str] = Query(default=[])):
+    """The Explainer agent: why a reasoning type matters with 1 or 2 knowledge types."""
+    if not explainer.valid(reasoning, knowledge):
+        raise HTTPException(400, "Choose 1 reasoning type and 1 or 2 knowledge types.")
+    return explainer.explain(reasoning, knowledge)
+
+
 @app.post("/api/overview")
 def overview(req: OverviewRequest):
     """The learner's overall status across every case they played in this
@@ -354,7 +362,8 @@ def overview(req: OverviewRequest):
         if s is None:
             continue  # unknown id
         if s.get("mode") == "skill_check":
-            checks += s["turns"]
+            if s["turns"]:
+                checks.append(s["turns"])
             continue
         if not s["history"]:
             continue  # opened but never answered
@@ -374,7 +383,8 @@ def overview(req: OverviewRequest):
         "standards": STANDARDS,
         "summary": summary,
         "sessions_played": played, "sessions_finished": finished,
-        "skill_check": skillcheck.summarize(checks) if checks else None,
+        "skill_check": skillcheck.summarize([t for c in checks for t in c]) if checks else None,
+        "mastery": stats.mastery(checks) if checks else None,
         "cases": [{"id": cid, "title": CONCEPTS[cid]["title"], "sessions": v["sessions"], "rounds": v["rounds"],
                    "level": LEVELS[v["level_idx"]][1],
                    # for the standards filter in the overall status panel

@@ -43,13 +43,13 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 ## Supervisor
 
 - Messages: `docs/supervisor/dr-ho-messages.md`. Parent SoTL grant details in the history file.
-- **Meeting 2 (19 October 2026):** read `docs/supervisor/meeting2-notes.md` before any Goal 1 work. Goal 1 (mid November 2026): attainment in reasoning type, knowledge type and quality, with new Reasoning and Explainer agents. **Ask the student before each step of section 8.**
+- **Meeting 2 (19 October 2026):** read `docs/supervisor/meeting2-notes.md` before any Goal 1 work. Goal 1 (mid November 2026): attainment in reasoning type, knowledge type and quality, with new Reasoning and Explainer agents. All 6 steps of section 8 are done.
 
 ## Architecture
 
 "Agents decide, rules guard." `app/graph.py` (LangGraph): assess, plan, guard, tutor (may run a tool), check, rewrite once, finish.
 
-- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`.
+- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Mastery stats `app/stats.py`, class model `eval/dina.py`, Explainer agent `app/explainer.py`. Goal 1 summary for Dr Ho: `docs/supervisor/goal1-summary.md`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`.
 - Rules: `app/orchestrator.py` (`apply_plan()` guard, `decide()` fallback). Copy check `app/copycheck.py`. Tools `app/tools.py`. Limits `app/limits.py`. Saving `app/storage.py` (Supabase; local `.env` writes to the live DB, so set `SUPABASE_URL=" "` for test servers).
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
@@ -66,7 +66,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## Next steps
 
-1. Goal 1 from Meeting 2, one step at a time with the student's OK.
+1. Goal 1 is built (21 October 2026). Next, Dr Ho checks the drafts (see `docs/supervisor/goal1-summary.md`), then check the Reasoning agent against a human marker.
 2. Improve prompts from real transcripts, keep every transcript.
 3. Real quant reading with Dr Ho, then simple RAG.
 4. Evaluation in FYP2 (R1 to R9, Assessor against human markers).
