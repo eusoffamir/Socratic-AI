@@ -326,9 +326,23 @@
     box-shadow:0 4px 16px rgba(47,90,168,.35);
   }
   .mode-btn[aria-pressed="true"]:hover:not(:disabled){color:#fff;}
-  /* the same switch, small, beside ROUND in the Ask chat's top bar */
-  .mode-btn.ask-mode{height:30px; min-width:0; padding:0 12px; font-size:13px; border-radius:999px; border-width:1.5px; margin-left:6px;}
-  .mode-btn.ask-mode[aria-pressed="true"]{box-shadow:0 2px 8px rgba(47,90,168,.3);}
+  /* Question style menu beside + in the Ask box, like Claude's mode menu */
+  .ask-mode{position:relative;}
+  #askModeBtn{display:inline-flex; align-items:center; gap:5px; font-size:13px; padding:6px 10px; border-radius:999px;
+              background:transparent; border:1px solid transparent; color:var(--ink-soft);}
+  #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"]{background:var(--panel-2); color:var(--ink); opacity:1;}
+  #askModeBtn.on{color:#2f5aa8;}
+  #askModeBtn svg{width:11px; height:11px;}
+  .ask-mode-menu{position:absolute; left:0; bottom:calc(100% + 8px); z-index:20; width:290px; padding:6px;
+                 background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.14);}
+  .ask-mode-menu .mm-head{font-size:12.5px; color:var(--ink-faint); padding:6px 10px 4px;}
+  .ask-mode-menu button{display:block; width:100%; text-align:left; position:relative; padding:8px 34px 8px 10px; border-radius:10px;
+                        background:transparent; border:0; color:var(--ink);}
+  .ask-mode-menu button:hover:not(:disabled){background:var(--panel-2); opacity:1;}
+  .ask-mode-menu b{display:block; font-size:14px; font-weight:600;}
+  .ask-mode-menu span{display:block; font-size:12.5px; line-height:1.4; color:var(--ink-soft); margin-top:2px;}
+  .ask-mode-menu [aria-checked="true"]::after{content:""; position:absolute; right:12px; top:50%; width:10px; height:5px; margin-top:-5px;
+                        border:solid var(--signal); border-width:0 0 2px 2px; transform:rotate(-45deg);}
   .home-scroll{flex:1; overflow:auto; padding:28px 32px 40px;}
   .home-inner{width:100%;}
   /* rotating thinking tips, pinned to the bottom of Home (subtle, changes every 8 s, pauses on hover) */
@@ -1144,10 +1158,6 @@
       <header class="chat-top" id="askStrip" role="button" tabindex="0" aria-expanded="false" aria-controls="askStats" title="Show your progress in this case">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
-          <button type="button" class="mode-btn ask-mode" id="askAb" aria-pressed="false"
-                  title="A or B?: from the next question, every question gives you 2 choices to pick from">
-            <span class="off-text">Normal</span><span class="on-text">A or B?</span>
-          </button>
         </div>
         <div class="spacer"></div>
         <span class="status ask-lv-label"><span class="lv-label">LEVEL:</span></span>
@@ -1169,6 +1179,18 @@
         <div class="ask-tools">
           <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <div class="ask-mode">
+            <button type="button" id="askModeBtn" aria-haspopup="menu" aria-expanded="false" title="Question style">
+              <span id="askModeName">Normal</span>
+              <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="ask-mode-menu hidden" id="askModeMenu" role="menu" aria-label="Question style">
+              <div class="mm-head">Question style</div>
+              <button type="button" role="menuitemradio" aria-checked="true" data-ab="0">
+                <b>Normal</b><span>Open questions that you answer in your own words.</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" data-ab="1">
+                <b>A or B?</b><span>Every question gives you 2 choices, then you say why.</span></button>
+            </div>
+          </div>
           <button type="button" class="ask-next hidden" id="askNext" title="A new case on the same topic">New case</button>
           <span class="spacer"></span>
           <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
@@ -2020,14 +2042,38 @@ $('askStrip').addEventListener('click', () => {
   $('askStrip').setAttribute('aria-expanded', open);
   if(open) askStatsLoad();
 });
-// A or B mode for this chat: kept for later cases in the same chat, sent to the server at once.
-$('askAb').addEventListener('click', async e => {
-  e.stopPropagation();  // the button sits in the top bar, which opens Status
-  const b = e.currentTarget, on = b.getAttribute('aria-pressed') !== 'true';
-  b.setAttribute('aria-pressed', String(on));
+// Question style (Normal or A or B?), picked beside + like Claude's mode menu. Kept for later
+// cases in the same chat, and sent to the server at once, so it counts from the next question.
+function setAskMode(on){
+  ask.ab = on;
+  $('askModeName').textContent = on ? 'A or B?' : 'Normal';
+  $('askModeBtn').classList.toggle('on', on);
+  $('askModeMenu').querySelectorAll('[data-ab]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.ab === '1') === on)));
+}
+function askModeOpen(open){
+  $('askModeMenu').classList.toggle('hidden', !open);
+  $('askModeBtn').setAttribute('aria-expanded', open);
+}
+$('askModeBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  askModeOpen($('askModeMenu').classList.contains('hidden'));
+});
+$('askModeMenu').addEventListener('click', async e => {
+  e.stopPropagation();
+  const item = e.target.closest('[data-ab]');
+  if(!item) return;
+  const on = item.dataset.ab === '1', was = !!ask.ab;
+  askModeOpen(false);
+  $('askModeBtn').focus();
+  if(on === was) return;
+  setAskMode(on);
   if(!ask.sid) return;
   try { await postJSON(`/api/session/${encodeURIComponent(ask.sid)}/mode`, {ab_only: on}); }
-  catch(err){ b.setAttribute('aria-pressed', String(!on)); }  // not saved, so show it as it really is
+  catch(err){ setAskMode(was); }  // not saved, so show it as it really is
+});
+document.addEventListener('click', () => askModeOpen(false));
+$('askModeMenu').parentElement.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && !$('askModeMenu').classList.contains('hidden')){ e.stopPropagation(); askModeOpen(false); $('askModeBtn').focus(); }
 });
 $('askStrip').addEventListener('keydown', e => {
   if(e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); e.currentTarget.click(); }
@@ -2095,7 +2141,7 @@ async function askStart(c, name){
   const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
   try {
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
-      case: c.generated ? c : undefined, ab_only: $('askAb').getAttribute('aria-pressed') === 'true', reading_seconds: 0,
+      case: c.generated ? c : undefined, ab_only: !!ask.ab, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
     if(!askLive(gen)) return;
     Object.assign(ask, {sid: data.session_id, hintOpened: false});
@@ -2254,7 +2300,8 @@ function askReset(){
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
   $('askStats').classList.add('hidden');
   $('askStrip').setAttribute('aria-expanded', false);
-  $('askAb').setAttribute('aria-pressed', 'false');
+  setAskMode(false);
+  askModeOpen(false);
   askChatting(false);
   setAskFile(null);
 }
@@ -2290,7 +2337,7 @@ async function askOpen(id){
       });
       last = sid;
       ended = d.ended;
-      $('askAb').setAttribute('aria-pressed', String(!!d.ab_only));  // the last case's A or B mode
+      setAskMode(!!d.ab_only);  // the last case's question style
     } catch(err){
       if(!askLive(gen)) return;
       if(!/could not be found/i.test(err.message)){ note('error', err.message, $('askThread')); }  // 404: that case is no longer saved
