@@ -737,7 +737,7 @@
   .rk{margin-top:30px;}
   .rk .mono-label{display:block; margin-bottom:12px;}
   .rk .mono-label + .rk-sub{margin:-6px 0 12px;}
-  .rk-sub{font-size:13px; color:var(--ink-soft);}
+  .rk-sub{font-size:13px; color:var(--ink-soft); margin:0 0 10px;}
   /* the chat grid is folded, because it counts chat answers and not the skill checks */
   details.rk-more{margin-top:30px; border:1px solid var(--rule); border-radius:12px; padding:12px 16px;}
   details.rk-more > summary{cursor:pointer; font-weight:600; font-size:14px;}
@@ -3146,7 +3146,7 @@ function skillGridHTML(r, title, sub){
     + types.map(t => cell(r.grid[k][t], t, k)).join('') + '</tr>').join('');
   const foot = types.map(t => cell(r.reasoning[t])).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
-  return `<div class="rk"><span class="mono-label">${title}</span>${sub ? `<p class="rk-sub">${sub}</p>` : ''}${msgs}
+  return `<div class="rk"><span class="mono-label">${title}</span>${msgs}${sub ? `<p class="rk-sub">${sub}</p>` : ''}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
     <tfoot><tr><th class="row">All</th>${foot}</tr></tfoot></table>
     <div class="note">"1 of 2" means you showed that kind of reasoning in 1 of the 2 questions on it. A darker cell is stronger, and a dot means not asked yet. Click a cell for an example.</div></div>`;
