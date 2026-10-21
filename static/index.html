@@ -1399,7 +1399,7 @@ $('topicFilter').addEventListener('click', e => {
     $('topicStatus').innerHTML = '';
     renderTopics();
     $('topicFilter').querySelector(':scope > button').focus();
-  } else if(e.target.closest(':scope > button') === toggle){
+  } else if(toggle.contains(e.target)){
     const open = !f.classList.contains('open');
     document.querySelectorAll('.ov-filter.open').forEach(o => o.classList.remove('open'));  // one menu at a time
     f.classList.toggle('open', open);
