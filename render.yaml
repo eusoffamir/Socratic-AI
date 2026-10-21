@@ -19,3 +19,5 @@ services:
         sync: false
       - key: SUPABASE_SECRET_KEY   # Supabase > Project Settings > API Keys > Secret key (sb_secret_...)
         sync: false
+      - key: AI_GUARD              # 1 = AI-style answer check on and paste off in the skill check; 0 = both off
+        value: "0"                 # off for testing (21 October 2026). MUST be "1" for the pilot and the study.
