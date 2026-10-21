@@ -51,6 +51,7 @@ Write 3 cases about the topic. Each case is one short, real situation where a pe
 Facts:
 - If SOURCE is given, take every fact and number from SOURCE only, and add nothing that SOURCE does not say. Pick the clearest, most important ideas in it for a beginner.
 - If the REQUEST is a reading, take the facts from it in the same way.
+- If SOURCE comes from the learner's own file, REQUEST may say which part to focus on. If REQUEST is empty, write about the main ideas of SOURCE.
 - With neither, use only well known, widely agreed facts that a good textbook would state.
 - Never invent studies, quotes, names of real people or exact numbers you are not sure of. Round numbers are fine when they are well known.
 - Write chances as percentages, never fractions, and write numbers as digits inside normal sentences, not with symbols like →, = or ≠.
@@ -133,6 +134,9 @@ def clean_source(source):
         return None
     if source.get("kind") == "reading":
         return {"kind": "reading"}
+    if source.get("kind") == "file":
+        name = re.sub(r"[^\w .()-]", "", str(source.get("name") or ""))[:80].strip()
+        return {"kind": "file", "name": name or "your file"}
     if source.get("kind") != "wikipedia":
         return None
     articles = [{"title": str(a.get("title"))[:120], "url": a["url"]} for a in source.get("articles") or []
@@ -203,7 +207,8 @@ def clean_topic(data, request, source=None):
         raise TopicError("The topic could not be built, so please try again.")
     if data.get("refuse"):
         raise TopicError(str(data["refuse"])[:200])
-    topic = _text(data.get("topic") or request[:60], WORDS["topic"], "topic name")
+    fallback = (source or {}).get("name") if (source or {}).get("kind") == "file" else request[:60]
+    topic = _text(data.get("topic") or fallback, WORDS["topic"], "topic name")
     tid = "t" + hashlib.sha1(_key(request).encode()).hexdigest()[:10]
     raw_cases = [c for c in data.get("cases") or [] if isinstance(c, dict)][:CASES_PER_TOPIC]
     cases = []
@@ -338,29 +343,53 @@ def _mock(request):
     return {"topic": name, "cases": [case(i) for i in range(1, CASES_PER_TOPIC + 1)]}
 
 
-def build(request):
+def build(request, file=None):
     """3 cases for any topic, written from 1 or 2 Wikipedia articles when they
-    can be found (sources.py), or from the learner's own reading. Raises
-    TopicError (or LLMError if the model fails)."""
+    can be found (sources.py), from the learner's own reading, or from their
+    own file. file: {"name", "text"} from files.read(); then request is
+    optional and says which part to focus on. Raises TopicError (or LLMError
+    if the model fails)."""
     request = (request or "").strip()[:MAX_REQUEST_CHARS]
-    if len(request) < 2:
+    if len(request) < 2 and not file:
         raise TopicError("Please type a topic first.")
-    key = _key(request)
+    if file:
+        from . import files
+        picked = files.select(file["text"], request)
+        digest = hashlib.sha1(file["text"].encode()).hexdigest()[:12]
+        key = _key(f"file:{digest}:{request}")
+        request_for_id = key
+    else:
+        key = request_for_id = _key(request)
     with _lock:
         if key in _CACHE:
             return _CACHE[key]
-    source = {"kind": "reading"} if len(request) >= sources.READING_CHARS else None
+    if file:
+        source = {"kind": "file", "name": file["name"]}
+    else:
+        source = {"kind": "reading"} if len(request) >= sources.READING_CHARS else None
     if llm_client.PROVIDER == "mock":
-        data = _mock(request)
+        data = _mock(request or file["name"])
     else:
         if not limits.budget_left():
             raise TopicError(limits.FULL_MESSAGE)
-        found = None if source else sources.find(request)
+        found = {"text": picked} if file else None if source else sources.find(request)
         payload = {"REQUEST": request, **({"SOURCE": found["text"]} if found else {})}
-        text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000, json_mode=True)
-        data = llm_client._parse_json(text)
         source = source or found
-    topic = clean_topic(data, request, source)
+        # Seen 21 October 2026: a long reply now and then comes back as broken
+        # JSON, so a reply with no usable case is asked for once more. A
+        # refusal is final.
+        for attempt in range(2):
+            text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000, json_mode=True)
+            data = llm_client._parse_json(text)
+            if isinstance(data, dict) and data.get("refuse"):
+                break
+            try:
+                clean_topic(data, request_for_id, source)
+                break
+            except TopicError:
+                if attempt or not limits.budget_left():
+                    raise
+    topic = clean_topic(data, request_for_id, source)
     topic["source"] = topic["cases"][0]["source"]
     with _lock:
         _CACHE[key] = topic

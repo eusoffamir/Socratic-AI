@@ -88,3 +88,20 @@ def test_build_sends_the_source_and_keeps_it_with_each_case(wiki, monkeypatch):
     builder._CACHE.clear()
     assert builder.build("word " * 100)["source"] == {"kind": "reading"}  # a pasted reading is its own source
     builder._CACHE.clear()
+
+
+def test_build_asks_once_more_after_a_broken_reply(wiki, monkeypatch):
+    from tests.test_builder import raw_case
+    replies = [None, {"topic": "Sleep", "cases": [raw_case()]}]
+    calls = []
+    monkeypatch.setattr(llm_client, "_generate", lambda *a, **k: calls.append(1) or "")
+    monkeypatch.setattr(llm_client, "_parse_json", lambda text: replies[len(calls) - 1])
+    builder._CACHE.clear()
+    assert builder.build("Sleep")["topic"] == "Sleep" and len(calls) == 2
+    builder._CACHE.clear()
+    calls.clear()
+    replies[:] = [{"refuse": "I cannot help with that."}, None]
+    with pytest.raises(builder.TopicError, match="cannot help"):
+        builder.build("something harmful")
+    assert len(calls) == 1  # a refusal is not asked again
+    builder._CACHE.clear()

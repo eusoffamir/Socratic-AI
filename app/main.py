@@ -1,3 +1,5 @@
+import base64
+import binascii
 import copy
 import os
 import threading
@@ -15,7 +17,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import builder, copycheck, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
+from . import builder, copycheck, files, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL, case_of
 
@@ -53,8 +55,14 @@ def study_codes():
     return {c.strip().upper() for c in os.getenv("STUDY_CODES", "").split(",") if c.strip()}
 
 
+class TopicFile(BaseModel):
+    name: str
+    data: str  # the file, base64 encoded
+
+
 class TopicRequest(BaseModel):
-    text: str = ""  # a topic name, a question or a short reading
+    text: str = ""  # a topic name, a question or a short reading; with a file, what part to focus on
+    file: TopicFile | None = None  # the learner's own PDF, Word or text file (never saved)
 
 
 class CodeRequest(BaseModel):
@@ -207,8 +215,16 @@ def make_topic(req: TopicRequest):
     """Goal 2: 3 new cases on any topic the learner types, from the Topic
     Builder agent (one model call, then cached). The page keeps the cases and
     sends one back to /api/session to start it."""
+    file = None
+    if req.file:
+        try:
+            raw = base64.b64decode(req.file.data, validate=True)
+            file = {"name": req.file.name[:120], "text": files.read(req.file.name, raw)}
+        except (binascii.Error, ValueError) as e:  # FileError is a ValueError
+            msg = str(e) if isinstance(e, files.FileError) else "This file could not be read, so please try again."
+            raise HTTPException(400, msg)
     try:
-        return builder.build(req.text)
+        return builder.build(req.text, file)
     except builder.TopicError as e:
         raise HTTPException(400, str(e))
     except LLMError as e:
