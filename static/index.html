@@ -2360,16 +2360,15 @@ $('startRow').addEventListener('click', e => {
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
-    ? `<div class="report"><div class="mono-label">Overall status</div><h2>Your skill checks</h2>
+    ? `<div class="report"><h2>Your skill checks</h2>
       <p class="lead">Play a case too, and your Socratic levels will show here.</p>${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, 'Skill checks')}</div>`
-    : `<div class="report"><div class="mono-label">Overall status</div><h2>Nothing yet</h2>
+    : `<div class="report"><h2>Nothing yet</h2>
       <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
   const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
   const cases = d.cases.map(c => `<div class="ov-case"><span class="t">${esc(c.title)}</span>
       <span class="meta">${plural(c.rounds, 'round')}</span><span class="lvl">${esc(c.level)}</span></div>`).join('');
   return `<div class="report">
-    <div class="mono-label">Overall status</div>
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
     <p class="lead">${plural(d.sessions_played, 'case')} · ${plural(n, 'round')}</p>
     <div class="report-grid">
