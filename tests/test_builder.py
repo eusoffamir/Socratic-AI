@@ -133,7 +133,13 @@ def test_whole_session_on_any_topic_through_the_api(monkeypatch):
     s = main.SESSIONS[sid]
     assert s["case"]["id"] == case["id"] == s["concept_id"]
     assert not any(t["tool_runs"] for t in s["turns"])  # a generated case has no simulation
-    assert c.get(f"/api/session/{sid}").json()["case"]["title"] == case["title"]
+    back = c.get(f"/api/session/{sid}").json()
+    assert back["case"]["title"] == case["title"]
+    # the Ask chat's "Thought process": none for the opening, plain words after each answer
+    assert back["turns"][0]["thought"] is None
+    thought = back["turns"][1]["thought"]
+    assert thought["move"] and all(m.lower() in main.STANDARDS for m in thought["standards_met"])
+    assert isinstance(back["level_idx"], int)
     over = c.post("/api/overview", json={"session_ids": [sid]}).json()
     assert over["cases"][0]["title"] == case["title"]
     tampered = {**case, "id": "pattern_or_luck"}

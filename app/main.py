@@ -146,6 +146,30 @@ def _get_session(sid, mode=None):
     return sid, SESSIONS[sid]
 
 
+def _thought(turn):
+    """What the agents did this turn, in plain words, for the folded "Thought
+    process" in the Ask chat. Plain code over what the turn already saved, so
+    it costs no model call. None for the opening turn (nothing to mark)."""
+    a = turn.get("assessment")
+    if not a:
+        return None
+    names = {k: name for k, name, _ in LEVELS}
+    met = [k.capitalize() for k, v in (a.get("standards") or {}).items() if v and k in STANDARDS]
+    marks = a.get("reasoning") or {}
+    plan = turn.get("plan") or {}
+    ins = turn.get("instruction") or {}
+    return {
+        "standards_met": met,
+        "move": names.get(a.get("reasoning_move")),
+        "reasoning": [k for k, v in (marks.get("types") or {}).items() if v],
+        "knowledge": [k for k, v in (marks.get("knowledge") or {}).items() if v],
+        "plan": plan.get("reason"),
+        "next": {"level": ins.get("level_name"), "format": ins.get("format")},
+        "guard": turn.get("guard_overrides") or [],
+        "rewrites": turn.get("rewrites", 0),
+    }
+
+
 def _tools_view(tool_runs):
     return [{"tool": r["tool"], "args": r["args"], "summary": r["summary"], "chart": r["chart"]} for r in tool_runs]
 
@@ -162,6 +186,8 @@ def _turn_response(session, result):
         "ended": session["ended"],
         # tool results for the case file chart, newest last
         "tools": _tools_view(result["tool_runs"]),
+        "level_idx": session["level_idx"],  # the Ask chat's level dots
+        "thought": _thought(session["turns"][-1]),  # the Ask chat's folded "Thought process"
         # a short view of what the agents did this turn (for the researcher, not shown as scores)
         "trace": {"plan_reason": (trace["plan"] or {}).get("reason"),
                   "guard_overrides": trace["guard_overrides"], "rewrites": trace["rewrites"]},
@@ -295,7 +321,8 @@ def get_session(sid: str):
         "ab_only": session.get("ab_only", False),
         # one entry per tutor turn: the learner answer that led to it (None for the opening), then the reply
         "turns": [{"answer": t["answer"], "parts": t["parts"], "format": t["instruction"].get("format"),
-                   "tools": _tools_view(t["tool_runs"])} for t in session["turns"]],
+                   "tools": _tools_view(t["tool_runs"]), "thought": _thought(t)} for t in session["turns"]],
+        "level_idx": session["level_idx"],
     }
 
 

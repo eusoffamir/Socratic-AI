@@ -102,7 +102,14 @@
 
   /* ======================= HOME ======================= */
   #homeView{display:grid; grid-template-columns:260px minmax(0, 1fr); transition:grid-template-columns .18s ease;}
-  #homeView.folded{grid-template-columns:72px minmax(0, 1fr);}
+  #homeView.folded{grid-template-columns:0 minmax(0, 1fr);}
+  #homeView.folded .nav{visibility:hidden; padding:0;}
+  .nav-unfold{display:none; position:fixed; top:14px; left:14px; z-index:12; width:38px; height:38px;
+              background:var(--paper); border:1px solid var(--rule); color:var(--ink-soft);}
+  .nav-unfold:hover:not(:disabled){color:var(--ink); opacity:1;}
+  .nav-unfold svg{width:20px; height:20px;}
+  #homeView.folded .nav-unfold{display:grid;}
+  #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:64px;}  /* room for the open button */
   .rail{
     background:var(--rail); color:var(--rail-ink); display:flex; flex-direction:column; align-items:center;
     gap:10px; padding:16px 0;
@@ -146,11 +153,6 @@
   .sn-empty{font-size:13px; opacity:.55; padding:4px 12px; white-space:normal;}
   .sn-foot{display:flex; gap:6px; padding-top:10px;}
   .nav-menu, .nav-backdrop{display:none;}
-  #homeView.folded .sn-name, #homeView.folded .sn-item span, #homeView.folded .sn-label,
-  #homeView.folded .sn-recents{display:none;}
-  #homeView.folded .sn-head{flex-direction:column; gap:10px; padding:0;}
-  #homeView.folded .sn-item{justify-content:center; padding:0;}
-  #homeView.folded .sn-foot{flex-direction:column; align-items:center;}
 
   /* Overall status as its own page */
   .status-main{display:flex; flex-direction:column; min-width:0; min-height:0;}
@@ -189,6 +191,29 @@
   .am-q{font-weight:600;}
   .am-ai .am-opts{display:flex; flex-direction:column; gap:8px; margin:4px 0 10px; font-family:var(--sans);}
   .am-hint{font-family:var(--sans); font-size:14px; background:none; border:none; padding:0; color:var(--signal); font-weight:600;}
+  .ask-strip{width:100%; max-width:760px; margin:0 auto; display:flex; align-items:center; gap:12px; padding:9px 14px;
+             border:1px solid var(--rule); border-radius:999px; background:var(--panel); color:var(--ink-soft);
+             font:inherit; font-size:13.5px; text-align:left;}
+  .ask-strip:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .ask-strip .dots6{display:flex; gap:4px; flex:none;}
+  .ask-strip .dots6 i{width:9px; height:9px; border-radius:50%; background:var(--rule);}
+  .ask-strip .dots6 i.on{background:var(--signal);}
+  .ask-strip b{color:var(--ink); font-weight:600;}
+  .ask-strip .grow{flex:1;}
+  .ask-strip svg{width:12px; height:12px; flex:none; transition:transform .15s;}
+  .ask-strip[aria-expanded="true"] svg{transform:rotate(180deg);}
+  .ask-top{width:100%; padding:12px 24px 0; flex:none; position:relative; z-index:5;}
+  .ask-main.empty .ask-top{display:none;}
+  .ask-stats{position:absolute; left:24px; right:24px; top:calc(100% + 8px); max-width:760px; margin:0 auto;
+             box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.12); background:var(--panel); border:1px solid var(--rule); border-radius:16px;
+             padding:18px 22px; display:grid; grid-template-columns:1fr 1fr; gap:24px; max-height:60vh; overflow:auto;}
+  .ask-stats .ladder{margin-top:8px;}
+  .am-thought{font-family:var(--sans); font-size:13.5px; color:var(--ink-faint); margin:0 0 10px;}
+  .am-thought summary{cursor:pointer; width:max-content;}
+  .am-thought summary:hover{color:var(--ink-soft);}
+  .am-thought ul{margin:8px 0 0; padding:0 0 0 14px; border-left:2px solid var(--rule); list-style:none; color:var(--ink-soft);}
+  .am-thought li{margin:0 0 6px;}
+  .am-thought li b{color:var(--ink); font-weight:600;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
           border-radius:10px; padding:10px 14px; margin:8px 0 0;}
   .ask-greet{display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 28px;
@@ -272,13 +297,13 @@
   .hero-art{overflow:hidden;}
   .hero-art img{width:100%; height:100%; object-fit:cover; object-position:35% center; display:block;}
   .hero-text{min-width:0;}
-  .phone-credit{display:none;}
+  .credit-line{margin:28px 0 0; text-align:center; font-size:13px; color:var(--ink-faint);}
+  .credit-line b{color:var(--ink-soft); font-weight:600;}
   .hero h2{
-    font-family:var(--serif); font-weight:600; font-size:clamp(22px, 2.2vw, 32px); line-height:1.1;
+    font-family:var(--serif); font-weight:600; font-size:clamp(22px, 1.8vw, 30px); line-height:1.15;
     margin:0 0 8px; letter-spacing:-.01em;
   }
   .hero p{color:var(--ink-soft); font-size:17px; margin:0;}
-  @media (min-width:701px){ .hero h2{white-space:nowrap;} }  /* one line beside Rounds and Mode */
   #homeStatus{margin-top:14px;}
 
   .section-head{display:flex; align-items:center; gap:10px; margin:32px 0 14px;}
@@ -874,11 +899,16 @@
     #homeView.nav-open .nav{transform:none;}
     #homeView.nav-open .nav-backdrop{display:block; position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.35);}
     .nav .sn-fold{display:none;}
-    #homeView.folded .sn-name, #homeView.folded .sn-item span, #homeView.folded .sn-label{display:revert;}
-    #homeView.folded .sn-recents{display:block;}
+    #homeView.folded .nav{visibility:visible; padding:14px 12px;}
+    #homeView.folded .nav-unfold{display:none;}
+    #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:16px;}
     .status-scroll{padding:16px 16px 32px;}
     .ask-main{padding:24px 16px 10vh;}
     .ask-greet{flex-direction:column; gap:12px;}
+    .ask-top{padding:10px 16px 0;}
+    .ask-stats{left:16px; right:16px;}
+    .ask-stats{grid-template-columns:1fr;}
+    .ask-strip .grow{display:none;}
     .ask-greet img{width:44px; height:44px;}
     .topbar{padding:0 16px; height:56px;}
     .home-scroll{padding:16px 16px 32px;}
@@ -912,8 +942,6 @@
        a tall top card, and the Status tab covered the chat) ----- */
     /* home: one bar instead of two; the credit moves to the bottom of the list */
     .topbar{display:none;}
-    .phone-credit{display:block; margin:24px 0 0; text-align:center; font-size:13px; color:var(--ink-faint);}
-    .phone-credit b{color:var(--ink-soft); font-weight:600;}
     .home-scroll{padding:14px 14px 24px;}
     /* the top card: smaller title, Rounds and Mode side by side */
     /* Rounds 70%, Mode 30% (student's request) */
@@ -991,6 +1019,7 @@
     <b>Socratic AI</b>
   </div>
   <div class="nav-backdrop" id="navBackdrop"></div>
+  <button class="icon-btn nav-unfold" id="navUnfold" title="Open the sidebar" aria-label="Open the sidebar"><svg><use href="#i-side"/></svg></button>
   <nav class="rail nav" aria-label="Main">
     <div class="sn-head">
       <div class="logo" role="img" aria-label="Socratic AI"><img src="/static/img/socrates.png" alt=""></div>
@@ -1009,11 +1038,6 @@
   </nav>
 
   <div class="home-main">
-    <header class="topbar">
-      <h1>Home</h1>
-      <div class="spacer"></div>
-      <span class="credit">Created by <b>Eusoff Amir</b></span>
-    </header>
 
     <div class="home-scroll">
       <div class="home-inner">
@@ -1076,7 +1100,7 @@
           <span class="draft-note hidden" id="draftNote">These cases were generated by AI and have not been reviewed by an expert. Please verify important facts.</span></div>
         <div class="cases three" id="cases"></div>
 
-        <p class="phone-credit">Created by <b>Eusoff Amir</b></p>  <!-- phones only: the top bar is hidden there -->
+        <p class="credit-line">Created by <b>Eusoff Amir</b></p>
       </div>
     </div>
 
@@ -1088,11 +1112,14 @@
   </div>
 
   <div class="status-main hidden" id="statusMain">
-    <header class="topbar"><h1>Overall status</h1></header>
     <div class="status-scroll"><div class="status-inner" id="overallBody"></div></div>
   </div>
 
   <div class="ask-main empty hidden" id="askMain">
+    <div class="ask-top">
+      <button type="button" class="ask-strip" id="askStrip" aria-expanded="false" aria-controls="askStats" title="Your progress in this chat"></button>
+      <div class="ask-stats hidden" id="askStats"></div>
+    </div>
     <div class="ask-scroll" id="askScroll">
       <div class="ask-thread" id="askThread" aria-live="polite"></div>
     </div>
@@ -1755,10 +1782,10 @@ $('navOpen').addEventListener('click', () => $('homeView').classList.add('nav-op
 $('navBackdrop').addEventListener('click', () => $('homeView').classList.remove('nav-open'));
 function setFolded(on){
   $('homeView').classList.toggle('folded', on);
-  $('navFold').title = $('navFold').ariaLabel = on ? 'Open the sidebar' : 'Fold the sidebar';
   try { localStorage.setItem('nav-folded', on ? '1' : ''); } catch(e){}
 }
-$('navFold').addEventListener('click', () => setFolded(!$('homeView').classList.contains('folded')));
+$('navFold').addEventListener('click', () => setFolded(true));
+$('navUnfold').addEventListener('click', () => setFolded(false));
 try { if(localStorage.getItem('nav-folded')) setFolded(true); } catch(e){}
 
 // Recents: the Ask chats played in this browser, newest first. Only the session
@@ -1890,13 +1917,59 @@ function askTurnHTML(p){
     ${p.key_idea && p.question ? `<button type="button" class="am-hint">Hint</button><p class="am-key hidden">${inline(p.key_idea)}</p>` : ''}`;
 }
 
+// What the agents did for the last answer, in plain words, folded like Claude's thinking.
+function askThoughtHTML(t){
+  if(!t) return '';
+  const list = xs => xs.map(x => esc(x.charAt(0).toUpperCase() + x.slice(1))).join(', ');
+  const n = t.standards_met.length;
+  const items = [
+    `<li><b>Assessor.</b> Your answer met ${n} of 9 standards${n ? ` (${list(t.standards_met)})` : ''}${t.move ? `, and it showed the ${esc(t.move)} move` : ''}.</li>`,
+    `<li><b>Reasoning agent.</b> ${t.reasoning.length ? `Reasoning shown is ${list(t.reasoning)}` : 'No clear type of reasoning yet'}${t.knowledge.length ? `, using ${list(t.knowledge)} knowledge` : ''}.</li>`,
+    t.plan ? `<li><b>Planner.</b> ${esc(t.plan)}</li>` : '',
+    t.guard.length ? `<li><b>Rules.</b> ${t.guard.map(esc).join(' ')}</li>` : '',
+    `<li><b>Tutor and Checker.</b> The next question is at the ${esc(t.next.level || 'same')} level${t.next.format ? ` as ${esc(t.next.format)}` : ''}, and ${t.rewrites ? `the Checker asked for ${t.rewrites} rewrite${t.rewrites === 1 ? '' : 's'}` : 'the Checker passed the first draft'}.</li>`,
+  ];
+  return `<details class="am-thought"><summary>Thought process</summary><ul>${items.join('')}</ul></details>`;
+}
+
+const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implications', 'Question the question'];
+function askStrip(levelIdx, thought){
+  if(levelIdx == null) return;
+  ask.levelIdx = levelIdx;
+  if(thought) ask.lastMet = thought.standards_met.length;
+  $('askStrip').innerHTML = `<span class="dots6" aria-hidden="true">${ASK_LEVELS.map((_, i) => `<i class="${i <= levelIdx ? 'on' : ''}"></i>`).join('')}</span>
+    <span>Level ${levelIdx + 1} of 6, <b>${esc(ASK_LEVELS[levelIdx] || '')}</b></span><span class="grow"></span>
+    <span>${ask.lastMet == null ? 'No answers yet' : `<b>${ask.lastMet} of 9</b> standards in your last answer`}</span>
+    <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if(!$('askStats').classList.contains('hidden')) askStatsLoad();
+}
+
+// The drop-down under the strip: this chat's levels and standards, the same charts as Overall status.
+async function askStatsLoad(){
+  const box = $('askStats');
+  if(!box.innerHTML) box.innerHTML = `<div class="thinking">${DOTS}Loading...</div>`;
+  try {
+    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats`);
+    const reached = d.levels.findIndex(l => l.name === d.summary.highest_level_reached);
+    box.innerHTML = `<section><span class="mono-label">6 Socratic Question Categories</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
+      <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>`;
+  } catch(e){ box.innerHTML = ''; note('error', e.message, box); }
+}
+$('askStrip').addEventListener('click', () => {
+  const open = $('askStats').classList.contains('hidden');
+  $('askStats').classList.toggle('hidden', !open);
+  $('askStrip').setAttribute('aria-expanded', open);
+  if(open) askStatsLoad();
+});
+
 function askShowTurn(data, intro){
   const parts = {...(data.parts || {question: data.reply})};
   if(intro) delete parts.feedback;  // the opening "welcome" line is for the case screen; the lesson replaces it
+  askStrip(data.level_idx, data.thought);
   ask.options = parts.options && parts.options.length === 2 ? parts.options : [];
   ask.picked = null;
   $('askThread').querySelectorAll('.am-opts .choice').forEach(c => c.disabled = true);  // old choices are done
-  askAdd('am-ai', (intro || '') + askTurnHTML(parts));
+  askAdd('am-ai', askThoughtHTML(data.thought) + (intro || '') + askTurnHTML(parts));
   $('askInput').placeholder = ask.options.length ? 'Pick A or B, then say why...' : 'Your answer...';
 }
 
@@ -2008,8 +2081,11 @@ $('askForm').addEventListener('submit', e => {
 
 function askReset(){
   if(ask.busy) return;
-  Object.assign(ask, {sid: null, options: [], picked: null, topic: null, cases: [], hintOpened: false});
+  Object.assign(ask, {sid: null, options: [], picked: null, topic: null, cases: [], hintOpened: false, lastMet: null});
   $('askThread').innerHTML = '';
+  $('askStrip').innerHTML = $('askStats').innerHTML = '';
+  $('askStats').classList.add('hidden');
+  $('askStrip').setAttribute('aria-expanded', false);
   askChatting(false);
   setAskFile(null);
 }
@@ -2033,7 +2109,7 @@ async function askOpen(sid){
     askAdd('am-user', esc(name || c.topic || c.title));
     d.turns.forEach((t, i) => {
       if(i) askAdd('am-user', esc(t.answer || ''));
-      askShowTurn({parts: t.parts}, i ? null : askCaseHTML(c));
+      askShowTurn({parts: t.parts, thought: t.thought, level_idx: i === d.turns.length - 1 ? d.level_idx : null}, i ? null : askCaseHTML(c));
     });
     if(d.ended){ askLock(true); $('askInput').placeholder = 'This chat has ended.'; return; }
   } catch(err){
