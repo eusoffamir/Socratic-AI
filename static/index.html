@@ -722,6 +722,13 @@
   /* reasoning and knowledge grid (Goal 1) */
   .rk{margin-top:30px;}
   .rk .mono-label{display:block; margin-bottom:12px;}
+  .rk .mono-label + .rk-sub{margin:-6px 0 12px;}
+  .rk-sub{font-size:13px; color:var(--ink-soft);}
+  /* the chat grid is folded, because it counts chat answers and not the skill checks */
+  details.rk-more{margin-top:30px; border:1px solid var(--rule); border-radius:12px; padding:12px 16px;}
+  details.rk-more > summary{cursor:pointer; font-weight:600; font-size:14px;}
+  details.rk-more > summary small{display:block; font-weight:400; font-size:12.5px; color:var(--ink-faint); margin-top:2px;}
+  details.rk-more .rk{margin-top:16px;}
   .rk-msg{margin:0 0 14px; padding:12px 14px; background:var(--panel-2); border-radius:10px; line-height:1.55;}
   .rk-msg p{margin:0;} .rk-msg p + p{margin-top:6px;}
   .rk table{width:100%; border-collapse:separate; border-spacing:4px; font-size:13px; table-layout:fixed;}
@@ -2536,17 +2543,20 @@ $('startRow').addEventListener('click', e => {
 // ---------- overall status ----------
 // Highest level and the 9 standards across every case played in this browser.
 
+const SKILL_GRID_TITLE = 'Where you are strong', SKILL_GRID_SUB = 'From your skill checks. Each column is a kind of reasoning, and each row is a kind of knowledge.';
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
     ? `<div class="report"><h2>Your skill checks</h2>
-      <p class="lead">Play a case too, and your Socratic levels will show here.</p>${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, 'Skill checks')}</div>`
+      <p class="lead">Play a case too, and your Socratic levels will show here.</p>${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>`
     : `<div class="report"><h2>Nothing yet</h2>
       <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
   const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
+  const levelNo = name => d.levels.findIndex(l => l.name === name) + 1;
   const cases = d.cases.map(c => `<div class="ov-case"><span class="t">${esc(c.title)}</span>
-      <span class="meta">${plural(c.rounds, 'round')}</span><span class="lvl">${esc(c.level)}</span></div>`).join('');
+      <span class="meta">${plural(c.rounds, 'round')}</span>
+      <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></div>`).join('');
   return `<div class="report">
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
     <p class="lead">${plural(d.sessions_played, 'case')} · ${plural(n, 'round')}</p>
@@ -2557,9 +2567,11 @@ function overallHTML(d){
         <div id="ovRadar">${standardsRadarSVG(d.standards, s.standards_met_count, n)}</div></div>
     </div>
     ${masteryHTML(d.mastery)}
-    ${skillGridHTML(d.skill_check, 'Skill checks')}
-    ${reasoningGridHTML(s.reasoning)}
-    <span class="mono-label ov-by">By case</span><div class="ov-cases">${cases}</div>
+    ${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}
+    ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
+      <small>How you reasoned in the case chats. This counts chat answers, not skill checks, so it can differ from the grid above.</small></summary>
+      ${reasoningGridHTML(s.reasoning)}</details>` : ''}
+    <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <div class="note">Only cases played in this browser count. The tutorial is practice, so it is not included.</div>
   </div>`;
 }
@@ -3098,7 +3110,7 @@ document.addEventListener('pointerdown', standardTip);  // a tap on phones
 // Goal 1 skill check: set questions, each tagged with one reasoning type on one
 // knowledge type. Each cell shows how many of the questions asked on that pair
 // the learner answered with both, so unlike the case grid it knows the total.
-function skillGridHTML(r, title){
+function skillGridHTML(r, title, sub){
   if(!r || !r.answers) return '';
   const types = Object.keys(r.reasoning_types), kinds = Object.keys(r.knowledge_types);
   const cap = w => w[0].toUpperCase() + w.slice(1);
@@ -3114,10 +3126,10 @@ function skillGridHTML(r, title){
     + types.map(t => cell(r.grid[k][t], t, k)).join('') + '</tr>').join('');
   const foot = types.map(t => cell(r.reasoning[t])).join('');
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
-  return `<div class="rk"><span class="mono-label">${title}</span>${msgs}
+  return `<div class="rk"><span class="mono-label">${title}</span>${sub ? `<p class="rk-sub">${sub}</p>` : ''}${msgs}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
     <tfoot><tr><th class="row">All</th>${foot}</tr></tfoot></table>
-    <div class="note">Each cell shows the questions where you used that reasoning on that knowledge, out of the questions asked. A dot means not asked yet. Click a cell to see why it matters.</div></div>`;
+    <div class="note">"1 of 2" means you showed that kind of reasoning in 1 of the 2 questions on it. A darker cell is stronger, and a dot means not asked yet. Click a cell for an example.</div></div>`;
 }
 
 // Mastery so far, from every skill check in this browser. The bar is the 90%
@@ -3132,10 +3144,10 @@ function masteryHTML(m){
         <span class="ms-line" style="left:${m.mastery_level}%"></span><span class="ms-dot" style="left:${r.mean}%"></span></span>
       <span class="st${r.status === 'mastered' ? ' ok' : ''}">${cap(r.status)}</span></div>`).join('');
   const msgs = m.messages.length ? `<div class="rk-msg">${m.messages.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : '';
-  return `<div class="rk"><span class="mono-label">Mastery so far</span>${msgs}
+  return `<div class="rk"><span class="mono-label">Your 8 skills</span>${msgs}
     <div class="ms-rows">${rows}</div>
     <div class="ms-axis"><span></span><span><i>0%</i><i>50%</i><i>100%</i></span><span></span></div>
-    <div class="note">The bar shows where your true score most likely is, and it gets shorter as you answer more. The dashed line is the mastery level of ${m.mastery_level}%.</div></div>`;
+    <div class="note">The dot is your most likely score, and the bar is the range it is probably in. A skill is mastered when you are past the dashed line at ${m.mastery_level}%. Hover a row for the numbers.</div></div>`;
 }
 
 // Explainer agent: why a reasoning type matters with 1 or 2 knowledge types.
@@ -3326,8 +3338,8 @@ function reasoningGridHTML(r){
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Reasoning × Knowledge</span>${msgs}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr><th class="row">Standards met</th>${quality}</tr></tfoot></table>
-    <div class="note">Each number counts your answers that used both, out of ${r.answers} so far. A mastery score comes once you have answered more questions. Click a cell to see why it matters.</div></div>`;
+    <tfoot><tr><th class="row" data-tip="The average of the 9 thinking standards your answers met with each kind of reasoning">Standards met</th>${quality}</tr></tfoot></table>
+    <div class="note">Each number is how many of your ${r.answers} chat answers used that reasoning on that knowledge. One answer can count in more than one cell. Standards met is the average out of the 9 thinking standards. Click a cell for an example.</div></div>`;
 }
 
 // Builds the profile. Used twice: in the right-side panel ("Profile" button,
