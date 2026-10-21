@@ -443,6 +443,8 @@
   .case-row .thumb svg{width:100%; height:auto; display:block;}
   .case-row .info{flex:1; min-width:0;}
   .case-row .num{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--ink-faint); margin-left:8px;}
+  /* a case in progress hides "CASE 01", so its Round badge stays on the tag's line */
+  .case-row .num:has(+ .resume){display:none;}
   .case-row .resume{
     display:inline-block; margin-left:10px; padding:2px 9px; border-radius:6px; font-size:11.5px; font-weight:600;
     background:var(--signal); color:var(--paper);
