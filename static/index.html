@@ -176,7 +176,7 @@
     .ov-three .coach-comment{grid-column:1 / -1;}  /* not enough room for 3, so the Coach goes below */
   }
   @media (max-width:700px){ .report-grid.ov-three{grid-template-columns:1fr;} .ov-three > div:nth-child(2){padding-left:0;} }
-  /* Your 8 skills and Where you are strong side by side */
+  /* mastery and the skill check grid side by side */
   .ov-two{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:72px; align-items:start;}
   .ov-two > .rk:only-child{grid-column:1 / -1;}
   @media (max-width:1100px){ .ov-two{grid-template-columns:1fr; gap:0;} }
@@ -2571,7 +2571,7 @@ $('startRow').addEventListener('click', e => {
 // ---------- overall status ----------
 // Highest level and the 9 standards across every case played in this browser.
 
-const SKILL_GRID_TITLE = 'Where you are strong', SKILL_GRID_SUB = 'From your skill checks. Each column is a kind of reasoning, and each row is a kind of knowledge.';
+const SKILL_GRID_TITLE = 'Reasoning Type by Knowledge Type', SKILL_GRID_SUB = 'From your skill checks. Each column is a kind of reasoning, and each row is a kind of knowledge.';
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
@@ -3198,7 +3198,7 @@ function masteryHTML(m){
         <span class="ms-line" style="left:${m.mastery_level}%"></span><span class="ms-dot" style="left:${r.mean}%"></span></span>
       <span class="st${r.status === 'mastered' ? ' ok' : ''}">${cap(r.status)}</span></div>`).join('');
   const msgs = m.messages.length ? `<div class="rk-msg">${m.messages.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : '';
-  return `<div class="rk"><span class="mono-label">Your 8 skills</span>${msgs}
+  return `<div class="rk"><span class="mono-label">3 Reasoning Types and 5 Knowledge Types</span>${msgs}
     <div class="ms-rows">${rows}</div>
     <div class="ms-axis"><span></span><span><i>0%</i><i>50%</i><i>100%</i></span><span></span></div>
     <div class="note">The dot is your most likely score, and the bar is the range it is probably in. A skill is mastered when you are past the dashed line at ${m.mastery_level}%. Hover a row for the numbers.</div></div>`;

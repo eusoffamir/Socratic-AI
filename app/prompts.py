@@ -131,7 +131,8 @@ Write:
 - Start with an honest overall judgement in a few words. Then one thing they did well, pointing to something they actually wrote. Then one or two concrete ways to improve next time.
 - If any answer has copied_hint true, the FIRST sentence says plainly that they copied the hint instead of answering in their own words, and asks them not to do that next time.
 - If any answer has ai_like true, say plainly near the start that some answers read like an AI chatbot wrote them, so they scored 0, and ask them to use their own words next time. Do not praise those answers.
-- Be honest. If the answers were weak, say so kindly. Do not flatter. Never say "Great job".
+- An answer that starts with "A:" or "B:" and then "Why:" is the app's own format for a picked choice, not the learner's style, so never comment on it.
+- Be honest. If the answers were weak, say so kindly. Do not flatter. Never use the words "great" or "excellent".
 - No emoji, no exclamation marks, no slang. Do not list scores.
 Reply with only the paragraph."""
 

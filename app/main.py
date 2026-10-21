@@ -528,16 +528,19 @@ def overview_coach(req: OverviewRequest):
         return {"comment": None}
     key = tuple(sorted((sid, len(s["history"])) for sid, s in played))
     played = [s for _, s in played]
-    if key not in _overall_comments:
-        try:
-            text = llm_client.call_coach_overall(played)
-        except Exception:  # any model problem: fall back, never block the page
-            text = None
+    if key in _overall_comments:
+        return {"comment": _overall_comments[key]}
+    try:
+        text = llm_client.call_coach_overall(played)
+    except Exception:  # any model problem: fall back, never block the page
+        text = None
+    if not text:  # not kept, so the next visit tries the Coach again
         merged = {"turns": [t for s in played for t in s["turns"]], "history": [h for s in played for h in s["history"]]}
-        if len(_overall_comments) > 500:
-            _overall_comments.clear()
-        _overall_comments[key] = text or orchestrator.fallback_comment(merged)
-    return {"comment": _overall_comments[key]}
+        return {"comment": orchestrator.fallback_comment(merged)}
+    if len(_overall_comments) > 500:
+        _overall_comments.clear()
+    _overall_comments[key] = text
+    return {"comment": text}
 
 
 # Only one Coach call per session, even if the stats panel and the final
