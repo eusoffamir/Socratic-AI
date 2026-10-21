@@ -189,7 +189,8 @@
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
   .am-ai .am-opts{display:flex; flex-direction:column; gap:8px; margin:4px 0 10px; font-family:var(--sans);}
-  .am-hint{font-family:var(--sans); font-size:14px; background:none; border:none; padding:0; color:var(--signal); font-weight:600;}
+  .am-qrow{display:flex; align-items:flex-start; gap:14px;}
+  .am-qrow .am-q{flex:1; margin-bottom:8px;}
   .ask-top{width:100%; flex:none; position:relative; z-index:5;}
   .ask-main.empty .ask-top{display:none;}
   #askStrip svg{color:var(--signal);}
@@ -229,7 +230,7 @@
   .am-map .legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-faint); margin:6px 2px 0;}
   .am-map .legend i{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
-          border-radius:10px; padding:10px 14px; margin:8px 0 0;}
+          border-radius:10px; padding:10px 14px; margin:0 0 10px;}
   .ask-greet{display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 28px;
              font-family:var(--serif); font-weight:500; font-size:clamp(28px, 4vw, 42px); line-height:1.15; text-align:center;}
   .ask-greet img{width:46px; height:46px; border-radius:50%; object-fit:cover; flex:none;}
@@ -1890,8 +1891,9 @@ function askTurnHTML(p){
   const opts = !p.options || p.options.length !== 2 ? '' : `<div class="am-opts choices">${p.options.map((o, i) =>
     `<button class="choice" type="button" aria-pressed="false" data-i="${i}"><span class="l">${'AB'[i]}</span>${esc(o)}</button>`).join('')}</div>`;
   return `${p.feedback ? `<p class="am-fb">${inline(p.feedback)}</p>` : ''}
-    ${p.question ? `<p class="am-q">${inline(p.question)}</p>` : ''}${opts}
-    ${p.key_idea && p.question ? `<button type="button" class="am-hint">Hint</button><p class="am-key hidden">${inline(p.key_idea)}</p>` : ''}`;
+    ${p.question ? `<div class="am-qrow"><p class="am-q">${inline(p.question)}</p>${p.key_idea
+      ? `<button type="button" class="hint-btn" aria-expanded="false" aria-label="Show hint" title="Hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}</div>` : ''}
+    ${p.key_idea && p.question ? `<p class="am-key hidden">${inline(p.key_idea)}</p>` : ''}${opts}`;
 }
 
 // What the agents did for the last answer, in plain words, folded like Claude's thinking.
@@ -1970,8 +1972,15 @@ $('askThread').addEventListener('click', e => {
   if(nd){ mapPick(nd); return; }
   if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
   if(e.target.closest('[data-stay]')){ e.target.closest('.am-card').remove(); $('askInput').focus(); return; }
-  const hint = e.target.closest('.am-hint');
-  if(hint){ hint.nextElementSibling.classList.toggle('hidden'); ask.hintOpened = true; return; }
+  const hint = e.target.closest('.hint-btn');
+  if(hint){
+    const key = hint.closest('.am-ai').querySelector('.am-key'), open = key.classList.toggle('hidden') === false;
+    if(open) key.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    hint.setAttribute('aria-expanded', open);
+    hint.setAttribute('aria-label', open ? 'Hide hint' : 'Show hint');
+    if(open) ask.hintOpened = true;  // saved with the next answer, as in a case session
+    return;
+  }
   const b = e.target.closest('.am-opts .choice');
   if(!b || b.disabled || ask.busy) return;
   const i = Number(b.dataset.i);
