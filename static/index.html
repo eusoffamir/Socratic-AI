@@ -193,9 +193,9 @@
   .ask-main:not(.empty) .ask-greet, .ask-main:not(.empty) .ask-chips{display:none;}
   /* messages: the learner on the right in a bubble, Socratic AI as plain text, like Claude */
   .am-user{align-self:flex-end; max-width:80%; background:var(--panel); border:1px solid var(--rule);
-           border-radius:16px; padding:10px 16px; font-size:15.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
+           border-radius:16px; padding:10px 16px; font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
   .am-status{color:var(--ink-faint); font-size:14.5px; display:flex; align-items:center; gap:8px;}
-  .am-ai{font-family:var(--sans); font-size:16.5px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
+  .am-ai{font-family:var(--sans); font-size:15.5px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
   .am-ai p{margin:0 0 12px;}
   .am-ai .am-words{display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 12px; font-family:var(--sans); font-size:14px; color:var(--ink-soft);}
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
@@ -208,8 +208,8 @@
   details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
   .am-more-body{display:flex; flex-direction:column; gap:14px; margin:14px 0 4px; padding-top:14px; border-top:1px solid var(--rule); cursor:auto;}
   .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
-  .am-more-body .am-lead{margin:0; font-size:15px; line-height:1.6; color:var(--ink);}
-  .am-think{background:var(--signal-soft); border-radius:10px; padding:10px 14px; font-size:14.5px; line-height:1.55; color:var(--ink);}
+  .am-more-body .am-lead{margin:0; font-size:14px; line-height:1.6; color:var(--ink);}
+  .am-think{background:var(--signal-soft); border-radius:10px; padding:10px 14px; font-size:13.5px; line-height:1.55; color:var(--ink);}
   .am-think b{display:block; font-size:12px; font-weight:600; color:var(--signal); margin-bottom:2px;}
   .am-glossary{display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px;}
   .am-glossary div{background:var(--panel-2); border:1px solid var(--rule); border-radius:10px; padding:8px 12px;}
@@ -219,12 +219,12 @@
   .am-case{font-family:var(--sans); background:color-mix(in srgb, var(--signal-soft) 30%, var(--panel));
            border:1px solid var(--rule);
            border-radius:14px; padding:20px 24px; margin:4px 0 28px;}
-  .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:15.5px; margin:0 0 10px; padding-right:90px;}
-  .am-case .s{font-size:15px; color:var(--ink-soft); margin:0;}
+  .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:14.5px; margin:0 0 10px; padding-right:90px;}
+  .am-case .s{font-size:14px; color:var(--ink-soft); margin:0;}
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
   .am-ai .am-opts{display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 10px; font-family:var(--sans);}  /* side by side, like the tutorial */
-  .am-ai .am-opts .choice{font-size:15px; font-weight:400; padding:12px 16px; gap:18px;}
+  .am-ai .am-opts .choice{font-size:14px; font-weight:400; padding:12px 16px; gap:18px;}
   .am-ai .am-opts .choice .l{width:28px; height:28px; font-size:13px;}
   .am-qrow{display:flex; align-items:center; gap:16px; margin:4px 0 14px;}
   /* the last thing in a Socratic message adds no space of its own, so the learner's answer sits closer */
@@ -298,9 +298,10 @@
            padding:10px 10px 8px; transition:border-color .15s ease, background .15s ease;}
   .ask-box:focus-within{border-color:var(--signal);}
   .ask-box.drop{border-color:var(--signal); border-style:dashed; background:var(--signal-soft);}
-  .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:16px; line-height:1.5; color:var(--ink);
+  .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:15px; line-height:1.5; color:var(--ink);
                     background:transparent; border:none; outline:none; padding:4px 6px 4px; min-height:28px; max-height:240px;}
   .ask-box textarea::placeholder{color:var(--ink-faint);}
+  @media (max-width:700px){ .ask-box textarea{font-size:16px;} }  /* under 16px, phones zoom in when typing */
   .ask-tools{display:flex; align-items:center; gap:6px; margin-top:8px;}
   .ask-tools .spacer{flex:1;}
   .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:16px;}
