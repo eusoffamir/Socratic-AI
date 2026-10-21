@@ -2566,6 +2566,8 @@ function overallHTML(d){
       <div><div class="ov-std-head"><span class="mono-label">9 Intellectual Standards</span>${caseFilterHTML(d.cases, 'ovFilter')}</div>
         <div id="ovRadar">${standardsRadarSVG(d.standards, s.standards_met_count, n)}</div></div>
     </div>
+    <div class="coach-comment" id="ovCoach"><div class="mono-label">Coach</div>
+      <div class="thinking">${DOTS}Reading all your answers...</div></div>
     ${masteryHTML(d.mastery)}
     ${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}
     ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
@@ -2621,6 +2623,11 @@ async function openOverall(){
   try {
     const d = await postJSON('/api/overview', {session_ids: ids});
     body.innerHTML = overallHTML(d);
+    // the Coach on every case, after the page shows, because it may be an AI call
+    if($('ovCoach')) postJSON('/api/overview/coach', {session_ids: ids})
+      .then(c => { const box = $('ovCoach'); if(box) box.innerHTML = c.comment
+        ? `<div class="mono-label">Coach</div><p>${esc(c.comment)}</p>` : ''; })
+      .catch(() => { const box = $('ovCoach'); if(box) box.remove(); });
     // filters: all cases, or one case only
     wireCaseFilter($('ovLevelFilter'), d.cases, c => {
       const name = c ? c.level : d.summary.highest_level_reached;

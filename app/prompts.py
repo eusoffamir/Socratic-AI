@@ -136,9 +136,28 @@ Write:
 Reply with only the paragraph."""
 
 
+# The same Coach, looking at every case the learner played instead of one session.
+COACH_OVERALL_SYSTEM = COACH_SYSTEM.replace(
+    "A learner has just answered the questions of a short Socratic session on a topic (the session may still be going). Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.",
+    "A learner has answered questions in several short Socratic sessions, maybe on different topics. Each answer says which case it came from. Write ONE short paragraph to the learner about HOW they answer overall, across all the cases, so they know what to do better next time. Look for habits that repeat across cases, and say if they improved from the earlier answers to the later ones.")
+assert COACH_OVERALL_SYSTEM != COACH_SYSTEM
+
+
+def coach_overall_user(sessions, max_answers=30):
+    """The answers from every case, oldest first, for the overall Coach. Only
+    the newest max_answers are sent, to keep the call small."""
+    pairs = [{"case": case_of(s)["title"], **p} for s in sessions for p in _coach_pairs(s)]
+    return json.dumps({"answers": pairs[-max_answers:]}, indent=1, ensure_ascii=False)
+
+
 def coach_user(session):
-    """All question and answer pairs of the session, for the Coach. Each
-    answer replies to the question in the turn before it."""
+    """All question and answer pairs of the session, for the Coach."""
+    return json.dumps({"topic": case_of(session)["title"], "answers": _coach_pairs(session)},
+                      indent=1, ensure_ascii=False)
+
+
+def _coach_pairs(session):
+    """Each answer replies to the question in the turn before it."""
     turns = session["turns"]
     pairs = []
     for prev, t in zip(turns, turns[1:]):
@@ -152,8 +171,7 @@ def coach_user(session):
                       "standards_met": _met(a) if a.get("standards") else [],
                       "move": a.get("reasoning_move"), "stuck": bool(a.get("confused_or_frustrated")),
                       "copied_hint": bool(a.get("copied_hint")), "ai_like": bool(a.get("ai_like"))})
-    return json.dumps({"topic": case_of(session)["title"], "answers": pairs},
-                      indent=1, ensure_ascii=False)
+    return pairs
 
 
 def assessor_user(session, answer, with_reasoning=False):

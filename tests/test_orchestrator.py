@@ -184,3 +184,7 @@ def test_overview_combines_every_session(monkeypatch, tmp_path):
     assert r["summary"]["rounds_completed"] == 3
     assert {c["id"] for c in r["cases"]} == {"pattern_or_luck", "together_not_cause"}
     assert client.post("/api/overview", json={"session_ids": []}).json()["sessions_played"] == 0
+    # the overall Coach: one paragraph across every case (plain-code text in mock mode)
+    coach = client.post("/api/overview/coach", json={"session_ids": ids}).json()["comment"]
+    assert coach and chr(10) not in coach
+    assert client.post("/api/overview/coach", json={"session_ids": []}).json()["comment"] is None

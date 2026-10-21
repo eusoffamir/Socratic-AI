@@ -15,8 +15,8 @@ import time
 
 from . import limits, reasoning, tools
 from .content import FORMATS, MOVES, STANDARDS, case_of
-from .prompts import (AB_FORMAT, ASSESSOR_REASONING_SYSTEM, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
-                      assessor_user, checker_user, coach_user, planner_user, tutor_user)
+from .prompts import (AB_FORMAT, ASSESSOR_REASONING_SYSTEM, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_OVERALL_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
+                      assessor_user, checker_user, coach_overall_user, coach_user, planner_user, tutor_user)
 
 
 def _pick_provider():
@@ -292,6 +292,15 @@ def call_coach(session):
         return None
     text = _generate(COACH_SYSTEM, coach_user(session), max_tokens=300)
     return " ".join(text.split()) or None  # one paragraph, no stray line breaks
+
+
+def call_coach_overall(sessions):
+    """The Coach on every case the learner played, for the Overall status
+    page. None in mock mode, so the caller uses the plain-code paragraph."""
+    if PROVIDER == "mock":
+        return None
+    text = _generate(COACH_OVERALL_SYSTEM, coach_overall_user(sessions), max_tokens=300)
+    return " ".join(text.split()) or None
 
 
 def _mock_tutor(payload):

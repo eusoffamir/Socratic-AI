@@ -502,6 +502,36 @@ def overview(req: OverviewRequest):
     }
 
 
+# The overall Coach comment, kept per set of answers, so opening the page
+# again costs no AI call until the learner has answered something new.
+_overall_comments = {}
+
+
+@app.post("/api/overview/coach")
+def overview_coach(req: OverviewRequest):
+    """One Coach paragraph on how the learner answers across every case played
+    in this browser. Asked for after /api/overview, so the page shows first."""
+    sids = list(dict.fromkeys(filter(None, map(_clean_id, req.session_ids[:300]))))
+    SESSIONS.update(storage.load_sessions([sid for sid in sids if sid not in SESSIONS]))
+    # in the browser's order, which is oldest first, so the Coach can see change
+    played = [(sid, s) for sid, s in ((sid, SESSIONS.get(sid)) for sid in sids)
+              if s and s.get("mode") != "skill_check" and s["history"]]
+    if not played:
+        return {"comment": None}
+    key = tuple(sorted((sid, len(s["history"])) for sid, s in played))
+    played = [s for _, s in played]
+    if key not in _overall_comments:
+        try:
+            text = llm_client.call_coach_overall(played)
+        except Exception:  # any model problem: fall back, never block the page
+            text = None
+        merged = {"turns": [t for s in played for t in s["turns"]], "history": [h for s in played for h in s["history"]]}
+        if len(_overall_comments) > 500:
+            _overall_comments.clear()
+        _overall_comments[key] = text or orchestrator.fallback_comment(merged)
+    return {"comment": _overall_comments[key]}
+
+
 # Only one Coach call per session, even if the stats panel and the final
 # profile ask at the same moment.
 _comment_lock = threading.Lock()
