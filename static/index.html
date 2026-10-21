@@ -132,7 +132,8 @@
   .nav{align-items:stretch; gap:3px; padding:14px 12px; min-height:0; overflow:hidden;}
   .nav .sn-head{display:flex; align-items:center; gap:10px; padding:4px 4px 0 12px; margin-bottom:22px; min-height:38px;}
   .nav .logo{margin:0; flex:none;}
-  .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1;}
+  .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1; cursor:pointer;}
+  .nav-menu b{cursor:pointer;}
   .nav .sn-fold{width:34px; height:34px; flex:none;}
   .sn-item{display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 10px; border-radius:8px;  /* the same size as a Recents row */
            background:transparent; border:none; color:var(--rail-ink); font:inherit; font-size:13.5px; font-weight:500;
@@ -1848,6 +1849,8 @@ function homeTourOnce(){
 }
 $('homeBtn').addEventListener('click', () => { showPage('home'); homeTourOnce(); });
 $('askBtn').addEventListener('click', () => { askReset(); showPage('ask'); });
+// the "Socratic AI" name (sidebar and phone bar) also starts a new chat
+document.querySelectorAll('.sn-name, .nav-menu b').forEach(el => el.addEventListener('click', () => $('askBtn').click()));
 $('navOpen').addEventListener('click', () => $('homeView').classList.add('nav-open'));
 $('navBackdrop').addEventListener('click', () => $('homeView').classList.remove('nav-open'));
 function setFolded(on){
