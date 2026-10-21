@@ -22,6 +22,23 @@ MAX_REQUEST_CHARS = 4000  # a topic name or a short reading
 CASES_PER_TOPIC = 3
 NOTES_PER_CASE = 5
 
+# The picture of a generated case is one of these icons, drawn by the page
+# (PICTURE_ICONS in static/index.html), so no image is generated or paid for.
+PICTURES = {
+    "leaf": "plants, nature, farming", "sun": "light, energy, weather, summer", "water": "water, rain, rivers, drinks",
+    "fire": "fire, heat, burning, energy use", "globe": "the world, countries, climate, travel",
+    "heart": "the body, health, feelings, care", "atom": "physics, chemistry, matter",
+    "scales": "law, justice, fairness, ethics", "columns": "history, government, old empires",
+    "book": "reading, language, learning, stories", "people": "society, groups, families, culture",
+    "chart": "data, statistics, economics, growth", "coin": "money, prices, trade, business",
+    "flask": "experiments, science labs, medicine making", "gear": "engineering, machines, technology",
+    "shield": "safety, defence, immunity, security", "crown": "kings, power, rulers, war",
+    "clock": "time, habits, schedules, ageing", "bulb": "ideas, the mind, inventions, thinking",
+    "moon": "sleep, night, space, the sky", "mountain": "geography, the earth, volcanoes, climbing",
+    "virus": "germs, disease, cells, biology", "music": "music, art, sound, creativity",
+    "apple": "food, eating, diet, cooking",
+}
+
 # Word limits for each part, a little above what the prompt asks, so one extra
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
@@ -45,6 +62,7 @@ Each case has:
 - title: 2 to 5 words, often a question, like "Pattern or luck?"
 - mission: at most 8 words, what the learner will learn, like "Tell a real pattern from luck."
 - tag: 1 word
+- picture: the 1 word from PICTURES that best fits the case
 - scenario: at most 35 words, the situation with a claim worth questioning, like "A stock went up 5 days in a row. Your friend says, \\"It is a pattern, so buy it now.\\""
 - notes: exactly 5 facts the tutor may use, at most 25 words each, in teaching order. Each has a knowledge type.
 - reading: what the learner reads before the case
@@ -54,6 +72,9 @@ Each case has:
   - think: 1 question to think about while reading
 - more_knowledge: 3 to 5 extra facts or steps, each with an id, text and knowledge type, so the knowledge graph is complete
 - links: 6 to 12 links [from_id, relation, to_id] between the notes (ids n1 to n5) and the more_knowledge ids. Every note and every extra fact is in at least 1 link.
+
+PICTURES (use these names only):
+""" + "\n".join(f"- {k}: {v}" for k, v in PICTURES.items()) + """
 
 Knowledge types (use these names only):
 """ + "\n".join(f"- {k}: {v}" for k, v in KNOWLEDGE_TYPES.items()) + """
@@ -67,6 +88,7 @@ If the REQUEST asks for help to harm people, such as weapons, hurting someone or
 Otherwise reply with ONLY this JSON and nothing else:
 {"topic": "the topic in at most 8 words",
  "cases": [{"title": "", "mission": "", "tag": "", "scenario": "",
+            "picture": "",
             "notes": [{"text": "", "type": ""}],
             "reading": {"idea": [""], "example": "", "key_words": [["", ""]], "think": ""},
             "more_knowledge": [{"id": "", "text": "", "type": ""}],
@@ -146,6 +168,7 @@ def clean_case(raw, topic, case_id):
         "mission": _text(raw.get("mission"), WORDS["mission"], "mission"),
         "tag": _text(raw.get("tag"), WORDS["tag"], "tag").capitalize(),
         "tool": None,
+        "picture": picture if (picture := str(raw.get("picture") or "").strip().lower()) in PICTURES else "bulb",
         "scenario": _text(raw.get("scenario"), WORDS["scenario"], "story"),
         "notes": [_text(n.get("text"), WORDS["note"], "note") for n in notes],
         "reading": {"idea": ideas, "example": _text(r.get("example"), WORDS["example"], "example"),
@@ -284,6 +307,7 @@ def _mock(request):
     def case(i):
         return {
             "title": f"Case {i} on {name[:20]}", "mission": "Question a claim about this topic.", "tag": "Claims",
+            "picture": "book",
             "scenario": f"[mock] A friend makes a bold claim about {name[:30]}, and says everyone agrees.",
             "notes": [{"text": f"[mock] Fact {j} about the topic.", "type": t}
                       for j, t in enumerate(["factual", "conceptual", "procedural", "causal", "epistemic"], 1)],
