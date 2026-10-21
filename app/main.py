@@ -19,7 +19,7 @@ from pydantic import BaseModel
 
 from . import builder, copycheck, files, explainer, graph, knowledge, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
-from .content import CONCEPTS, LEVELS, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
+from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
 
 app = FastAPI(title="Socratic AI")
 
@@ -481,8 +481,14 @@ def overview(req: OverviewRequest):
         history += s["history"]
         reached = orchestrator.best_level_idx(s)
         best_idx = max(best_idx, reached)
-        c = per_case.setdefault(s["concept_id"], {"title": case_of(s)["title"], "sessions": 0, "level_idx": 0, "rounds": 0, "history": []})
+        c = per_case.setdefault(s["concept_id"], {"title": case_of(s)["title"], "sessions": 0, "level_idx": 0, "rounds": 0, "history": [],
+                                                  "topic": case_of(s).get("topic") or QUANT_TOPIC, "finished": False,
+                                                  "comment": None, "session_ids": []})
         c["sessions"] += 1
+        c["session_ids"].append(sid)
+        c["finished"] |= bool(s["ended"])
+        # the newest Coach comment already saved, so no new AI call here
+        c["comment"] = s.get("comment") or s.get("progress_comment") or c["comment"]
         c["rounds"] += len(s["history"])
         c["history"] += s["history"]
         c["level_idx"] = max(c["level_idx"], reached)
@@ -495,7 +501,8 @@ def overview(req: OverviewRequest):
         "skill_check": skillcheck.summarize([t for c in checks for t in c]) if checks else None,
         "mastery": stats.mastery(checks) if checks else None,
         "cases": [{"id": cid, "title": v["title"], "sessions": v["sessions"], "rounds": v["rounds"],
-                   "level": LEVELS[v["level_idx"]][1],
+                   "level": LEVELS[v["level_idx"]][1], "topic": v["topic"], "finished": v["finished"],
+                   "comment": v["comment"], "session_ids": v["session_ids"],
                    # for the standards filter in the overall status panel
                    "standards_met_count": orchestrator.summarize(
                        {"history": v["history"], "level_idx": v["level_idx"]})["standards_met_count"]}
