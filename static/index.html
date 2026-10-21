@@ -2573,7 +2573,6 @@ function overallHTML(d){
       <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></div>`).join('');
   return `<div class="report" data-ex-general>
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
-    <p class="lead">${plural(d.sessions_played, 'case')} · ${plural(n, 'round')}</p>
     <div class="report-grid ov-three">
       <div><div class="ov-std-head"><span class="mono-label">6 Socratic Question Categories</span>${caseFilterHTML(d.cases, 'ovLevelFilter')}</div>
         <div id="ovLadder">${ladderHTML(d.levels, reachedIdx, 'Highest level')}</div></div>
