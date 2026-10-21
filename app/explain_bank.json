@@ -1,0 +1,1070 @@
+{
+ "abductive|causal": {
+  "why": "This reasoning helps you find the best cause when you only see the result, so you can solve daily puzzles.",
+  "scenario": "Sarah walked into the kitchen and found the cookie jar open and empty. Her dog had crumbs on its nose. She guessed the dog ate the cookies.",
+  "steps": [
+   "Look at what you see in front of you.",
+   "Think of a cause that makes sense of the clues.",
+   "Pick the most likely reason."
+  ],
+  "try": "You see wet grass outside your window. What is the most likely cause of this?"
+ },
+ "abductive|causal,epistemic": {
+  "why": "Abductive reasoning helps you find the most likely cause when you only see the final result.",
+  "scenario": "Anna walked into her kitchen and saw water on the floor. She looked up and noticed the window was open during a heavy rain storm, so she guessed the rain came inside.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for what happened.",
+   "Pick the best and most simple explanation."
+  ],
+  "try": "You find your front door wide open when you get home. What is the best explanation?"
+ },
+ "abductive|causal,metacognitive": {
+  "why": "Abductive reasoning helps you find the best cause for missing information so you can solve everyday problems.",
+  "scenario": "Anna sees wet footprints on the floor. She thinks about her thinking and decides the best reason is that her dog walked in from the rain.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about possible reasons that make sense.",
+   "Pick the most likely reason to be true."
+  ],
+  "try": "What is the best reason for finding an empty cookie jar on the kitchen table?"
+ },
+ "abductive|causal,relational": {
+  "why": "Abductive reasoning helps you find the best cause for what you see when you do not have all the facts.",
+  "scenario": "Anna sees wet grass outside her window. She thinks it rained last night because the sky was dark and cloudy before she went to sleep.",
+  "steps": [
+   "Look closely at what happened and what you can see right now.",
+   "Think about a few simple reasons that could explain it.",
+   "Pick the most likely reason as your best answer."
+  ],
+  "try": "Your kitchen smells like smoke and the toaster is still plugged in. What is the best reason for this?"
+ },
+ "abductive|causal,strategic": {
+  "why": "This reasoning helps you guess the best cause for what you see so you can choose what to do next.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She thinks the open window let the rain in, so she decides to close it.",
+  "steps": [
+   "Look at the clues you can see in front of you.",
+   "Think of the most likely cause for these clues.",
+   "Decide the best action to take based on that cause."
+  ],
+  "try": "You find your ice cream melted on the counter and the kitchen is warm. What is the best reason and what should you do?"
+ },
+ "abductive|conceptual": {
+  "why": "This reasoning helps you find the most likely cause of a problem when you only have a few clues, so you can solve it quickly.",
+  "scenario": "Sarah walked into her kitchen and saw water on the floor. The sink was full and the tap was left open, so she guessed the sink overflowed.",
+  "steps": [
+   "Look at the clues you can see in your room.",
+   "Think of possible reasons for what happened.",
+   "Pick the best reason that fits all the clues."
+  ],
+  "try": "You wake up and the street outside is wet. What is the best reason for this?"
+ },
+ "abductive|conceptual,causal": {
+  "why": "This helps you find the best cause for what you see when you do not have all the facts.",
+  "scenario": "Anna sees wet grass outside her window. She thinks it rained last night. This is the best guess because rain makes grass wet.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about what idea or cause could explain it best."
+  ],
+  "try": "Your kitchen smells like burnt toast. What is the best guess for why this happened?"
+ },
+ "abductive|conceptual,epistemic": {
+  "why": "This helps you find the best cause for a strange event when you do not have all the facts yet.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She guesses someone walked in from the storm.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for these clues.",
+   "Pick the most likely reason."
+  ],
+  "try": "What is the best reason when you find your kitchen cookies are gone and the dog has crumbs on its face?"
+ },
+ "abductive|conceptual,metacognitive": {
+  "why": "Abductive reasoning helps you guess the best cause for everyday clues when you do not know all the facts.",
+  "scenario": "Anna sees wet footprints by the front door. She thinks about what rain means and checks her own certainty. She decides someone walked in from the sudden storm outside.",
+  "steps": [
+   "Notice a strange clue in your day and think about what the term means.",
+   "Reflect on how sure you are about your guess based on your thoughts."
+  ],
+  "try": "What is the best explanation for a missing set of keys on the table, and how sure are you?"
+ },
+ "abductive|conceptual,procedural": {
+  "why": "This helps you guess the true cause when you only see the result and want to understand the meaning behind it.",
+  "scenario": "Anna saw wet footprints on the floor and heard thunder outside. She guessed that her dog came inside from the rain.",
+  "steps": [
+   "Look at what happened and list the clues you can see right now.",
+   "Think of the most likely reason that connects all these clues together."
+  ],
+  "try": "What is the best reason for finding an empty cookie jar and chocolate on your brother's face?"
+ },
+ "abductive|conceptual,relational": {
+  "why": "This reasoning helps you find the hidden cause of an event because it connects what you see with a logical meaning.",
+  "scenario": "Anna sees wet footprints on the floor. She knows water means something spilled, so she guesses the dog knocked over his bowl.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about what ideas or connections could explain it best."
+  ],
+  "try": "Why do you think the kitchen light is on when no one is downstairs?"
+ },
+ "abductive|conceptual,strategic": {
+  "why": "This reasoning helps you find the best guess when facts are missing so you can understand what happened and what to do next.",
+  "scenario": "Anna sees wet footprints by the front door and hears thunder outside. She uses these clues to guess it started raining, so she decides to grab an umbrella before leaving.",
+  "steps": [
+   "Look closely at what you can see in the situation.",
+   "Think about a few ideas that could explain the clues.",
+   "Pick the most likely reason and decide your next step."
+  ],
+  "try": "You find your kitchen floor is wet and the fridge door is open a crack. What is your best explanation for this?"
+ },
+ "abductive|epistemic": {
+  "why": "This helps you find the most likely cause when you only have partial clues, so you can make a sensible guess.",
+  "scenario": "Anna sees wet footprints by the front door. She has no other information, so she decides it probably rained outside.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for these clues.",
+   "Choose the reason that makes the most sense."
+  ],
+  "try": "You find your kitchen jar is empty and crumbs are on the counter. What is the best explanation for this?"
+ },
+ "abductive|factual": {
+  "why": "This helps you find the most likely cause when you only have a few clues about what happened in your daily routine.",
+  "scenario": "Sarah walked into her kitchen and saw water on the floor. She looked up and noticed the sink tap was still running, so she guessed the tap overflowed.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about a few reasons that could explain it.",
+   "Pick the most likely reason as your best answer."
+  ],
+  "try": "You find your front door is wide open when you return home, so what is the best reason for this?"
+ },
+ "abductive|factual,causal": {
+  "why": "This reasoning helps you find the best cause when you only see the final result, so you can solve daily mysteries easily.",
+  "scenario": "Anna sees the wet grass in the morning. She knows rain makes grass wet. She thinks it rained last night.",
+  "steps": [
+   "Look closely at the fact you can see right now.",
+   "Think about what cause usually makes that fact happen."
+  ],
+  "try": "You find your front door is wide open and you remember the wind was strong. What is the best reason for this?"
+ },
+ "abductive|factual,conceptual": {
+  "why": "Guessing the best reason from clues helps you solve daily puzzles when you do not know the whole truth.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She thinks someone walked inside with wet shoes.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for what happened.",
+   "Pick the most likely reason to be true."
+  ],
+  "try": "Why did the kitchen lights turn on by themselves?"
+ },
+ "abductive|factual,epistemic": {
+  "why": "This reasoning helps you find the most likely cause when you only have a few facts and need to decide what to believe.",
+  "scenario": "Anna sees wet footprints by the front door and hears rain outside. She uses these facts to guess that her brother came home in the storm.",
+  "steps": [
+   "List the clear facts you can observe.",
+   "Think of possible causes for those facts.",
+   "Pick the cause that is most likely to be true."
+  ],
+  "try": "What is the best reason for finding an empty ice cream bowl on the table when you return home?"
+ },
+ "abductive|factual,metacognitive": {
+  "why": "You use this to find the best cause for a fact when you do not know everything.",
+  "scenario": "Anna sees wet grass outside her window. She thinks about how she knows it rained last night and decides that is the most likely reason.",
+  "steps": [
+   "Look closely at the factual clue you see.",
+   "Think about how reliable your memory is.",
+   "Choose the best explanation for what happened."
+  ],
+  "try": "You find your front door is unlocked. What is the best explanation for this fact?"
+ },
+ "abductive|factual,procedural": {
+  "why": "This reasoning helps you find the best cause for a surprise because clues are missing.",
+  "scenario": "Anna sees the kitchen floor is wet and the window is open, so she thinks it rained.",
+  "steps": [
+   "Look closely at the facts and clues you can see.",
+   "Think of all possible reasons for what happened.",
+   "Choose the most likely reason as your best guess."
+  ],
+  "try": "Your keys are missing from the table and the front door is unlocked. What is the best guess?"
+ },
+ "abductive|factual,relational": {
+  "why": "This reasoning helps you find the hidden cause of a surprising fact so you can solve daily problems.",
+  "scenario": "Anna sees wet footprints on the kitchen floor and no one is outside. She thinks the cat knocked over his water bowl.",
+  "steps": [
+   "Look closely at the strange fact you found.",
+   "Think of the most likely reason that explains it."
+  ],
+  "try": "You wake up and your car window is wet on the inside. What is the best guess for why this happened?"
+ },
+ "abductive|factual,strategic": {
+  "why": "Abductive reasoning helps you find the best cause for a strange fact so you can decide what action to take next.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She guesses someone left the window open, so she decides to close it quickly.",
+  "steps": [
+   "Look closely at the strange fact you can see.",
+   "Think of the most likely reason that explains it.",
+   "Decide on the best action to take based on your guess."
+  ],
+  "try": "You notice the lights are out and hear thunder outside. What is the best reason for this and what should you do?"
+ },
+ "abductive|metacognitive": {
+  "why": "Abductive reasoning helps you find the best cause for missing clues, and metacognition lets you check if your guess is reliable.",
+  "scenario": "Anna sees water on the kitchen floor and hears the tap dripping. She thinks the tap leaked while she slept and checks her own memory to see if she turned it off fully.",
+  "steps": [
+   "Look closely at the clues and list possible causes.",
+   "Pick the simplest and most likely explanation.",
+   "Check your own thoughts to see why you trust this guess."
+  ],
+  "try": "What is the best explanation for finding your front door wide open when you return home?"
+ },
+ "abductive|metacognitive,epistemic": {
+  "why": "Abductive reasoning helps you find the most likely cause when you only have a few clues, so you can make sense of daily events.",
+  "scenario": "Leo walks into the kitchen and sees a wet floor and an empty cup. He thinks about what happened and decides the cup spilled.",
+  "steps": [
+   "Look closely at the clues you can see around you.",
+   "Think of a few simple reasons that could explain the clues.",
+   "Pick the reason that makes the most sense."
+  ],
+  "try": "You find your front door open and your keys on the floor. What is the best explanation for this?"
+ },
+ "abductive|procedural": {
+  "why": "This reasoning helps you find the hidden cause of a problem so you can fix it.",
+  "scenario": "Anna sees water on the kitchen floor and hears a strange dripping sound from the sink pipes. She guesses the pipe broke and checks underneath to confirm her idea.",
+  "steps": [
+   "Look closely at the strange clues you can see.",
+   "Think of the most likely reason that explains all the clues together."
+  ],
+  "try": "What is the best reason for wet grass outside when it did not rain last night?"
+ },
+ "abductive|procedural,causal": {
+  "why": "Abductive reasoning helps you find the best cause for what you see when you do not have all the facts.",
+  "scenario": "Sarah sees wet footprints by the front door and hears thunder outside. She thinks it started raining while she was inside.",
+  "steps": [
+   "Look closely at the clues you can see around you.",
+   "Think of a few simple reasons that could explain the clues.",
+   "Pick the reason that makes the most sense of everything."
+  ],
+  "try": "You wake up and the kitchen floor is wet near the sink. What is the most likely cause?"
+ },
+ "abductive|procedural,epistemic": {
+  "why": "This reasoning helps you find the most likely cause when you only have a few clues because it fills in missing gaps.",
+  "scenario": "Sarah walked into her kitchen and saw water dripping from the ceiling. She checked the bathroom upstairs and found the sink running. She guessed the sink caused the leak.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for what happened.",
+   "Choose the best explanation that fits all the clues."
+  ],
+  "try": "You find your front door wide open and your keys on the floor. What is the best reason for this?"
+ },
+ "abductive|procedural,metacognitive": {
+  "why": "This reasoning helps you find the best cause for a problem when you only have a few clues, so you can fix it.",
+  "scenario": "Anna walked into her kitchen and saw water on the floor. The sink was dry, but the window was open and it had rained. She guessed the rain came through the window.",
+  "steps": [
+   "Look closely at the clues you can see in your home.",
+   "Think of a few simple reasons that could explain the clues.",
+   "Choose the reason that makes the most sense."
+  ],
+  "try": "What is the best reason for finding your front door wide open when you come home?"
+ },
+ "abductive|procedural,relational": {
+  "why": "Abductive reasoning helps you find the most likely cause when you only have a few clues about daily events.",
+  "scenario": "Anna walked into the kitchen and found the jar of cookies empty with crumbs on the floor. She guessed the dog ate them because the dog looked guilty and wagged its tail slowly.",
+  "steps": [
+   "Look at the clues you can see in your room.",
+   "Think of a few reasons that could explain those clues.",
+   "Choose the reason that makes the most sense."
+  ],
+  "try": "You see wet footprints on the floor and hear thunder outside. What is the best guess for why the floor is wet?"
+ },
+ "abductive|procedural,strategic": {
+  "why": "This reasoning helps you guess the best cause when you only see the result so you can fix everyday problems quickly.",
+  "scenario": "Anna sees the kitchen floor is wet and the window is open. She thinks rain got in and closed the window.",
+  "steps": [
+   "Look at what you see in front of you.",
+   "Think of possible reasons for it.",
+   "Pick the most likely reason."
+  ],
+  "try": "You smell smoke in the kitchen and see the toaster is on. What is the best reason for this?"
+ },
+ "abductive|relational": {
+  "why": "This helps you find the most likely cause when you only see the final result.",
+  "scenario": "Sarah walked into the kitchen and found the kitchen floor wet. She knew that an open window lets rain in, so she guessed the rain made the floor wet.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think of possible reasons that connect the facts together.",
+   "Pick the best and most likely explanation."
+  ],
+  "try": "Your plants died while you were away on holiday and the soil is completely dry. What is the best reason for this?"
+ },
+ "abductive|relational,epistemic": {
+  "why": "This reasoning helps you find the best cause for what you see when you do not have all the facts yet.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She thinks someone walked inside with wet shoes.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about possible reasons that could explain it.",
+   "Pick the most likely reason as your best answer."
+  ],
+  "try": "Why did the kitchen light turn on by itself if nobody was home?"
+ },
+ "abductive|relational,metacognitive": {
+  "why": "This reasoning helps you find the best cause when facts are missing, so you can make sense of daily events.",
+  "scenario": "Anna sees wet grass outside her window and thinks it rained overnight because dark clouds were in the evening sky.",
+  "steps": [
+   "Look closely at what you see in front of you.",
+   "Think about possible reasons that could explain the clue.",
+   "Pick the most likely reason as your best guess."
+  ],
+  "try": "What is the best reason for finding a cold cup of coffee on your desk?"
+ },
+ "abductive|relational,strategic": {
+  "why": "Abductive reasoning helps you find the best guess when you do not have all the facts, so you can connect things and decide what to do next.",
+  "scenario": "Anna sees wet footprints on the floor and hears rain outside. She guesses someone left the window open, so she decides to close it quickly.",
+  "steps": [
+   "Look at the clues you can see.",
+   "Think of the most likely reason for those clues.",
+   "Choose your next action based on that guess."
+  ],
+  "try": "You smell smoke in the kitchen and see the toaster is on. What is the best explanation and what should you do?"
+ },
+ "abductive|strategic": {
+  "why": "This helps you find the most likely cause when you only have a few clues so you can choose what to do next.",
+  "scenario": "Anna sees wet footprints by the front door and hears thunder outside. She guesses it started to rain so she decides to grab an umbrella before leaving.",
+  "steps": [
+   "Look at the clues you can see.",
+   "Think of the simplest reason that explains those clues.",
+   "Decide your next action based on that reason."
+  ],
+  "try": "You smell smoke in the kitchen and see the toaster is on. What is the best explanation and what should you do?"
+ },
+ "abductive|strategic,epistemic": {
+  "why": "This reasoning helps you find the best guess when you do not know all the facts, so you can decide what to do.",
+  "scenario": "Anna sees wet coats by the front door and hears thunder outside. She guesses it is raining heavily and decides to take her umbrella.",
+  "steps": [
+   "Look closely at the clues you can see.",
+   "Think of possible reasons for these clues.",
+   "Pick the most likely reason to guide your next action."
+  ],
+  "try": "You see your friend smiling and holding an open gift box. What is the best reason for this?"
+ },
+ "abductive|strategic,metacognitive": {
+  "why": "This reasoning helps you find the best plan when you do not have all the facts, so you can decide what to do next.",
+  "scenario": "Anna sees wet footprints on the kitchen floor and hears the back door open. She guesses the dog went outside in the rain, so she brings a towel to clean the floor.",
+  "steps": [
+   "Look at the clues you can see.",
+   "Think of the most likely reason for these clues.",
+   "Choose your next action based on that guess."
+  ],
+  "try": "You find your keys on the kitchen table and your coat is gone. What do you think happened?"
+ },
+ "deductive|causal": {
+  "why": "This reasoning helps you apply 1 proven rule about causes to new situations so you can predict results.",
+  "scenario": "Anna knows the general rule that wet roads cause cars to slide. She sees rain outside and concludes that the road will be wet so she must drive very slowly.",
+  "steps": [
+   "Find a proven rule about why something happens.",
+   "Check if your current situation fits that rule.",
+   "Draw a safe conclusion about the result."
+  ],
+  "try": "If heat melts ice cream, what will happen to your cone left in the warm sun?"
+ },
+ "deductive|causal,epistemic": {
+  "why": "Deductive reasoning with causal knowledge helps you predict outcomes because reliable rules connect actions to results.",
+  "scenario": "Anna knows that wet roads make cars slip. She sees rain on the street and decides to drive slower.",
+  "steps": [
+   "Find the general rule about cause and effect.",
+   "Check if the rule applies to your situation.",
+   "Draw your final conclusion."
+  ],
+  "try": "If cold weather causes pipes to freeze, what should you do when temperatures drop below zero?"
+ },
+ "deductive|causal,metacognitive": {
+  "why": "This reasoning helps you use known rules to understand causes and check your own thoughts so you can make reliable choices.",
+  "scenario": "Anna knows that wet roads make cars slip. She sees rain outside and thinks the roads are wet. She checks her memory to be sure she trusts this rule.",
+  "steps": [
+   "Start with a known rule about how one thing causes another.",
+   "Check if this rule applies to your current situation.",
+   "Reflect on how well you know this fact."
+  ],
+  "try": "What rule helps you know why your phone battery dies when you leave apps open all day?"
+ },
+ "deductive|causal,relational": {
+  "why": "Deductive reasoning with causal and relational knowledge helps you predict outcomes because you apply known rules to specific everyday situations safely.",
+  "scenario": "Anna knows that wet roads make stopping cars take longer. It is raining outside now. She leaves extra space because she uses this rule.",
+  "steps": [
+   "Find a general rule about how things connect.",
+   "Check if your current situation matches that rule.",
+   "State the specific outcome based on the rule."
+  ],
+  "try": "If cold weather causes pipes to freeze, what will happen to your outdoor pipes when the temperature drops below zero degrees?"
+ },
+ "deductive|causal,strategic": {
+  "why": "Deductive reasoning with causal knowledge helps you predict outcomes because you apply a known rule to a specific event.",
+  "scenario": "Anna knows that wet roads make cars slide. It starts to rain heavily so Anna drives much slower because she wants to stay safe.",
+  "steps": [
+   "Find a general rule about causes.",
+   "Apply that rule to your current situation.",
+   "Reach a clear conclusion about what will happen."
+  ],
+  "try": "You know that ice makes sidewalks slippery so what will happen if you walk outside today?"
+ },
+ "deductive|conceptual": {
+  "why": "Deductive reasoning helps you apply clear rules to daily life so you can make smart and safe choices.",
+  "scenario": "Maria knows the rule that all frozen food must go in the freezer immediately. She buys ice cream and puts it in the freezer right away.",
+  "steps": [
+   "Find a known rule about your daily situation.",
+   "Check if your current case fits the rule.",
+   "Draw a safe conclusion based on that rule."
+  ],
+  "try": "If all grocery store milk must stay cold, where should you put your milk after you get home?"
+ },
+ "deductive|conceptual,causal": {
+  "why": "Deductive reasoning helps you apply clear rules to everyday facts so you can make safe and smart choices.",
+  "scenario": "Anna knows the rule that all ice cream melts in the hot sun. She buys an ice cream cone and walks outside into the bright sunlight. She concludes that her ice cream will soon melt.",
+  "steps": [
+   "Find a known rule or fact about everyday life.",
+   "Check if your current situation matches that rule.",
+   "Draw a direct conclusion based on the rule."
+  ],
+  "try": "If all wet roads are slippery and your street is wet, what can you expect?"
+ },
+ "deductive|conceptual,epistemic": {
+  "why": "Deductive reasoning helps you apply a general rule to a specific situation so you can make a safe choice based on clear evidence.",
+  "scenario": "Maria knows that the local store is always closed on Sundays. Today is Sunday. She concludes that she cannot buy milk there today.",
+  "steps": [
+   "Start with a general rule you know is true.",
+   "Check the facts of your current situation.",
+   "Apply the rule to reach your final conclusion."
+  ],
+  "try": "If all fresh fruit needs to go in the fridge to last longer, where should you put your new apples?"
+ },
+ "deductive|conceptual,metacognitive": {
+  "why": "Deductive reasoning with conceptual knowledge helps you apply general rules to specific daily situations so you can make reliable choices.",
+  "scenario": "Anna knows that all perishable food spoils if left out of the fridge. She leaves her milk on the counter. She concludes the milk will spoil.",
+  "steps": [
+   "Find a known rule about your topic.",
+   "Check if your specific case fits the rule.",
+   "Draw your conclusion based on the rule."
+  ],
+  "try": "If all metal objects sink in water, what happens when you drop a metal key into a pond?"
+ },
+ "deductive|conceptual,procedural": {
+  "why": "Deductive reasoning helps you apply known rules to specific situations so you can make safe choices in daily life.",
+  "scenario": "Anna knows the rule that milk spoils if left out of the fridge. She sees a carton of milk left on the counter all night and concludes it is spoiled.",
+  "steps": [
+   "Start with a known rule or fact.",
+   "Check if your current situation fits the rule.",
+   "Draw a clear conclusion based on that fit."
+  ],
+  "try": "If all park benches get wet when it rains, and it rained today, what can you say about the benches?"
+ },
+ "deductive|conceptual,relational": {
+  "why": "Deductive reasoning lets you apply a general rule to a specific situation so you can understand what will happen next.",
+  "scenario": "Maria knows that ice cream melts quickly in the hot sun. She looks at her ice cream cone and concludes it will melt fast outside.",
+  "steps": [
+   "Start with a known rule about how things work.",
+   "Look at your specific situation.",
+   "Apply the rule to find the result."
+  ],
+  "try": "If all metal objects sink in water, what happens when you drop a metal key into a pond?"
+ },
+ "deductive|conceptual,strategic": {
+  "why": "Deductive reasoning helps you apply general rules to everyday choices so you make smart plans based on what terms mean.",
+  "scenario": "Anna knows that all food in the open fridge for 3 days spoils. Her milk was there for 4 days. She decides to throw it out.",
+  "steps": [
+   "Find a general rule about the idea or situation.",
+   "Check if your specific case fits that rule.",
+   "Choose the right action based on that match."
+  ],
+  "try": "If all frozen food melts after 2 hours without power, and your power was out for 3 hours, what should you do?"
+ },
+ "deductive|epistemic": {
+  "why": "Deductive reasoning with epistemic knowledge helps you check if your beliefs are truly backed by solid evidence so you avoid mistakes.",
+  "scenario": "Anna knows the strict rule that the train always stops at noon. She sees it is noon and concludes the train is stopping now.",
+  "steps": [
+   "Find a trusted general rule or fact.",
+   "Check if your current evidence matches that rule.",
+   "Draw your final conclusion based on the match."
+  ],
+  "try": "If all cats sleep indoors at night and your cat is inside, what must you conclude?"
+ },
+ "deductive|factual": {
+  "why": "Deductive reasoning from factual knowledge helps you apply general rules to specific situations so you can make reliable decisions in daily life.",
+  "scenario": "Anna knows the factual rule that all milk spoils within 2 days after opening. She checks the carton and sees it was opened 3 days ago, so she concludes it is spoiled.",
+  "steps": [
+   "Find a reliable rule or known fact.",
+   "Check the specific facts of your current situation.",
+   "Apply the rule to reach a logical conclusion."
+  ],
+  "try": "If all local buses stop running at 10 PM and it is now 11 PM, what can you conclude about catching a bus?"
+ },
+ "deductive|factual,causal": {
+  "why": "Deductive reasoning with factual and causal knowledge helps you apply general rules to solve daily problems and predict outcomes accurately.",
+  "scenario": "Anna knows that ice melts above zero degrees because heat transfers to the solid. She sees the thermometer reads five degrees, so she expects her ice cream to melt outside.",
+  "steps": [
+   "State the general rule and the cause behind it.",
+   "Check the specific facts of your current situation.",
+   "Apply the rule to reach your certain conclusion."
+  ],
+  "try": "If all metal pans get hot on a warm stove because heat transfers quickly, what happens when you touch a pan?"
+ },
+ "deductive|factual,conceptual": {
+  "why": "Deductive reasoning helps you apply general rules to facts so you can make safe and logical choices in your daily life.",
+  "scenario": "Maria knows that the local grocery store closes at 8 pm every night. She checks her watch and sees it is 7 pm. She concludes the store is still open.",
+  "steps": [
+   "Start with a known rule or fact.",
+   "Check the specific details of your current situation.",
+   "Combine them to reach a clear conclusion."
+  ],
+  "try": "If all weekend buses run every 30 minutes and the last one left at noon, when is the next bus due?"
+ },
+ "deductive|factual,epistemic": {
+  "why": "This reasoning helps you use known facts to make safe choices because it connects general rules to your specific daily life.",
+  "scenario": "Anna knows that ice melts when it is warm outside. She sees the sun shining brightly, so she concludes her ice cream will melt quickly.",
+  "steps": [
+   "Start with a general rule you know is true.",
+   "Check the specific facts about your current situation.",
+   "Draw a clear conclusion that follows from both."
+  ],
+  "try": "You know that all libraries close at 9 pm and it is currently 9:30 pm. What should you believe about entering now?"
+ },
+ "deductive|factual,metacognitive": {
+  "why": "Deductive reasoning with factual and metacognitive knowledge helps you check if your beliefs are true so you can make smart choices every day.",
+  "scenario": "Anna knows the strict rule that ice melts above zero degrees Celsius. She checks her thermometer and sees it reads 5 degrees, so she concludes her ice cream will melt outside.",
+  "steps": [
+   "Start with a proven rule you already know.",
+   "Check the current facts to see if the rule fits.",
+   "Reach a clear conclusion based on that rule."
+  ],
+  "try": "If all supermarkets are closed on Sundays and today is Sunday, what do you know about visiting the supermarket?"
+ },
+ "deductive|factual,procedural": {
+  "why": "Deductive reasoning lets you apply a general rule to a specific factual observation so you can make a reliable plan for your day.",
+  "scenario": "Maria knows that buses stop running at 10 PM every night. She sees that it is 9 PM now and checks her watch. She concludes that she still has time to catch the late bus home.",
+  "steps": [
+   "Start with a known rule or fact about your daily routine.",
+   "Check the specific facts of your current situation.",
+   "Apply the rule to your situation to reach a clear conclusion."
+  ],
+  "try": "If all supermarkets close at 9 PM and it is 8 PM, what can you conclude about buying milk now?"
+ },
+ "deductive|factual,relational": {
+  "why": "Deductive reasoning helps you apply known facts to new situations so you can make safe and logical choices in daily life.",
+  "scenario": "Anna knows that ice melts when left in the warm sun. She leaves her ice cream on the sunny porch and concludes it will melt.",
+  "steps": [
+   "Start with a known rule or fact.",
+   "Check if your specific situation fits that rule.",
+   "Reach a clear conclusion based on the rule."
+  ],
+  "try": "If all supermarkets close at 10 pm and it is now 11 pm, what can you conclude about visiting the supermarket?"
+ },
+ "deductive|factual,strategic": {
+  "why": "Deductive reasoning helps you apply a general rule to a specific fact so you can decide what action to take next.",
+  "scenario": "Anna knows that all fresh milk must go into the fridge. She sees a new carton of milk on the counter and decides to put it away.",
+  "steps": [
+   "Start with a known rule about the topic.",
+   "Check the specific fact in front of you.",
+   "Apply the rule to choose your next action."
+  ],
+  "try": "You know that umbrellas keep you dry in rain, and it is raining now. What should you do?"
+ },
+ "deductive|metacognitive": {
+  "why": "Deductive reasoning with metacognitive knowledge helps you check your reliable rules so you make fewer mistakes.",
+  "scenario": "Anna knows the rule that milk spoils when left out of the fridge. She thinks about how she knows this and checks the milk carton before drinking.",
+  "steps": [
+   "Think about the rule you learned and why you trust it.",
+   "Apply that rule to your current situation.",
+   "Check if your conclusion is correct."
+  ],
+  "try": "What rule can you check to know if it will rain today?"
+ },
+ "deductive|metacognitive,epistemic": {
+  "why": "Deductive reasoning with epistemic knowledge helps you apply a proven rule to new evidence so you can decide what is truly justified to believe.",
+  "scenario": "Anna sees a weather rule that dark storm clouds always bring rain. She looks outside and sees dark clouds, so she concludes it will rain soon.",
+  "steps": [
+   "Find a reliable rule or known fact.",
+   "Check the current evidence to see if the rule applies.",
+   "Draw your specific conclusion based on the rule."
+  ],
+  "try": "If all stores are closed on Sundays and today is Sunday, what can you safely conclude about the local bookstore?"
+ },
+ "deductive|procedural": {
+  "why": "Deductive reasoning with procedural knowledge helps you follow proven rules so you always get the right result safely.",
+  "scenario": "Anna wants to bake a cake. She knows the recipe rule that baking soda must be mixed with flour first. She applies this rule to her cake steps and mixes them correctly.",
+  "steps": [
+   "Start with a known rule or method.",
+   "Check your specific task against that rule.",
+   "Follow the steps to reach a sure conclusion."
+  ],
+  "try": "If the rule says to lock the door before leaving, what should you do when you leave your house?"
+ },
+ "deductive|procedural,causal": {
+  "why": "Deductive reasoning helps you apply general rules to specific steps so you can solve daily tasks safely and correctly.",
+  "scenario": "Anna knows that wet floors are slippery and cause falls. She sees the kitchen floor is wet from a spill, so she decides to mop it dry before walking across the room.",
+  "steps": [
+   "Find a known rule or fact about the situation.",
+   "Check if your current case fits that rule.",
+   "Reach a safe conclusion for your next action."
+  ],
+  "try": "You know that ice cream melts in the warm sun. If you leave your cone outside, what will happen?"
+ },
+ "deductive|procedural,epistemic": {
+  "why": "Deductive reasoning helps you apply general rules to specific steps so you can follow methods correctly and trust your daily choices.",
+  "scenario": "Anna follows a recipe rule that says all cakes need 30 minutes in the oven. She concludes her cake needs 30 minutes.",
+  "steps": [
+   "Find a proven general rule.",
+   "Check if your specific case fits the rule.",
+   "Draw your final conclusion."
+  ],
+  "try": "If all cold foods belong in the fridge, where does your fresh milk go?"
+ },
+ "deductive|procedural,metacognitive": {
+  "why": "Deductive reasoning helps you apply a general safety rule to your own steps so you avoid mistakes and stay sure of your method.",
+  "scenario": "Anna wants to bake a cake safely. She knows the rule that hot oven trays need thick oven mitts. She applies this rule to her current action and picks up her mitts before touching the tray.",
+  "steps": [
+   "State a known rule about your method clearly.",
+   "Check if your current step matches that rule.",
+   "Make your specific choice based on the rule."
+  ],
+  "try": "What rule should you use when you check your front door is locked before you leave?"
+ },
+ "deductive|procedural,relational": {
+  "why": "This helps you apply a general rule to a specific task so you know exactly what to do.",
+  "scenario": "Maria knows that all frozen meals must bake for 40 minutes. She has a frozen lasagna, so she sets her timer for 40 minutes.",
+  "steps": [
+   "Find the general rule for your task.",
+   "Check that your case fits the rule.",
+   "Apply the rule to get your answer."
+  ],
+  "try": "All raincoats are waterproof. You wear your raincoat in a storm. Will you stay dry?"
+ },
+ "deductive|procedural,strategic": {
+  "why": "Deductive reasoning helps you apply safe cooking rules to your meal so you avoid food poisoning every time.",
+  "scenario": "Sam wants to cook raw chicken safely. He knows the rule that raw chicken must reach 74 degrees Celsius to kill germs. He uses a food thermometer to check the temperature before eating.",
+  "steps": [
+   "Find a safe rule for your task.",
+   "Follow the steps to test your case."
+  ],
+  "try": "If the rule says ice melts above zero degrees, what will happen to your ice cube left outside on a warm day?"
+ },
+ "deductive|relational": {
+  "why": "This helps you predict what will happen next because you connect a known rule to how things change together.",
+  "scenario": "Anna knows that when the sun shines brightly, the ice cream melts faster. She sees the hot sun today, so she hurries to eat her ice cream before it drips.",
+  "steps": [
+   "Find the general rule about how two things connect.",
+   "Look at what is happening right now in your situation.",
+   "Apply the rule to reach a clear conclusion."
+  ],
+  "try": "If you know that wearing a thick wool sweater makes you feel warmer, what happens when you put one on today?"
+ },
+ "deductive|relational,epistemic": {
+  "why": "Deductive reasoning with relational and epistemic knowledge helps you draw firm conclusions from trusted facts and connections.",
+  "scenario": "Anna knows that when it rains, the grass gets wet. She sees the wet grass and concludes it rained.",
+  "steps": [
+   "Start with a known rule about how things connect.",
+   "Check the evidence to see if it fits the rule.",
+   "Draw a clear conclusion from the facts."
+  ],
+  "try": "If all shops are closed on Sundays and today is Sunday, what do you know about the local shop?"
+ },
+ "deductive|relational,metacognitive": {
+  "why": "Using a known rule helps you connect facts and check your own thinking so you can make reliable choices.",
+  "scenario": "Anna knows that waking up late makes her miss the bus. She sees the clock shows 8 am and realizes she will miss her bus today.",
+  "steps": [
+   "Start with a trusted rule about how two things connect.",
+   "Check your current facts against that rule.",
+   "Reach a clear conclusion about your situation."
+  ],
+  "try": "If studying for 2 hours always helps you pass tests, what should you do when a big test comes?"
+ },
+ "deductive|relational,strategic": {
+  "why": "Deductive reasoning with relational and strategic knowledge helps you apply general rules to connected daily situations so you can decide what action to take next.",
+  "scenario": "Anna knows the rule that a wet road makes driving slippery and dangerous. She sees rain start to fall outside. She decides to drive much slower today.",
+  "steps": [
+   "Look at the general rule and how things are connected.",
+   "Check your current situation to see if the rule applies.",
+   "Choose your next action based on that rule."
+  ],
+  "try": "If cold weather kills outdoor plants and tonight will freeze, what should you do with your potted plants?"
+ },
+ "deductive|strategic": {
+  "why": "Deductive reasoning with strategic knowledge helps you apply a general rule to choose the best action so you reach your goal.",
+  "scenario": "Anna knows the rule that ice cream melts fast in the sun. She wants to keep her treat cold, so she decides to sit in the shade.",
+  "steps": [
+   "Find a known rule about your current situation.",
+   "Check how this rule applies to your exact problem.",
+   "Choose the action that follows the rule."
+  ],
+  "try": "You know that wet roads make stopping harder, so what should you do when you drive in the rain?"
+ },
+ "deductive|strategic,epistemic": {
+  "why": "Deductive reasoning helps you apply general rules to everyday situations so you know what is right to believe and do.",
+  "scenario": "Anna knows that all grocery stores close at 8 pm today. She checks her clock and sees it is 8:30 pm. She concludes that her local store is now closed.",
+  "steps": [
+   "Find a trusted general rule about your daily situation.",
+   "Check the specific facts of your current case.",
+   "Apply the rule to reach a clear conclusion."
+  ],
+  "try": "If all fresh milk spoils outside the fridge, and you left your milk on the counter, what must you believe?"
+ },
+ "deductive|strategic,metacognitive": {
+  "why": "This reasoning helps you apply a general rule to a specific choice so you can act wisely.",
+  "scenario": "Anna knows that ice cream melts quickly in the sun. She wants to eat her snack outside, so she decides to sit in the shade.",
+  "steps": [
+   "Find a known rule about the situation.",
+   "Check how that rule fits your current choice.",
+   "Decide the best action based on the rule."
+  ],
+  "try": "What should you do next if you know that wet roads make driving dangerous?"
+ },
+ "inductive|causal": {
+  "why": "Inductive reasoning with causal knowledge helps you find hidden rules in daily life so you can predict what happens next and stay safe.",
+  "scenario": "Anna touched three different hot stoves and each one burned her finger. She formed the general idea that all hot stoves cause burns.",
+  "steps": [
+   "Notice several similar events happen in your day.",
+   "Find the common cause behind these events.",
+   "Make a general rule for the future."
+  ],
+  "try": "You notice your plants die every time you forget to water them. What general rule can you make?"
+ },
+ "inductive|causal,epistemic": {
+  "why": "Inductive reasoning helps you find general patterns from causal and epistemic knowledge so you can predict future events safely.",
+  "scenario": "Anna noticed that every time she drank coffee late at night, she stayed awake. She concluded that caffeine causes insomnia.",
+  "steps": [
+   "Gather several examples of the event happening.",
+   "Look for the common cause in all cases.",
+   "Form a general rule based on the evidence."
+  ],
+  "try": "What general rule can you make if your phone battery dies every time you play games outside?"
+ },
+ "inductive|causal,metacognitive": {
+  "why": "This helps you find hidden patterns because you look at a few examples and make a safe guess about how things work.",
+  "scenario": "Anna touches three different metal kettles while they are boiling on the stove and each one feels very hot. She concludes that all boiling kettles are hot.",
+  "steps": [
+   "Look at a few specific cases.",
+   "Find the common cause shared by them.",
+   "Make a general rule for the future."
+  ],
+  "try": "You notice your plant dies after you forget to water it three times. What general rule can you make?"
+ },
+ "inductive|causal,relational": {
+  "why": "Inductive reasoning helps you find general patterns from everyday observations so you can understand causal and relational connections around you.",
+  "scenario": "Anna noticed that every time she watered her house plants more often, they grew faster. She concluded that more water causes faster plant growth.",
+  "steps": [
+   "Look for repeated events or patterns in your daily life.",
+   "Check how one thing causes or relates to another.",
+   "Make a general rule based on what you saw."
+  ],
+  "try": "What pattern do you see when you study more hours for a test?"
+ },
+ "inductive|causal,strategic": {
+  "why": "Inductive reasoning helps you find patterns from what you see so you can make good choices.",
+  "scenario": "Anna notices that every time she leaves her umbrella at home, it rains later. She connects this cause and effect to decide to pack her umbrella today.",
+  "steps": [
+   "Look at what happens several times.",
+   "Find the common cause and effect.",
+   "Decide what to do next based on this pattern."
+  ],
+  "try": "What should you do today if your alarm failed to ring the last 3 mornings?"
+ },
+ "inductive|conceptual": {
+  "why": "This reasoning helps you take 3 examples and form a rule so you know what a concept means with a 100 percent success rate.",
+  "scenario": "Anna notices her bus is late on Monday, Tuesday, and Wednesday. She uses this to understand the concept of unreliability because she sees a clear pattern in her daily travel.",
+  "steps": [
+   "Look at 2 specific examples from your day.",
+   "Find what is the same in both examples.",
+   "Name the general concept that fits them both."
+  ],
+  "try": "What concept describes your habit of checking your phone 4 times an hour and what does it mean for your day?"
+ },
+ "inductive|conceptual,causal": {
+  "why": "This reasoning helps you find general rules from a few examples so you can understand what things mean and why they happen.",
+  "scenario": "Leo sees three different dogs bark when the mail arrives. He forms the idea that mail carriers cause dogs to bark.",
+  "steps": [
+   "Look at a few similar events or examples.",
+   "Find the common pattern or meaning.",
+   "Make a general rule for similar situations."
+  ],
+  "try": "If your plant wilts every time you forget to water it, what general rule can you make?"
+ },
+ "inductive|conceptual,epistemic": {
+  "why": "Inductive reasoning helps you build general ideas from daily observations so you can understand what concepts mean and what you should believe.",
+  "scenario": "Anna noticed that every time she left her ice cream on the sunny porch, it melted quickly. She concluded that warm sunlight melts frozen treats, so she now believes she must keep them indoors.",
+  "steps": [
+   "Look at several similar events in your daily life.",
+   "Find the common pattern connecting these events.",
+   "Make a general rule based on what you saw."
+  ],
+  "try": "You notice your phone battery dies fast when playing games. What general rule can you form about your phone?"
+ },
+ "inductive|conceptual,metacognitive": {
+  "why": "This reasoning helps you build general rules from specific examples so you can understand what concepts mean and trust your own thinking.",
+  "scenario": "Anna noticed that every time she drank coffee in the afternoon, she stayed awake late at night. She concluded that afternoon caffeine delays sleep and realized she can trust this pattern because she tested it three times.",
+  "steps": [
+   "Look at several specific examples from your daily life.",
+   "Find the common pattern that connects all of them.",
+   "Decide how sure you are about this new general rule."
+  ],
+  "try": "What daily pattern have you noticed this week, and how do you know it is true?"
+ },
+ "inductive|conceptual,procedural": {
+  "why": "Inductive reasoning helps you build general ideas from daily observations so you can understand what concepts mean and how habits work.",
+  "scenario": "Anna noticed that every time she drank coffee in the afternoon, she stayed awake late at night. She concluded that afternoon caffeine delays sleep.",
+  "steps": [
+   "Notice a repeating event or pattern in your daily life.",
+   "Check if this event happens many times in the same way.",
+   "Form a general rule based on what you observed."
+  ],
+  "try": "What general rule can you make if your bus is late three days in a row?"
+ },
+ "inductive|conceptual,relational": {
+  "why": "This reasoning helps you build a general idea from small daily facts so you can understand how things connect in your life.",
+  "scenario": "Anna notices her plant dies when she forgets water on Monday and her desk plant dies when she skips water on Thursday. She decides all house plants need regular water to stay green.",
+  "steps": [
+   "Look at two or more specific events in your day.",
+   "Find what is the same in all of them.",
+   "Make a simple rule that fits every case."
+  ],
+  "try": "What general rule can you make if your coffee is cold on Monday and Tuesday?"
+ },
+ "inductive|conceptual,strategic": {
+  "why": "Inductive reasoning helps you build general ideas from daily observations so you can choose the right actions for new situations.",
+  "scenario": "Anna sees that her plant wilts every time the soil is dry and bright sun hits it. She concludes that plants need water and shade in hot weather, so she moves her potted ferns away from the sunny window.",
+  "steps": [
+   "Notice a pattern in several specific daily events.",
+   "Combine these cases into a general rule about meaning or action."
+  ],
+  "try": "You notice your phone battery dies fast when you keep games open. What general rule can you make for tomorrow?"
+ },
+ "inductive|epistemic": {
+  "why": "This reasoning helps you build a general rule from what you see often so you can decide what is true.",
+  "scenario": "Anna noticed that every time she left her toast in the toaster too long, it burned. She used this to believe that a 3 minute setting is always too hot.",
+  "steps": [
+   "Look at a few specific cases.",
+   "Find the common pattern between them.",
+   "Make a general rule based on the evidence."
+  ],
+  "try": "If your phone battery dies quickly three days in a row, what can you safely believe about it?"
+ },
+ "inductive|factual": {
+  "why": "Inductive reasoning helps you find general patterns from specific facts so you can make smart guesses about the world.",
+  "scenario": "Anna noticed that every time she touched a hot stove on 3 separate occasions, her finger burned. She decided that touching hot stoves always causes burns.",
+  "steps": [
+   "Gather several specific facts or observations.",
+   "Look for a common pattern in your observations.",
+   "Form a general rule based on that pattern."
+  ],
+  "try": "What general rule can you make if you see rain fall on 3 weekend mornings in a row?"
+ },
+ "inductive|factual,causal": {
+  "why": "Inductive reasoning helps you build general rules from factual observations and causal explanations, so you can understand patterns in your daily life.",
+  "scenario": "Anna notices that every time she drinks coffee late at night, she stays awake for hours. She connects these facts to form a general rule about caffeine and sleep.",
+  "steps": [
+   "Gather several factual observations about your daily routine.",
+   "Look for a causal link between these events.",
+   "Form a general rule based on what you found."
+  ],
+  "try": "What general rule can you make if you notice that skipping breakfast always makes you tired by noon?"
+ },
+ "inductive|factual,conceptual": {
+  "why": "This reasoning helps you find patterns in facts so you can understand what usually happens in daily life.",
+  "scenario": "Anna noticed that her bus was late on Monday, Tuesday and Wednesday. She used these facts to decide that the bus is always late.",
+  "steps": [
+   "Look at a few specific facts about your day.",
+   "Find the common pattern linking these facts together.",
+   "Make a general rule based on that pattern."
+  ],
+  "try": "If your coffee tasted bitter three mornings in a row, what general rule can you make?"
+ },
+ "inductive|factual,epistemic": {
+  "why": "Inductive reasoning helps you find general rules from factual observations so you can make justified beliefs about everyday life.",
+  "scenario": "Anna noticed that every time she left her house without an umbrella during cloudy mornings, it rained by noon. She observed this for 5 days straight and concluded that cloudy mornings mean rain later.",
+  "steps": [
+   "Gather several factual observations about your daily routine.",
+   "Look for a common pattern in those facts.",
+   "Form a general rule that you can reasonably believe."
+  ],
+  "try": "What general rule can you make if your bus was late three days this week?"
+ },
+ "inductive|factual,metacognitive": {
+  "why": "Inductive reasoning helps you build general rules from specific facts and check how you know them so you can trust your ideas.",
+  "scenario": "Maria noticed her bus was late on Monday, Tuesday and Wednesday. She checked her memory and realized traffic is heavy every morning, so she concluded the bus will be late tomorrow.",
+  "steps": [
+   "Gather several specific facts and observations.",
+   "Look for a common pattern among them.",
+   "Check how reliable your memories or sources are."
+  ],
+  "try": "What general rule can you make after seeing rain fall every afternoon this week?"
+ },
+ "inductive|factual,procedural": {
+  "why": "Inductive reasoning helps you build general rules from specific facts and methods so you can predict what will happen next in your daily routine.",
+  "scenario": "Anna notices her phone dies by noon every time she streams videos during breakfast. She uses this fact and her charging routine to decide that streaming drains her battery fast.",
+  "steps": [
+   "Notice a few similar facts or steps from your day.",
+   "Look for a common pattern between them.",
+   "Make a simple general rule based on what you found."
+  ],
+  "try": "What general rule can you make if you notice you always feel tired after sleeping for only five hours?"
+ },
+ "inductive|factual,relational": {
+  "why": "Inductive reasoning helps you find general patterns from factual observations and relational connections so you can understand everyday life better.",
+  "scenario": "Anna notices that every time she drinks coffee in the afternoon, she stays awake late at night. She connects the coffee to her sleep and concludes that afternoon caffeine causes insomnia.",
+  "steps": [
+   "Gather several factual observations about your daily routine.",
+   "Look for a common link between these connected events.",
+   "Form a general rule based on what you found."
+  ],
+  "try": "What general rule can you make if every time it rains, your street floods?"
+ },
+ "inductive|factual,strategic": {
+  "why": "Inductive reasoning helps you build general rules from specific facts so you can make smart strategic choices in daily life.",
+  "scenario": "Anna noticed that every time she skipped breakfast, she felt tired by ten in the morning. She concluded that breakfast gives her energy, so she decided to eat a banana every morning.",
+  "steps": [
+   "Notice a few specific facts or events that happen often.",
+   "Find the common pattern connecting these facts.",
+   "Create a general rule to guide your next action."
+  ],
+  "try": "What general rule can you make if it rained on your last 3 walks?"
+ },
+ "inductive|metacognitive": {
+  "why": "Inductive reasoning on your own thinking helps you find daily habits because you notice patterns in what you do.",
+  "scenario": "Anna notices she always feels tired on days she stays up late using her phone. She thinks about her own choices and sees a clear pattern in her sleep habits.",
+  "steps": [
+   "Look at a few past choices and find what they have in common.",
+   "Ask yourself how reliable your memory is about these past choices."
+  ],
+  "try": "What pattern do you notice in your own daily routines, and how do you know it is true?"
+ },
+ "inductive|metacognitive,epistemic": {
+  "why": "Inductive reasoning helps you build general rules from specific observations, so you can make reliable choices in daily life.",
+  "scenario": "Anna noticed that every time she left her window open on a rainy day, her desk got wet. She concluded that rain always wets open windows and started closing them.",
+  "steps": [
+   "Notice a pattern in several similar events.",
+   "Check if the evidence is strong enough.",
+   "Form a general rule you can trust."
+  ],
+  "try": "What general rule can you make after your phone battery dies three times when you play games outside?"
+ },
+ "inductive|procedural": {
+  "why": "Inductive reasoning helps you build a general rule from procedural steps so you can repeat successes easily.",
+  "scenario": "Anna noticed that every time she watered her houseplant slowly and soaked the soil completely, the leaves stayed green. She concluded that slow watering is the best method for all her indoor plants.",
+  "steps": [
+   "Notice the steps you took in a task.",
+   "Check if the same steps lead to the same result each time.",
+   "Create a general rule from your observations."
+  ],
+  "try": "What rule can you make after noticing that checking your door lock twice always stops you from worrying?"
+ },
+ "inductive|procedural,causal": {
+  "why": "Inductive reasoning helps you find general rules from your daily actions so you can repeat good results and avoid mistakes.",
+  "scenario": "Anna noticed that every time she rushed out the door without checking her bag, she forgot her keys. She used this to form a general rule about packing.",
+  "steps": [
+   "Notice what happens in several similar situations.",
+   "Look for a common pattern connecting them.",
+   "Form a general rule based on that pattern."
+  ],
+  "try": "What general rule can you make after your coffee machine leaks three mornings in a row?"
+ },
+ "inductive|procedural,epistemic": {
+  "why": "This reasoning helps you find general rules from your daily experiences so you can make good choices.",
+  "scenario": "Anna touches three hot coffee cups and burns her finger each time. She concludes that all hot coffee cups can burn her.",
+  "steps": [
+   "Look at a few specific events in your day.",
+   "Find what is the same in all of them.",
+   "Make a simple rule for the future."
+  ],
+  "try": "You notice your phone battery dies fast when you play games. What general rule can you make?"
+ },
+ "inductive|procedural,metacognitive": {
+  "why": "This reasoning matters because you can test your steps several times and find a reliable method that works well in daily life.",
+  "scenario": "Anna notices that every time she checks her keys before leaving, she never locks herself out. She uses this past observation to form a general rule for her morning routine.",
+  "steps": [
+   "Notice what you do each time you complete a task.",
+   "Check if the same steps give you the same good result."
+  ],
+  "try": "What daily habit can you test to see if it always gives you a good result?"
+ },
+ "inductive|procedural,relational": {
+  "why": "This reasoning helps you find rules from what you see so you can solve daily problems easily.",
+  "scenario": "Anna noticed that every time she watered her houseplant on Mondays, it stayed green. She decided that Monday watering keeps it healthy.",
+  "steps": [
+   "Look at what happens several times.",
+   "Find the common pattern in those events.",
+   "Make a simple rule for the future."
+  ],
+  "try": "What daily habit do you have that always leads to the same result?"
+ },
+ "inductive|procedural,strategic": {
+  "why": "Inductive reasoning helps you find general patterns from specific daily actions so you can make smart choices in new situations.",
+  "scenario": "Anna noticed that every time she checked her transit schedule before leaving home, she caught her bus on time. She decided this method works best for her daily routine.",
+  "steps": [
+   "Look at a few specific times you did the task.",
+   "Find the common steps that led to a good result.",
+   "Form a general rule for what to do next time."
+  ],
+  "try": "What simple rule can you make after seeing which morning habits help you arrive on time?"
+ },
+ "inductive|relational": {
+  "why": "This helps you find hidden patterns in daily life so you can predict what will happen next and make better choices.",
+  "scenario": "Anna notices that every time she drinks coffee late in the evening, she stays awake for 3 hours. She tests this over 5 days and concludes that late coffee causes sleepless nights.",
+  "steps": [
+   "Look at a few specific events or examples in your day.",
+   "Find the common connection between how these things change together.",
+   "Make a simple rule based on what you saw."
+  ],
+  "try": "What pattern do you notice when you study late at night and take tests the next morning?"
+ },
+ "inductive|relational,epistemic": {
+  "why": "Inductive reasoning helps you connect ideas and judge evidence so you can find useful patterns in your daily life.",
+  "scenario": "Anna notices that every time she drinks coffee late at night, she stays awake for hours. She connects the two events and concludes that evening coffee causes sleep trouble.",
+  "steps": [
+   "Look at several similar cases or daily events.",
+   "Find the common connection between them.",
+   "Form a general rule based on your evidence."
+  ],
+  "try": "What pattern do you notice when you study late at night before an exam?"
+ },
+ "inductive|relational,metacognitive": {
+  "why": "Inductive reasoning connects things to show patterns, and this helps you build reliable rules from daily experiences so you can make good choices.",
+  "scenario": "Anna notices that every time she drinks coffee after four in the afternoon, she stays awake late at night. She connects caffeine intake to sleep trouble.",
+  "steps": [
+   "Notice a repeated connection between two things in your daily life.",
+   "Check if this pattern happens almost every time.",
+   "Form a general rule based on your observations."
+  ],
+  "try": "What daily pattern do you notice when you skip breakfast and feel tired?"
+ },
+ "inductive|relational,strategic": {
+  "why": "This reasoning helps you see patterns in everyday life so you can make good choices and know how things connect.",
+  "scenario": "Anna noticed that every time she watered her houseplant on Mondays, it grew taller. She connected the water to the growth and decided to water it every Monday.",
+  "steps": [
+   "Look at a few specific events or examples in your day.",
+   "Find the common pattern between them.",
+   "Decide what to do based on that connection."
+  ],
+  "try": "What pattern do you see when you stay up late and how will you change your bedtime?"
+ },
+ "inductive|strategic": {
+  "why": "Inductive reasoning helps you find patterns in daily life so you can make good choices about what to do next.",
+  "scenario": "Anna noticed that every time she skipped breakfast, she felt very tired by noon. She used this pattern to decide that she should eat a healthy meal every morning to keep her energy up.",
+  "steps": [
+   "Notice what happens around you on different days.",
+   "Look for a common pattern in those events.",
+   "Decide on your next action based on that pattern."
+  ],
+  "try": "What action will you take tomorrow if you notice that sleeping late always makes you miss your bus?"
+ },
+ "inductive|strategic,epistemic": {
+  "why": "Inductive reasoning helps you build a general rule from specific observations, so you can decide what to do next in daily life.",
+  "scenario": "Anna noticed that every time she left her house without an umbrella on cloudy days, it started to rain. She concluded that cloudy days usually bring rain.",
+  "steps": [
+   "Look at a few similar situations and find a common pattern.",
+   "Make a general rule based on what you saw."
+  ],
+  "try": "What general rule can you make if your bus was late on Monday, Tuesday, and Wednesday?"
+ },
+ "inductive|strategic,metacognitive": {
+  "why": "Inductive reasoning helps you build smart plans and trust your own thinking because you spot patterns in daily events.",
+  "scenario": "Leo noticed his bus was late three days in a row. He decided to leave five minutes earlier so he would not miss it.",
+  "steps": [
+   "Look at a few similar events.",
+   "Find the common pattern between them.",
+   "Make a general plan for the future."
+  ],
+  "try": "If your coffee shop is crowded every morning at eight, when should you go tomorrow?"
+ }
+}
