@@ -1909,18 +1909,18 @@ function askMapHTML(c){
     <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div></div>`;
 }
 
-// The first message: a short lesson (the case reading), the case story. Tapping the case
-// card opens the rest (idea, example, key words, map), so the first look stays short.
+// The first message is only the case card. Tapping it opens the reading (the idea, an example,
+// a question to think about, key words, the map), so the first look stays short.
 function askCaseHTML(c){
   const r = c.reading || {}, ideas = r.idea || [], words = r.key_words || [];
   const src = c.source ? sourceHTML(c.source) : '', map = askMapHTML(c);
-  const lesson = ideas.length ? `<p>${ideas.slice(0, 3).map(esc).join(' ')}</p>` : '';
   const card = `<p class="t">${esc(c.title)}<span class="tag">${esc(c.tag || 'Case')}</span></p><p class="s">${esc(c.scenario)}</p>`;
-  if(!(words.length || map || ideas.length > 3 || r.example || r.think || src)) return `${lesson}<div class="am-case">${card}</div>`;
-  return `${lesson}<details class="am-case"><summary>${card}<span class="am-case-more">Read more
+  if(!(words.length || map || ideas.length || r.example || r.think || src)) return `<div class="am-case">${card}</div>`;
+  return `<details class="am-case"><summary>${card}<span class="am-case-more">Read more
       <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
       <div class="am-more-body">
-      ${ideas.length > 3 || r.example ? `<p class="am-lead">${esc([...ideas.slice(3), r.example || ''].join(' ').trim())}</p>` : ''}
+      ${ideas.length ? `<p class="am-lead">${ideas.map(esc).join(' ')}</p>` : ''}
+      ${r.example ? `<p class="am-lead">${esc(r.example)}</p>` : ''}
       ${r.think ? `<div class="am-think"><b>Think about</b>${esc(r.think)}</div>` : ''}
       ${words.length ? `<div class="am-glossary">${words.map(([w, m]) => `<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>` : ''}
       ${map}${src}</div></details>`;
