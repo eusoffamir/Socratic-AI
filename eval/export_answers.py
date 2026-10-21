@@ -30,6 +30,8 @@ COLUMNS = (["session_id", "participant_code", "last_saved", "case", "total_round
 
 def rows_of(sid, session, saved):
     """One row per answer. Each answer replies to the question in the turn before it."""
+    if session.get("mode") == "skill_check":
+        return  # skill checks have their own shape; their export comes with the statistics (Goal 1 step 5)
     turns = session.get("turns", [])
     for prev, t in zip(turns, turns[1:]):
         if t.get("answer") is None:

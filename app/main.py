@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import graph, limits, llm_client, orchestrator, storage, tutorial
+from . import graph, limits, llm_client, orchestrator, skillcheck, storage, tutorial
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL
 
@@ -115,8 +115,9 @@ def _clean_id(sid):
         return None
 
 
-def _get_session(sid):
-    """The live session from memory, else from storage, else 404."""
+def _get_session(sid, mode=None):
+    """The live session from memory, else from storage, else 404. A case
+    session and a skill check never stand in for each other."""
     sid = _clean_id(sid)
     if sid is None:
         raise HTTPException(404, NOT_FOUND)
@@ -125,6 +126,8 @@ def _get_session(sid):
         if session is None:
             raise HTTPException(404, NOT_FOUND)
         SESSIONS[sid] = session
+    if SESSIONS[sid].get("mode") != mode:
+        raise HTTPException(404, NOT_FOUND)
     return sid, SESSIONS[sid]
 
 
@@ -278,6 +281,63 @@ def end_session(sid: str):
     return {"ended": True, "rounds_answered": len(session["history"])}
 
 
+# ---------- skill check (Goal 1): set questions, each tagged with one skill ----------
+
+class CheckRequest(BaseModel):
+    past_check_ids: list[str] = []  # earlier checks from this browser, so new questions come first
+
+
+def _check_view(check):
+    return {"question": skillcheck.current(check), "ended": check["ended"],
+            "results": skillcheck.summarize(check["turns"]) if check["ended"] else None}
+
+
+def _get_check(sid):
+    return _get_session(sid, mode="skill_check")
+
+
+@app.post("/api/check")
+def start_check(req: CheckRequest):
+    if study_codes():
+        raise HTTPException(403, "The skill check is not part of the study yet.")
+    ids = list(filter(None, map(_clean_id, req.past_check_ids[:100])))
+    SESSIONS.update(storage.load_sessions([i for i in ids if i not in SESSIONS]))
+    seen = [t["item"] for i in ids for t in (SESSIONS.get(i) or {}).get("turns", [])
+            if (SESSIONS.get(i) or {}).get("mode") == "skill_check"]
+    check = skillcheck.new_check(seen)
+    sid = str(uuid.uuid4())
+    SESSIONS[sid] = check
+    _persist(sid, check)
+    return {"check_id": sid, **_check_view(check)}
+
+
+@app.get("/api/check/{sid}")
+def get_check(sid: str):
+    sid, check = _get_check(sid)
+    return {"check_id": sid, **_check_view(check)}
+
+
+@app.post("/api/check/{sid}/answer")
+def answer_check(sid: str, req: AnswerRequest):
+    sid, check = _get_check(sid)
+    if check["ended"]:
+        raise HTTPException(400, "This skill check has already ended.")
+    if not req.answer.strip():
+        raise HTTPException(400, "Please type an answer first.")
+    if not limits.budget_left():
+        raise HTTPException(429, limits.FULL_MESSAGE)
+    working = copy.deepcopy(check)  # a failed model call leaves the saved check as it was
+    try:
+        turn = skillcheck.answer(working, req.answer[:MAX_ANSWER_CHARS])
+    except LLMError as e:
+        raise HTTPException(503, str(e)) from e
+    SESSIONS[sid] = working
+    _persist(sid, working)
+    storage.append_transcript(sid, {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                                    "session_id": sid, "mode": "skill_check", "provider": llm_client.PROVIDER, **turn})
+    return {"check_id": sid, **_check_view(working)}
+
+
 @app.post("/api/overview")
 def overview(req: OverviewRequest):
     """The learner's overall status across every case they played in this
@@ -285,7 +345,7 @@ def overview(req: OverviewRequest):
     level per case. Same summary shape as /stats, so the page reuses its
     drawings. Unknown or broken ids are skipped. The tutorial is practice and
     is not saved, so it never counts here."""
-    history, best_idx, played, finished, per_case = [], 0, 0, 0, {}
+    history, best_idx, played, finished, per_case, checks = [], 0, 0, 0, {}, []
     sids = list(dict.fromkeys(filter(None, map(_clean_id, req.session_ids[:300]))))
     # one storage call for every session not in memory yet
     SESSIONS.update(storage.load_sessions([sid for sid in sids if sid not in SESSIONS]))
@@ -293,6 +353,9 @@ def overview(req: OverviewRequest):
         s = SESSIONS.get(sid)
         if s is None:
             continue  # unknown id
+        if s.get("mode") == "skill_check":
+            checks += s["turns"]
+            continue
         if not s["history"]:
             continue  # opened but never answered
         played += 1
@@ -311,6 +374,7 @@ def overview(req: OverviewRequest):
         "standards": STANDARDS,
         "summary": summary,
         "sessions_played": played, "sessions_finished": finished,
+        "skill_check": skillcheck.summarize(checks) if checks else None,
         "cases": [{"id": cid, "title": CONCEPTS[cid]["title"], "sessions": v["sessions"], "rounds": v["rounds"],
                    "level": LEVELS[v["level_idx"]][1],
                    # for the standards filter in the overall status panel

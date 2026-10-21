@@ -452,6 +452,13 @@
   .ov-case .meta{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
   .ov-case .lvl{font-size:12.5px; font-weight:600; color:var(--signal); background:var(--signal-soft); padding:2px 10px; border-radius:999px;}
   .ov-by{display:block; margin-top:28px;}
+  /* skill check pop-up (Goal 1) */
+  .ck-card{width:min(680px, 94vw);}
+  .ck-situation{font-size:16px; line-height:1.55; margin:0 0 14px;}
+  .ck-question{font-weight:600; font-size:16.5px; line-height:1.5; margin:0 0 18px; padding:14px 16px; background:var(--signal-soft); border-radius:12px;}
+  .ck-body .composer-box{margin-bottom:12px;}
+  .ck-body textarea{min-height:90px;}
+  .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
   /* reasoning and knowledge grid (Goal 1) */
   .rk{margin-top:30px;}
   .rk .mono-label{display:block; margin-bottom:12px;}
@@ -819,6 +826,22 @@
 
         <div class="section-head"><h3>Cases</h3></div>
         <div class="cases" id="cases"></div>
+
+        <div class="section-head"><h3>Skill check</h3></div>
+        <div class="cases">
+          <button class="case-row" id="checkBtn">
+            <span class="thumb" aria-hidden="true"><svg viewBox="0 0 96 64"><g fill="var(--signal)">
+              <rect x="8" y="10" width="24" height="12" rx="3" opacity=".35"/><rect x="36" y="10" width="24" height="12" rx="3"/><rect x="64" y="10" width="24" height="12" rx="3" opacity=".6"/>
+              <rect x="8" y="26" width="24" height="12" rx="3"/><rect x="36" y="26" width="24" height="12" rx="3" opacity=".2"/><rect x="64" y="26" width="24" height="12" rx="3" opacity=".35"/>
+              <rect x="8" y="42" width="24" height="12" rx="3" opacity=".6"/><rect x="36" y="42" width="24" height="12" rx="3" opacity=".35"/><rect x="64" y="42" width="24" height="12" rx="3"/></g></svg></span>
+            <span class="info">
+              <span class="tag t1">Check</span><span class="num">6 QUESTIONS</span>
+              <span class="t">What kind of thinker are you?</span>
+              <span class="m">Short questions that show which kinds of reasoning you have mastered.</span>
+            </span>
+            <span class="go" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+          </button>
+        </div>
         <p class="phone-credit">Created by <b>Eusoff Amir</b></p>  <!-- phones only: the top bar is hidden there -->
       </div>
     </div>
@@ -912,6 +935,24 @@
     </div>
     <div class="pp-body" id="profileBody"></div>
   </aside>
+</div>
+
+<!-- ======================= skill check pop-up (Goal 1) ======================= -->
+<div class="read-modal hidden" id="checkModal" role="dialog" aria-modal="true" aria-labelledby="ckTitle">
+  <div class="rm-backdrop" data-close></div>
+  <div class="rm-card ck-card">
+    <header class="rm-head">
+      <span class="tag t1">Check</span><span class="num" id="ckNum"></span>
+      <h2 id="ckTitle">Skill check</h2>
+      <div class="rm-sub" id="ckSub"></div>
+      <button class="icon-btn rm-x" data-close title="Close (Esc)" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="rm-body" id="ckBody"></div>
+    <footer class="rm-foot">
+      <div id="ckStatus" aria-live="polite"></div>
+      <button class="rm-start" id="ckSend">Send <svg><use href="#i-play"/></svg></button>
+    </footer>
+  </div>
 </div>
 
 <!-- ======================= reading pop-up ======================= -->
@@ -1248,7 +1289,7 @@ $('cases').addEventListener('click', e => {
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return `<div class="report"><div class="mono-label">Overall status</div><h2>Nothing yet</h2>
-    <p class="lead">Play a case, and your overall status will show here.</p></div>`;
+    <p class="lead">Play a case or a skill check, and your overall status will show here.</p>${skillGridHTML(d.skill_check, 'Skill checks')}</div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
   const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
   const cases = d.cases.map(c => `<div class="ov-case"><span class="t">${esc(c.title)}</span>
@@ -1263,6 +1304,7 @@ function overallHTML(d){
       <div><div class="ov-std-head"><span class="mono-label">9 Intellectual Standards</span>${caseFilterHTML(d.cases, 'ovFilter')}</div>
         <div id="ovRadar">${standardsRadarSVG(d.standards, s.standards_met_count, n)}</div></div>
     </div>
+    ${skillGridHTML(d.skill_check, 'Skill checks')}
     ${reasoningGridHTML(s.reasoning)}
     <span class="mono-label ov-by">By case</span><div class="ov-cases">${cases}</div>
     <div class="note">Only cases played in this browser count. The tutorial is practice, so it is not included.</div>
@@ -1314,7 +1356,7 @@ async function openOverall(){
   const body = $('overallBody');
   body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
   // also count unfinished cases saved before this list existed
-  const ids = [...new Set([...mySessions(), ...Object.values(savedSessions())])];
+  const ids = [...new Set([...mySessions(), ...Object.values(savedSessions()), ...myChecks()])];
   try {
     const d = await postJSON('/api/overview', {session_ids: ids});
     body.innerHTML = overallHTML(d);
@@ -1798,6 +1840,103 @@ function standardTip(e){
 }
 document.addEventListener('pointermove', standardTip);
 document.addEventListener('pointerdown', standardTip);  // a tap on phones
+
+// Goal 1 skill check: set questions, each tagged with one reasoning type on one
+// knowledge type. Each cell shows how many of the questions asked on that pair
+// the learner answered with both, so unlike the case grid it knows the total.
+function skillGridHTML(r, title){
+  if(!r || !r.answers) return '';
+  const types = Object.keys(r.reasoning_types), kinds = Object.keys(r.knowledge_types);
+  const cap = w => w[0].toUpperCase() + w.slice(1);
+  const head = types.map(t => `<th title="${esc(cap(r.reasoning_types[t]))}">${cap(t)}</th>`).join('');
+  const cell = c => c.asked ? `<td style="--a:${(c.attained / c.asked).toFixed(2)}">${c.attained} of ${c.asked}</td>` : '<td class="unasked">·</td>';
+  const rows = kinds.map(k => `<tr><th class="row" title="${esc(r.knowledge_types[k])}">${cap(k)}</th>`
+    + types.map(t => cell(r.grid[k][t])).join('') + '</tr>').join('');
+  const foot = types.map(t => cell(r.reasoning[t])).join('');
+  const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
+  return `<div class="rk"><span class="mono-label">${title}</span>${msgs}
+    <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><th class="row">All</th>${foot}</tr></tfoot></table>
+    <div class="note">Each cell shows the questions where you used that reasoning on that knowledge, out of the questions asked. A dot means not asked yet.</div></div>`;
+}
+
+function myChecks(){
+  try { return JSON.parse(localStorage.getItem('my-checks')) || []; } catch(e){ return []; }
+}
+function rememberCheck(id){
+  const ids = myChecks().filter(x => x !== id);
+  ids.push(id);
+  try { localStorage.setItem('my-checks', JSON.stringify(ids.slice(-100))); } catch(e){}
+}
+
+const check = {id: null, busy: false, ended: false};
+const checkOpen = () => !$('checkModal').classList.contains('hidden');
+
+function showCheck(d){
+  check.id = d.check_id; check.ended = d.ended;
+  $('ckStatus').innerHTML = '';
+  if(d.ended){
+    $('ckNum').textContent = 'DONE';
+    $('ckTitle').textContent = 'Your results';
+    $('ckSub').textContent = 'Based on the questions you just answered.';
+    $('ckBody').innerHTML = skillGridHTML(d.results, 'This check');
+    $('ckSend').innerHTML = 'Done';
+    $('ckSend').focus();
+    return;
+  }
+  const q = d.question;
+  $('ckNum').textContent = `QUESTION ${q.number} OF ${q.total}`;
+  $('ckTitle').textContent = 'Skill check';
+  $('ckSub').textContent = `From the case ${q.case}`;
+  $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-situation">${esc(q.situation)}</p>
+    <p class="ck-question">${esc(q.question)}</p>
+    <div class="composer-box"><textarea id="ckAnswer" rows="3" placeholder="Explain your thinking in a few sentences"></textarea></div></div>`;
+  $('ckSend').innerHTML = 'Send <svg><use href="#i-play"/></svg>';
+  $('ckAnswer').focus();
+}
+
+async function openCheck(){
+  $('checkModal').classList.remove('hidden');
+  $('ckBody').innerHTML = `<div class="thinking">${DOTS}Loading...</div>`;
+  $('ckNum').textContent = ''; $('ckSub').textContent = ''; $('ckStatus').innerHTML = '';
+  const last = myChecks().slice(-1)[0];
+  try {
+    let d = null;
+    if(last){ try { d = await api(`/api/check/${last}`); } catch(e){} }  // continue an unfinished check
+    if(!d || d.ended){ d = await postJSON('/api/check', {past_check_ids: myChecks()}); rememberCheck(d.check_id); }
+    showCheck(d);
+  } catch(e){ $('ckBody').innerHTML = ''; note('error', e.message, $('ckBody')); }
+}
+
+async function sendCheck(){
+  if(check.busy) return;
+  if(check.ended){ closeCheck(); return; }
+  const box = $('ckAnswer');
+  if(!box) return;
+  const answer = box.value.trim();
+  if(!answer){ $('ckStatus').textContent = 'Please type an answer first.'; return; }
+  check.busy = true; $('ckSend').disabled = true;
+  $('ckStatus').innerHTML = `<div class="thinking">${DOTS}Reading your answer...</div>`;
+  const slow = whenSlow(() => $('ckStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
+  try { showCheck(await postJSON(`/api/check/${check.id}/answer`, {answer})); }
+  catch(e){ $('ckStatus').innerHTML = ''; note('error', e.message, $('ckStatus')); }
+  finally { clearTimeout(slow); check.busy = false; $('ckSend').disabled = false; }
+}
+
+function closeCheck(){
+  if(check.busy) return;
+  $('checkModal').classList.add('hidden');
+  $('checkBtn').focus();
+}
+
+$('checkBtn').addEventListener('click', openCheck);
+$('ckSend').addEventListener('click', sendCheck);
+$('checkModal').querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeCheck));
+document.addEventListener('keydown', e => {
+  if(!checkOpen()) return;
+  if(e.key === 'Escape') closeCheck();
+  if(e.key === 'Enter' && !e.shiftKey && e.target.id === 'ckAnswer'){ e.preventDefault(); sendCheck(); }
+});
 
 // Goal 1 dashboard: reasoning type (columns) by knowledge type (rows). Each
 // number counts the answers that showed both. Empty for the tutorial and for

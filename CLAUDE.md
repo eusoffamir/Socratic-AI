@@ -49,7 +49,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 "Agents decide, rules guard." `app/graph.py` (LangGraph): assess, plan, guard, tutor (may run a tool), check, rewrite once, finish.
 
-- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`.
+- Agents: prompts `app/prompts.py`, calls `app/llm_client.py`. Assessor, Planner, Tutor, Checker (`app/checker.py` runs first), Coach. Reasoning agent `app/reasoning.py` (Goal 1, shares the Assessor call), knowledge graphs `app/knowledge.py`. Skill check (tagged question bank, 1 call per answer) `app/skillcheck.py`. Toggles `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER`, `AGENT_REASONING`.
 - Rules: `app/orchestrator.py` (`apply_plan()` guard, `decide()` fallback). Copy check `app/copycheck.py`. Tools `app/tools.py`. Limits `app/limits.py`. Saving `app/storage.py` (Supabase; local `.env` writes to the live DB, so set `SUPABASE_URL=" "` for test servers).
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
