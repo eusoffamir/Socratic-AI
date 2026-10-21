@@ -9,6 +9,7 @@ If PROVIDER is not set, it's picked automatically: GOOGLE_API_KEY present -> gem
 else ANTHROPIC_API_KEY present -> anthropic, else mock.
 """
 import json
+import logging
 import os
 import random
 import time
@@ -35,6 +36,15 @@ def _pick_provider():
 PROVIDER = _pick_provider()
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+# Each Gemini model has its own free quota. When GEMINI_MODEL is used up (429)
+# or overloaded (503), the call moves on to these, in order. All three were
+# checked with the same settings on 22 October 2026 (3.1-flash-lite was busy
+# that day, so only its name was checked). Empty means no fallback.
+GEMINI_FALLBACK_MODELS = [m.strip() for m in os.getenv(
+    "GEMINI_FALLBACK_MODELS", "gemini-3.6-flash,gemini-3.5-flash,gemini-3.1-flash-lite").split(",") if m.strip()]
+# A model that said "quota used up" is skipped for this many seconds, so each
+# call does not ask it again first. The per-minute limit is back by then.
+GEMINI_COOLDOWN_SECONDS = 60
 
 # Gemini 3.x models "think" before answering, and those thinking tokens count
 # against max_output_tokens. With a tight cap the visible reply gets cut off
@@ -61,6 +71,7 @@ REQUEST_TIMEOUT_SECONDS = 45
 
 _anthropic_client = None
 _gemini_client = None
+_gemini_resting = {}  # model -> time.time() until which it is skipped
 
 
 class LLMError(RuntimeError):
@@ -88,9 +99,42 @@ def _get_gemini():
     return _gemini_client
 
 
-def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="low"):
+class _GeminiBusy(Exception):
+    """One Gemini model is used up (429) or overloaded (503), so the next one is tried."""
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def _gemini_call(model, user, config, last):
+    """One model, with a short retry when it is overloaded. A fallback model
+    that does not exist (404) counts as busy, so the next one is tried."""
     import httpx
-    from google.genai import errors, types
+    from google.genai import errors
+    for attempt in range(OVERLOAD_RETRIES + 1):
+        try:
+            return _get_gemini().models.generate_content(model=model, contents=user, config=config)
+        except httpx.TimeoutException as e:
+            raise LLMError(f"Gemini ({model}) took longer than {REQUEST_TIMEOUT_SECONDS}s to reply. "
+                           f"Try again.") from e
+        except httpx.TransportError as e:
+            raise LLMError("Couldn't reach the Gemini API. Check your internet connection.") from e
+        except errors.APIError as e:
+            # only the last model waits and retries when overloaded; the others hand over at once
+            if e.code == 503 and last and attempt < OVERLOAD_RETRIES:
+                time.sleep(2 ** (attempt + 1))
+                continue
+            if e.code == 429:
+                _gemini_resting[model] = time.time() + GEMINI_COOLDOWN_SECONDS
+            if e.code in (429, 503) or (e.code == 404 and model != GEMINI_MODEL):
+                raise _GeminiBusy(e.code) from e
+            if e.code == 404:
+                raise LLMError(f"Gemini model {model!r} not found. Check GEMINI_MODEL in .env.") from e
+            raise LLMError(f"Gemini error {e.code}: {e.message}") from e
+
+
+def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="low"):
+    from google.genai import types
     config = types.GenerateContentConfig(
         system_instruction=system,
         max_output_tokens=max_tokens + GEMINI_THINKING_HEADROOM,
@@ -100,27 +144,22 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
         thinking_config=types.ThinkingConfig(thinking_level=thinking),
         seed=seed,
     )
-    for attempt in range(OVERLOAD_RETRIES + 1):
+    models = [GEMINI_MODEL] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL]
+    awake = [m for m in models if _gemini_resting.get(m, 0) <= time.time()] or models
+    problem = None
+    for model in awake:
         try:
-            resp = _get_gemini().models.generate_content(model=GEMINI_MODEL, contents=user, config=config)
+            resp = _gemini_call(model, user, config, last=model == awake[-1])
+            if model != GEMINI_MODEL:
+                logging.getLogger(__name__).warning("Gemini fallback: %s answered for %s", model, GEMINI_MODEL)
             break
-        except httpx.TimeoutException as e:
-            raise LLMError(f"Gemini ({GEMINI_MODEL}) took longer than {REQUEST_TIMEOUT_SECONDS}s to reply. "
-                           f"Try again.") from e
-        except httpx.TransportError as e:
-            raise LLMError("Couldn't reach the Gemini API. Check your internet connection.") from e
-        except errors.APIError as e:
-            if e.code == 503 and attempt < OVERLOAD_RETRIES:
-                time.sleep(2 ** (attempt + 1))
-                continue
-            if e.code == 503:
-                raise LLMError(f"Gemini ({GEMINI_MODEL}) is overloaded right now. Wait a moment and try again.") from e
-            if e.code == 429:
-                raise LLMError(f"Gemini quota used up for {GEMINI_MODEL}. Wait a minute (or until tomorrow for the "
-                               f"daily limit), or set GEMINI_MODEL in .env to another model.") from e
-            if e.code == 404:
-                raise LLMError(f"Gemini model {GEMINI_MODEL!r} not found. Check GEMINI_MODEL in .env.") from e
-            raise LLMError(f"Gemini error {e.code}: {e.message}") from e
+        except _GeminiBusy as e:
+            problem = e  # used up or overloaded: try the next model
+    else:
+        if problem.code == 429:
+            raise LLMError(f"Gemini quota used up for {GEMINI_MODEL} and its fallback models. Wait a minute "
+                           f"(or until tomorrow for the daily limit).") from problem
+        raise LLMError(f"Gemini is overloaded right now. Wait a moment and try again.") from problem
     if not resp.text:
         reason = resp.candidates[0].finish_reason if resp.candidates else "no candidates"
         raise LLMError(f"Gemini returned an empty reply (finish reason: {reason}). Try again.")
