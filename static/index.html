@@ -307,7 +307,7 @@
   .rounds .mono-label{font-size:12px;}
   .rounds .seg{border-radius:12px;}
   .rounds .seg label{padding:9px 22px; font-size:17px;}
-  /* Mode button: "Normal" (gray, default) <-> "2 choices" (vibrant A-blue to B-orange, the A/B button colors) */
+  /* Mode button: "Open questions" (gray, default) <-> "2 choices" (vibrant A-blue to B-orange, the A/B button colors) */
   .mode{display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
     margin-left:16px; padding-left:28px; border-left:1px solid var(--rule);}  /* same spacing + divider as .rounds */
   .mode .mono-label{font-size:12px;}
@@ -1121,7 +1121,7 @@
             <span class="mono-label">Mode</span>
             <button class="mode-btn" id="abOnly" aria-pressed="false"
                     title="Press for A or B?: every question gives you 2 choices to pick from">
-              <span class="off-text">Normal</span><span class="on-text">A or B?</span>
+              <span class="off-text">Open questions</span><span class="on-text">A or B?</span>
             </button>
           </div>
         </section>
@@ -1202,12 +1202,12 @@
           </div>
           <div class="ask-mode">
             <button type="button" id="askModeBtn" aria-haspopup="menu" aria-expanded="false" title="Question style">
-              <span id="askModeName">Normal</span>
+              <span id="askModeName">A or B?</span>
               <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <div class="ask-mode-menu hidden" id="askModeMenu" role="menu" aria-label="Question style">
               <div class="mm-head">Question style</div>
               <button type="button" role="menuitemradio" aria-checked="true" data-ab="0">
-                <b>Normal</b><span>Open questions that you answer in your own words.</span></button>
+                <b>Open questions</b><span>Questions that you answer in your own words.</span></button>
               <button type="button" role="menuitemradio" aria-checked="false" data-ab="1">
                 <b>A or B?</b><span>Every question gives you 2 choices, then you say why.</span></button>
             </div>
@@ -2062,11 +2062,11 @@ $('askStrip').addEventListener('click', () => {
   $('askStrip').setAttribute('aria-expanded', open);
   if(open) askStatsLoad();
 });
-// Question style (Normal or A or B?), picked beside + like Claude's mode menu. Kept for later
+// Question style (Open questions or A or B?), picked beside + like Claude's mode menu. Kept for later
 // cases in the same chat, and sent to the server at once, so it counts from the next question.
 function setAskMode(on){
   ask.ab = on;
-  $('askModeName').textContent = on ? 'A or B?' : 'Normal';
+  $('askModeName').textContent = on ? 'A or B?' : 'Open questions';
   $('askModeBtn').classList.toggle('on', on);
   $('askModeMenu').querySelectorAll('[data-ab]').forEach(b => b.setAttribute('aria-checked', String((b.dataset.ab === '1') === on)));
 }
