@@ -211,9 +211,13 @@
   .am-qrow .am-q{flex:1; margin:0;}
   .ask-top{width:100%; flex:none; position:relative; z-index:5;}
   .ask-main.empty .ask-top{display:none;}
-  #askStrip svg{color:var(--signal);}
-  #askStrip[aria-expanded="true"]{border-color:var(--signal); color:var(--signal);}
-  #askLevel{margin-right:14px;}
+  /* the whole top bar opens Status; a small arrow on the right shows it can open */
+  #askStrip{cursor:pointer; transition:background .15s;}
+  #askStrip:hover, #askStrip[aria-expanded="true"]{background:var(--panel-2);}
+  #askStrip:focus-visible{outline:2px solid var(--signal); outline-offset:-2px;}
+  .ask-chev{width:14px; height:14px; flex:none; color:var(--ink-faint); transition:transform .15s;}
+  #askStrip[aria-expanded="true"] .ask-chev{transform:rotate(180deg);}
+  #askLevel{margin-right:0;}
   .chat-top:has(#askLevel:empty) .ask-lv-label{display:none;}  /* no "LEVEL:" before the first question */
   .ask-stats{position:absolute; right:20px; top:calc(100% + 8px); width:min(760px, calc(100% - 40px));
              box-shadow:var(--shadow), 0 16px 40px rgba(0,0,0,.18); background:var(--panel-2); border:1px solid var(--rule); border-radius:16px;
@@ -1007,7 +1011,7 @@
     .end-word{display:none;}  /* "End session" becomes "End", so the level name keeps its room */
     #hudLevel{flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; margin-right:0;}
     body:has(#statsToggle.hidden) .chat-top, body:has(#statsToggle[aria-pressed="true"]) .chat-top{padding-right:12px;}
-    #askMain .chat-top{padding-right:12px;}  /* the chat has its Status button in the bar */
+    #askMain .chat-top{padding-right:12px;}  /* the whole bar opens Status, so no room is kept for a button */
     .stats-tab{
       writing-mode:horizontal-tb; top:8px; right:12px; transform:none; width:40px; height:40px;
       padding:0; gap:0; font-size:0; justify-content:center; border-radius:50%; border:1px solid var(--rule);
@@ -1125,7 +1129,7 @@
 
   <div class="ask-main empty hidden" id="askMain">
     <div class="ask-top">
-      <header class="chat-top">
+      <header class="chat-top" id="askStrip" role="button" tabindex="0" aria-expanded="false" aria-controls="askStats" title="Show your progress in this case">
         <div class="hud-progress">
           <span class="status" id="askRound"></span>
         </div>
@@ -1133,7 +1137,7 @@
         <span class="status ask-lv-label"><span class="lv-label">LEVEL:</span></span>
         <div class="ticks" id="askTicks" aria-hidden="true"></div>
         <span class="status" id="askLevel"></span>
-        <button type="button" class="top-home" id="askStrip" aria-expanded="false" aria-controls="askStats" title="Your progress in this case"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.5 7.3v9.4L12 21.5 3.5 16.7V7.3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 6.5 16.5 10l-1.6 6.2-4.9-.9L7.8 10.3z" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Status</button>
+        <svg class="ask-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </header>
       <div class="ask-stats hidden" id="askStats"></div>
     </div>
@@ -1996,6 +2000,9 @@ $('askStrip').addEventListener('click', () => {
   $('askStats').classList.toggle('hidden', !open);
   $('askStrip').setAttribute('aria-expanded', open);
   if(open) askStatsLoad();
+});
+$('askStrip').addEventListener('keydown', e => {
+  if(e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); e.currentTarget.click(); }
 });
 
 function askShowTurn(data, intro){
