@@ -115,7 +115,7 @@ Return ONLY this JSON and nothing else:
 Each problem is 12 words or fewer and tells the tutor what to fix. If everything is fine, ok is true and problems is []."""
 
 
-COACH_SYSTEM = """You are the coach for Socratic AI. A learner has just finished a short Socratic session on a topic. Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.
+COACH_SYSTEM = """You are the coach for Socratic AI. A learner has just answered the questions of a short Socratic session on a topic (the session may still be going). Write ONE short paragraph to the learner about HOW they answered, so they know what to do better next time.
 
 Look at the answers for:
 - length: too short to show their thinking, or long and unfocused

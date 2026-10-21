@@ -510,9 +510,31 @@ def _final_comment(sid, session):
     return session["comment"]
 
 
+def _progress_comment(sid, session):
+    """The Coach's comment while a session is still going (the Ask chat's
+    Status panel). Written again only every 5 answers, so it costs at most
+    one AI call per 5 answers. None before the first 5 answers."""
+    step = len(session["history"]) // 5
+    if not step:
+        return None
+    with _comment_lock:
+        if session.get("progress_comment_step") != step:
+            try:
+                text = llm_client.call_coach(session)
+            except Exception:  # any model problem: fall back, never block the panel
+                text = None
+            session["progress_comment"] = text or orchestrator.fallback_comment(session)
+            session["progress_comment_step"] = step
+            _persist(sid, session)
+    return session["progress_comment"]
+
+
 @app.get("/api/session/{sid}/stats")
-def get_stats(sid: str):
+def get_stats(sid: str, coach: bool = False):
     sid, session = _get_session(sid)
+    comment = _final_comment(sid, session)
+    if comment is None and coach:
+        comment = _progress_comment(sid, session)
     return {
         "round": session["round"],
         "total_rounds": session["total_rounds"],
@@ -521,6 +543,6 @@ def get_stats(sid: str):
         "standards": STANDARDS,
         "summary": (summary := orchestrator.summarize(session)),
         "tip": STANDARD_TIPS.get(summary["weakest_standard"]),  # the Ask chat's progress card
-        "comment": _final_comment(sid, session),
+        "comment": comment,
         "history": session["history"],
     }

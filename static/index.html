@@ -215,9 +215,11 @@
   #askStrip[aria-expanded="true"]{border-color:var(--signal); color:var(--signal);}
   #askLevel{margin-right:14px;}
   .ask-stats{position:absolute; right:20px; top:calc(100% + 8px); width:min(760px, calc(100% - 40px));
-             box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.12); background:var(--panel); border:1px solid var(--rule); border-radius:16px;
+             box-shadow:var(--shadow), 0 16px 40px rgba(0,0,0,.18); background:var(--panel-2); border:1px solid var(--rule); border-radius:16px;
              padding:18px 22px; display:grid; grid-template-columns:1fr 1fr; gap:24px; max-height:60vh; overflow:auto;}
   .ask-stats .ladder{margin-top:8px;}
+  .ask-stats .coach-comment{grid-column:1 / -1; margin-top:0;}
+  .ask-stats .coach-comment p.wait{color:var(--ink-faint); font-size:14px;}
   .am-thought{font-family:var(--sans); font-size:13.5px; color:var(--ink-faint); margin:0 0 18px;}
   /* one quiet row, "Thought process"; the feedback is the first line inside it */
   .am-thought summary{cursor:pointer; display:flex; align-items:baseline; gap:20px; list-style:none; opacity:.7;}
@@ -1969,10 +1971,15 @@ async function askStatsLoad(){
   const box = $('askStats');
   if(!box.innerHTML) box.innerHTML = `<div class="thinking">${DOTS}Loading...</div>`;
   try {
-    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats`);
+    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats?coach=1`);
     const reached = d.levels.findIndex(l => l.name === d.summary.highest_level_reached);
+    // the Coach's comment, written again every 5 answers (one AI call each time)
+    const left = 5 - d.history.length % 5;
     box.innerHTML = `<section><span class="mono-label">6 Socratic Question Categories</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
-      <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>`;
+      <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>
+      <div class="coach-comment"><div class="mono-label">Coach</div>${d.comment ? `<p>${esc(d.comment)}</p>` : ''}
+        <p class="wait">${d.comment ? `The next comment comes in ${left} answer${left === 1 ? '' : 's'}.`
+          : `The coach comments after 5 answers, so ${left} more to go.`}</p></div>`;
   } catch(e){ box.innerHTML = ''; note('error', e.message, box); }
 }
 $('askStrip').addEventListener('click', () => {
@@ -2015,6 +2022,7 @@ $('askThread').addEventListener('click', e => {
   const nd = e.target.closest('.am-map .nd');
   if(nd){ mapPick(nd); return; }
   if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
+  if(e.target.closest('[data-status]')){ if($('askStats').classList.contains('hidden')) $('askStrip').click(); return; }
   if(e.target.closest('[data-stay]')){ e.target.closest('.am-card').remove(); $('askInput').focus(); return; }
   const hint = e.target.closest('.hint-btn');
   if(hint){
@@ -2108,19 +2116,11 @@ async function askNext(){
   await askStart(t.cases[0]);
 }
 
-// Every 5 answers, a short progress card from this case's marks (plain code, no AI call).
-async function askProgress(){
-  const gen = ask.gen;
-  try {
-    const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats`);
-    if(!askLive(gen)) return;
-    const s = d.summary, cap = k => k ? k.charAt(0).toUpperCase() + k.slice(1) : '';
-    if(!s.rounds_completed) return;
-    askAdd('am-card', `<span class="mono-label">Progress check, ${ask.answers} answers</span>
-      In this case your highest level is <b>${esc(s.highest_level_reached)}</b>. Your strongest standard is
-      <b>${esc(cap(s.strongest_standard))}</b>, and the one to work on is <b>${esc(cap(s.weakest_standard))}</b>.
-      ${d.tip ? esc(d.tip) : ''}`);
-  } catch(e){}  // the card is extra, so a failed call shows nothing
+// Every 5 answers, a short card that points to Status, where the Coach has a new comment.
+function askProgress(){
+  askAdd('am-card', `<span class="mono-label">Progress check, ${ask.answers} answers</span>
+    The coach has a new comment on how you are answering.
+    <div class="row"><button type="button" data-status>See status</button></div>`);
 }
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
