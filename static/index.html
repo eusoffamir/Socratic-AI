@@ -2028,7 +2028,7 @@ function askThoughtHTML(t, feedback){
 const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implications', 'Question the question'];
 function askStrip(levelIdx, round){
   if(levelIdx == null) return;
-  $('askRound').textContent = !round ? '' : ask.total ? `ROUND ${round} OF ${ask.total}` : `ROUND ${round}/∞`;
+  $('askRound').textContent = !round ? '' : ask.total ? `ROUND ${round}/${ask.total}` : `ROUND ${round}/∞`;
   $('askTicks').innerHTML = ASK_LEVELS.map((name, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}" title="${esc(name)}"></div>`).join('');
   $('askLevel').innerHTML = `<span class="lv">${esc((ASK_LEVELS[levelIdx] || '').toUpperCase())}</span>`;
   if(!$('askStats').classList.contains('hidden')) askStatsLoad();
