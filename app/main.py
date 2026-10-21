@@ -565,11 +565,16 @@ def _final_comment(sid, session):
     return session["comment"]
 
 
+# How often the Coach writes a new comment during a case (the student's choice,
+# 22 October 2026: every 2 answers, about 1 extra AI call per 2 rounds).
+COACH_EVERY = 2
+
+
 def _progress_comment(sid, session):
     """The Coach's comment while a session is still going (the Ask chat's
-    Status panel). Written again only every 5 answers, so it costs at most
-    one AI call per 5 answers. None before the first 5 answers."""
-    step = len(session["history"]) // 5
+    Status panel). Written again only every COACH_EVERY answers, so it costs at
+    most one AI call per COACH_EVERY answers. None before the first ones."""
+    step = len(session["history"]) // COACH_EVERY
     if not step:
         return None
     with _comment_lock:
@@ -597,7 +602,8 @@ def get_stats(sid: str, coach: bool = False):
         "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],
         "standards": STANDARDS,
         "summary": (summary := orchestrator.summarize(session)),
-        "tip": STANDARD_TIPS.get(summary["weakest_standard"]),  # the Ask chat's progress card
+        "tip": STANDARD_TIPS.get(summary["weakest_standard"]),
+        "coach_every": COACH_EVERY,  # the Ask chat's progress card
         "comment": comment,
         "history": session["history"],
         "topic": (session.get("case") or {}).get("topic"),  # a built topic (Goal 2), None for quant and the tutorial

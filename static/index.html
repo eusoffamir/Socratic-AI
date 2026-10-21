@@ -2140,13 +2140,13 @@ async function askStatsLoad(){
   try {
     const d = await api(`/api/session/${encodeURIComponent(ask.sid)}/stats?coach=1`);
     const reached = d.levels.findIndex(l => l.name === d.summary.highest_level_reached);
-    // the Coach's comment, written again every 5 answers (one AI call each time)
-    const left = 5 - d.history.length % 5;
+    // the Coach's comment, written again every few answers (one AI call each time)
+    const every = d.coach_every || 2, left = every - d.history.length % every;
     box.innerHTML = `<section><span class="mono-label">6 Socratic Question Categories</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
       <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>
       <div class="coach-comment"><div class="mono-label">Coach</div>${d.comment ? `<p>${esc(d.comment)}</p>` : ''}
         <p class="wait">${d.comment ? `The next comment comes in ${left} answer${left === 1 ? '' : 's'}.`
-          : `The coach comments after 5 answers, so ${left} more to go.`}</p></div>`;
+          : `The coach comments after ${every} answers, so ${left} more to go.`}</p></div>`;
     // trim the empty space around the chart, so the panel is no taller than it needs to be
     const svg = box.querySelector('.sradar'), b = svg && svg.getBBox();
     if(b && b.width) svg.setAttribute('viewBox', `${b.x - 6} ${b.y - 6} ${b.width + 12} ${b.height + 12}`);
@@ -2375,7 +2375,7 @@ async function askNext(){
   await askStart(t.cases[0], null, ctx);
 }
 
-// Every 5 answers, the Status panel opens by itself to show the Coach's new comment.
+// Every 2 answers, the Status panel opens by itself to show the Coach's new comment.
 function askProgress(){
   if($('askStats').classList.contains('hidden')) $('askStrip').click();
 }
@@ -2443,7 +2443,7 @@ async function askAnswer(typed){
     askShowTurn(data);
     ask.answers++;
     ask.caseAnswers++;  // the Coach counts per case, not per chat
-    if(ask.caseAnswers % 5 === 0) askProgress();
+    if(ask.caseAnswers % 2 === 0) askProgress();  // a new Coach comment (COACH_EVERY in main.py)
     if(data.ended) ask.done = true;
   } catch(err){
     if(!askLive(gen)) return;
@@ -2616,7 +2616,7 @@ function overallHTML(d){
       <div class="ov-case-more">
         <p class="meta">${c.finished ? 'Finished' : 'Not finished yet'} · played ${c.sessions === 1 ? 'once' : `${c.sessions} times`}</p>
         ${c.comment ? `<div class="coach-comment"><div class="mono-label">Coach</div><p>${esc(c.comment)}</p></div>`
-                    : '<p class="meta">The coach comments after 5 answers, so there is no comment for this case yet.</p>'}
+                    : '<p class="meta">The coach comments after 2 answers, so there is no comment for this case yet.</p>'}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
       </div></details>`;
   }).join('');
