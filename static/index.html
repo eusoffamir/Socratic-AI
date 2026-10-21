@@ -1688,9 +1688,11 @@ const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMa
 function showPage(name){
   if(tour.name && name !== 'home') endTour(false);  // the Home tour points at Home, so it is not left over another page
   for(const [k, sel] of Object.entries(PAGES)) document.querySelector(sel).classList.toggle('hidden', k !== name);
-  $('homeBtn').toggleAttribute('aria-current', name === 'home');
-  $('overallBtn').toggleAttribute('aria-current', name === 'status');
-  $('askBtn').toggleAttribute('aria-current', name === 'ask' && !ask.sid);
+  // aria-current="page" marks the open page (the highlight style matches that value)
+  const mark = (id, on) => on ? $(id).setAttribute('aria-current', 'page') : $(id).removeAttribute('aria-current');
+  mark('homeBtn', name === 'home');
+  mark('overallBtn', name === 'status');
+  mark('askBtn', name === 'ask' && !ask.sid);
   renderRecents();
   $('homeView').classList.remove('nav-open');  // phones: close the drawer
   if(name === 'ask') $('askInput').focus();
