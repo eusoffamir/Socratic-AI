@@ -57,7 +57,10 @@ def _assess_node(state: TurnState) -> TurnState:
         elif copycheck.is_copied(state["answer"], copycheck.session_sources(s), copycheck.session_story(s)):
             state["assessment"] = copycheck.copied_assessment()
         else:
-            state["assessment"] = llm_client.call_assessor(state["session"], state["answer"])
+            # the Planner shares this call when it will plan (AGENT_PLANNER_SHARED, default on)
+            share = agent_on("AGENT_PLANNER") and agent_on("AGENT_PLANNER_SHARED") and not orchestrator.is_last_round(s)
+            state["assessment"] = (llm_client.call_assessor(s, state["answer"], True) if share
+                                   else llm_client.call_assessor(s, state["answer"]))
     else:
         state["assessment"] = None  # first turn of the session, nothing to assess yet
     return state
@@ -67,7 +70,8 @@ def _plan_node(state: TurnState) -> TurnState:
     s = state["session"]
     ending = orchestrator.is_last_round(s)
     state["planned"] = state["assessment"] is not None and not ending and agent_on("AGENT_PLANNER")
-    state["plan"] = llm_client.call_planner(s, state["assessment"]) if state["planned"] else None
+    shared = (state["assessment"] or {}).pop("plan", None)  # a plan made in the Assessor's call
+    state["plan"] = (shared or llm_client.call_planner(s, state["assessment"])) if state["planned"] else None
     return state
 
 

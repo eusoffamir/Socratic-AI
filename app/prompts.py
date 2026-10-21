@@ -84,9 +84,7 @@ ASSESSOR_REASONING_SYSTEM = (ASSESSOR_SYSTEM + "\n\n" + reasoning.PROMPT + _RETU
                              + _ASSESSOR_JSON + ", " + reasoning.JSON_FIELDS + "}")
 ASSESSOR_SYSTEM = ASSESSOR_SYSTEM + _RETURN + _ASSESSOR_JSON + "}"
 
-PLANNER_SYSTEM = """You are the Planner agent for a Socratic tutor. After each learner answer you choose the next teaching move. You never talk to the learner.
-
-Socratic levels, from easiest to hardest: """ + ", ".join(name for _, name, _ in LEVELS) + """.
+_PLANNER_RULES = """Socratic levels, from easiest to hardest: """ + ", ".join(name for _, name, _ in LEVELS) + """.
 Question formats: """ + "; ".join(FORMATS) + """.
 
 Good habits:
@@ -96,10 +94,28 @@ Good habits:
 - Set hint to true after weak answers, so the tutor gives a helpful fact.
 - Set suggest_tool when real numbers would let the learner test a claim they just made. Otherwise null.
 - If the learner is frustrated, pick \"""" + AB_FORMAT + """\" and set hint to true.
-- If ab_only_mode is true, always pick \"""" + AB_FORMAT + """\". The learner chose that mode.
+- If ab_only_mode is true, always pick \"""" + AB_FORMAT + """\". The learner chose that mode."""
+_PLAN_JSON = '{"level_change": "stay", "format": "<one of the formats>", "hint": false, "suggest_tool": null, "reason": "<15 words or fewer>"}'
+PLANNER_SYSTEM = ("You are the Planner agent for a Socratic tutor. After each learner answer you choose the next "
+                  "teaching move. You never talk to the learner.\n\n" + _PLANNER_RULES + _RETURN + _PLAN_JSON)
 
-Return ONLY this JSON and nothing else:
-{"level_change": "stay", "format": "<one of the formats>", "hint": false, "suggest_tool": null, "reason": "<15 words or fewer>"}"""
+# The Planner can also share the Assessor's call, to save one AI call per answer
+# (the student's choice, 22 October 2026). It plans from its own marks, which
+# come first in the reply, and from PLANNER_STATE. The marking part of the
+# prompt is unchanged, so the eval of the Assessor on its own still applies.
+_PLAN_PART = ("\n\nPLANNER: after marking, also act as the Planner agent and choose the tutor's next teaching move, "
+              "using PLANNER_STATE and your own marks above. The plan is never shown to the learner and must not "
+              "change your marks.\n" + _PLANNER_RULES)
+
+
+def assessor_system(with_reasoning=False, with_plan=False):
+    """The Assessor prompt, with the Reasoning agent's and the Planner's parts
+    added when they share the call."""
+    head = ASSESSOR_REASONING_SYSTEM if with_reasoning else ASSESSOR_SYSTEM
+    if not with_plan:
+        return head
+    rules, json_part = head.split(_RETURN)
+    return rules + _PLAN_PART + _RETURN + json_part[:-1] + ', "plan": ' + _PLAN_JSON + "}"
 
 CHECKER_SYSTEM = """You are the Checker agent. You review one reply from a Socratic tutor before the learner sees it. You never talk to the learner.
 
@@ -175,12 +191,14 @@ def _coach_pairs(session):
     return pairs
 
 
-def assessor_user(session, answer, with_reasoning=False):
+def assessor_user(session, answer, with_reasoning=False, with_plan=False):
     payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
     if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
         c = case_of(session)
         extra = {"NOTE_TYPES": reasoning.note_types(c)} if with_reasoning else {}
         payload = {"case_story": c["scenario"], "NOTES": c["notes"], **extra, **payload}
+    if with_plan:
+        payload["PLANNER_STATE"] = planner_state(session)
     return json.dumps(payload, indent=1, ensure_ascii=False)
 
 
@@ -229,9 +247,10 @@ def tutor_user(session, ins, answer, assessment, tool_runs=(), tools_left=0, dra
     return json.dumps(payload, indent=1, ensure_ascii=False)
 
 
-def planner_user(session, assessment):
+def planner_state(session):
+    """What the Planner needs to know about the session, apart from the marks."""
     level_key, level_name, _ = LEVELS[session["level_idx"]]
-    return json.dumps({
+    return {
         "topic": case_of(session)["topic"],
         "concept": case_of(session)["title"],
         "round": session["round"],
@@ -242,16 +261,19 @@ def planner_user(session, assessment):
         "recent_formats": [fmt for _, fmt in session["asked"][-3:]],
         "good_streak": session["good_streak"],
         "weak_streak": session["weak_streak"],
-        "assessment": {
-            "standards_met": _met(assessment),
-            "reasoning_move": assessment["reasoning_move"],
-            "confused_or_frustrated": assessment["confused_or_frustrated"],
-            "learner_points": assessment.get("learner_points", []),
-        },
         "LEARNER_SAID": session["said"],
         "tools": [t for t in [case_of(session).get("tool")] if t],  # only this case's own simulation, if it has one
         "tools_used_so_far": [r["tool"] for t in session["turns"] for r in t.get("tool_runs", [])],
-    }, indent=1, ensure_ascii=False)
+    }
+
+
+def planner_user(session, assessment):
+    return json.dumps({**planner_state(session), "assessment": {
+        "standards_met": _met(assessment),
+        "reasoning_move": assessment["reasoning_move"],
+        "confused_or_frustrated": assessment["confused_or_frustrated"],
+        "learner_points": assessment.get("learner_points", []),
+    }}, indent=1, ensure_ascii=False)
 
 
 def checker_user(ins, answer, parts, asked_questions=()):

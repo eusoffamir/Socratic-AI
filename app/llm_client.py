@@ -16,8 +16,8 @@ import time
 
 from . import limits, reasoning, tools
 from .content import FORMATS, MOVES, STANDARDS, case_of
-from .prompts import (AB_FORMAT, ASSESSOR_REASONING_SYSTEM, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_OVERALL_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
-                      assessor_user, checker_user, coach_overall_user, coach_user, planner_user, tutor_user)
+from .prompts import (AB_FORMAT, CHECKER_SYSTEM, COACH_OVERALL_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
+                      assessor_system, assessor_user, checker_user, coach_overall_user, coach_user, planner_user, tutor_user)
 
 
 def _pick_provider():
@@ -291,19 +291,25 @@ def clean_assessment(data):
             "confidence": confidence}
 
 
-def call_assessor(session, answer):
+def call_assessor(session, answer, with_plan=False):
     """The Assessor, plus the Reasoning agent in the same call when it is on.
-    "reasoning" is None when the Reasoning agent is switched off."""
+    "reasoning" is None when the Reasoning agent is switched off. With
+    with_plan, the Planner shares the call too and its proposal is in "plan"
+    (None if it is missing, so the graph asks the Planner on its own)."""
     with_reasoning = reasoning.enabled()
-    user_payload = assessor_user(session, answer, with_reasoning)
+    user_payload = assessor_user(session, answer, with_reasoning, with_plan)
     if PROVIDER == "mock":
-        return {**_mock_assessor(answer), "reasoning": reasoning.mock(answer) if with_reasoning else None}
-    system = ASSESSOR_REASONING_SYSTEM if with_reasoning else ASSESSOR_SYSTEM
-    data = _parse_json(_generate(system, user_payload, max_tokens=650 if with_reasoning else 400,
+        out = {**_mock_assessor(answer), "reasoning": reasoning.mock(answer) if with_reasoning else None}
+        return {**out, "plan": _mock_planner(session, out)} if with_plan else out
+    max_tokens = (650 if with_reasoning else 400) + (150 if with_plan else 0)
+    data = _parse_json(_generate(assessor_system(with_reasoning, with_plan), user_payload, max_tokens=max_tokens,
                                  json_mode=True, seed=ASSESSOR_SEED))
     if data is None or "standards" not in data:
         raise LLMError("The assessor returned a reply that isn't valid JSON. Try sending your answer again.")
-    return {**clean_assessment(data), "reasoning": reasoning.clean(data) if with_reasoning else None}
+    out = {**clean_assessment(data), "reasoning": reasoning.clean(data) if with_reasoning else None}
+    if with_plan:
+        out["plan"] = data["plan"] if isinstance(data.get("plan"), dict) else None
+    return out
 
 
 def call_planner(session, assessment):

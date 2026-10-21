@@ -226,6 +226,7 @@ def test_checker_is_shown_the_questions_already_asked(monkeypatch):
 def test_planner_suggested_tool_is_run_by_code_once_per_session(monkeypatch):
     # Seen 15 Oct 2026: the Planner suggested simulate_streaks, the Tutor ignored it.
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setenv("AGENT_PLANNER_SHARED", "0")  # the Planner on its own, so call_planner is used
     monkeypatch.setattr(llm_client, "call_planner", lambda *a: plan(suggest_tool="simulate_streaks"))
     seen = []
     def tutor(session, ins, answer, assessment, **k):
@@ -440,3 +441,33 @@ def test_case_ai_answer_scores_zero_and_is_called_out(monkeypatch):
     assert orc.fallback_comment(s).startswith("2 answers read like an AI chatbot wrote them, so they scored 0.")
     from app import prompts
     assert '"ai_like": true' in prompts.coach_user(s)
+
+
+def test_planner_shares_the_assessor_call(monkeypatch):
+    # 22 Oct 2026: the Planner rides on the Assessor's call, so an answer costs one call less.
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    monkeypatch.setenv("AGENT_CHECKER", "0")
+    systems = []
+    def fake(system, user, *a, **k):
+        systems.append(system)
+        if "assessor" in system:
+            return ('{"standards": {"clarity": 1, "logic": 1}, "reasoning_move": "evidence", "confidence": 0.8, '
+                    '"plan": {"level_change": "up", "format": "' + FORMATS[0] + '", "hint": false, "reason": "good"}}')
+        return '{"feedback": "Good.", "key_idea": "", "question": "What would test it?", "options": []}'
+    monkeypatch.setattr(llm_client, "_generate", fake)
+    s = orc.new_session("pattern_or_luck", total_rounds=6)
+    s["last_tutor"] = "Pattern or luck, and why?"
+    out = graph.run_turn(s, "luck, because many stocks rise five days in a row by chance")
+    assert not any(x.startswith("You are the Planner") for x in systems)  # no separate Planner call
+    assert "PLANNER:" in systems[0]
+    assert out["session"]["turns"][-1]["plan"]["level_change"] == "up"
+
+
+def test_missing_shared_plan_falls_back_to_the_planner(monkeypatch):
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    monkeypatch.setattr(llm_client, "_mock_planner", lambda *a: None)
+    called = []
+    monkeypatch.setattr(llm_client, "call_planner", lambda *a: called.append(1) or plan())
+    s = graph.run_turn(orc.new_session("pattern_or_luck", total_rounds=6), None)["session"]
+    graph.run_turn(s, "it could be luck because many stocks rise")
+    assert called == [1]
