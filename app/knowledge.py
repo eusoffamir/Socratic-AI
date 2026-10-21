@@ -151,7 +151,8 @@ def node_text(case, node):
 def graph(case):
     """The case graph with every node's text filled in, ready for an agent or the page."""
     g = case_graph(case)
-    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case, n)} for n in g["nodes"]]
+    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case, n), **({"label": n["label"]} if n.get("label") else {})}
+             for n in g["nodes"]]
     return {"nodes": nodes, "edges": [list(e) for e in g["edges"]]}
 
 

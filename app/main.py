@@ -17,9 +17,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import builder, copycheck, files, explainer, graph, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
+from . import builder, copycheck, files, explainer, graph, knowledge, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
 from .llm_client import LLMError
-from .content import CONCEPTS, LEVELS, STANDARDS, TUTORIAL, case_of
+from .content import CONCEPTS, LEVELS, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
 
 app = FastAPI(title="Socratic AI")
 
@@ -234,7 +234,7 @@ def check_participant(req: CodeRequest):
 @app.get("/api/concepts")
 def list_concepts():
     return [{"id": k, "title": v["title"], "mission": v["mission"], "scenario": v["scenario"], "tag": v["tag"],
-             "reading": v["reading"]}
+             "reading": v["reading"], "knowledge": knowledge.graph(k)}  # the graph for the Ask chat's diagram
             for k, v in CONCEPTS.items()]
 
 
@@ -519,7 +519,8 @@ def get_stats(sid: str):
         "level": LEVELS[session["level_idx"]][1],
         "levels": [{"key": k, "name": name} for k, name, _ in LEVELS],
         "standards": STANDARDS,
-        "summary": orchestrator.summarize(session),
+        "summary": (summary := orchestrator.summarize(session)),
+        "tip": STANDARD_TIPS.get(summary["weakest_standard"]),  # the Ask chat's progress card
         "comment": _final_comment(sid, session),
         "history": session["history"],
     }

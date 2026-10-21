@@ -127,8 +127,8 @@
   .rail .spacer{flex:1;}
 
   /* the wide sidebar (like Claude): New chat, Home, Overall status, Recents. Folds back to icons. */
-  .nav{align-items:stretch; gap:2px; padding:14px 12px; min-height:0; overflow:hidden;}
-  .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px; margin-bottom:14px;}
+  .nav{align-items:stretch; gap:6px; padding:14px 12px; min-height:0; overflow:hidden;}
+  .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px; margin-bottom:22px;}
   .nav .logo{margin:0; flex:none;}
   .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1;}
   .nav .sn-fold{width:34px; height:34px; flex:none;}
@@ -138,8 +138,8 @@
   .sn-item svg{width:20px; height:20px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
-  .sn-new{margin-bottom:6px; background:rgba(255,255,255,.1); opacity:1;}
-  .sn-label{font-size:12px; opacity:.6; padding:18px 12px 6px; white-space:nowrap;}
+  .sn-new{background:rgba(255,255,255,.1); opacity:1;}
+  .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   .sn-chat{display:flex; align-items:center; border-radius:8px;}
   .sn-chat:hover, .sn-chat.on{background:rgba(255,255,255,.12);}
@@ -247,19 +247,19 @@
   .topbar .spacer{flex:1;}
   .rounds{
     display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
-    margin-left:24px; padding-left:48px; border-left:1px solid var(--rule);
+    margin-left:16px; padding-left:28px; border-left:1px solid var(--rule);
   }
-  .rounds .mono-label{font-size:12.5px;}
-  .rounds .seg{border-radius:14px;}
-  .rounds .seg label{padding:14px 34px; font-size:22px;}
+  .rounds .mono-label{font-size:12px;}
+  .rounds .seg{border-radius:12px;}
+  .rounds .seg label{padding:9px 22px; font-size:17px;}
   /* Mode button: "Normal" (gray, default) <-> "2 choices" (vibrant A-blue to B-orange, the A/B button colors) */
   .mode{display:flex; flex-direction:column; align-items:flex-start; gap:10px; flex:none;
-    margin-left:24px; padding-left:48px; border-left:1px solid var(--rule);}  /* same spacing + divider as .rounds */
-  .mode .mono-label{font-size:12.5px;}
+    margin-left:16px; padding-left:28px; border-left:1px solid var(--rule);}  /* same spacing + divider as .rounds */
+  .mode .mono-label{font-size:12px;}
   .mode-btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:10px; height:64px; min-width:200px;
-    padding:0 26px; border-radius:14px; background:var(--panel-2); color:var(--ink-faint); border:2px solid var(--rule);
-    font-weight:600; font-size:20px; transition:background .2s, color .2s, border-color .2s, box-shadow .2s, transform .1s;
+    display:inline-flex; align-items:center; justify-content:center; gap:10px; height:46px; min-width:140px;
+    padding:0 20px; border-radius:12px; background:var(--panel-2); color:var(--ink-faint); border:2px solid var(--rule);
+    font-weight:600; font-size:16px; transition:background .2s, color .2s, border-color .2s, box-shadow .2s, transform .1s;
   }
   .mode-btn:hover:not(:disabled){color:var(--ink-soft); opacity:1;}
   .mode-btn:active{transform:scale(.97);}
@@ -903,6 +903,7 @@
     #homeView.folded .nav-unfold{display:none;}
     #homeView.folded .home-scroll, #homeView.folded .status-scroll{padding-top:16px;}
     .status-scroll{padding:16px 16px 32px;}
+    .sn-label{margin-top:24px;}
     .ask-main{padding:24px 16px 10vh;}
     .ask-greet{flex-direction:column; gap:12px;}
     .ask-top{padding:10px 16px 0;}

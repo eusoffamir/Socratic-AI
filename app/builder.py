@@ -43,7 +43,8 @@ PICTURES = {
 # Word limits for each part, a little above what the prompt asks, so one extra
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
-         "idea": 35, "example": 40, "think": 30, "question": 25, "key_word": 4, "meaning": 12, "node": 35}
+         "idea": 35, "example": 40, "think": 30, "question": 25, "key_word": 4, "meaning": 12, "node": 35,
+         "label": 5}
 
 SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps university beginners practise critical thinking on any topic. A learner gives you a REQUEST: a topic name, a question, or a short reading. You write the material the tutor will use. You never write the questions; the tutor does that.
 
@@ -68,13 +69,13 @@ Each case has:
 - tag: 1 word
 - picture: the 1 word from PICTURES that best fits the case
 - scenario: at most 35 words, the situation in which a person SAYS a claim or makes a choice, with their words in quotes, so there is something to question. Never only describe facts. Like "A stock went up 5 days in a row. Your friend says, \\"It is a pattern, so buy it now.\\""
-- notes: exactly 5 facts the tutor may use, at most 25 words each, in teaching order. Each has a knowledge type.
+- notes: exactly 5 facts the tutor may use, at most 25 words each, in teaching order. Each has a knowledge type and a label of 2 to 4 words for a diagram box, like "Green light reflects".
 - reading: what the learner reads before the case
   - idea: 4 short sentences that teach the key idea
   - example: 1 concrete example sentence
   - key_words: 3 pairs of [word, meaning in at most 10 words]
   - think: 1 question to think about while reading
-- more_knowledge: 3 to 5 extra facts or steps, each with an id, text and knowledge type, so the knowledge graph is complete
+- more_knowledge: 3 to 5 extra facts or steps, each with an id, text, knowledge type and a label of 2 to 4 words, so the knowledge graph is complete
 - links: 6 to 12 links [from_id, relation, to_id] between the notes (ids n1 to n5) and the more_knowledge ids. Every note and every extra fact is in at least 1 link.
 
 PICTURES (use these names only):
@@ -93,9 +94,9 @@ Otherwise reply with ONLY this JSON and nothing else:
 {"topic": "the topic in at most 8 words",
  "cases": [{"title": "", "mission": "", "tag": "", "scenario": "",
             "picture": "",
-            "notes": [{"text": "", "type": ""}],
+            "notes": [{"text": "", "type": "", "label": ""}],
             "reading": {"idea": [""], "example": "", "key_words": [["", ""]], "think": ""},
-            "more_knowledge": [{"id": "", "text": "", "type": ""}],
+            "more_knowledge": [{"id": "", "text": "", "type": "", "label": ""}],
             "links": [["n1", "supports", ""]]}]}"""
 
 
@@ -120,6 +121,14 @@ def _text(value, limit, what):
     if len(text.split()) > limit:
         raise TopicError(f"The {what} is too long.")
     return text
+
+
+def _label(value):
+    """A short diagram label, or None (the page then makes one from the text)."""
+    try:
+        return _text(value, WORDS["label"], "label")
+    except TopicError:
+        return None
 
 
 def _type(value):
@@ -162,7 +171,8 @@ def clean_case(raw, topic, case_id, source=None):
     if len(ideas) < 2 or not words:
         raise TopicError("A reading is too short.")
 
-    nodes = [{"id": f"n{i + 1}", "type": _type(n.get("type")) or "factual", "note": i} for i, n in enumerate(notes)]
+    nodes = [{"id": f"n{i + 1}", "type": _type(n.get("type")) or "factual", "note": i,
+              **({"label": lab} if (lab := _label(n.get("label"))) else {})} for i, n in enumerate(notes)]
     for extra in raw.get("more_knowledge") or []:
         if not isinstance(extra, dict):
             continue
@@ -170,7 +180,8 @@ def clean_case(raw, topic, case_id, source=None):
         kind = _type(extra.get("type"))
         if nid and kind and nid not in {n["id"] for n in nodes} and len(nodes) < NOTES_PER_CASE + 6:
             try:
-                nodes.append({"id": nid, "type": kind, "text": _text(extra.get("text"), WORDS["node"], "fact")})
+                nodes.append({"id": nid, "type": kind, "text": _text(extra.get("text"), WORDS["node"], "fact"),
+                              **({"label": lab} if (lab := _label(extra.get("label"))) else {})})
             except TopicError:
                 continue  # one broken extra fact is dropped, not the whole topic
     ids = {n["id"] for n in nodes}
@@ -316,9 +327,10 @@ def recheck(case):
         raise TopicError("This case is broken, so please build the topic again.")
     texts = {n.get("id"): n for n in case["knowledge"].get("nodes") or [] if isinstance(n, dict)}
     notes = case.get("notes") or []
-    types = {n.get("note"): n.get("type") for n in texts.values() if "note" in n}
+    by_note = {n.get("note"): n for n in texts.values() if "note" in n}
     raw = {**case,
-           "notes": [{"text": t, "type": types.get(i)} for i, t in enumerate(notes)],
+           "notes": [{"text": t, "type": by_note.get(i, {}).get("type"), "label": by_note.get(i, {}).get("label")}
+                     for i, t in enumerate(notes)],
            "more_knowledge": [n for n in texts.values() if "text" in n],
            "links": case["knowledge"].get("edges") or []}
     case_id = str(case.get("id") or "")
