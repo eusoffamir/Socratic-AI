@@ -2581,11 +2581,11 @@ function overallHTML(d){
       <div class="coach-comment" id="ovCoach"><div class="mono-label">Coach</div>
         <div class="thinking">${DOTS}Reading all your answers...</div></div>
     </div>
+    <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
     ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
       <small>How you reasoned in the case chats. This counts chat answers, not skill checks, so it can differ from the grid above.</small></summary>
       ${reasoningGridHTML(s.reasoning)}</details>` : ''}
-    <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <div class="note">Only cases played in this browser count. The tutorial is practice, so it is not included.</div>
   </div>`;
 }
