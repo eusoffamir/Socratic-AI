@@ -1,5 +1,6 @@
 import json
 
+from . import reasoning
 from .content import CONCEPTS, FORMATS, LEVELS, STANDARDS
 from .tools import TOOLS
 
@@ -8,7 +9,8 @@ AB_FORMAT = FORMATS[-1]  # "choose A or B and defend the choice"
 # Saved with every assessed answer, so marks from different Assessor prompts are
 # never mixed up in the thesis. Change it whenever ASSESSOR_SYSTEM or
 # assessor_user changes. Answers saved before 15 October 2026 have no version.
-ASSESSOR_VERSION = "2026-10-15"
+# 2026-10-21 adds the Reasoning agent's part; the 9 standards rules are unchanged.
+ASSESSOR_VERSION = "2026-10-21"
 
 # Word limits the Tutor is asked to keep. The Checker allows a little slack
 # (see checker.py) so a reply one word over does not cost a rewrite call.
@@ -70,10 +72,16 @@ reasoning_move: the move the learner mainly showed, only if it is clearly there.
 learner_points: up to 3 short paraphrases of ideas or claims the learner stated.
 confused_or_frustrated: true if the learner says they are lost, confused, annoyed, asks for fewer questions, or only says something like "I don't know".
 evidence_quote: a short quote from the answer that supports your ratings.
-confidence: your confidence from 0 to 1.
+confidence: your confidence from 0 to 1."""
 
-Return ONLY this JSON and nothing else:
-{"standards": {""" + ", ".join(f'"{k}": 0' for k in STANDARDS) + """}, "reasoning_move": "none", "learner_points": [], "confused_or_frustrated": false, "evidence_quote": "", "confidence": 0.0}"""
+_ASSESSOR_JSON = ('{"standards": {' + ", ".join(f'"{k}": 0' for k in STANDARDS) + '}, "reasoning_move": "none", '
+                  '"learner_points": [], "confused_or_frustrated": false, "evidence_quote": "", "confidence": 0.0')
+_RETURN = "\n\nReturn ONLY this JSON and nothing else:\n"
+# The Reasoning agent (reasoning.py) shares the Assessor's call to save quota,
+# so its prompt part and JSON fields are added here when it is switched on.
+ASSESSOR_REASONING_SYSTEM = (ASSESSOR_SYSTEM + "\n\n" + reasoning.PROMPT + _RETURN
+                             + _ASSESSOR_JSON + ", " + reasoning.JSON_FIELDS + "}")
+ASSESSOR_SYSTEM = ASSESSOR_SYSTEM + _RETURN + _ASSESSOR_JSON + "}"
 
 PLANNER_SYSTEM = """You are the Planner agent for a Socratic tutor. After each learner answer you choose the next teaching move. You never talk to the learner.
 
@@ -146,11 +154,12 @@ def coach_user(session):
                       indent=1, ensure_ascii=False)
 
 
-def assessor_user(session, answer):
+def assessor_user(session, answer, with_reasoning=False):
     payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
     if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
         c = CONCEPTS[session["concept_id"]]
-        payload = {"case_story": c["scenario"], "NOTES": c["notes"], **payload}
+        extra = {"NOTE_TYPES": reasoning.note_types(session["concept_id"])} if with_reasoning else {}
+        payload = {"case_story": c["scenario"], "NOTES": c["notes"], **extra, **payload}
     return json.dumps(payload, indent=1, ensure_ascii=False)
 
 

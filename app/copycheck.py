@@ -4,6 +4,7 @@ Plain code, no AI: it is free, instant and gives the same result every time.
 A rule guards; the agents never see a copied answer as real reasoning."""
 import re
 
+from . import reasoning
 from .content import CONCEPTS, STANDARDS
 
 # Most of the answer copied = not the learner's own thinking.
@@ -62,7 +63,8 @@ def is_copied(answer, sources, story=""):
 def copied_assessment():
     """What a copied answer scores: nothing, because none of it is the learner's own."""
     return {"standards": {k: 0 for k in STANDARDS}, "reasoning_move": "none", "learner_points": [],
-            "confused_or_frustrated": False, "evidence_quote": "", "confidence": 1.0, "copied_hint": True}
+            "confused_or_frustrated": False, "evidence_quote": "", "confidence": 1.0, "copied_hint": True,
+            "reasoning": reasoning.empty() if reasoning.enabled() else None}
 
 
 def session_sources(session):

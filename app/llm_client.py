@@ -13,9 +13,9 @@ import os
 import random
 import time
 
-from . import limits, tools
+from . import limits, reasoning, tools
 from .content import CONCEPTS, FORMATS, MOVES, STANDARDS
-from .prompts import (AB_FORMAT, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
+from .prompts import (AB_FORMAT, ASSESSOR_REASONING_SYSTEM, ASSESSOR_SYSTEM, CHECKER_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
                       assessor_user, checker_user, coach_user, planner_user, tutor_user)
 
 
@@ -243,13 +243,18 @@ def clean_assessment(data):
 
 
 def call_assessor(session, answer):
-    user_payload = assessor_user(session, answer)
+    """The Assessor, plus the Reasoning agent in the same call when it is on.
+    "reasoning" is None when the Reasoning agent is switched off."""
+    with_reasoning = reasoning.enabled()
+    user_payload = assessor_user(session, answer, with_reasoning)
     if PROVIDER == "mock":
-        return _mock_assessor(answer)
-    data = _parse_json(_generate(ASSESSOR_SYSTEM, user_payload, max_tokens=400, json_mode=True, seed=ASSESSOR_SEED))
+        return {**_mock_assessor(answer), "reasoning": reasoning.mock(answer) if with_reasoning else None}
+    system = ASSESSOR_REASONING_SYSTEM if with_reasoning else ASSESSOR_SYSTEM
+    data = _parse_json(_generate(system, user_payload, max_tokens=650 if with_reasoning else 400,
+                                 json_mode=True, seed=ASSESSOR_SEED))
     if data is None or "standards" not in data:
         raise LLMError("The assessor returned a reply that isn't valid JSON. Try sending your answer again.")
-    return clean_assessment(data)
+    return {**clean_assessment(data), "reasoning": reasoning.clean(data) if with_reasoning else None}
 
 
 def call_planner(session, assessment):
