@@ -328,11 +328,14 @@
   .mode-btn[aria-pressed="true"]:hover:not(:disabled){color:#fff;}
   /* Question style menu beside + in the Ask box, like Claude's mode menu */
   .ask-mode{position:relative; margin-right:8px;}
-  #askModeBtn{display:inline-flex; align-items:center; gap:5px; font-size:13px; padding:6px 10px; border-radius:999px;
+  .ask-rounds{margin-right:0;}
+  .ask-rounds .ask-mode-menu{width:240px;}
+  #askModeBtn, #askRoundsBtn{display:inline-flex; align-items:center; gap:5px; font-size:13px; padding:6px 10px; border-radius:999px;
               background:transparent; border:1px solid transparent; color:var(--ink-soft);}
-  #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"]{background:var(--panel-2); color:var(--ink); opacity:1;}
+  #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"],
+  #askRoundsBtn:hover:not(:disabled), #askRoundsBtn[aria-expanded="true"]{background:var(--panel-2); color:var(--ink); opacity:1;}
   #askModeBtn.on{color:#2f5aa8;}
-  #askModeBtn svg{width:11px; height:11px;}
+  #askModeBtn svg, #askRoundsBtn svg{width:11px; height:11px;}
   .ask-mode-menu{position:absolute; right:0; bottom:calc(100% + 8px); z-index:20; width:290px; padding:6px;
                  background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.14);}
   .ask-mode-menu .mm-head{font-size:12.5px; color:var(--ink-faint); padding:6px 10px 4px;}
@@ -1181,6 +1184,20 @@
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           <button type="button" class="ask-next hidden" id="askNext" title="A new case on the same topic">New case</button>
           <span class="spacer"></span>
+          <div class="ask-mode ask-rounds">
+            <button type="button" id="askRoundsBtn" aria-haspopup="menu" aria-expanded="false" title="Rounds per case">
+              <span id="askRoundsName">No limit</span>
+              <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="ask-mode-menu hidden" id="askRoundsMenu" role="menu" aria-label="Rounds per case">
+              <div class="mm-head">Rounds per case, from the next case</div>
+              <button type="button" role="menuitemradio" aria-checked="false" data-rounds="3">
+                <b>3 rounds</b><span>A short case with 3 questions.</span></button>
+              <button type="button" role="menuitemradio" aria-checked="false" data-rounds="6">
+                <b>6 rounds</b><span>The usual length, with 6 questions.</span></button>
+              <button type="button" role="menuitemradio" aria-checked="true" data-rounds="0">
+                <b>No limit</b><span>Keep going for as long as you like.</span></button>
+            </div>
+          </div>
           <div class="ask-mode">
             <button type="button" id="askModeBtn" aria-haspopup="menu" aria-expanded="false" title="Question style">
               <span id="askModeName">Normal</span>
@@ -1753,7 +1770,7 @@ function fileBase64(file){
 // case and asks the first question. The session has no round limit. Home is
 // not changed; the topic also shows there, the same as one built on Home.
 let askFile = null;
-const ask = {sid: null, busy: false, options: [], picked: null, cases: [], hintOpened: false,
+const ask = {sid: null, busy: false, rounds: 0, total: 0, done: false, options: [], picked: null, cases: [], hintOpened: false,
              chatId: null, sids: [], request: null, answers: 0, offered: [], gen: 0};
 // The learner may switch chats while a reply is on its way. Each switch bumps
 // ask.gen, so a late reply sees it belongs to a chat that is no longer shown and
@@ -2011,7 +2028,7 @@ function askThoughtHTML(t, feedback){
 const ASK_LEVELS = ['Clarify', 'Assumptions', 'Evidence', 'Viewpoints', 'Implications', 'Question the question'];
 function askStrip(levelIdx, round){
   if(levelIdx == null) return;
-  $('askRound').textContent = round ? `ROUND ${round}` : '';
+  $('askRound').textContent = !round ? '' : ask.total ? `ROUND ${round}/${ask.total}` : `ROUND ${round}`;
   $('askTicks').innerHTML = ASK_LEVELS.map((name, i) => `<div class="tick${i < levelIdx ? ' done' : i === levelIdx ? ' now' : ''}" title="${esc(name)}"></div>`).join('');
   $('askLevel').innerHTML = `<span class="lv">${esc((ASK_LEVELS[levelIdx] || '').toUpperCase())}</span>`;
   if(!$('askStats').classList.contains('hidden')) askStatsLoad();
@@ -2053,6 +2070,42 @@ function setAskMode(on){
 function askModeOpen(open){
   $('askModeMenu').classList.toggle('hidden', !open);
   $('askModeBtn').setAttribute('aria-expanded', open);
+  if(open) askRoundsOpen(false);
+}
+// Rounds per case (3, 6 or no limit), picked beside the question style. A case's
+// length is fixed when it starts, so a new pick counts from the next case.
+const ROUND_NAMES = {3: '3 rounds', 6: '6 rounds', 0: 'No limit'};
+function setAskRounds(n){
+  ask.rounds = n;
+  $('askRoundsName').textContent = ROUND_NAMES[n];
+  $('askRoundsMenu').querySelectorAll('[data-rounds]').forEach(b => b.setAttribute('aria-checked', String(Number(b.dataset.rounds) === n)));
+}
+function askRoundsOpen(open){
+  $('askRoundsMenu').classList.toggle('hidden', !open);
+  $('askRoundsBtn').setAttribute('aria-expanded', open);
+  if(open) askModeOpen(false);
+}
+$('askRoundsBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  askRoundsOpen($('askRoundsMenu').classList.contains('hidden'));
+});
+$('askRoundsMenu').addEventListener('click', e => {
+  e.stopPropagation();
+  const item = e.target.closest('[data-rounds]');
+  if(!item) return;
+  setAskRounds(Number(item.dataset.rounds));
+  askRoundsOpen(false);
+  $('askRoundsBtn').focus();
+});
+document.addEventListener('click', () => askRoundsOpen(false));
+$('askRoundsMenu').parentElement.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && !$('askRoundsMenu').classList.contains('hidden')){ e.stopPropagation(); askRoundsOpen(false); $('askRoundsBtn').focus(); }
+});
+// A case with a round limit ends after its last round: no more answers, but New case still works.
+function askDone(){
+  ask.done = true;
+  $('askSend').disabled = $('askInput').disabled = true;
+  $('askInput').placeholder = askCanNext() ? 'This case is done. Press New case for another one.' : 'This case is done.';
 }
 $('askModeBtn').addEventListener('click', e => {
   e.stopPropagation();
@@ -2140,11 +2193,12 @@ async function askStart(c, name){
   const wait = askStatus('Reading the case and writing the first question...');
   const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
   try {
-    const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: 0,
+    const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: ask.rounds,
       case: c.generated ? c : undefined, ab_only: !!ask.ab, reading_seconds: 0,
       participant_code: study.code || '', consent: !!study.code});
     if(!askLive(gen)) return;
-    Object.assign(ask, {sid: data.session_id, hintOpened: false});
+    Object.assign(ask, {sid: data.session_id, hintOpened: false, total: data.total_rounds || 0, done: false});
+    $('askInput').placeholder = 'Your answer...';
     ask.chatId = ask.chatId || data.session_id;
     ask.sids.push(data.session_id);
     ask.cases.push(c);
@@ -2268,6 +2322,7 @@ async function askAnswer(typed){
     askShowTurn(data);
     ask.answers++;
     if(ask.answers % 5 === 0) askProgress();
+    if(data.ended) ask.done = true;
   } catch(err){
     if(!askLive(gen)) return;
     // the server leaves the session as it was, so the answer goes back in the box
@@ -2277,13 +2332,13 @@ async function askAnswer(typed){
     note('error', err.message + ' This answer was not counted, so please send it again.', $('askThread'));
   } finally {
     clearTimeout(slow);
-    if(askLive(gen)){ askLock(false); $('askInput').focus(); }
+    if(askLive(gen)){ askLock(false); if(ask.done) askDone(); else $('askInput').focus(); }
   }
 }
 
 $('askForm').addEventListener('submit', e => {
   e.preventDefault();
-  if(ask.busy) return;
+  if(ask.busy || ask.done) return;
   const text = $('askInput').value.trim();
   if(ask.sid) return askAnswer(text);
   if(!text && !askFile){ $('askInput').focus(); return; }
@@ -2294,7 +2349,7 @@ $('askForm').addEventListener('submit', e => {
 
 function askReset(){
   Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false,
-                     chatId: null, sids: [], request: null, answers: 0, offered: [], gen: ask.gen + 1});
+                     chatId: null, sids: [], request: null, answers: 0, offered: [], total: 0, done: false, gen: ask.gen + 1});
   askLock(false);
   $('askThread').innerHTML = '';
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
@@ -2329,6 +2384,7 @@ async function askOpen(id){
       else askAdd('am-divider', `Case ${ask.cases.length + 1}`);
       ask.cases.push(c);
       ask.sids.push(sid);
+      ask.total = d.total_rounds || 0;
       d.turns.forEach((t, i) => {
         if(i){ askAdd('am-user', esc(t.answer || '')); ask.answers++; }
         const lastTurn = i === d.turns.length - 1;
@@ -2356,7 +2412,7 @@ async function askOpen(id){
   ask.sid = last;
   askLock(false);
   askNextButton();
-  if(ended){ askLock(true); $('askInput').placeholder = 'This chat has ended.'; return; }
+  if(ended){ askDone(); return; }
   $('askInput').focus();
 }
 
