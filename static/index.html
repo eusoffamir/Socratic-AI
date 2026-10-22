@@ -284,8 +284,8 @@
   .am-card .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
   .am-card .row button{font-size:13.5px; padding:7px 14px; border-radius:999px;}
   .am-card .row .ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--rule);}
-  .ask-next{font-size:13px; padding:6px 12px; border-radius:999px; background:var(--panel); border:1px solid var(--rule); color:var(--ink-soft);}
-  .ask-next:hover:not(:disabled){color:var(--ink); border-color:var(--signal); opacity:1;}
+  .ask-next{font-size:13px; padding:6px 12px; border-radius:999px; background:var(--signal-soft); border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal); font-weight:500;}
+  .ask-next:hover:not(:disabled){border-color:var(--signal); opacity:1;}
   /* the knowledge map of a case: boxes coloured by knowledge type, arrows for the links */
   .am-map{font-family:var(--sans); margin:2px 0 14px; background:var(--panel); border:1px solid var(--rule); border-radius:14px; padding:12px 14px 10px;}
   .am-map svg{display:block; width:100%; height:auto;}
