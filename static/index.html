@@ -362,6 +362,7 @@
   .am-map .cap .tag{margin-right:6px; font-weight:600; color:var(--c);}
   .am-map .cap .tag::before{content:""; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c); margin-right:6px; vertical-align:1px;}
   .am-map .legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-faint); margin:6px 2px 0;}
+  .am-map:has(.cap.on) .legend{display:none;}  /* once a box is picked, its card names the type, so the key goes */
   .am-map .legend i{display:inline-block; width:9px; height:9px; border-radius:3px; opacity:.75; margin-right:5px; vertical-align:-1px;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
           border-radius:10px; padding:12px 16px; margin:0 0 6px; scroll-margin-bottom:28px;}  /* opened near the end, it stops above the answer box */
