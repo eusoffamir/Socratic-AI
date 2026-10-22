@@ -21,6 +21,7 @@ Eusoff works from his PC, his laptop and his phone (Claude Code cloud sessions).
 - Project knowledge goes in this file or `docs/project-history.md`, not only in Claude's memory.
 - **`.env` is shared through git, encrypted with dotenvx** (the repo is public). Each device has the private key once as the `DOTENV_PRIVATE_KEY` environment variable (Windows: `setx`; cloud sessions: environment settings). Backup of the key: Eusoff's password manager. `.env.keys` is never committed.
   - Run anything that needs the keys through dotenvx: `dotenvx run -- uvicorn app.main:app --reload`, `dotenvx run -- pytest`.
+  - **Windows PowerShell:** use `npx.cmd dotenvx run -- ...` (or `dotenvx.cmd`). Plain `npx`/`dotenvx` run as PowerShell scripts, which swallow the `--`, so flags like `--reload` go to dotenvx and fail.
   - Change a value: `dotenvx set KEY value` (encrypts it). Never type a plain value into `.env` and commit it; `tests/test_env.py` fails if the shared `.env` holds a plain value.
   - `app/env.py` skips encrypted values when the app runs without dotenvx, so Render keeps using its dashboard values and defaults.
 - Not synced, set up by hand per device: `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
