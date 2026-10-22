@@ -359,6 +359,10 @@
   .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
   .am-map .cap.on{margin:10px 0 0; padding:10px 14px; line-height:1.5; color:var(--ink); background:var(--signal-soft); border-radius:10px;
                   border:1px solid color-mix(in srgb, var(--signal) 25%, transparent);}  /* the picked box's text, a shade greener than the map */
+  .am-map .cap.on{position:relative; padding-right:40px;}
+  .am-map .cap-x{position:absolute; top:50%; right:8px; transform:translateY(-50%); width:26px; height:26px; padding:0; border:0; border-radius:50%;
+                 background:transparent; color:var(--ink-soft); font-size:18px; line-height:26px; cursor:pointer;}
+  .am-map .cap-x:hover{background:color-mix(in srgb, var(--signal) 12%, transparent); color:var(--ink);}
   .am-map .cap .tag{margin-right:6px; font-weight:600; color:var(--c);}
   .am-map .cap .tag::before{content:""; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c); margin-right:6px; vertical-align:1px;}
   .am-map .legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-faint); margin:6px 2px 0;}
@@ -2423,14 +2427,25 @@ function askShowTurn(data, intro){
   $('askInput').placeholder = ask.options.length ? 'Pick A or B, then say why...' : 'Your answer...';
 }
 
+// Tapping a box shows its text in a card; tapping it again, or the card's x, closes it and brings back the key
+function mapUnpick(map){
+  const cap = map.querySelector('.cap');
+  map.querySelectorAll('.nd.on').forEach(g => g.classList.remove('on'));
+  cap.classList.remove('on');
+  cap.textContent = cap.dataset.tip || '';
+}
 function mapPick(nd){
-  const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts);
+  const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts), cap = map.querySelector('.cap');
+  if(cap.dataset.tip === undefined) cap.dataset.tip = cap.textContent;
+  if(nd.classList.contains('on')){ mapUnpick(map); return false; }
   map.querySelectorAll('.nd').forEach(g => g.classList.toggle('on', g === nd));
-  const t = texts[Number(nd.dataset.i)] || '', cut = t.indexOf('. '), cap = map.querySelector('.cap');
+  const t = texts[Number(nd.dataset.i)] || '', cut = t.indexOf('. ');
   const type = cut > 0 ? t.slice(0, cut) : '', text = cut > 0 ? t.slice(cut + 2) : t;
   cap.classList.add('on');
   cap.style.setProperty('--c', nd.style.getPropertyValue('--c'));
-  cap.innerHTML = (type ? `<span class="tag">${esc(type.charAt(0).toUpperCase() + type.slice(1))}</span>` : '') + esc(text);
+  cap.innerHTML = (type ? `<span class="tag">${esc(type.charAt(0).toUpperCase() + type.slice(1))}</span>` : '') + esc(text)
+    + '<button type="button" class="cap-x" title="Close" aria-label="Close">&times;</button>';
+  return true;
 }
 $('askThread').addEventListener('keydown', e => {
   const nd = e.target.closest('.am-map .nd');
@@ -2439,6 +2454,8 @@ $('askThread').addEventListener('keydown', e => {
 $('askThread').addEventListener('click', e => {
   const nd = e.target.closest('.am-map .nd');
   if(nd){ mapPick(nd); return; }
+  const x = e.target.closest('.am-map .cap-x');
+  if(x){ mapUnpick(x.closest('.am-map')); return; }
   if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
   if(e.target.closest('[data-stay]')){ e.target.closest('.am-card').remove(); $('askInput').focus(); return; }
   const hint = e.target.closest('.hint-btn');
@@ -3013,7 +3030,9 @@ $('knowBody').addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]');
   if(tab){ know.tab = tab.dataset.tab; renderKnowledge(); return; }
   const nd = e.target.closest('.am-map .nd');
-  if(nd && c){ mapPick(nd); $('knowSrc').innerHTML = knowSourceHTML(c, c.knowledge.nodes[Number(nd.dataset.i)] || {}); return; }
+  if(nd && c){ $('knowSrc').innerHTML = mapPick(nd) ? knowSourceHTML(c, c.knowledge.nodes[Number(nd.dataset.i)] || {}) : ''; return; }
+  const x = e.target.closest('.am-map .cap-x');
+  if(x){ mapUnpick(x.closest('.am-map')); $('knowSrc').innerHTML = ''; return; }
   const ans = e.target.closest('[data-ans]');
   if(ans && c){ know.answers[c.id] = {...(know.answers[c.id] || {}), [ans.dataset.q]: ans.dataset.ans}; renderKnowPane(c); return; }
   if(e.target.closest('[data-restart]') && c){ know.answers[c.id] = {}; renderKnowPane(c); }
