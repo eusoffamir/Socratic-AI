@@ -201,12 +201,12 @@
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
   details.am-case summary{list-style:none; cursor:pointer; position:relative;}
   details.am-case summary::-webkit-details-marker{display:none;}
-  details.am-case:hover{border-color:var(--blue);}
-  .am-case-more{position:absolute; top:2px; right:0; display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:400; color:var(--ink-faint); opacity:.7; transition:opacity .15s;}
+  details.am-case:hover{border-color:var(--signal);}
+  .am-case-more{position:absolute; top:2px; right:0; display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:400; color:var(--rail-ink); opacity:.7; transition:opacity .15s;}
   details.am-case:hover .am-case-more, details.am-case[open] .am-case-more{opacity:1;}
   .am-case-more svg{width:11px; height:11px; transition:transform .15s;}
   details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
-  .am-more-body{display:flex; flex-direction:column; gap:14px; margin:14px 0 4px; padding-top:14px; border-top:1px solid var(--rule); cursor:auto;}
+  .am-more-body{display:flex; flex-direction:column; gap:14px; margin:16px 0 0; padding:16px 18px; background:var(--panel); color:var(--ink); border-radius:10px; cursor:auto;}
   .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
   .am-more-body .am-lead{margin:0; font-size:14px; line-height:1.6; color:var(--ink);}
   .am-think{background:var(--signal-soft); border-radius:10px; padding:10px 14px; font-size:13.5px; line-height:1.55; color:var(--ink);}
@@ -216,11 +216,12 @@
   .am-glossary b{display:block; font-size:13.5px; font-weight:600; color:var(--ink);}
   .am-glossary span{display:block; font-size:13px; line-height:1.45; color:var(--ink-soft); margin-top:2px;}
   .am-more-body a{color:var(--signal);}
-  .am-case{font-family:var(--sans); background:var(--blue-soft);
-           border:1px solid color-mix(in srgb, var(--blue) 30%, transparent); border-left:4px solid var(--blue);
+  .am-case{font-family:var(--sans); background:var(--rail); color:var(--rail-ink);
+           border:1px solid var(--rail);
            border-radius:14px; padding:20px 24px; margin:4px 0 28px;}
   .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:14.5px; margin:0 0 10px; padding-right:90px;}
-  .am-case .s{font-size:14px; color:var(--ink-soft); margin:0;}
+  .am-case .s{font-size:14px; color:var(--rail-ink); opacity:.88; margin:0;}
+  .am-case .t .tag{background:var(--rail-ink); color:var(--rail);}
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
   .am-ai .am-opts{display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 10px; font-family:var(--sans);}  /* side by side, like the tutorial */
