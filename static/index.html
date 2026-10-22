@@ -817,7 +817,8 @@
   details.rk-more > summary{cursor:pointer; font-weight:600; font-size:14px;}
   details.rk-more > summary small{display:block; font-weight:400; font-size:12.5px; color:var(--ink-faint); margin-top:2px;}
   details.rk-more .rk{margin-top:16px;}
-  .rk-msg{margin:0 0 14px; padding:12px 14px; background:var(--panel-2); border-radius:10px; line-height:1.55;}
+  .rk-msg{margin:0 0 14px; padding:10px 14px; border-radius:10px; line-height:1.55; font-size:13.5px;  /* the same box as a Your cases row, on every page */
+          background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
   .rk-msg p{margin:0; line-height:1.45; position:relative; padding-left:16px;} .rk-msg p + p{margin-top:6px;}
   .rk-msg p::before{content:""; position:absolute; left:2px; top:.6em; width:5px; height:5px; border-radius:50%; background:var(--signal);}  /* each message is a green bullet point */
   .rk table{width:100%; border-collapse:separate; border-spacing:4px; font-size:13px; table-layout:fixed;}
