@@ -110,6 +110,8 @@ def _save_turn(sid, session, result):
             "reading_seconds": session.get("reading_seconds", 0),
             "participant_code": session.get("participant_code"),  # None outside study mode
             "provider": llm_client.PROVIDER,
+            # the git commit Render runs, so every reply can be traced to the exact prompts in app/prompts.py
+            "app_version": os.getenv("RENDER_GIT_COMMIT", "local")[:7],
             **result["trace"]}
     storage.append_transcript(sid, line)
 
