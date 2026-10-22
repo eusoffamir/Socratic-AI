@@ -1155,10 +1155,11 @@
      soft green boxes instead of beige, so they match the chat */
   :is(#overallBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
   :is(#overallBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
-  :is(#overallBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .report .lead, .rk-msg){font-size:15px;}
-  :is(#overallBody, .ask-stats) :is(.meta, .lvl, .ov-filter > button, .ov-menu button, .ms-row .nm, .rk table, .rk-sub,
-     .ov-open, details.rk-more > summary, details.rk-more > summary small, .note, .ov-case .t small){font-size:13px;}
-  :is(#overallBody, .ask-stats) :is(.ms-row .st, .ms-row .nm small, .ms-axis, .rk th, .rk tfoot td, .rung .rn, .rung .here){font-size:12px;}
+  /* two sizes only, the same as the sidebar: 13.5 for everything you read (like New chat), 12 for tiny labels (like Recents) */
+  :is(#overallBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .ov-case .t small, .report .lead, .rk-msg, .meta,
+     .ms-row .nm, .ms-row .st, .rk table, .rk th.row, .rk-sub, .note, .ov-open, details.rk-more > summary, .ov-menu button){font-size:13.5px;}
+  :is(#overallBody, .ask-stats) :is(.lvl, .ov-filter > button, .ms-row .nm small, .ms-axis, .rk thead th, .rk tfoot td,
+     .rung .rn, .rung .here, details.rk-more > summary small){font-size:12px;}
   :is(#overallBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
   :is(#overallBody, .ask-stats) .ov-case{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
   :is(#overallBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
