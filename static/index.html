@@ -1154,21 +1154,30 @@
   }
   /* Overall status and the chat's status panel: one font (sans), three sizes (15 text, 13 small, 12 tiny),
      soft green boxes instead of beige, so they match the chat */
-  :is(#overallBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
-  :is(#overallBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
+  :is(#overallBody, #knowBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
+  :is(#overallBody, #knowBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
   /* two sizes only, the same as the sidebar: 13.5 for everything you read (like New chat), 12 for tiny labels (like Recents) */
-  :is(#overallBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .ov-case .t small, .report .lead, .rk-msg, .meta,
+  :is(#overallBody, #knowBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .ov-case .t small, .report .lead, .rk-msg, .meta,
      .ms-row .nm, .ms-row .st, .rk table, .rk th.row, .rk-sub, .note, .ov-open, details.rk-more > summary, .ov-menu button){font-size:13.5px;}
-  :is(#overallBody, .ask-stats) :is(.lvl, .ov-filter > button, .ms-row .nm small, .ms-axis, .rk thead th, .rk tfoot td,
+  :is(#overallBody, #knowBody, .ask-stats) :is(.lvl, .ov-filter > button, .ms-row .nm small, .ms-axis, .rk thead th, .rk tfoot td,
      .rung .rn, .rung .here, details.rk-more > summary small){font-size:12px;}
-  :is(#overallBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
-  :is(#overallBody, .ask-stats) .ov-case{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
-  :is(#overallBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
-  :is(#overallBody, .ask-stats) .rk-msg{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
-  :is(#overallBody, .ask-stats) .ov-case-more{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-top:0;}
-  :is(#overallBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
-  :is(#overallBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
-  :is(#overallBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
+  :is(#overallBody, #knowBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
+  :is(#overallBody, #knowBody, .ask-stats) .ov-case{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
+  :is(#overallBody, #knowBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
+  :is(#overallBody, #knowBody, .ask-stats) .rk-msg{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
+  :is(#overallBody, #knowBody, .ask-stats) .ov-case-more{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-top:0;}
+  :is(#overallBody, #knowBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
+  :is(#overallBody, #knowBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
+  :is(#overallBody, #knowBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
+  /* Knowledge page: the same two sizes and green boxes */
+  #knowBody :is(.know-pick select, .know-tabs button, .know-intro, .know-none, .know-quote, .know-lesson, .know-tree li p,
+     .know-tree .why, .know-restart, .know-bar, .am-map .cap){font-size:13.5px;}
+  #knowBody :is(.know-tree .know-ans, .know-bar .mv, .am-map .legend){font-size:12px;}
+  #knowBody :is(.know-bar .mv, .am-map .mono-label){font-family:var(--sans);}
+  #knowBody .am-map .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
+  #knowBody :is(.am-map, .know-quote, .know-tree li:not(.end), .know-pick select){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
+  #knowBody .know-restart{color:var(--signal); background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
+  #knowBody .know-bar .track{background:var(--signal-soft);}
 </style>
 </head>
 <body>
