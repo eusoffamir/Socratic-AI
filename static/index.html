@@ -351,10 +351,10 @@
   .ask-tools{display:flex; align-items:center; gap:6px; margin-top:8px;}
   .ask-tools .spacer{flex:1;}
   .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:16px;}
-  .ask-chips button{font-size:13.5px; padding:7px 14px; border-radius:999px; background:var(--panel-2);
-                    border:1px solid var(--rule); color:var(--ink-soft);}
-  .ask-chips button:hover:not(:disabled){color:var(--ink); border-color:var(--signal); opacity:1;}
-  .ask-chips button.checked{color:var(--signal); border-color:var(--signal); background:var(--signal-soft);}
+  .ask-chips button{font-size:13.5px; padding:7px 14px; border-radius:999px; background:var(--signal-soft);
+                    border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal);}
+  .ask-chips button:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .ask-chips button.checked{border-color:var(--signal);}  /* the built-in, checked topic keeps a full green edge */
   #askStatus{margin-top:16px; text-align:center;}
   #askStatus .thinking{justify-content:center;}
 
@@ -400,9 +400,9 @@
   #askRound .sl{margin:0 3px;}
   .ask-rounds .ask-mode-menu{width:300px;}
   #askModeBtn, #askRoundsBtn{display:inline-flex; align-items:center; gap:5px; font-size:13px; padding:6px 10px; border-radius:999px;
-              background:transparent; border:1px solid transparent; color:var(--ink-soft);}
+              background:transparent; border:1px solid transparent; color:var(--signal);}
   #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"],
-  #askRoundsBtn:hover:not(:disabled), #askRoundsBtn[aria-expanded="true"]{background:var(--panel-2); color:var(--ink); opacity:1;}
+  #askRoundsBtn:hover:not(:disabled), #askRoundsBtn[aria-expanded="true"]{background:var(--signal-soft); opacity:1;}
   #askModeBtn.on{color:var(--signal);}
   #askModeBtn svg, #askRoundsBtn svg{width:11px; height:11px;}
   .ask-mode-menu{position:absolute; right:0; bottom:calc(100% + 8px); z-index:20; width:400px; max-width:calc(100vw - 32px); padding:6px;
