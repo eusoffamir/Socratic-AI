@@ -209,9 +209,8 @@
   .know-tree .why{margin-top:8px; color:var(--ink-soft);}
   .know-tree .why .mono-label{display:inline; margin-right:8px;}
   .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px; display:block; margin:0 auto;}
-  /* drawn 1.17 times larger, like the map of the ideas, so its 11.5px text shows at about 13.5px; same green panel and tinted boxes */
-  .know-net-fig{--bg:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); background:var(--bg); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);
-                border-radius:14px; padding:16px 14px; margin:0 0 18px;}
+  /* drawn 1.17 times larger, like the map of the ideas, so its 11.5px text shows at about 13.5px; same tinted boxes */
+  .know-net-fig{--bg:var(--paper); margin:4px 0 22px;}
   .know-net svg{display:block; width:100%; height:auto; margin:0 auto;}
   .know-net rect{fill:color-mix(in srgb, var(--signal) 8%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 35%, transparent); stroke-width:1;}
   .know-net rect.cause{fill:color-mix(in srgb, var(--signal) 16%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 50%, transparent);}
@@ -3009,7 +3008,7 @@ function knowNetHTML(v){
     ? 'The AI guessed these chances, because there is no data to count for this topic, so treat them as a rough sketch. Asking the model backwards, from the signs to their likely cause, is abductive reasoning.'
     : `This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.`;
   return `<div class="know-net"><p class="know-intro">${intro}</p>
-    <div class="know-net-fig"><svg viewBox="0 0 ${width} ${4 + ROW + H + 4}" style="max-width:${Math.round(width * 1.17)}px" aria-label="What causes what in this case">
+    <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
     <span class="mono-label">The chance that</span>${bars}
