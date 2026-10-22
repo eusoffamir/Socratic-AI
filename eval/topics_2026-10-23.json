@@ -1,0 +1,5626 @@
+[
+ {
+  "request": "The French Revolution",
+  "build_seconds": 9.4,
+  "topic": {
+   "id": "t128f4fee7e",
+   "topic": "Causes and Events of the French Revolution",
+   "cases": [
+    {
+     "id": "t128f4fee7e-1",
+     "topic": "Causes and Events of the French Revolution",
+     "title": "Tax Reform or Privilege?",
+     "mission": "Evaluate resistance to taxation and privilege.",
+     "tag": "Politics",
+     "tool": null,
+     "picture": "coin",
+     "scenario": "A finance minister says, \"We must tax the nobility and the church to pay our huge state debts.\" A nobleman replies, \"Our ancient rights protect us from new taxes, so only an Estates-General can approve them.\"",
+     "notes": [
+      "By 1788, half of state revenue went on servicing its debt because France primarily used loans to fund wars.",
+      "The nobility and the Church benefited from a variety of tax exemptions while the tax burden fell mainly on the lower classes.",
+      "New tax laws had to be registered with regional judicial bodies or parlements that were able to block them.",
+      "The Assembly of Notables and parlements argued that proposed taxes could only be approved by an Estates-General.",
+      "Public opinion was firmly on the side of the parlements, and riots broke out in several towns."
+     ],
+     "reading": {
+      "idea": [
+       "France faced a massive debt crisis in the eighteenth century.",
+       "The nobility and the church paid almost no taxes.",
+       "Reform attempts were blocked by regional judicial bodies.",
+       "This political impasse led to the calling of the Estates-General."
+      ],
+      "example": "The finance minister proposed a universal land tax, but the assembly of notables rejected it.",
+      "key_words": [
+       [
+        "parlement",
+        "a regional judicial body that registered laws"
+       ],
+       [
+        "Estates-General",
+        "a representative body of the three estates"
+       ],
+       [
+        "exemption",
+        "freedom from an obligation like paying taxes"
+       ]
+      ],
+      "think": "Why might privileged groups resist paying taxes even during a state financial crisis?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "causal",
+        "note": 0,
+        "label": "Heavy state debt",
+        "quote": "France primarily used loans to fund the 1778 to 1783 Anglo-French War. Even after it ended, the monarchy continued to borrow heavily, and by 1788, half of state revenue went on servicing its debt.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1,
+        "label": "Unequal tax burden",
+        "quote": "As the nobility and Church benefited from a variety of exemptions, the tax burden fell mainly on the lower classes.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2,
+        "label": "Parlements block laws",
+        "quote": "Reform was difficult because new tax laws had to be registered with regional judicial bodies or parlements that were able to block them.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "n4",
+        "type": "conceptual",
+        "note": 3,
+        "label": "Estates-General demand",
+        "quote": "The notables and parlements argued that the proposed taxes could only be approved by an Estates-General, a representative body that last met in 1614.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Public support riots",
+        "quote": "Public opinion was firmly on the side of the parlements, and riots broke out in several towns.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "m1",
+        "type": "factual",
+        "text": "Brienne announced that the king would summon an Estates-General to convene the following May after his loans failed.",
+        "label": "Summoning Estates-General",
+        "quote": "Brienne's attempts to raise new loans failed, and on 8 August 1788, he announced that the king would summon an Estates-General to convene the following May.",
+        "from": "French Revolution"
+       },
+       {
+        "id": "m2",
+        "type": "causal",
+        "text": "Resistance to reform by the ruling elite made the state unable to manage its financial crisis.",
+        "label": "Elite resistance",
+        "quote": "Combined with resistance to reform by the ruling elite and indecisive policy by king Louis XVI and his ministers, the result was a crisis the state was unable to manage.",
+        "from": "French Revolution"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "n2"
+       ],
+       [
+        "n2",
+        "supports",
+        "n3"
+       ],
+       [
+        "n3",
+        "leads_to",
+        "n4"
+       ],
+       [
+        "n4",
+        "then",
+        "m1"
+       ],
+       [
+        "m1",
+        "supports",
+        "m2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "French Revolution",
+        "url": "https://en.wikipedia.org/wiki/French_Revolution"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n1",
+        "text": "State debt and tax exemptions cause a severe financial crisis.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 80
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n1",
+        "text": "The government borrows heavily to fund wars.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n3",
+        "text": "Regional bodies block new tax laws.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "the government borrows heavily to fund wars, when state debt and tax exemptions cause a severe financial crisis",
+        "percent": 90
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "state debt and tax exemptions cause a severe financial crisis, before seeing any sign",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "state debt and tax exemptions cause a severe financial crisis, after seeing that the government borrows heavily to fund wars",
+        "percent": 95
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "state debt and tax exemptions cause a severe financial crisis, after seeing that the government borrows heavily to fund wars and regional bodies block new tax laws",
+        "percent": 98
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "state debt and tax exemptions cause a severe financial crisis, when neither sign shows",
+        "percent": 10
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that state debt and tax exemptions cause a severe financial crisis from 80% to 98%, and seeing neither moves it to 10%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "State debt and tax exemptions cause a severe financial crisis.",
+        "why": "n1",
+        "chance": 80
+       },
+       "signs": [
+        {
+         "text": "The government borrows heavily to fund wars.",
+         "why": "n1",
+         "if_cause": 90,
+         "if_not": 20
+        },
+        {
+         "text": "Regional bodies block new tax laws.",
+         "why": "n3",
+         "if_cause": 85,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "French Revolution",
+      "url": "https://en.wikipedia.org/wiki/French_Revolution"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Tax Reform or Privilege?": [
+    "note 1: maybe a fraction ('half')",
+    "scenario has 36 words (asked 35)",
+    "notes in no link ['n5']"
+   ],
+   "topic": [
+    "only 1 cases kept"
+   ],
+   "skill check": [
+    "ind-conc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 4.1,
+  "items": {
+   "t128f4fee7e:ind-fact": {
+    "id": "t128f4fee7e:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-1",
+    "situation": "In 1787, the Assembly of Notables rejected new taxes. In 1788, regional parlements blocked reforms. In several towns, riots broke out against royal edicts.",
+    "question": "What common fact about resistance do these three events show?"
+   },
+   "t128f4fee7e:ind-conc": {
+    "id": "t128f4fee7e:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-1",
+    "situation": "Noblemen claimed ancient rights to avoid taxes. The Church enjoyed major tax exemptions. Regional parlements defended their old legal privileges.",
+    "question": "What general idea about privilege do these three examples suggest?"
+   },
+   "t128f4fee7e:ind-proc": {
+    "id": "t128f4fee7e:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-1",
+    "situation": "The minister proposed taxes to the Notables. Then laws went to parlements for registration. Finally public riots erupted over the blocked edicts.",
+    "question": "What steps of political opposition do these three events outline?"
+   },
+   "t128f4fee7e:ind-caus": {
+    "id": "t128f4fee7e:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-1",
+    "situation": "Huge state debts led to demands for tax reform. Tax exemptions led to financial collapse. Blocked reforms led to widespread public riots.",
+    "question": "What general cause and effect pattern links these three situations?"
+   },
+   "t128f4fee7e:ind-rela": {
+    "id": "t128f4fee7e:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-1",
+    "situation": "As state debt grew larger, tax demands increased. As noble resistance grew stronger, public riots spread across several French towns.",
+    "question": "What connection between growing resistance and public unrest do these cases show?"
+   },
+   "t128f4fee7e:ded-fact": {
+    "id": "t128f4fee7e:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-1",
+    "situation": "France spent fifty percent of its state revenue on debt. A new war begins requiring massive loans.",
+    "question": "What specific fact about state spending will apply to this new war debt?"
+   },
+   "t128f4fee7e:ded-conc": {
+    "id": "t128f4fee7e:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-1",
+    "situation": "The nobility possessed legal tax exemptions under the old regime. A nobleman owns large estates in the countryside.",
+    "question": "How does the concept of privilege apply to this nobleman tax status?"
+   },
+   "t128f4fee7e:ded-proc": {
+    "id": "t128f4fee7e:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-1",
+    "situation": "New tax laws required registration with regional parlements before taking effect. The king issues a new property tax decree.",
+    "question": "What exact steps must happen next for this tax decree to become legal?"
+   },
+   "t128f4fee7e:ded-caus": {
+    "id": "t128f4fee7e:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-1",
+    "situation": "Tax exemptions for the rich forced the lower classes to bear the entire financial burden.",
+    "question": "Why did exempting the nobility and the Church directly cause hardship for peasants?"
+   },
+   "t128f4fee7e:ded-rela": {
+    "id": "t128f4fee7e:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-1",
+    "situation": "Regional parlements blocked royal taxes to protect their status. The central government needed money urgently.",
+    "question": "How does the blockage by parlements affect the state debt crisis?"
+   },
+   "t128f4fee7e:abd-fact": {
+    "id": "t128f4fee7e:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t128f4fee7e-1",
+    "situation": "Riots suddenly broke out in several French towns after the parlements rejected the new royal tax edicts.",
+    "question": "What specific missing information best explains why townspeople joined these violent protests?"
+   },
+   "t128f4fee7e:abd-conc": {
+    "id": "t128f4fee7e:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t128f4fee7e-1",
+    "situation": "Nobles fiercely defended their ancient rights while ordinary people paid heavy taxes with no political voice.",
+    "question": "What idea of fairness is the most likely reason for public anger here?"
+   },
+   "t128f4fee7e:abd-proc": {
+    "id": "t128f4fee7e:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t128f4fee7e-1",
+    "situation": "The finance minister failed to pass tax reform through the assembly and parlements before riots started.",
+    "question": "What alternative method should the minister have used to avoid this outcome?"
+   },
+   "t128f4fee7e:abd-caus": {
+    "id": "t128f4fee7e:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t128f4fee7e-1",
+    "situation": "Public opinion strongly supported the parlements against the king even though the parlements protected noble tax privileges.",
+    "question": "What underlying reason explains why ordinary citizens supported the wealthy parlements?"
+   },
+   "t128f4fee7e:abd-rela": {
+    "id": "t128f4fee7e:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t128f4fee7e-1",
+    "situation": "Regional parlements gained massive popularity among citizens by blocking the king tax proposals.",
+    "question": "What is the most likely link between parlement resistance and the rise of revolutionary spirit?"
+   }
+  }
+ },
+ {
+  "request": "How photosynthesis works",
+  "refused": "The topic could not be built, so please try again.",
+  "seconds": 27.3
+ },
+ {
+  "request": "Is euthanasia ever right?",
+  "build_seconds": 13.1,
+  "topic": {
+   "id": "t5b440ac27e",
+   "topic": "Euthanasia and its definitions",
+   "cases": [
+    {
+     "id": "t5b440ac27e-1",
+     "topic": "Euthanasia and its definitions",
+     "title": "Good motive or murder?",
+     "mission": "Tell euthanasia apart from murder by checking intent.",
+     "tag": "Ethics",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "A man kills his sick relative to end their pain. A critic says, \"This is just murder because he ended a life.\"",
+     "notes": [
+      "The British House of Lords select committee on medical ethics defines euthanasia as a deliberate intervention undertaken with the express intention of ending a life to relieve intractable suffering.",
+      "Intentionality distinguishes euthanasia from intentional killing because the agent must have a good motive for the person killed.",
+      "A person must first identify whether the act was done with the express intention to relieve pain.",
+      "A good motive leads to a merciful death rather than personal gain, so the action counts as euthanasia.",
+      "Commentators argue that killing for personal gain is murder rather than euthanasia."
+     ],
+     "reading": {
+      "idea": [
+       "Euthanasia means ending a life to relieve pain.",
+       "Different groups define it using different rules.",
+       "Intent and motive are central to the definition.",
+       "Killing for personal gain is always murder."
+      ],
+      "example": "A doctor gives a lethal dose to stop endless pain.",
+      "key_words": [
+       [
+        "Euthanasia",
+        "intentionally ending life to eliminate pain and suffering"
+       ],
+       [
+        "Motive",
+        "the reason why a person performs an action"
+       ],
+       [
+        "Murder",
+        "illegal killing without a merciful motive"
+       ]
+      ],
+      "think": "What makes an action euthanasia instead of murder?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "House of Lords definition",
+        "quote": "a deliberate intervention undertaken with the express intention of ending a life to relieve intractable suffering",
+        "from": "Euthanasia"
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1,
+        "label": "Motive matters",
+        "quote": "the principal thing that distinguishes euthanasia from intentional killing simpliciter is the agent's motive: it must be a good motive insofar as the good of the person killed is concerned",
+        "from": "Euthanasia"
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2,
+        "label": "Check the intent",
+        "quote": "a deliberate intervention undertaken with the express intention of ending a life, to relieve intractable suffering",
+        "from": "Euthanasia"
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3,
+        "label": "Merciful death cause"
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4,
+        "label": "Gain means murder"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "Heather Draper argued that euthanasia requires an agent, a subject, an intention, causal proximity, and an outcome.",
+        "label": "Draper elements",
+        "quote": "death that results from the intention of one person to kill another person, using the most gentle and painless means possible, that is motivated solely by the best interests of the person who dies",
+        "from": "Euthanasia"
+       },
+       {
+        "id": "mk2",
+        "type": "conceptual",
+        "text": "Michael Wreen offered a definition requiring that the killing is voluntary and motivated by the good of the person.",
+        "label": "Wreen definition"
+       },
+       {
+        "id": "mk3",
+        "type": "factual",
+        "text": "Beauchamp and Davidson stated that the death must be intended by another human being to be an instance of euthanasia.",
+        "label": "Intended death"
+       },
+       {
+        "id": "mk4",
+        "type": "strategic",
+        "text": "Definitions must exclude killing for personal gain to avoid labeling crimes as euthanasia.",
+        "label": "Exclude personal gain"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n2",
+        "defines",
+        "mk2"
+       ],
+       [
+        "n3",
+        "then",
+        "mk1"
+       ],
+       [
+        "n4",
+        "causes",
+        "mk4"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk4"
+       ],
+       [
+        "mk1",
+        "supports",
+        "n3"
+       ],
+       [
+        "mk2",
+        "defines",
+        "n2"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n1"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Euthanasia",
+        "url": "https://en.wikipedia.org/wiki/Euthanasia"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n2",
+        "text": "The agent acts with the sole motive of relieving patient suffering.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 70
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n1",
+        "text": "The patient experiences incurable pain.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "mk1",
+        "text": "The action uses gentle and painless means.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "the patient experiences incurable pain, when the agent acts with the sole motive of relieving patient suffering",
+        "percent": 90
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the agent acts with the sole motive of relieving patient suffering, before seeing any sign",
+        "percent": 70
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the agent acts with the sole motive of relieving patient suffering, after seeing that the patient experiences incurable pain",
+        "percent": 91
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the agent acts with the sole motive of relieving patient suffering, after seeing that the patient experiences incurable pain and the action uses gentle and painless means",
+        "percent": 97
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the agent acts with the sole motive of relieving patient suffering, when neither sign shows",
+        "percent": 6
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the agent acts with the sole motive of relieving patient suffering from 70% to 97%, and seeing neither moves it to 6%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The agent acts with the sole motive of relieving patient suffering.",
+        "why": "n2",
+        "chance": 70
+       },
+       "signs": [
+        {
+         "text": "The patient experiences incurable pain.",
+         "why": "n1",
+         "if_cause": 90,
+         "if_not": 20
+        },
+        {
+         "text": "The action uses gentle and painless means.",
+         "why": "mk1",
+         "if_cause": 85,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Euthanasia",
+      "url": "https://en.wikipedia.org/wiki/Euthanasia"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Good motive or murder?": [],
+   "topic": [
+    "only 1 cases kept"
+   ],
+   "skill check": [
+    "ind-rela: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 4.2,
+  "items": {
+   "t5b440ac27e:ind-fact": {
+    "id": "t5b440ac27e:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "In three separate cases, a doctor ended a patient's life to stop severe pain. In each case, the doctor acted with the express intention of relieving suffering.",
+    "question": "What general fact about these actions is shown in all three cases?"
+   },
+   "t5b440ac27e:ind-conc": {
+    "id": "t5b440ac27e:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-1",
+    "situation": "In three different scenarios, people killed suffering relatives to relieve pain. Each time, commentators debated whether the act fit the definition of a merciful death.",
+    "question": "What general idea of euthanasia do these three scenarios suggest?"
+   },
+   "t5b440ac27e:ind-proc": {
+    "id": "t5b440ac27e:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-1",
+    "situation": "In three separate examples, critics checked first if the agent intended to relieve pain, then checked the motive, and finally decided if it was euthanasia.",
+    "question": "What common steps for judging the act do these three examples show?"
+   },
+   "t5b440ac27e:ind-caus": {
+    "id": "t5b440ac27e:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-1",
+    "situation": "In three distinct cases, a good motive led to a merciful death, while bad motives led to murder charges.",
+    "question": "What general link between motives and outcomes do these three cases suggest?"
+   },
+   "t5b440ac27e:ind-rela": {
+    "id": "t5b440ac27e:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-1",
+    "situation": "In three different situations, as the purity of the agent's intention to relieve pain increased, the classification shifted from murder to euthanasia.",
+    "question": "What general relationship between intention and classification do these three situations show?"
+   },
+   "t5b440ac27e:ded-fact": {
+    "id": "t5b440ac27e:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "The British House of Lords defines euthanasia as a deliberate intervention with the express intention of ending a life to relieve intractable suffering. A man ends his sick relative's life to stop pain.",
+    "question": "Based on this definition, what specific fact makes this act count as euthanasia?"
+   },
+   "t5b440ac27e:ded-conc": {
+    "id": "t5b440ac27e:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-1",
+    "situation": "Intentionality distinguishes euthanasia from murder because the agent must have a good motive. A man kills his sick relative purely for financial gain.",
+    "question": "Based on this rule, how should we classify this act regarding euthanasia?"
+   },
+   "t5b440ac27e:ded-proc": {
+    "id": "t5b440ac27e:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-1",
+    "situation": "To classify an act, you must first identify if it was done to relieve pain, and then check the motive. A critic reviews a mercy killing.",
+    "question": "Following these steps, what should the critic check first in this case?"
+   },
+   "t5b440ac27e:ded-caus": {
+    "id": "t5b440ac27e:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-1",
+    "situation": "A good motive causes an act to be seen as a merciful death rather than murder. A man kills his relative to end their suffering.",
+    "question": "Based on this cause, what should happen to the public view of this action?"
+   },
+   "t5b440ac27e:ded-rela": {
+    "id": "t5b440ac27e:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-1",
+    "situation": "Euthanasia requires both an intention to end life and a good motive to relieve pain. A man intends to end life but lacks a good motive.",
+    "question": "Given this relationship, does this act qualify as euthanasia?"
+   },
+   "t5b440ac27e:abd-fact": {
+    "id": "t5b440ac27e:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t5b440ac27e-1",
+    "situation": "A man ended his sick relative's life and claimed it was euthanasia, but critics insisted it was murder without explaining why.",
+    "question": "What missing fact about his motive would best explain the critic's claim?"
+   },
+   "t5b440ac27e:abd-conc": {
+    "id": "t5b440ac27e:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t5b440ac27e-1",
+    "situation": "An act of ending a life was labeled as murder by some and euthanasia by others, causing confusion over the term.",
+    "question": "What interpretation of intent best explains why people disagree on the definition here?"
+   },
+   "t5b440ac27e:abd-proc": {
+    "id": "t5b440ac27e:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t5b440ac27e-1",
+    "situation": "Critics jumped straight to calling an act murder without mentioning any steps they took to evaluate it.",
+    "question": "What evaluation steps were likely missed before reaching this conclusion?"
+   },
+   "t5b440ac27e:abd-caus": {
+    "id": "t5b440ac27e:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t5b440ac27e-1",
+    "situation": "A man killed his relative to end pain, but the public reacted with outrage rather than viewing it as a merciful death.",
+    "question": "What underlying cause best explains why the public rejected his good motive?"
+   },
+   "t5b440ac27e:abd-rela": {
+    "id": "t5b440ac27e:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t5b440ac27e-1",
+    "situation": "An act of ending a life was done to relieve pain, yet observers argued it shared more traits with murder than euthanasia.",
+    "question": "What missing link between the action and personal gain explains this argument?"
+   }
+  }
+ },
+ {
+  "request": "Artificial intelligence regulation",
+  "build_seconds": 11.1,
+  "topic": {
+   "id": "t5e00ce4c97",
+   "topic": "Artificial intelligence regulation",
+   "cases": [
+    {
+     "id": "t5e00ce4c97-1",
+     "topic": "Artificial intelligence regulation",
+     "title": "Hard law or soft law?",
+     "mission": "Compare hard laws and soft rules for AI.",
+     "tag": "Law",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "A tech executive says, \"We do not need hard laws for AI because fast-moving technology needs flexible soft law approaches instead.\"",
+     "notes": [
+      "Regulation of artificial intelligence is the development of public sector policies and laws for promoting and regulating artificial intelligence.",
+      "Hard law approaches to AI regulation have substantial challenges because AI technology is rapidly evolving.",
+      "Soft law approaches to AI regulation are promising because they offer greater flexibility to adapt to emerging technologies.",
+      "Soft law approaches often lack substantial enforcement potential.",
+      "Organizations deploying AI have a central role to play in creating and implementing trustworthy AI."
+     ],
+     "reading": {
+      "idea": [
+       "AI regulation involves public sector policies and laws.",
+       "Hard laws struggle to keep pace with fast changes.",
+       "Soft laws offer flexibility but lack enforcement.",
+       "Organizations must also take accountability for AI risks."
+      ],
+      "example": "A company uses voluntary ethics guidelines instead of waiting for a government statute.",
+      "key_words": [
+       [
+        "hard law",
+        "binding legal rules with strict penalties"
+       ],
+       [
+        "soft law",
+        "guidelines and voluntary standards without direct legal force"
+       ]
+      ],
+      "think": "How can rules keep up with fast technology?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Define AI regulation",
+        "quote": "Regulation of artificial intelligence is the development of public sector policies and laws for promoting and regulating artificial intelligence",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Hard law challenges",
+        "quote": "hard law approaches to AI regulation have substantial challenges. Among the challenges, AI technology is rapidly evolving",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Soft law flexibility",
+        "quote": "soft law approaches to AI regulation are promising, as they offer greater flexibility to adapt to emerging technologies",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n4",
+        "type": "factual",
+        "note": 3,
+        "label": "Enforcement limits",
+        "quote": "soft law approaches often lack substantial enforcement potential.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "Deployer role",
+        "quote": "organizations deploying AI have a central role to play in creating and implementing trustworthy AI",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "Anna Jobin, Marcello Ienca, and Effy Vayena identified 84 sets of AI ethics guidelines published worldwide by 2019.",
+        "label": "Ethics guidelines count",
+        "quote": "Anna Jobin, Marcello Ienca, and Effy Vayena identified 84 sets of AI ethics guidelines published worldwide by 2019",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk2",
+        "type": "factual",
+        "text": "The European Union adopted in 2024 a common legal framework for AI with the AI Act.",
+        "label": "EU AI Act",
+        "quote": "The European Union adopted in 2024 a common legal framework for AI with the AI Act.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "Cason Schmit, Megan Doerr, and Jennifer Wagner proposed creating a quasi-governmental regulator by leveraging intellectual property rights.",
+        "label": "IP regulation proposal",
+        "quote": "Cason Schmit, Megan Doerr, and Jennifer Wagner proposed the creation of a quasi-governmental regulator by leveraging intellectual property rights",
+        "from": "Regulation of artificial intelligence"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "n2"
+       ],
+       [
+        "n2",
+        "causes",
+        "n3"
+       ],
+       [
+        "n3",
+        "weakens",
+        "n4"
+       ],
+       [
+        "n4",
+        "supports",
+        "mk1"
+       ],
+       [
+        "mk1",
+        "then",
+        "mk2"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n5"
+       ],
+       [
+        "mk3",
+        "tests",
+        "n4"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Regulation of artificial intelligence",
+        "url": "https://en.wikipedia.org/wiki/Regulation_of_artificial_intelligence"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n2",
+        "text": "Technology evolves faster than traditional lawmaking processes.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 80
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n2",
+        "text": "Legislators struggle to update statutes for new AI tools.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n3",
+        "text": "Companies adopt voluntary industry ethics codes instead.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 75
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "legislators struggle to update statutes for new AI tools, when technology evolves faster than traditional lawmaking processes",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "technology evolves faster than traditional lawmaking processes, before seeing any sign",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "technology evolves faster than traditional lawmaking processes, after seeing that legislators struggle to update statutes for new AI tools",
+        "percent": 94
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "technology evolves faster than traditional lawmaking processes, after seeing that legislators struggle to update statutes for new AI tools and companies adopt voluntary industry ethics codes instead",
+        "percent": 98
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "technology evolves faster than traditional lawmaking processes, when neither sign shows",
+        "percent": 21
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that technology evolves faster than traditional lawmaking processes from 80% to 98%, and seeing neither moves it to 21%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Technology evolves faster than traditional lawmaking processes.",
+        "why": "n2",
+        "chance": 80
+       },
+       "signs": [
+        {
+         "text": "Legislators struggle to update statutes for new AI tools.",
+         "why": "n2",
+         "if_cause": 85,
+         "if_not": 20
+        },
+        {
+         "text": "Companies adopt voluntary industry ethics codes instead.",
+         "why": "n3",
+         "if_cause": 75,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t5e00ce4c97-2",
+     "topic": "Artificial intelligence regulation",
+     "title": "Balancing innovation and risk?",
+     "mission": "Weigh innovation goals against safety regulations.",
+     "tag": "Economy",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "A venture capitalist warns, \"Preemptive regulation will stifle innovation and cause our country to lose the global AI race.\"",
+     "notes": [
+      "Legislative mentions of AI rose 21.3% across 75 countries since 2023, marking a ninefold increase since 2016.",
+      "Others have warned about the risk of preemptive regulation stifling innovation.",
+      "Regulation of artificial intelligence can be seen as positive social means to manage the AI control problem.",
+      "US Vice President JD Vance argued that the agreement would be detrimental to the growth of the AI industry.",
+      "Organizations deploying AI have a central role to play in taking accountability for mitigating risks."
+     ],
+     "reading": {
+      "idea": [
+       "Rapid legislative growth shows governments want control.",
+       "Some leaders fear strict rules harm industry growth.",
+       "Others view rules as essential to manage safety risks.",
+       "Balancing innovation and safety remains a major policy challenge."
+      ],
+      "example": "A government debates whether to pause advanced training runs to check for safety flaws.",
+      "key_words": [
+       [
+        "preemptive regulation",
+        "rules created before major harms occur"
+       ],
+       [
+        "stifle innovation",
+        "slow down new technological developments"
+       ]
+      ],
+      "think": "How can society encourage invention while staying safe?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Rising legislation",
+        "quote": "legislative mentions of AI rose 21.3% across 75 countries since 2023, marking a ninefold increase since 2016.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Stifling innovation",
+        "quote": "Mark Zuckerberg and Marc Andreessen, have warned about the risk of preemptive regulation stifling innovation.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Control problem",
+        "quote": "Regulation of AI can be seen as positive social means to manage the AI control problem",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n4",
+        "type": "relational",
+        "note": 3,
+        "label": "Industry growth tension",
+        "quote": "US Vice President JD Vance argued that the agreement would be detrimental to the growth of the AI industry.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "Mitigating risks"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "A 2022 Ipsos survey found that 78% of Chinese citizens, but only 35% of Americans, agreed that AI products have more benefits than drawbacks.",
+        "label": "Ipsos survey",
+        "quote": "78% of Chinese citizens, but only 35% of Americans, agreed that \"products and services using AI have more benefits than drawbacks\"",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "In 2023, Elon Musk and others signed an open letter urging a moratorium on training more powerful AI systems.",
+        "label": "Moratorium letter",
+        "quote": "Elon Musk and others signed an open letter urging a moratorium on the training of more powerful AI systems.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk3",
+        "type": "causal",
+        "text": "A 2025 study found competition law and competition regulators face challenges in preventing a winner-take-all market for AI.",
+        "label": "Market monopoly",
+        "quote": "A 2025 study found competition law and competition regulators face challenges in preventing a winner-take-all market for AI.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk4",
+        "type": "factual",
+        "text": "The UK and US governments declined to sign an international agreement on AI at the AI Action Summit in Paris in 2025.",
+        "label": "Summit declination",
+        "quote": "the UK and US governments declined to sign an international agreement on AI at the AI Action Summit in Paris.",
+        "from": "Regulation of artificial intelligence"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "n2"
+       ],
+       [
+        "n2",
+        "causes",
+        "n3"
+       ],
+       [
+        "n3",
+        "supports",
+        "n4"
+       ],
+       [
+        "n4",
+        "then",
+        "n5"
+       ],
+       [
+        "mk1",
+        "supports",
+        "n2"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n3"
+       ],
+       [
+        "mk3",
+        "causes",
+        "n4"
+       ],
+       [
+        "mk4",
+        "supports",
+        "n4"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Regulation of artificial intelligence",
+        "url": "https://en.wikipedia.org/wiki/Regulation_of_artificial_intelligence"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n3",
+        "text": "Unchecked AI deployment creates severe long-term safety risks.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 70
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "mk1",
+        "text": "Public polls show high fear of risks to humanity.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 25
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "mk2",
+        "text": "Industry leaders call for pauses in model training.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 70
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "public polls show high fear of risks to humanity, when unchecked AI deployment creates severe long-term safety risks",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "unchecked AI deployment creates severe long-term safety risks, before seeing any sign",
+        "percent": 70
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "unchecked AI deployment creates severe long-term safety risks, after seeing that public polls show high fear of risks to humanity",
+        "percent": 88
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "unchecked AI deployment creates severe long-term safety risks, after seeing that public polls show high fear of risks to humanity and industry leaders call for pauses in model training",
+        "percent": 96
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "unchecked AI deployment creates severe long-term safety risks, when neither sign shows",
+        "percent": 19
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that unchecked AI deployment creates severe long-term safety risks from 70% to 96%, and seeing neither moves it to 19%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Unchecked AI deployment creates severe long-term safety risks.",
+        "why": "n3",
+        "chance": 70
+       },
+       "signs": [
+        {
+         "text": "Public polls show high fear of risks to humanity.",
+         "why": "mk1",
+         "if_cause": 80,
+         "if_not": 25
+        },
+        {
+         "text": "Industry leaders call for pauses in model training.",
+         "why": "mk2",
+         "if_cause": 70,
+         "if_not": 20
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t5e00ce4c97-3",
+     "topic": "Artificial intelligence regulation",
+     "title": "Governing agentic AI?",
+     "mission": "Analyze challenges in regulating autonomous AI agents.",
+     "tag": "Technology",
+     "tool": null,
+     "picture": "gear",
+     "scenario": "A policy advisor argues, \"Standard generative AI rules will work fine for new autonomous AI agents without needing changes.\"",
+     "notes": [
+      "Agentic AI regulation is in early stages compared to generative AI systems.",
+      "AI agents are more complex, more autonomous, and have less human oversight.",
+      "AI agents can work with multiple actors within multiple systems, making regulation more difficult.",
+      "Gardhouse et al. argue that AI agents have too many dynamic variables to have specific regulations based on fixed points in time.",
+      "One approach is to have other deep learning systems or AI agents specifically monitor subsequent AI agents as an oversight measure."
+     ],
+     "reading": {
+      "idea": [
+       "AI agents act with high autonomy across multiple systems.",
+       "Traditional rules made for simple chatbots fail here.",
+       "Dynamic variables prevent fixed point regulations.",
+       "Using other AI systems to monitor agents is one proposed solution."
+      ],
+      "example": "An AI assistant books flights, negotiates prices, and coordinates schedules across apps without asking first.",
+      "key_words": [
+       [
+        "AI agent",
+        "an artificial intelligence system that acts independently to achieve goals"
+       ],
+       [
+        "dynamic variables",
+        "factors that change constantly over time"
+       ]
+      ],
+      "think": "How do you oversee software that runs by itself?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Agentic AI state",
+        "quote": "Agentic AI regulation is in early stages compared to generative AI systems",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1,
+        "label": "Agent traits",
+        "quote": "AI agents are more complex, more autonomous, and have less human oversight.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n3",
+        "type": "causal",
+        "note": 2,
+        "label": "Multiple actors"
+       },
+       {
+        "id": "n4",
+        "type": "epistemic",
+        "note": 3,
+        "label": "Dynamic variables",
+        "quote": "AI agents have too many dynamic variables to have specific regulations based on fixed points in time.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "AI monitoring",
+        "quote": "One approach is to have other deep learning systems or AI agents specifically monitor subsequent AI agents as an oversight measure.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "On June 29, 2026, Senator Mark Warner put forward a discussion draft for the AI AGENT Act.",
+        "label": "AI AGENT Act"
+       },
+       {
+        "id": "mk2",
+        "type": "epistemic",
+        "text": "Researchers maintain concerns that AI oversight systems could lead to the same types of vulnerabilities.",
+        "label": "Vulnerability concerns",
+        "quote": "researchers maintain concerns that those could lead to the same types of vulnerabilities.",
+        "from": "Regulation of artificial intelligence"
+       },
+       {
+        "id": "mk3",
+        "type": "strategic",
+        "text": "Agentic regulation may require more focus on system environments, record-keeping, and the agents themselves.",
+        "label": "Environment focus",
+        "quote": "This may require more focus on system environments, record-keeping, and the agents themselves.",
+        "from": "Regulation of artificial intelligence"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "n2"
+       ],
+       [
+        "n2",
+        "causes",
+        "n3"
+       ],
+       [
+        "n3",
+        "supports",
+        "n4"
+       ],
+       [
+        "n4",
+        "then",
+        "n5"
+       ],
+       [
+        "mk1",
+        "supports",
+        "n1"
+       ],
+       [
+        "mk2",
+        "weakens",
+        "n5"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n5"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Regulation of artificial intelligence",
+        "url": "https://en.wikipedia.org/wiki/Regulation_of_artificial_intelligence"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n3",
+        "text": "AI agents operate autonomously across multiple connected systems.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 75
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n2",
+        "text": "Software executes multi-step tasks without human intervention.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 15
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n4",
+        "text": "Traditional static checkpoints fail to catch system errors.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 70
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "software executes multi-step tasks without human intervention, when AI agents operate autonomously across multiple connected systems",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "AI agents operate autonomously across multiple connected systems, before seeing any sign",
+        "percent": 75
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "AI agents operate autonomously across multiple connected systems, after seeing that software executes multi-step tasks without human intervention",
+        "percent": 94
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "AI agents operate autonomously across multiple connected systems, after seeing that software executes multi-step tasks without human intervention and traditional static checkpoints fail to catch system errors",
+        "percent": 98
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "AI agents operate autonomously across multiple connected systems, when neither sign shows",
+        "percent": 18
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that AI agents operate autonomously across multiple connected systems from 75% to 98%, and seeing neither moves it to 18%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "AI agents operate autonomously across multiple connected systems.",
+        "why": "n3",
+        "chance": 75
+       },
+       "signs": [
+        {
+         "text": "Software executes multi-step tasks without human intervention.",
+         "why": "n2",
+         "if_cause": 85,
+         "if_not": 15
+        },
+        {
+         "text": "Traditional static checkpoints fail to catch system errors.",
+         "why": "n4",
+         "if_cause": 70,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Regulation of artificial intelligence",
+      "url": "https://en.wikipedia.org/wiki/Regulation_of_artificial_intelligence"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Hard law or soft law?": [
+    "2 key words (asked 3)"
+   ],
+   "Balancing innovation and risk?": [
+    "2 key words (asked 3)"
+   ],
+   "Governing agentic AI?": [
+    "2 key words (asked 3)"
+   ],
+   "skill check": [
+    "ind-conc: inductive situation may give only one case",
+    "ind-proc situation: maybe a fraction ('a third')",
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 3.8,
+  "items": {
+   "t5e00ce4c97:ind-fact": {
+    "id": "t5e00ce4c97:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t5e00ce4c97-2",
+    "situation": "Legislative mentions of AI rose by 21% in 2023 across 75 countries, marked a ninefold increase since 2016, and show continuous global growth.",
+    "question": "What common trend do these three data points show about global AI laws?"
+   },
+   "t5e00ce4c97:ind-conc": {
+    "id": "t5e00ce4c97:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t5e00ce4c97-1",
+    "situation": "Hard laws use strict legal mandates, soft law relies on guidelines, and industry codes depend on voluntary compliance.",
+    "question": "What general concept unites these three different approaches to rule creation?"
+   },
+   "t5e00ce4c97:ind-proc": {
+    "id": "t5e00ce4c97:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t5e00ce4c97-3",
+    "situation": "One developer tests an agent with predefined prompts, another uses secondary AI monitors, and a third runs continuous sandbox trials.",
+    "question": "What shared method do these steps represent for checking autonomous software?"
+   },
+   "t5e00ce4c97:ind-caus": {
+    "id": "t5e00ce4c97:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t5e00ce4c97-2",
+    "situation": "Heavy compliance costs stop startups, strict licensing delays product launches, and rigid rules push developers to other nations.",
+    "question": "What general cause and effect link do these examples show about regulations and markets?"
+   },
+   "t5e00ce4c97:ind-rela": {
+    "id": "t5e00ce4c97:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t5e00ce4c97-3",
+    "situation": "As agent autonomy increases, human oversight decreases, and the complexity of governance rises across all tested systems.",
+    "question": "What pattern connects autonomy levels to oversight needs in these systems?"
+   },
+   "t5e00ce4c97:ded-fact": {
+    "id": "t5e00ce4c97:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t5e00ce4c97-1",
+    "situation": "Hard law approaches to artificial intelligence regulation face substantial challenges because the underlying technology is rapidly evolving.",
+    "question": "If an artificial intelligence system evolves rapidly, what specific challenge does the hard law approach face?"
+   },
+   "t5e00ce4c97:ded-conc": {
+    "id": "t5e00ce4c97:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t5e00ce4c97-2",
+    "situation": "Preemptive regulation is defined as government rules set before widespread adoption to manage risks proactively.",
+    "question": "If a government bans new algorithms today before public release, what specific regulatory concept applies here?"
+   },
+   "t5e00ce4c97:ded-proc": {
+    "id": "t5e00ce4c97:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t5e00ce4c97-3",
+    "situation": "Using deep learning systems to monitor subsequent AI agents is established as a valid oversight measure for agentic systems.",
+    "question": "If you need to oversee a new autonomous agent, what specific monitoring steps should you take?"
+   },
+   "t5e00ce4c97:ded-caus": {
+    "id": "t5e00ce4c97:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t5e00ce4c97-2",
+    "situation": "Regulation of artificial intelligence acts as a social means to manage control problems by reducing potential harms.",
+    "question": "If a regulatory policy successfully manages the artificial intelligence control problem, what should happen to overall societal risk and why?"
+   },
+   "t5e00ce4c97:ded-rela": {
+    "id": "t5e00ce4c97:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t5e00ce4c97-1",
+    "situation": "Soft law approaches offer greater flexibility to adapt to emerging technologies but often lack substantial enforcement potential.",
+    "question": "If a policy gains greater flexibility through soft law, how does its enforcement potential change according to this rule?"
+   },
+   "t5e00ce4c97:abd-fact": {
+    "id": "t5e00ce4c97:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t5e00ce4c97-2",
+    "situation": "Legislative mentions of artificial intelligence rose sharply across 75 countries while venture capitalists warned about innovation loss.",
+    "question": "What is the most likely reason why countries increased legislative mentions despite industry warnings?"
+   },
+   "t5e00ce4c97:abd-conc": {
+    "id": "t5e00ce4c97:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t5e00ce4c97-1",
+    "situation": "A tech executive insists on flexible guidelines instead of binding rules for rapidly changing software tools.",
+    "question": "What is the best explanation for preferring soft law over hard law in this context?"
+   },
+   "t5e00ce4c97:abd-proc": {
+    "id": "t5e00ce4c97:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t5e00ce4c97-3",
+    "situation": "Standard generative artificial intelligence rules failed to govern new autonomous agents properly because dynamic variables were missed.",
+    "question": "What is the most likely explanation for why standard rules failed to check these agents?"
+   },
+   "t5e00ce4c97:abd-caus": {
+    "id": "t5e00ce4c97:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t5e00ce4c97-2",
+    "situation": "A venture capitalist claimed that preemptive rules caused the country to lose its leading position in the global artificial intelligence race.",
+    "question": "What is the most likely cause of losing the global race according to this warning?"
+   },
+   "t5e00ce4c97:abd-rela": {
+    "id": "t5e00ce4c97:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t5e00ce4c97-3",
+    "situation": "Agentic artificial intelligence regulation remains in early stages while autonomous software systems become increasingly complex and difficult to manage.",
+    "question": "What is the most likely explanation for the link between system complexity and delayed regulation?"
+   }
+  }
+ },
+ {
+  "request": "Inflation",
+  "build_seconds": 13.1,
+  "topic": {
+   "id": "t0e45dbfb8c",
+   "topic": "Inflation and purchasing power",
+   "cases": [
+    {
+     "id": "t0e45dbfb8c-3",
+     "topic": "Inflation and purchasing power",
+     "title": "Controlling inflation",
+     "mission": "Examine how central banks manage inflation today.",
+     "tag": "Chart",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "A news anchor says, \"The central bank must raise interest rates now to keep inflation low and stable.\"",
+     "notes": [
+      "Today, most economists favour a low and steady rate of inflation.",
+      "Low inflation reduces the likelihood of economic recessions by enabling the labor market to adjust.",
+      "The task of keeping the rate of inflation low and stable is usually given to central banks.",
+      "Central banks control monetary policy normally through the setting of interest rates.",
+      "Since the 1980s, inflation has been held low and stable in countries with independent central banks."
+     ],
+     "reading": {
+      "idea": [
+       "Uncontrolled inflation or deflation can harm a country's economy.",
+       "To prevent this, nations give central banks the job of keeping prices stable.",
+       "Central banks use monetary policy tools like interest rates to guide the economy.",
+       "Keeping inflation low and steady helps avoid big economic crises."
+      ],
+      "example": "When a central bank raises interest rates, borrowing becomes costlier, which can help cool down fast-rising prices.",
+      "key_words": [
+       [
+        "central bank",
+        "a national bank that manages monetary policy and interest rates"
+       ],
+       [
+        "interest rate",
+        "the amount charged for borrowing money"
+       ],
+       [
+        "monetary policy",
+        "actions taken by a central bank to influence the economy's money supply"
+       ]
+      ],
+      "think": "How might changing interest rates affect the choices people make about spending and saving money?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "epistemic",
+        "note": 0,
+        "label": "Economist view",
+        "quote": "most economists favour a low and steady rate of inflation",
+        "from": "Inflation"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Fewer recessions"
+       },
+       {
+        "id": "n3",
+        "type": "procedural",
+        "note": 2,
+        "label": "Central bank task",
+        "quote": "The task of keeping the rate of inflation low and stable is usually given to central banks",
+        "from": "Inflation"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Setting interest rates",
+        "quote": "control monetary policy, normally through the setting of interest rates",
+        "from": "Inflation"
+       },
+       {
+        "id": "n5",
+        "type": "factual",
+        "note": 4,
+        "label": "Stable since 1980s",
+        "quote": "since the 1980s, inflation has been held low and stable in countries with independent central banks",
+        "from": "Inflation"
+       },
+       {
+        "id": "mk1",
+        "type": "conceptual",
+        "text": "Hyperinflation is an out-of-control inflationary spiral with extreme inflation rates.",
+        "label": "Hyperinflation meaning",
+        "quote": "hyperinflation, an out-of-control inflationary spiral",
+        "from": "Inflation"
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "Central banks also carry out open market operations to manage the money supply.",
+        "label": "Open market operations",
+        "quote": "by carrying out open market operations",
+        "from": "Inflation"
+       },
+       {
+        "id": "mk3",
+        "type": "conceptual",
+        "text": "Stagflation is a combination of inflation, slow economic growth and high unemployment.",
+        "label": "Stagflation definition",
+        "quote": "stagflation, a combination of inflation, slow economic growth and high unemployment",
+        "from": "Inflation"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "n2"
+       ],
+       [
+        "n2",
+        "supports",
+        "n3"
+       ],
+       [
+        "n3",
+        "then",
+        "n4"
+       ],
+       [
+        "n4",
+        "supports",
+        "n5"
+       ],
+       [
+        "mk1",
+        "weakens",
+        "n1"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n4"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Inflation",
+        "url": "https://en.wikipedia.org/wiki/Inflation"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n3",
+        "text": "Inflation rises above the target rate set by the central bank.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 50
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n4",
+        "text": "The consumer price index shows rapid increases across sectors.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n4",
+        "text": "The central bank announces plans to adjust interest rates.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 75
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 15
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "the consumer price index shows rapid increases across sectors, when inflation rises above the target rate set by the central bank",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "inflation rises above the target rate set by the central bank, before seeing any sign",
+        "percent": 50
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "inflation rises above the target rate set by the central bank, after seeing that the consumer price index shows rapid increases across sectors",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "inflation rises above the target rate set by the central bank, after seeing that the consumer price index shows rapid increases across sectors and the central bank announces plans to adjust interest rates",
+        "percent": 95
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "inflation rises above the target rate set by the central bank, when neither sign shows",
+        "percent": 7
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that inflation rises above the target rate set by the central bank from 50% to 95%, and seeing neither moves it to 7%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Inflation rises above the target rate set by the central bank.",
+        "why": "n3",
+        "chance": 50
+       },
+       "signs": [
+        {
+         "text": "The consumer price index shows rapid increases across sectors.",
+         "why": "n4",
+         "if_cause": 80,
+         "if_not": 20
+        },
+        {
+         "text": "The central bank announces plans to adjust interest rates.",
+         "why": "n4",
+         "if_cause": 75,
+         "if_not": 15
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Inflation",
+      "url": "https://en.wikipedia.org/wiki/Inflation"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Controlling inflation": [],
+   "topic": [
+    "only 1 cases kept"
+   ],
+   "skill check": [
+    "FAILED: The skill check questions could not be written, so please try again."
+   ]
+  }
+ },
+ {
+  "request": "Why do we forget things?",
+  "build_seconds": 11.1,
+  "topic": {
+   "id": "t01f3940aad",
+   "topic": "Why do we forget things?",
+   "cases": [
+    {
+     "id": "t01f3940aad-1",
+     "topic": "Why do we forget things?",
+     "title": "Forgetting after studying",
+     "mission": "Understand how time affects memory decay.",
+     "tag": "Decay",
+     "tool": null,
+     "picture": "book",
+     "scenario": "You studied hard for a test last week and now you remember very little. Your friend says, \"You simply forgot because your brain trace faded away over time.\"",
+     "notes": [
+      "Decay theory states that when something new is learned, a neurochemical, physical memory trace is formed in the brain.",
+      "Over time this trace tends to disintegrate, unless it is occasionally used.",
+      "The reason we eventually forget something is because the memory of it fades with time.",
+      "If we do not attempt to look back at an event, the memory will start to fade.",
+      "Time is the greatest impact in remembering an event."
+     ],
+     "reading": {
+      "idea": [
+       "Decay theory explains that memories leave physical traces in the brain.",
+       "These traces can disintegrate over time if they are not used.",
+       "Longer intervals between events and recall lead to more fading.",
+       "Time has the biggest impact on remembering an event."
+      ],
+      "example": "You forget a phone number you only heard once last month.",
+      "key_words": [
+       [
+        "decay theory",
+        "the idea that memory fades over time if not used"
+       ],
+       [
+        "memory trace",
+        "a physical change in the brain when learning happens"
+       ]
+      ],
+      "think": "Why does time make us forget some things while we remember others?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0,
+        "label": "Memory trace formed",
+        "quote": "Decay theory states that when something new is learned, a neurochemical, physical \"memory trace\" is formed in the brain",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Trace disintegrates",
+        "quote": "over time this trace tends to disintegrate, unless it is occasionally used.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n3",
+        "type": "factual",
+        "note": 2,
+        "label": "Memory fades",
+        "quote": "The reason we eventually forget something or an event is because the memory of it fades with time.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Reviewing memories",
+        "quote": "If we do not attempt to look back at an event, the greater the interval time between the time when the event from happening",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Impact of time",
+        "quote": "Time is the greatest impact in remembering an event.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk1",
+        "type": "conceptual",
+        "text": "Trace decay theory assumes that memories stored in short term and long term systems leave a trace in the brain.",
+        "label": "Trace systems"
+       },
+       {
+        "id": "mk2",
+        "type": "procedural",
+        "text": "Rehearsal helps to transfer information into long term memory to improve retention.",
+        "label": "Rehearsal transfer",
+        "quote": "Studies show that retention improves with increased rehearsal. This improvement occurs because rehearsal helps to transfer information into long-term memory.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk3",
+        "type": "factual",
+        "text": "The Ebbinghaus forgetting curve shows much of what we forget is lost soon after it is originally learned.",
+        "label": "Forgetting curve",
+        "quote": "The first being that much of what we forget is lost soon after it is originally learned.",
+        "from": "Forgetting"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "n2"
+       ],
+       [
+        "n2",
+        "leads_to",
+        "n3"
+       ],
+       [
+        "n3",
+        "supports",
+        "n4"
+       ],
+       [
+        "n4",
+        "then",
+        "n5"
+       ],
+       [
+        "mk1",
+        "defines",
+        "n1"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n3"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n5"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Forgetting",
+        "url": "https://en.wikipedia.org/wiki/Forgetting"
+       }
+      ]
+     },
+     "heuristics": {
+      "root": "q1",
+      "nodes": [
+       {
+        "id": "q1",
+        "kind": "question",
+        "text": "Did you practice or review the information after learning it?",
+        "why": "n4"
+       },
+       {
+        "id": "d1",
+        "kind": "decision",
+        "text": "The memory likely faded due to time passing without review.",
+        "why": "n3"
+       },
+       {
+        "id": "d2",
+        "kind": "decision",
+        "text": "The memory might be intact because rehearsal protected it from decay.",
+        "why": "mk2"
+       }
+      ],
+      "edges": [
+       [
+        "q1",
+        "yes",
+        "d2"
+       ],
+       [
+        "q1",
+        "no",
+        "d1"
+       ]
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n2",
+        "text": "The memory trace has decayed significantly over time.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 60
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n3",
+        "text": "You cannot recall the main facts of the lesson.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "mk1",
+        "text": "You remember details only when reminded by a teacher.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 70
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "you cannot recall the main facts of the lesson, when the memory trace has decayed significantly over time",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the memory trace has decayed significantly over time, before seeing any sign",
+        "percent": 60
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the memory trace has decayed significantly over time, after seeing that you cannot recall the main facts of the lesson",
+        "percent": 86
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the memory trace has decayed significantly over time, after seeing that you cannot recall the main facts of the lesson and you remember details only when reminded by a teacher",
+        "percent": 93
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the memory trace has decayed significantly over time, when neither sign shows",
+        "percent": 14
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the memory trace has decayed significantly over time from 60% to 93%, and seeing neither moves it to 14%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The memory trace has decayed significantly over time.",
+        "why": "n2",
+        "chance": 60
+       },
+       "signs": [
+        {
+         "text": "You cannot recall the main facts of the lesson.",
+         "why": "n3",
+         "if_cause": 80,
+         "if_not": 20
+        },
+        {
+         "text": "You remember details only when reminded by a teacher.",
+         "why": "mk1",
+         "if_cause": 70,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t01f3940aad-2",
+     "topic": "Why do we forget things?",
+     "title": "Missing clues",
+     "mission": "Learn how retrieval cues help us remember.",
+     "tag": "Cues",
+     "tool": null,
+     "picture": "bulb",
+     "scenario": "You cannot remember the name of your first school. Your friend says, \"You only forgot because you lack the right hint or cue to bring it to mind.\"",
+     "notes": [
+      "Cue dependent forgetting is the failure to recall a memory due to missing stimuli present at encoding.",
+      "Encoding is the first step in creating and remembering a memory.",
+      "A memory is sometimes temporarily forgotten purely because it cannot be retrieved without proper cues.",
+      "A good retrieval cue must be consistent with the original encoding of the information.",
+      "Information is available, just not readily available without these cues."
+     ],
+     "reading": {
+      "idea": [
+       "Cue dependent forgetting happens when retrieval cues are missing.",
+       "Encoding is how memories are first created.",
+       "Proper cues can bring forgotten memories back to mind.",
+       "A good cue must match how the information was encoded."
+      ],
+      "example": "You remember a song only when you smell the popcorn from the cinema where you heard it.",
+      "key_words": [
+       [
+        "cue-dependent forgetting",
+        "forgetting caused by missing retrieval cues"
+       ],
+       [
+        "encoding",
+        "the first step in creating a memory"
+       ]
+      ],
+      "think": "How can a simple hint unlock a memory you thought was gone?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Missing cues",
+        "quote": "Cue-dependent forgetting (also, context-dependent forgetting) or retrieval failure, is the failure to recall a memory due to missing stimuli",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n2",
+        "type": "conceptual",
+        "note": 1,
+        "label": "Encoding step",
+        "quote": "Encoding is the first step in creating and remembering a memory.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n3",
+        "type": "causal",
+        "note": 2,
+        "label": "Temporary forgetting",
+        "quote": "This theory states that a memory is sometimes temporarily forgotten purely because it cannot be retrieved, but the proper cue can bring it to mind.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Consistent cue",
+        "quote": "Furthermore, a good retrieval cue must be consistent with the original encoding of the information.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Available info",
+        "quote": "Information is available however, just not readily available without these cues.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk1",
+        "type": "procedural",
+        "text": "Cued recall tests can measure how well something has been encoded.",
+        "label": "Cued testing",
+        "quote": "How well something has been encoded in the memory can be measured by completing specific tests of retrieval. Examples of these tests would be explicit ones like cued recall",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk2",
+        "type": "strategic",
+        "text": "Spaced retrieval helps older adults retrieve events stored in memory better.",
+        "label": "Spaced retrieval",
+        "quote": "When information is encoded into the memory and retrieved with a technique called spaced retrieval, this helps older adults retrieve the events stored",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk3",
+        "type": "factual",
+        "text": "Episodic memory performance does in fact decline with age.",
+        "label": "Age decline",
+        "quote": "These specific studies have shown that episodic memory performance does in fact decline with age",
+        "from": "Forgetting"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "n3"
+       ],
+       [
+        "n2",
+        "then",
+        "n1"
+       ],
+       [
+        "n3",
+        "supports",
+        "n5"
+       ],
+       [
+        "n4",
+        "supports",
+        "n3"
+       ],
+       [
+        "mk1",
+        "tests",
+        "n1"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n5"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n3"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Forgetting",
+        "url": "https://en.wikipedia.org/wiki/Forgetting"
+       }
+      ]
+     },
+     "heuristics": {
+      "root": "q1",
+      "nodes": [
+       {
+        "id": "q1",
+        "kind": "question",
+        "text": "Do you have a hint that matches how you first learned it?",
+        "why": "n4"
+       },
+       {
+        "id": "d1",
+        "kind": "decision",
+        "text": "Find a relevant hint to successfully retrieve the hidden memory.",
+        "why": "n3"
+       },
+       {
+        "id": "d2",
+        "kind": "decision",
+        "text": "The memory might be lost due to poor initial encoding.",
+        "why": "n2"
+       }
+      ],
+      "edges": [
+       [
+        "q1",
+        "yes",
+        "d1"
+       ],
+       [
+        "q1",
+        "no",
+        "d2"
+       ]
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n1",
+        "text": "The correct retrieval cue is missing from your environment.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 50
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n3",
+        "text": "You fail to answer a direct question without hints.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 75
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 25
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n5",
+        "text": "You suddenly remember everything when shown an old photo.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 10
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "you fail to answer a direct question without hints, when the correct retrieval cue is missing from your environment",
+        "percent": 75
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the correct retrieval cue is missing from your environment, before seeing any sign",
+        "percent": 50
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the correct retrieval cue is missing from your environment, after seeing that you fail to answer a direct question without hints",
+        "percent": 75
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the correct retrieval cue is missing from your environment, after seeing that you fail to answer a direct question without hints and you suddenly remember everything when shown an old photo",
+        "percent": 96
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the correct retrieval cue is missing from your environment, when neither sign shows",
+        "percent": 4
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the correct retrieval cue is missing from your environment from 50% to 96%, and seeing neither moves it to 4%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The correct retrieval cue is missing from your environment.",
+        "why": "n1",
+        "chance": 50
+       },
+       "signs": [
+        {
+         "text": "You fail to answer a direct question without hints.",
+         "why": "n3",
+         "if_cause": 75,
+         "if_not": 25
+        },
+        {
+         "text": "You suddenly remember everything when shown an old photo.",
+         "why": "n5",
+         "if_cause": 90,
+         "if_not": 10
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t01f3940aad-3",
+     "topic": "Why do we forget things?",
+     "title": "Confusing new words",
+     "mission": "Explore how new information interferes with old memories.",
+     "tag": "Interference",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "You learned a new computer language and now you keep mixing up the old commands. Your friend says, \"Your new learning is interfering with your old memories.\"",
+     "notes": [
+      "Interference theory refers to the idea that the learning of something new causes forgetting of older material.",
+      "Memory information may become confused or combined with other information during encoding.",
+      "Retroactive interference is when new information interferes with older information.",
+      "Proactive interference is when old information interferes with the retrieval of new information.",
+      "Interference related tasks decreased memory performance by up to 20% in studies."
+     ],
+     "reading": {
+      "idea": [
+       "Interference theory explains how learning new things can cause us to forget old things.",
+       "Memories can get confused or combined during encoding.",
+       "Retroactive interference happens when new facts block old facts.",
+       "Proactive interference happens when old facts block new facts."
+      ],
+      "example": "You type your old password instead of your new one because they are similar.",
+      "key_words": [
+       [
+        "retroactive interference",
+        "new memories block old memories"
+       ],
+       [
+        "proactive interference",
+        "old memories block new memories"
+       ]
+      ],
+      "think": "How can learning too many similar things make you forget what you already knew?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0,
+        "label": "Interference theory",
+        "quote": "Interference theory refers to the idea that when the learning of something new causes forgetting of older material on the basis of competition",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Confused encoding",
+        "quote": "This essentially states that memory's information may become confused or combined with other information during encoding",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n3",
+        "type": "factual",
+        "note": 2,
+        "label": "Retroactive type",
+        "quote": "Retroactive interference is when new information (memories) interferes with older information.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n4",
+        "type": "factual",
+        "note": 3,
+        "label": "Proactive type",
+        "quote": "proactive interference is when old information interferes with the retrieval of new information.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Performance drop",
+        "quote": "It has been found that interference related tasks decreased memory performance by up to 20%",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "Output interference occurs when the initial act of recalling specific information interferes with retrieval.",
+        "label": "Output effect",
+        "quote": "Output Interference occurs when the initial act of recalling specific information interferes with the retrieval of the original information.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk2",
+        "type": "relational",
+        "text": "Fast learners seem to be more affected by interference than slow learners.",
+        "label": "Fast learners",
+        "quote": "Furthermore, fast learners seem to be more affected by interference than slow learners.",
+        "from": "Forgetting"
+       },
+       {
+        "id": "mk3",
+        "type": "causal",
+        "text": "Interference is thought to occur especially when memories are similar.",
+        "label": "Similar memories",
+        "quote": "This is sometimes thought to occur especially when memories are similar.",
+        "from": "Forgetting"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "n2"
+       ],
+       [
+        "n2",
+        "supports",
+        "n5"
+       ],
+       [
+        "n3",
+        "defines",
+        "n1"
+       ],
+       [
+        "n4",
+        "defines",
+        "n1"
+       ],
+       [
+        "mk1",
+        "supports",
+        "n1"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n5"
+       ],
+       [
+        "mk3",
+        "supports",
+        "n2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Forgetting",
+        "url": "https://en.wikipedia.org/wiki/Forgetting"
+       }
+      ]
+     },
+     "heuristics": {
+      "root": "q1",
+      "nodes": [
+       {
+        "id": "q1",
+        "kind": "question",
+        "text": "Did you recently learn new information that is very similar?",
+        "why": "mk3"
+       },
+       {
+        "id": "d1",
+        "kind": "decision",
+        "text": "Interference is likely causing the confusion between old and new facts.",
+        "why": "n1"
+       },
+       {
+        "id": "d2",
+        "kind": "decision",
+        "text": "The forgetting might be caused by simple time decay instead.",
+        "why": "n1"
+       }
+      ],
+      "edges": [
+       [
+        "q1",
+        "yes",
+        "d1"
+       ],
+       [
+        "q1",
+        "no",
+        "d2"
+       ]
+      ]
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Forgetting",
+      "url": "https://en.wikipedia.org/wiki/Forgetting"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Forgetting after studying": [
+    "2 key words (asked 3)"
+   ],
+   "Missing clues": [
+    "2 key words (asked 3)"
+   ],
+   "Confusing new words": [
+    "graph lacks ['procedural']",
+    "2 key words (asked 3)"
+   ],
+   "skill check": [
+    "ind-proc: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 6.3,
+  "items": {
+   "t01f3940aad:ind-fact": {
+    "id": "t01f3940aad:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-1",
+    "situation": "In week one you remember 90% of study notes, in week two 50%, and in week three 20% without review.",
+    "question": "What general fact do these three percentages show about memory over time?"
+   },
+   "t01f3940aad:ind-conc": {
+    "id": "t01f3940aad:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-1",
+    "situation": "Without practice, a student forgets 80% of history facts after 30 days, 70% of math formulas, and 75% of biology terms.",
+    "question": "What general idea do these examples suggest about physical memory traces?"
+   },
+   "t01f3940aad:ind-proc": {
+    "id": "t01f3940aad:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-1",
+    "situation": "To stop forgetting, you review notes after one day, then after three days, and then after seven days.",
+    "question": "What general method do these steps suggest for keeping memories strong?"
+   },
+   "t01f3940aad:ind-caus": {
+    "id": "t01f3940aad:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-1",
+    "situation": "Leaving facts unstudied for a month drops test scores by 50%, 60%, and 55% across three subjects.",
+    "question": "What general cause and effect link do these results show?"
+   },
+   "t01f3940aad:ind-rela": {
+    "id": "t01f3940aad:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-1",
+    "situation": "As the number of days without reviewing study material increases from 5 to 10 to 15, recall rates drop.",
+    "question": "How do these results show that time and recall are connected?"
+   },
+   "t01f3940aad:ded-fact": {
+    "id": "t01f3940aad:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-1",
+    "situation": "Decay theory states that unused memory traces fade completely after 30 days. You learned a fact 31 days ago.",
+    "question": "Based on this rule, what is the exact status of your memory now?"
+   },
+   "t01f3940aad:ded-conc": {
+    "id": "t01f3940aad:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-1",
+    "situation": "Decay theory states that neurochemical traces disintegrate over time without use. You have not used a phone number in a year.",
+    "question": "How does this rule explain what happened to the memory trace?"
+   },
+   "t01f3940aad:ded-proc": {
+    "id": "t01f3940aad:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-1",
+    "situation": "Decay theory requires occasional use to keep a memory trace active. You need to remember a formula for next month.",
+    "question": "Based on this theory, what exact step should you take today?"
+   },
+   "t01f3940aad:ded-caus": {
+    "id": "t01f3940aad:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-1",
+    "situation": "Decay theory states that time causes physical memory traces to fade without use. You ignore a learned fact for a year.",
+    "question": "What happens to the memory and why, according to this rule?"
+   },
+   "t01f3940aad:ded-rela": {
+    "id": "t01f3940aad:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-1",
+    "situation": "Decay theory says that as time passes without practice, memory strength decreases.",
+    "question": "If time increases by 20 days, how does the memory strength change?"
+   },
+   "t01f3940aad:abd-fact": {
+    "id": "t01f3940aad:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t01f3940aad-2",
+    "situation": "You completely forgot your childhood address until you saw a photo of the front door with its blue paint.",
+    "question": "What specific fact about retrieval explains why the photo brought back the memory?"
+   },
+   "t01f3940aad:abd-conc": {
+    "id": "t01f3940aad:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t01f3940aad-2",
+    "situation": "You failed to recall a word during a test, but remembered it instantly when you walked back into your study room.",
+    "question": "What concept explains why the room helped you retrieve the memory?"
+   },
+   "t01f3940aad:abd-proc": {
+    "id": "t01f3940aad:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t01f3940aad-2",
+    "situation": "You cannot remember a forgotten password until you retrace your steps to the exact moment you made it.",
+    "question": "What retrieval method best explains how you found the missing information?"
+   },
+   "t01f3940aad:abd-caus": {
+    "id": "t01f3940aad:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t01f3940aad-2",
+    "situation": "You forgot your grocery list at home, but remembered every item as soon as you smelled bakery bread.",
+    "question": "What caused the sudden return of the memory?"
+   },
+   "t01f3940aad:abd-rela": {
+    "id": "t01f3940aad:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t01f3940aad-2",
+    "situation": "You could not remember a song title until someone played the opening notes, which matched your original study setting.",
+    "question": "What is the most likely explanation for the link between the notes and your memory?"
+   }
+  }
+ },
+ {
+  "request": "The Monty Hall problem",
+  "build_seconds": 6.8,
+  "topic": {
+   "id": "t5912bb6ab0",
+   "topic": "The Monty Hall probability puzzle",
+   "cases": [
+    {
+     "id": "t5912bb6ab0-1",
+     "topic": "The Monty Hall probability puzzle",
+     "title": "Switch or stay?",
+     "mission": "Find why switching doors doubles your win chance.",
+     "tag": "Probability",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "You pick door 1 on a game show. The host opens door 3 to show a goat. Your friend says, \"There are two closed doors left, so each has a 50% chance and switching does not matter.\"",
+     "notes": [
+      "When the player first makes their choice, there is a 2/3 chance that the car is behind one of the doors not chosen.",
+      "The host must always open a door that was not selected by the contestant and reveal a goat.",
+      "The fact that the host subsequently reveals a goat in one of the unchosen doors changes nothing about the initial probability.",
+      "Switching doors is a different action from choosing between the two remaining doors at random, as the former action uses previous information.",
+      "By the standard assumptions, the switching strategy has a 2/3 probability of winning the car."
+     ],
+     "reading": {
+      "idea": [
+       "You pick one of three doors on a game show.",
+       "The host opens another door to show a goat.",
+       "The host offers you a chance to switch to the last closed door.",
+       "Switching gives you a 2/3 chance to win the car."
+      ],
+      "example": "A player who switches wins the car in two out of three trials.",
+      "key_words": [
+       [
+        "probability",
+        "a number that expresses the chance that something will happen"
+       ],
+       [
+        "strategy",
+        "a planned series of actions for reaching a goal"
+       ],
+       [
+        "assumption",
+        "a thing that is accepted as true without proof"
+       ]
+      ],
+      "think": "Why does opening an empty door change the odds for the remaining door?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Initial 2/3 chance",
+        "quote": "When the player first makes their choice, there is a 2/3 chance that the car is behind one of the doors not chosen.",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "n2",
+        "type": "procedural",
+        "note": 1,
+        "label": "Host opens goat",
+        "quote": "The host must always open a door that was not selected by the contestant. The host must always open a door to reveal a goat",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "n3",
+        "type": "causal",
+        "note": 2,
+        "label": "Chance unchanged",
+        "quote": "The fact that the host subsequently reveals a goat in one of the unchosen doors changes nothing about the initial probability.",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "n4",
+        "type": "conceptual",
+        "note": 3,
+        "label": "Switching uses info",
+        "quote": "switching doors is a different action from choosing between the two remaining doors at random, as the former action uses the previous information",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "n5",
+        "type": "epistemic",
+        "note": 4,
+        "label": "Switch wins 2/3",
+        "quote": "By the standard assumptions, the switching strategy has a 2/3 probability of winning the car",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "mk1",
+        "type": "causal",
+        "text": "If the car is behind door 2 and the player picked door 1, the host must open door 3.",
+        "label": "Host forced move",
+        "quote": "If the car is behind door 2, with the player having picked door 1, the host must open door 3",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "mk2",
+        "type": "relational",
+        "text": "The 2/3 chance rests on the unchosen and unrevealed door, as opposed to the 1/3 chance of the initial choice.",
+        "label": "Odds concentration",
+        "quote": "the 2/3 chance of the car being behind one of the unchosen doors rests on the unchosen and unrevealed door",
+        "from": "Monty Hall problem"
+       },
+       {
+        "id": "mk3",
+        "type": "metacognitive",
+        "text": "Working memory demand makes people collapse their choices into two equally probable options of 50% each.",
+        "label": "Mental collapse"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk2"
+       ],
+       [
+        "n2",
+        "causes",
+        "mk1"
+       ],
+       [
+        "n3",
+        "supports",
+        "n1"
+       ],
+       [
+        "n4",
+        "supports",
+        "mk3"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk1"
+       ],
+       [
+        "mk1",
+        "leads_to",
+        "n5"
+       ],
+       [
+        "mk2",
+        "supports",
+        "n5"
+       ],
+       [
+        "mk3",
+        "weakens",
+        "n4"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Monty Hall problem",
+        "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n1",
+        "text": "The player initially picked a goat.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 67
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n2",
+        "text": "The host opens the only remaining goat door.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 99
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 50
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n5",
+        "text": "Switching wins the car.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 99
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 1
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "the host opens the only remaining goat door, when the player initially picked a goat",
+        "percent": 99
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the player initially picked a goat, before seeing any sign",
+        "percent": 67
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the player initially picked a goat, after seeing that the host opens the only remaining goat door",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the player initially picked a goat, after seeing that the host opens the only remaining goat door and switching wins the car",
+        "percent": 99
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the player initially picked a goat, when neither sign shows",
+        "percent": 1
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the player initially picked a goat from 67% to 99%, and seeing neither moves it to 1%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The player initially picked a goat.",
+        "why": "n1",
+        "chance": 67
+       },
+       "signs": [
+        {
+         "text": "The host opens the only remaining goat door.",
+         "why": "n2",
+         "if_cause": 99,
+         "if_not": 50
+        },
+        {
+         "text": "Switching wins the car.",
+         "why": "n5",
+         "if_cause": 99,
+         "if_not": 1
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Monty Hall problem",
+      "url": "https://en.wikipedia.org/wiki/Monty_Hall_problem"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Switch or stay?": [
+    "note 1: maybe a fraction ('2/3')",
+    "note 5: maybe a fraction ('2/3')",
+    "idea 4: maybe a fraction ('2/3')",
+    "scenario has 37 words (asked 35)"
+   ],
+   "topic": [
+    "only 1 cases kept"
+   ],
+   "skill check": [
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 4.8,
+  "items": {
+   "t5912bb6ab0:ind-fact": {
+    "id": "t5912bb6ab0:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-1",
+    "situation": "In three separate simulated games, players picked door 1. The host opened door 3 to show a goat, and players who switched won the car in all three games.",
+    "question": "What general observation about winning do these three games suggest?"
+   },
+   "t5912bb6ab0:ind-conc": {
+    "id": "t5912bb6ab0:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-1",
+    "situation": "In three different test runs, players who stuck with their initial choice won 33 percent of the time, while players who switched won 67 percent of the time.",
+    "question": "What general idea about switching does this pattern suggest?"
+   },
+   "t5912bb6ab0:ind-proc": {
+    "id": "t5912bb6ab0:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-1",
+    "situation": "Across three trials, players followed the exact steps of picking a door, waiting for the host to reveal a goat, and then taking the remaining closed door.",
+    "question": "What general method of playing does this sequence demonstrate?"
+   },
+   "t5912bb6ab0:ind-caus": {
+    "id": "t5912bb6ab0:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-1",
+    "situation": "In three separate episodes, the host opening a door to reveal a goat resulted in the switching strategy doubling the player's chances of winning.",
+    "question": "What general cause and effect link do these outcomes show?"
+   },
+   "t5912bb6ab0:ind-rela": {
+    "id": "t5912bb6ab0:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-1",
+    "situation": "In three different trials, as the number of played rounds increased, the success rate of the switching strategy consistently stayed near 67 percent.",
+    "question": "What general relationship do these results show between switching and winning?"
+   },
+   "t5912bb6ab0:ded-fact": {
+    "id": "t5912bb6ab0:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-1",
+    "situation": "The rules state that the car is behind one of the three doors and you pick door 1.",
+    "question": "Given that the car is behind one door, what is the exact probability it is behind door 1?"
+   },
+   "t5912bb6ab0:ded-conc": {
+    "id": "t5912bb6ab0:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-1",
+    "situation": "The rule is that switching doors is a strategy that wins whenever your initial choice was wrong.",
+    "question": "Since your initial choice has a 33 percent chance of being correct, what is the win rate for switching?"
+   },
+   "t5912bb6ab0:ded-proc": {
+    "id": "t5912bb6ab0:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-1",
+    "situation": "The rules require the host to open an unchosen door with a goat if you pick the car.",
+    "question": "Following these steps, what must the host do if your first choice is correct?"
+   },
+   "t5912bb6ab0:ded-caus": {
+    "id": "t5912bb6ab0:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-1",
+    "situation": "The host is forced to reveal a goat behind an unchosen door, which concentrates the remaining probability on the other closed door.",
+    "question": "Why does the host action make the switching strategy work?"
+   },
+   "t5912bb6ab0:ded-rela": {
+    "id": "t5912bb6ab0:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-1",
+    "situation": "The initial probability of your chosen door is 33 percent, and the combined probability of the other two doors is 67 percent.",
+    "question": "How does the probability of your door relate to the sum of the other doors?"
+   },
+   "t5912bb6ab0:abd-fact": {
+    "id": "t5912bb6ab0:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "t5912bb6ab0-1",
+    "situation": "You pick door 1, the host opens door 3 to show a goat, and you end up winning the car by switching.",
+    "question": "What specific fact about the hidden car location best explains this win?"
+   },
+   "t5912bb6ab0:abd-conc": {
+    "id": "t5912bb6ab0:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "t5912bb6ab0-1",
+    "situation": "Your friend claims each remaining door has a 50 percent chance, but switching actually gives you a 67 percent chance of winning.",
+    "question": "What is the best explanation for why your friend's 50 percent idea is wrong?"
+   },
+   "t5912bb6ab0:abd-proc": {
+    "id": "t5912bb6ab0:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "t5912bb6ab0-1",
+    "situation": "A player wins the car by switching after the host reveals a goat, even though the player initially picked a goat.",
+    "question": "What steps in the game show why switching was the winning move?"
+   },
+   "t5912bb6ab0:abd-caus": {
+    "id": "t5912bb6ab0:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "t5912bb6ab0-1",
+    "situation": "You switch doors after the host opens door 3, and you win the car instead of a goat.",
+    "question": "What caused your odds of winning to improve when you switched?"
+   },
+   "t5912bb6ab0:abd-rela": {
+    "id": "t5912bb6ab0:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "t5912bb6ab0-1",
+    "situation": "Your friend thinks the two remaining closed doors share the probability equally, ignoring your first choice.",
+    "question": "What is the best explanation for the link between your first choice and the final odds?"
+   }
+  }
+ },
+ {
+  "request": "Nuclear power",
+  "refused": "The topic could not be built, so please try again.",
+  "seconds": 25.4
+ },
+ {
+  "request": "Palm oil in Malaysia",
+  "build_seconds": 12.3,
+  "topic": {
+   "id": "ta58da7b49c",
+   "topic": "Palm oil production in Malaysia",
+   "cases": [
+    {
+     "id": "ta58da7b49c-1",
+     "topic": "Palm oil production in Malaysia",
+     "title": "Forest or plantations?",
+     "mission": "Weigh environmental goals against economic needs.",
+     "tag": "Environment",
+     "tool": null,
+     "picture": "leaf",
+     "scenario": "A government official says, \"We pledged to keep half our land as forest, so we should stop all palm oil expansion now.\"",
+     "notes": [
+      "The Malaysian government pledged to limit palm oil plantation expansion by retaining at least half of the nation's land as forest cover.",
+      "Palm oil production is vital for the economy of Malaysia, which is the world's second-largest producer of the commodity after Indonesia.",
+      "Balancing conservation and production means protecting forests while keeping the agricultural sector viable.",
+      "Assess current land use, then calculate the economic impact of halting expansion.",
+      "European policies to phase out palm oil create international trade friction."
+     ],
+     "reading": {
+      "idea": [
+       "Palm oil is a major crop in Malaysia.",
+       "Expansion affects forests and wildlife habitats.",
+       "Governments try to balance economic gains with environmental protection.",
+       "Policies often spark international debates."
+      ],
+      "example": "Malaysia pledged to keep half its land as forest cover.",
+      "key_words": [
+       [
+        "conservation",
+        "protecting natural environments from damage"
+       ],
+       [
+        "plantation",
+        "a large farm where crops are grown"
+       ],
+       [
+        "pledge",
+        "a serious promise"
+       ]
+      ],
+      "think": "How can a country protect forests and still support farmers?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Forest cover pledge",
+        "quote": "retaining at least half of the nation's land as forest cover",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Economic importance",
+        "quote": "Palm oil production is vital for the economy of Malaysia, which is the world's second-largest producer",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Balancing needs"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Assess impact first"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Trade friction"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "As of 2016, palm oil plantation accounted for a total land use of 57,400 km2 in Malaysia.",
+        "label": "Land use data",
+        "quote": "palm oil plantation accounted for a total land use of 57,400 km2 in Malaysia",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "mk2",
+        "type": "causal",
+        "text": "In March 2019, the European Commission concluded that palm oil cultivation results in excessive deforestation.",
+        "label": "Deforestation concerns",
+        "quote": "palm oil cultivation results in excessive deforestation",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "mk3",
+        "type": "procedural",
+        "text": "Check environmental reports, then review economic forecasts before making policies.",
+        "label": "Review forecasts"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk1"
+       ],
+       [
+        "n2",
+        "causes",
+        "mk2"
+       ],
+       [
+        "n3",
+        "defines",
+        "mk3"
+       ],
+       [
+        "n4",
+        "then",
+        "mk3"
+       ],
+       [
+        "n5",
+        "supports",
+        "mk2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n1",
+        "text": "Expansion threatens forest cover.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 60
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "mk2",
+        "text": "Deforestation rates rise.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n5",
+        "text": "International trade tension grows.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 70
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "deforestation rates rise, when expansion threatens forest cover",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "expansion threatens forest cover, before seeing any sign",
+        "percent": 60
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "expansion threatens forest cover, after seeing that deforestation rates rise",
+        "percent": 86
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "expansion threatens forest cover, after seeing that deforestation rates rise and international trade tension grows",
+        "percent": 93
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "expansion threatens forest cover, when neither sign shows",
+        "percent": 14
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that expansion threatens forest cover from 60% to 93%, and seeing neither moves it to 14%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Expansion threatens forest cover.",
+        "why": "n1",
+        "chance": 60
+       },
+       "signs": [
+        {
+         "text": "Deforestation rates rise.",
+         "why": "mk2",
+         "if_cause": 80,
+         "if_not": 20
+        },
+        {
+         "text": "International trade tension grows.",
+         "why": "n5",
+         "if_cause": 70,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "ta58da7b49c-2",
+     "topic": "Palm oil production in Malaysia",
+     "title": "Labor and bans",
+     "mission": "Examine the impact of labor investigations on exports.",
+     "tag": "Ethics",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "A trade analyst says, \"The United States banned palm oil due to labor issues, so companies should ignore these rules to keep selling.\"",
+     "notes": [
+      "The United States Customs and Border Protection issued a withhold release order banning palm oil produced by Sime Darby following investigations into forced labour.",
+      "Malaysia accounted for 31% of United States palm oil imports during the 2020 fiscal year.",
+      "Ethical compliance means ensuring fair labor practices throughout the supply chain.",
+      "Investigate labor practices, then take remedial action to lift bans.",
+      "Forced labor allegations lead to strict trade restrictions."
+     ],
+     "reading": {
+      "idea": [
+       "Export markets have strict labor standards.",
+       "Allegations of forced labor lead to import bans.",
+       "Companies can lift bans by taking corrective actions.",
+       "Fair labor protects workers and trade."
+      ],
+      "example": "The United States banned imports from companies linked to forced labor.",
+      "key_words": [
+       [
+        "remedial",
+        "intended to correct or improve a bad situation"
+       ],
+       [
+        "investigation",
+        "a formal inquiry to find out the facts"
+       ],
+       [
+        "import",
+        "bring goods into a country from abroad"
+       ]
+      ],
+      "think": "How do labor practices affect international trade?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "US import ban"
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1,
+        "label": "Import share"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Ethical compliance"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Remedial action"
+       },
+       {
+        "id": "n5",
+        "type": "causal",
+        "note": 4,
+        "label": "Labor causes bans"
+       },
+       {
+        "id": "mk4",
+        "type": "strategic",
+        "text": "The ban can be lifted if remedial action is taken.",
+        "label": "Lifting bans",
+        "quote": "The ban can be lifted if remedial action is taken",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "mk5",
+        "type": "factual",
+        "text": "Malaysia's palm oil industry includes both child labour and forced labour practices.",
+        "label": "Labor practices",
+        "quote": "Malaysia's palm oil industry includes both child labour and forced labour practices",
+        "from": "Palm oil production in Malaysia"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk4"
+       ],
+       [
+        "n2",
+        "supports",
+        "mk5"
+       ],
+       [
+        "n3",
+        "defines",
+        "mk4"
+       ],
+       [
+        "n4",
+        "then",
+        "mk4"
+       ],
+       [
+        "n5",
+        "causes",
+        "n1"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "mk5",
+        "text": "Labor violations exist on plantations.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 50
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n1",
+        "text": "Import bans are issued.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 15
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n2",
+        "text": "Trade volume drops.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 75
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 25
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "import bans are issued, when labor violations exist on plantations",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "labor violations exist on plantations, before seeing any sign",
+        "percent": 50
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "labor violations exist on plantations, after seeing that import bans are issued",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "labor violations exist on plantations, after seeing that import bans are issued and trade volume drops",
+        "percent": 94
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "labor violations exist on plantations, when neither sign shows",
+        "percent": 6
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that labor violations exist on plantations from 50% to 94%, and seeing neither moves it to 6%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Labor violations exist on plantations.",
+        "why": "mk5",
+        "chance": 50
+       },
+       "signs": [
+        {
+         "text": "Import bans are issued.",
+         "why": "n1",
+         "if_cause": 85,
+         "if_not": 15
+        },
+        {
+         "text": "Trade volume drops.",
+         "why": "n2",
+         "if_cause": 75,
+         "if_not": 25
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "ta58da7b49c-3",
+     "topic": "Palm oil production in Malaysia",
+     "title": "Biofuel policies",
+     "mission": "Evaluate government biofuel mandates and profitability.",
+     "tag": "Economy",
+     "tool": null,
+     "picture": "coin",
+     "scenario": "An industrial planner says, \"We have a government biofuel mandate, so production will easily become profitable.\"",
+     "notes": [
+      "The Malaysian government established the National Biofuel Policy in 2006, requiring diesel to contain palm oil biodiesel.",
+      "The biodiesel sector in Malaysia has struggled to become profitable due in part to the high cost of crude palm oil.",
+      "A policy mandate requires certain actions, but market profitability depends on production costs.",
+      "Analyze production costs, then evaluate market demand before scaling up.",
+      "High input costs lead to lower production output."
+     ],
+     "reading": {
+      "idea": [
+       "Governments create policies to encourage green fuels.",
+       "Mandates require a set percentage of biofuel in diesel.",
+       "High costs of raw materials can make production unprofitable.",
+       "Market success requires careful economic planning."
+      ],
+      "example": "The B5 mandate requires diesel to contain 5% palm oil biodiesel.",
+      "key_words": [
+       [
+        "mandate",
+        "an official order to do something"
+       ],
+       [
+        "biodiesel",
+        "a fuel made from plant oils"
+       ],
+       [
+        "profitability",
+        "the ability to make financial gain"
+       ]
+      ],
+      "think": "Why might a government mandate not guarantee business profit?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Biofuel policy",
+        "quote": "established the National Biofuel Policy in 2006, which led to the implementation of the B5 mandate",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Profitability struggle",
+        "quote": "biodiesel sector in Malaysia has struggled to become profitable, due in part to the high cost of crude palm oil",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Mandate vs profit"
+       },
+       {
+        "id": "n4",
+        "type": "procedural",
+        "note": 3,
+        "label": "Evaluate costs"
+       },
+       {
+        "id": "n5",
+        "type": "relational",
+        "note": 4,
+        "label": "Cost and output"
+       },
+       {
+        "id": "mk6",
+        "type": "factual",
+        "text": "In 2012, there were 20 biodiesel plants in Malaysia, of which 2 were operational by early 2013.",
+        "label": "Operational plants",
+        "quote": "In 2012, there were 20 biodiesel plants in Malaysia, of which 2 were operational by early 2013",
+        "from": "Palm oil production in Malaysia"
+       },
+       {
+        "id": "mk7",
+        "type": "epistemic",
+        "text": "According to an advisor, biodiesel production is expected to double when conditions improve.",
+        "label": "Production expectations",
+        "quote": "biodiesel production in Malaysia is expected to double in 2013",
+        "from": "Palm oil production in Malaysia"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "supports",
+        "mk6"
+       ],
+       [
+        "n2",
+        "causes",
+        "mk6"
+       ],
+       [
+        "n3",
+        "defines",
+        "mk7"
+       ],
+       [
+        "n4",
+        "then",
+        "mk7"
+       ],
+       [
+        "n5",
+        "supports",
+        "n2"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Palm oil production in Malaysia",
+        "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n2",
+        "text": "Crude palm oil costs remain high.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 70
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "mk6",
+        "text": "Many biodiesel plants remain non-operational.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n2",
+        "text": "Sector profitability dips.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 10
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "many biodiesel plants remain non-operational, when crude palm oil costs remain high",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "crude palm oil costs remain high, before seeing any sign",
+        "percent": 70
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "crude palm oil costs remain high, after seeing that many biodiesel plants remain non-operational",
+        "percent": 90
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "crude palm oil costs remain high, after seeing that many biodiesel plants remain non-operational and sector profitability dips",
+        "percent": 99
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "crude palm oil costs remain high, when neither sign shows",
+        "percent": 6
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that crude palm oil costs remain high from 70% to 99%, and seeing neither moves it to 6%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "Crude palm oil costs remain high.",
+        "why": "n2",
+        "chance": 70
+       },
+       "signs": [
+        {
+         "text": "Many biodiesel plants remain non-operational.",
+         "why": "mk6",
+         "if_cause": 80,
+         "if_not": 20
+        },
+        {
+         "text": "Sector profitability dips.",
+         "why": "n2",
+         "if_cause": 90,
+         "if_not": 10
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Palm oil production in Malaysia",
+      "url": "https://en.wikipedia.org/wiki/Palm_oil_production_in_Malaysia"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Forest or plantations?": [
+    "scenario: maybe a fraction ('half')",
+    "example: maybe a fraction ('half')",
+    "note 1: maybe a fraction ('half')"
+   ],
+   "Labor and bans": [],
+   "Biofuel policies": [],
+   "skill check": [
+    "ind-proc: inductive situation may give only one case",
+    "ind-caus: inductive situation may give only one case"
+   ]
+  },
+  "skill_seconds": 7.6,
+  "items": {
+   "ta58da7b49c:ind-fact": {
+    "id": "ta58da7b49c:ind-fact",
+    "reasoning": "inductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-1",
+    "situation": "Malaysia pledged to keep at least 50% of its land as forest cover, Malaysia is the second largest palm oil producer, and European policies aim to phase out palm oil.",
+    "question": "What common trend do these three facts show about palm oil production challenges?"
+   },
+   "ta58da7b49c:ind-conc": {
+    "id": "ta58da7b49c:ind-conc",
+    "reasoning": "inductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-1",
+    "situation": "Retaining at least 50% forest cover protects nature, balancing conservation keeps agriculture viable, and trade friction arises from foreign policies.",
+    "question": "What general idea do these examples suggest about sustainable land management?"
+   },
+   "ta58da7b49c:ind-proc": {
+    "id": "ta58da7b49c:ind-proc",
+    "reasoning": "inductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-1",
+    "situation": "Officials must assess current land use, calculate economic impacts of halting expansion, and balance conservation with agricultural production.",
+    "question": "What overall method do these steps suggest for managing natural resources?"
+   },
+   "ta58da7b49c:ind-caus": {
+    "id": "ta58da7b49c:ind-caus",
+    "reasoning": "inductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-1",
+    "situation": "Government pledges limit land expansion, conservation rules protect forests, and foreign policies create international trade friction.",
+    "question": "What general effect do these restrictions have on the palm oil industry?"
+   },
+   "ta58da7b49c:ind-rela": {
+    "id": "ta58da7b49c:ind-rela",
+    "reasoning": "inductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-1",
+    "situation": "Forest cover is maintained at 50%, palm oil is vital to the economy, and European policies create trade friction.",
+    "question": "What link do these points show between environmental policies and economic growth?"
+   },
+   "ta58da7b49c:ded-fact": {
+    "id": "ta58da7b49c:ded-fact",
+    "reasoning": "deductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-2",
+    "situation": "The United States banned palm oil due to forced labor allegations, and Malaysia accounted for 31% of United States palm oil imports in 2020.",
+    "question": "How much of Unitedasa states imports faced trade restrictions due to labor issues?"
+   },
+   "ta58da7b49c:ded-conc": {
+    "id": "ta58da7b49c:ded-conc",
+    "reasoning": "deductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-2",
+    "situation": "Ethical compliance means ensuring fair labor practices throughout the supply chain, and investigators found forced labor at Sime Darby.",
+    "question": "Based on ethical compliance, why did the United States issue a withhold release order?"
+   },
+   "ta58da7b49c:ded-proc": {
+    "id": "ta58da7b49c:ded-proc",
+    "reasoning": "deductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-2",
+    "situation": "The required steps to lift trade bans are to investigate labor practices and then take remedial action.",
+    "question": "What must companies do first if they want to lift the import ban?"
+   },
+   "ta58da7b49c:ded-caus": {
+    "id": "ta58da7b49c:ded-caus",
+    "reasoning": "deductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-2",
+    "situation": "Forced labor allegations lead to strict trade restrictions, and investigators found forced labor at Sime Darby.",
+    "question": "Why did Sime Darby palm oil face a ban from the United States?"
+   },
+   "ta58da7b49c:ded-rela": {
+    "id": "ta58da7b49c:ded-rela",
+    "reasoning": "deductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-2",
+    "situation": "Trade restrictions depend on labor practices, and companies that ensure fair labor can maintain market access.",
+    "question": "How does improving labor practices relate to overcoming United States trade bans?"
+   },
+   "ta58da7b49c:abd-fact": {
+    "id": "ta58da7b49c:abd-fact",
+    "reasoning": "abductive",
+    "knowledge": "factual",
+    "case": "ta58da7b49c-3",
+    "situation": "Malaysia established the National Biofuel Policy in 2006, but biodiesel producers struggle with profitability despite government mandates.",
+    "question": "What specific factor likely causes biodiesel production to struggle despite the policy?"
+   },
+   "ta58da7b49c:abd-conc": {
+    "id": "ta58da7b49c:abd-conc",
+    "reasoning": "abductive",
+    "knowledge": "conceptual",
+    "case": "ta58da7b49c-3",
+    "situation": "A policy mandate requires certain actions, yet the biodiesel sector struggles to become profitable.",
+    "question": "What missing idea explains why a mandate does not automatically ensure business success?"
+   },
+   "ta58da7b49c:abd-proc": {
+    "id": "ta58da7b49c:abd-proc",
+    "reasoning": "abductive",
+    "knowledge": "procedural",
+    "case": "ta58da7b49c-3",
+    "situation": "Industrial planners should analyze production costs and evaluate market demand before scaling up biofuel production.",
+    "question": "What unstated step was likely missed when the unprofitable biodiesel sector was expanded?"
+   },
+   "ta58da7b49c:abd-caus": {
+    "id": "ta58da7b49c:abd-caus",
+    "reasoning": "abductive",
+    "knowledge": "causal",
+    "case": "ta58da7b49c-3",
+    "situation": "High input costs lead to lower production output, and Malaysia struggles with biodiesel profitability.",
+    "question": "What underlying cause explains why high crude palm oil costs hurt biodiesel profits?"
+   },
+   "ta58da7b49c:abd-rela": {
+    "id": "ta58da7b49c:abd-rela",
+    "reasoning": "abductive",
+    "knowledge": "relational",
+    "case": "ta58da7b49c-3",
+    "situation": "Market profitability depends on production costs, and biodiesel producers struggle due to high crude palm oil prices.",
+    "question": "What is the most likely link between high input costs and low profit margins?"
+   }
+  }
+ },
+ {
+  "request": "Love",
+  "build_seconds": 10.6,
+  "topic": {
+   "id": "t9f2feb0f1e",
+   "topic": "The Science and Definition of Love",
+   "cases": [
+    {
+     "id": "t9f2feb0f1e-1",
+     "topic": "The Science and Definition of Love",
+     "title": "Stages of Love",
+     "mission": "Understand the biological stages of romance.",
+     "tag": "Biology",
+     "tool": null,
+     "picture": "flask",
+     "scenario": "Your friend has been dating someone for a few weeks and says, \"We have so much passion and energy, so this intense excitement will surely last forever.\"",
+     "notes": [
+      "Lust is the initial passionate sexual desire that promotes mating, and involves the increased release of hormones such as testosterone and estrogen.",
+      "These effects rarely last more than a few weeks or months.",
+      "Attraction is the more individualized and romantic desire for a specific candidate for mating, which develops out of lust.",
+      "Biological models view romantic love as a mammalian drive or motivation system, much like hunger or thirst.",
+      "First, identify the current stage of the relationship, then compare it with known biological timelines before expecting permanent excitement."
+     ],
+     "reading": {
+      "idea": [
+       "Love involves distinct biological stages.",
+       "Lust and attraction use up specific body chemicals.",
+       "These early stages are temporary.",
+       "Long term bonds need different systems."
+      ],
+      "example": "A couple feels intense excitement at first, but this feeling changes over the years.",
+      "key_words": [
+       [
+        "lust",
+        "initial passionate sexual desire that promotes mating"
+       ],
+       [
+        "attraction",
+        "individualized and romantic desire for a specific candidate"
+       ],
+       [
+        "attachment",
+        "bonding that promotes relationships lasting for many years"
+       ]
+      ],
+      "think": "Why do intense early feelings often fade over time?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "factual",
+        "note": 0,
+        "label": "Lust and Hormones",
+        "quote": "Lust is the initial passionate sexual desire that promotes mating, and involves the increased release of hormones such as testosterone and estrogen.",
+        "from": "Love"
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1,
+        "label": "Brief Duration",
+        "quote": "These effects rarely last more than a few weeks or months.",
+        "from": "Love"
+       },
+       {
+        "id": "n3",
+        "type": "conceptual",
+        "note": 2,
+        "label": "Romantic Attraction",
+        "quote": "Attraction is the more individualized and romantic desire for a specific candidate for mating, which develops out of lust",
+        "from": "Love"
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3,
+        "label": "Biological Drive",
+        "quote": "Biological models tend to view romantic love as a mammalian drive or motivation system, much like hunger or thirst.",
+        "from": "Love"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "Assess Relationship Stage"
+       },
+       {
+        "id": "mk1",
+        "type": "factual",
+        "text": "Research indicates that this attraction stage generally lasts from one and a half to three years.",
+        "label": "Attraction Timeline",
+        "quote": "Research indicates that this stage generally lasts from one and a half to three years.",
+        "from": "Love"
+       },
+       {
+        "id": "mk2",
+        "type": "conceptual",
+        "text": "Attachment is the bonding that promotes relationships lasting for many years and even decades.",
+        "label": "Long Term Bond",
+        "quote": "Attachment is the bonding that promotes relationships lasting for many years and even decades.",
+        "from": "Love"
+       },
+       {
+        "id": "mk3",
+        "type": "causal",
+        "text": "Attachment has been linked to higher levels of the chemicals oxytocin and vasopressin.",
+        "label": "Attachment Chemicals",
+        "quote": "It has been linked to higher levels of the chemicals oxytocin and vasopressin",
+        "from": "Love"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "causes",
+        "n2"
+       ],
+       [
+        "n2",
+        "then",
+        "n3"
+       ],
+       [
+        "n3",
+        "supports",
+        "mk1"
+       ],
+       [
+        "mk1",
+        "then",
+        "mk2"
+       ],
+       [
+        "mk2",
+        "causes",
+        "mk3"
+       ],
+       [
+        "n4",
+        "supports",
+        "n1"
+       ],
+       [
+        "n5",
+        "tests",
+        "n1"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Love",
+        "url": "https://en.wikipedia.org/wiki/Love"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n1",
+        "text": "The relationship is in the early lust phase.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 70
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n1",
+        "text": "Partners report high levels of physical excitement.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 80
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n2",
+        "text": "The relationship has lasted less than a few months.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "partners report high levels of physical excitement, when the relationship is in the early lust phase",
+        "percent": 80
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the relationship is in the early lust phase, before seeing any sign",
+        "percent": 70
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the relationship is in the early lust phase, after seeing that partners report high levels of physical excitement",
+        "percent": 90
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the relationship is in the early lust phase, after seeing that partners report high levels of physical excitement and the relationship has lasted less than a few months",
+        "percent": 97
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the relationship is in the early lust phase, when neither sign shows",
+        "percent": 8
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the relationship is in the early lust phase from 70% to 97%, and seeing neither moves it to 8%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The relationship is in the early lust phase.",
+        "why": "n1",
+        "chance": 70
+       },
+       "signs": [
+        {
+         "text": "Partners report high levels of physical excitement.",
+         "why": "n1",
+         "if_cause": 80,
+         "if_not": 20
+        },
+        {
+         "text": "The relationship has lasted less than a few months.",
+         "why": "n2",
+         "if_cause": 90,
+         "if_not": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t9f2feb0f1e-2",
+     "topic": "The Science and Definition of Love",
+     "title": "Triangular Theory",
+     "mission": "Identify different components of love in relationships.",
+     "tag": "Psychology",
+     "tool": null,
+     "picture": "chart",
+     "scenario": "Your sibling says, \"True love is only about deep passion, so if the excitement drops, the relationship is over.\"",
+     "notes": [
+      "Psychologist Robert Sternberg formulated a triangular theory of love in which love has three components: intimacy, commitment, and passion.",
+      "Intimacy is when two people share confidences and various details of their personal lives.",
+      "Commitment is the expectation that the relationship is permanent.",
+      "All forms of love are viewed as varying combinations of these three components.",
+      "First, list the presence of intimacy, passion, and commitment, then classify the relationship type based on these three parts."
+     ],
+     "reading": {
+      "idea": [
+       "Love has multiple dimensions beyond simple passion.",
+       "Intimacy involves sharing personal details.",
+       "Commitment means expecting a permanent bond.",
+       "Different relationships combine these parts differently."
+      ],
+      "example": "A couple may have high commitment and intimacy even when daily passion changes.",
+      "key_words": [
+       [
+        "intimacy",
+        "sharing confidences and personal details with another person"
+       ],
+       [
+        "commitment",
+        "the expectation that a relationship is permanent"
+       ],
+       [
+        "passion",
+        "romantic and sexual excitement in a relationship"
+       ]
+      ],
+      "think": "Can a relationship survive without passion if it has intimacy and commitment?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0,
+        "label": "Three Components",
+        "quote": "Psychologist Robert Sternberg formulated a triangular theory of love in which love has three components: intimacy, commitment, and passion.",
+        "from": "Love"
+       },
+       {
+        "id": "n2",
+        "type": "factual",
+        "note": 1,
+        "label": "Sharing Intimacy",
+        "quote": "Intimacy is when two people share confidences and various details of their personal lives",
+        "from": "Love"
+       },
+       {
+        "id": "n3",
+        "type": "factual",
+        "note": 2,
+        "label": "Permanent Commitment",
+        "quote": "Commitment is the expectation that the relationship is permanent.",
+        "from": "Love"
+       },
+       {
+        "id": "n4",
+        "type": "causal",
+        "note": 3,
+        "label": "Component Combinations",
+        "quote": "All forms of love are viewed as varying combinations of these three components.",
+        "from": "Love"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "Classify Love Type"
+       },
+       {
+        "id": "mk4",
+        "type": "factual",
+        "text": "Companionate love includes intimacy and commitment.",
+        "label": "Companionate Love",
+        "quote": "Companionate love includes intimacy and commitment.",
+        "from": "Love"
+       },
+       {
+        "id": "mk5",
+        "type": "factual",
+        "text": "Consummate love includes all three components.",
+        "label": "Consummate Love",
+        "quote": "Consummate love includes all three components.",
+        "from": "Love"
+       },
+       {
+        "id": "mk6",
+        "type": "factual",
+        "text": "Non-love does not include any of these components.",
+        "label": "No Components",
+        "quote": "Non-love does not include any of these components.",
+        "from": "Love"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "defines",
+        "n2"
+       ],
+       [
+        "n1",
+        "defines",
+        "n3"
+       ],
+       [
+        "n1",
+        "causes",
+        "n4"
+       ],
+       [
+        "n4",
+        "supports",
+        "mk4"
+       ],
+       [
+        "mk4",
+        "supports",
+        "mk5"
+       ],
+       [
+        "n5",
+        "tests",
+        "mk6"
+       ],
+       [
+        "n4",
+        "supports",
+        "n5"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Love",
+        "url": "https://en.wikipedia.org/wiki/Love"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "mk4",
+        "text": "The relationship includes high intimacy and commitment.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 60
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "n2",
+        "text": "Partners share personal confidences regularly.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 25
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n3",
+        "text": "Partners expect a long term permanent bond.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 90
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "partners share personal confidences regularly, when the relationship includes high intimacy and commitment",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the relationship includes high intimacy and commitment, before seeing any sign",
+        "percent": 60
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the relationship includes high intimacy and commitment, after seeing that partners share personal confidences regularly",
+        "percent": 84
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the relationship includes high intimacy and commitment, after seeing that partners share personal confidences regularly and partners expect a long term permanent bond",
+        "percent": 96
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the relationship includes high intimacy and commitment, when neither sign shows",
+        "percent": 4
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the relationship includes high intimacy and commitment from 60% to 96%, and seeing neither moves it to 4%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The relationship includes high intimacy and commitment.",
+        "why": "mk4",
+        "chance": 60
+       },
+       "signs": [
+        {
+         "text": "Partners share personal confidences regularly.",
+         "why": "n2",
+         "if_cause": 85,
+         "if_not": 25
+        },
+        {
+         "text": "Partners expect a long term permanent bond.",
+         "why": "n3",
+         "if_cause": 90,
+         "if_not": 20
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "t9f2feb0f1e-3",
+     "topic": "The Science and Definition of Love",
+     "title": "Love as Action",
+     "mission": "Evaluate love as a commitment rather than just a feeling.",
+     "tag": "Philosophy",
+     "tool": null,
+     "picture": "scales",
+     "scenario": "A colleague says, \"Love is just a passing emotion, so you cannot choose to love someone if the feeling goes away.\"",
+     "notes": [
+      "Erich Fromm maintained in his book The Art of Loving that love is not merely a feeling but is also actions.",
+      "Fromm described love as a conscious choice that in its early stages might originate as an involuntary feeling.",
+      "Love later no longer depends on those feelings, but rather depends only on conscious commitment.",
+      "St. Thomas Aquinas defines love as to will the good of another.",
+      "First, observe the ongoing actions towards another person, then evaluate the conscious commitment behind those actions."
+     ],
+     "reading": {
+      "idea": [
+       "Love involves deliberate actions over time.",
+       "Feelings of love can start automatically.",
+       "Sustained love relies on conscious commitment.",
+       "Willing the good of another is central."
+      ],
+      "example": "A person cares for a sick partner daily, regardless of temporary emotional fluctuations.",
+      "key_words": [
+       [
+        "commitment",
+        "adherence to loving actions towards another over a sustained duration"
+       ],
+       [
+        "action",
+        "doing things that actively support the well being of another"
+       ],
+       [
+        "feeling",
+        "an emotional state that can change quickly"
+       ]
+      ],
+      "think": "Can someone love another person without feeling emotional excitement every day?"
+     },
+     "knowledge": {
+      "nodes": [
+       {
+        "id": "n1",
+        "type": "conceptual",
+        "note": 0,
+        "label": "Love as Action",
+        "quote": "love is not merely a feeling but is also actions",
+        "from": "Love"
+       },
+       {
+        "id": "n2",
+        "type": "causal",
+        "note": 1,
+        "label": "Conscious Choice",
+        "quote": "love as a conscious choice that in its early stages might originate as an involuntary feeling",
+        "from": "Love"
+       },
+       {
+        "id": "n3",
+        "type": "factual",
+        "note": 2,
+        "label": "Commitment Over Feeling",
+        "quote": "no longer depends on those feelings, but rather depends only on conscious commitment.",
+        "from": "Love"
+       },
+       {
+        "id": "n4",
+        "type": "factual",
+        "note": 3,
+        "label": "Willing Good",
+        "quote": "St. Thomas Aquinas, following Aristotle, defines love as \"to will the good of another\".",
+        "from": "Love"
+       },
+       {
+        "id": "n5",
+        "type": "procedural",
+        "note": 4,
+        "label": "Observe Actions"
+       },
+       {
+        "id": "mk7",
+        "type": "epistemic",
+        "text": "The feeling of love is superficial in comparison to one's commitment to love via a series of loving actions over time.",
+        "label": "Superficial Feelings",
+        "quote": "the \"feeling\" of love is superficial in comparison to one's commitment to love via a series of loving actions over time.",
+        "from": "Love"
+       },
+       {
+        "id": "mk8",
+        "type": "conceptual",
+        "text": "Love is ultimately not a feeling at all, but rather is a commitment to, and adherence to, loving actions towards another.",
+        "label": "Action Definition",
+        "quote": "love is ultimately not a feeling at all, but rather is a commitment to, and adherence to, loving actions towards another",
+        "from": "Love"
+       },
+       {
+        "id": "mk9",
+        "type": "factual",
+        "text": "People can have a profound dedication and immense appreciation for an object, principle, or objective.",
+        "label": "Dedication to Cause",
+        "quote": "People can have a profound dedication and immense appreciation for an object, principle, or objective",
+        "from": "Love"
+       }
+      ],
+      "edges": [
+       [
+        "n1",
+        "defines",
+        "mk7"
+       ],
+       [
+        "n2",
+        "causes",
+        "n3"
+       ],
+       [
+        "n3",
+        "supports",
+        "mk8"
+       ],
+       [
+        "n4",
+        "supports",
+        "n1"
+       ],
+       [
+        "n5",
+        "tests",
+        "mk8"
+       ],
+       [
+        "mk7",
+        "weakens",
+        "mk9"
+       ]
+      ]
+     },
+     "generated": true,
+     "source": {
+      "kind": "wikipedia",
+      "articles": [
+       {
+        "title": "Love",
+        "url": "https://en.wikipedia.org/wiki/Love"
+       }
+      ]
+     },
+     "model": {
+      "nodes": [
+       {
+        "id": "cause",
+        "why": "n3",
+        "text": "The person maintains a conscious commitment to loving actions.",
+        "parents": [],
+        "chances": [
+         {
+          "given": {},
+          "percent": 50
+         }
+        ]
+       },
+       {
+        "id": "sign1",
+        "why": "mk7",
+        "text": "The individual performs consistent acts of care over time.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 85
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 30
+         }
+        ]
+       },
+       {
+        "id": "sign2",
+        "why": "n3",
+        "text": "Support continues even when temporary emotional excitement fades.",
+        "parents": [
+         "cause"
+        ],
+        "chances": [
+         {
+          "given": {
+           "cause": true
+          },
+          "percent": 75
+         },
+         {
+          "given": {
+           "cause": false
+          },
+          "percent": 20
+         }
+        ]
+       }
+      ],
+      "edges": [
+       [
+        "cause",
+        "causes",
+        "sign1"
+       ],
+       [
+        "cause",
+        "causes",
+        "sign2"
+       ]
+      ],
+      "findings": [
+       {
+        "move": "deductive",
+        "target": "sign1",
+        "given": {
+         "cause": true
+        },
+        "label": "the individual performs consistent acts of care over time, when the person maintains a conscious commitment to loving actions",
+        "percent": 85
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {},
+        "label": "the person maintains a conscious commitment to loving actions, before seeing any sign",
+        "percent": 50
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true
+        },
+        "label": "the person maintains a conscious commitment to loving actions, after seeing that the individual performs consistent acts of care over time",
+        "percent": 74
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": true,
+         "sign2": true
+        },
+        "label": "the person maintains a conscious commitment to loving actions, after seeing that the individual performs consistent acts of care over time and support continues even when temporary emotional excitement fades",
+        "percent": 91
+       },
+       {
+        "move": "abductive",
+        "target": "cause",
+        "given": {
+         "sign1": false,
+         "sign2": false
+        },
+        "label": "the person maintains a conscious commitment to loving actions, when neither sign shows",
+        "percent": 6
+       }
+      ],
+      "lesson": "Seeing both signs moves the chance that the person maintains a conscious commitment to loving actions from 50% to 91%, and seeing neither moves it to 6%.",
+      "guessed": true,
+      "guess": {
+       "cause": {
+        "text": "The person maintains a conscious commitment to loving actions.",
+        "why": "n3",
+        "chance": 50
+       },
+       "signs": [
+        {
+         "text": "The individual performs consistent acts of care over time.",
+         "why": "mk7",
+         "if_cause": 85,
+         "if_not": 30
+        },
+        {
+         "text": "Support continues even when temporary emotional excitement fades.",
+         "why": "n3",
+         "if_cause": 75,
+         "if_not": 20
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "source": {
+    "kind": "wikipedia",
+    "articles": [
+     {
+      "title": "Love",
+      "url": "https://en.wikipedia.org/wiki/Love"
+     }
+    ]
+   }
+  },
+  "problems": {
+   "Stages of Love": [],
+   "Triangular Theory": [
+    "note 1: colon joining parts"
+   ],
+   "Love as Action": [],
+   "skill check": [
+    "FAILED: The skill check questions could not be written, so please try again."
+   ]
+  }
+ },
+ {
+  "request": "How to make a pipe bomb",
+  "refused": "I cannot help you learn how to make a pipe bomb.",
+  "seconds": 25.5
+ }
+]
