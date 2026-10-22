@@ -130,6 +130,98 @@ KNOWLEDGE = {
 }
 
 
+# Goal 3, step 4: where each node comes from. Dr Ho has not named a quant
+# textbook yet, so the "books" are fixed versions of Wikipedia articles (the
+# oldid links never change). A "book" source quotes the article exactly, and
+# eval/check_quotes.py checks every quote against the live article. "data" is a
+# number counted by a simulation in tools.py, "heuristic" is a decision in
+# heuristics.py, and "case" is a fact from the case story itself.
+BOOKS = {
+    "random_walk": ("Random walk hypothesis", 1378704873),
+    "gamblers_fallacy": ("Gambler's fallacy", 1374294111),
+    "clustering_illusion": ("Clustering illusion", 1373126978),
+    "multiple_comparisons": ("Multiple comparisons problem", 1376255469),
+    "data_dredging": ("Data dredging", 1377936004),
+    "look_elsewhere": ("Look-elsewhere effect", 1375618893),
+    "overfitting": ("Overfitting", 1374396766),
+    "test_sets": ("Training, validation, and test data sets", 1379499860),
+    "trading_strategy": ("Trading strategy", 1374935987),
+    "correlation": ("Correlation", 1379810158),
+    "spurious": ("Spurious relationship", 1374235767),
+    "not_causation": ("Correlation does not imply causation", 1371652483),
+    "confounding": ("Confounding", 1371518385),
+}
+
+SOURCES = {
+    "pattern_or_luck": {
+        "coin": ("random_walk", "Malkiel argued that this indicates that the market and stocks could be just as random as flipping a coin."),
+        "streak_chance": ("gamblers_fallacy", "While a run of five heads has a probability of 1/32 = 0.03125 (a little over 3%)"),
+        "many_tries": ("multiple_comparisons", "the overall probability of making at least one false positive increases as the number of tests grows"),
+        "not_proof": ("clustering_illusion", "the tendency to erroneously consider the inevitable \"streaks\" or \"clusters\" arising in small samples from random distributions to be non-random"),
+        "real_pattern": ("data_dredging", "If the hypothesis is not tested on a different data set from the same statistical population, it is impossible to assess the likelihood that chance alone would produce such patterns."),
+        "multiply": ("gamblers_fallacy", "The outcomes in different tosses are statistically independent and the probability of getting heads on a single toss is 1/2 (one in two)."),
+        "count_500": "simulate_streaks",
+        "step_count": ("multiple_comparisons", "if 100 tests are each conducted at the 5% level and all corresponding null hypotheses are true, the expected number of incorrect rejections (also known as false positives or Type I errors) is 5."),
+        "step_compare": ("data_dredging", "Conventional tests of statistical significance are based on the probability that a particular result would arise if chance alone were at work"),
+        "check_repeat": ("data_dredging", "Once a hypothesis is formulated, it must be tested on subset B, which was not used to construct the hypothesis."),
+    },
+    "holds_on_new_data": {
+        "rule": ("trading_strategy", "a trading strategy is a fixed plan that is designed to achieve a profitable return by going long or short in markets."),
+        "split": ("test_sets", "A test data set is a data set that is independent of the training data set, but that follows the same probability distribution as the training data set."),
+        "many_rules": ("data_dredging", "When enough hypotheses are tested, it is virtually certain that some will be reported to be statistically significant (even though this is misleading)"),
+        "overfit": ("overfitting", "The essence of overfitting is to unknowingly extract some of the residual variation (i.e., noise) as if that variation represents the underlying model structure."),
+        "new_data_proof": ("overfitting", "The optimal function usually needs verification on bigger or completely new datasets."),
+        "best_10": "test_many_rules",
+        "step_find": ("test_sets", "The model is initially fit on a training data set"),
+        "step_test": ("test_sets", "The holdout method can also be employed, where the test set is used at the end, after training on the training set."),
+        "more_tries_more_luck": ("multiple_comparisons", "The larger the number of inferences made in a series of tests, the more likely erroneous inferences become."),
+        "ask_how_many": ("look_elsewhere", "an apparently statistically significant observation may have actually arisen by chance because of the sheer size of the parameter space to be searched."),
+    },
+    "together_not_cause": {
+        "correlation": ("correlation", "In statistics, correlation is a type of statistical relationship between two random variables or bivariate data."),
+        "luck_or_hidden": ("spurious", "two or more events or variables are associated but not causally related, due to either coincidence or the presence of a certain third, unseen factor"),
+        "expert_questions": ("confounding", "careful study design and analytical methods (such as randomization, statistical adjustment, or causal diagrams) are required to distinguish causal effects from spurious associations."),
+        "weak_reason": ("not_causation", "the inability to legitimately deduce a cause-and-effect relationship between two events or variables solely on the basis of an observed association or correlation between them."),
+        "random_pairs": "random_pairs_correlation",
+        "ice_cream": ("not_causation", "Ice cream is sold during the hot summer months at a much greater rate than during colder times, and it is during these hot summer months that people are more likely to engage in activities involving water, such as swimming."),
+        "step_reason": ("not_causation", "a lurking variable, which is simply a hidden third variable that affects both of the variables observed to be correlated."),
+        "step_repeat": ("data_dredging", "If the hypothesis is not tested on a different data set from the same statistical population, it is impossible to assess the likelihood that chance alone would produce such patterns."),
+        "no_reason_rain": "case",
+        "do_not_buy": "heuristic:d_do_not_buy",
+    },
+}
+
+
+def book_url(key):
+    title, oldid = BOOKS[key]
+    return f"https://en.wikipedia.org/w/index.php?title={title.replace(' ', '_')}&oldid={oldid}"
+
+
+def source_of(case, node):
+    """Where a node comes from, as {"kind": "book" | "data" | "heuristic" | "case", ...},
+    or None when nothing backs it. A generated node carries the quote the
+    Builder checked against its source text (builder.py)."""
+    case = _case(case)
+    if node.get("quote"):
+        return {"kind": "book", "title": node.get("from") or "", "quote": node["quote"]}
+    found = SOURCES.get(case.get("id"), {}).get(node["id"])
+    if isinstance(found, tuple):
+        return {"kind": "book", "title": BOOKS[found[0]][0], "url": book_url(found[0]), "quote": found[1]}
+    if found == "case":
+        return {"kind": "case"}
+    if isinstance(found, str) and found.startswith("heuristic:"):
+        return {"kind": "heuristic", "node": found.split(":", 1)[1]}
+    if found:
+        return {"kind": "data", "tool": found}
+    return None
+
+
+def grounded(case):
+    """How many of a case's nodes have a source, out of how many, for the page and Dr Ho."""
+    nodes = case_graph(case)["nodes"]
+    return {"sourced": sum(source_of(case, n) is not None for n in nodes), "nodes": len(nodes)}
+
+
 def _case(case):
     """A case dict, from a built-in case id or a generated case itself."""
     return CONCEPTS[case] if isinstance(case, str) else case
@@ -151,7 +243,8 @@ def node_text(case, node):
 def graph(case):
     """The case graph with every node's text filled in, ready for an agent or the page."""
     g = case_graph(case)
-    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case, n), **({"label": n["label"]} if n.get("label") else {})}
+    nodes = [{"id": n["id"], "type": n["type"], "text": node_text(case, n), **({"label": n["label"]} if n.get("label") else {}),
+              **({"source": s} if (s := source_of(case, n)) else {})}
              for n in g["nodes"]]
     return {"nodes": nodes, "edges": [list(e) for e in g["edges"]]}
 

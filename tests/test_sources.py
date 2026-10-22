@@ -112,3 +112,31 @@ def test_a_plain_topic_name_is_looked_up_with_no_model_call(wiki, monkeypatch):
     assert sources.find("I want to think about Sleep")["articles"][0]["title"] == "Sleep"
     assert sources._direct("Why we need sleep") is None  # a question goes to the model
     assert sources._direct("Mercury") is None  # a disambiguation page is not the topic
+
+
+def test_locate_finds_exact_quotes_and_their_article():
+    text = "ARTICLE: Sleep\nSleep helps the brain store\u2060 memories.\n\nARTICLE: Dreams\nMost dreams happen in \u201cREM\u201d sleep."
+    assert sources.locate("sleep helps the  brain store memories.", text) == "Sleep"
+    assert sources.locate('dreams happen in "REM" sleep', text) == "Dreams"
+    assert sources.locate("A plain reading with no headings", "Here is a plain reading with no headings.") == ""
+    assert sources.locate("Sleep helps the heart", text) is None
+    assert sources.locate("Sleep helps", text) is None  # too short to count as a quote
+
+
+def test_build_keeps_only_quotes_that_are_really_in_the_source(wiki, monkeypatch):
+    from tests.test_builder import raw_case
+    wiki += ["Sleep"]
+    raw = raw_case()
+    raw["notes"][0]["quote"] = "A real fact about the topic."
+    raw["notes"][1]["quote"] = "Sleep was invented in 1850 by doctors."
+    raw["more_knowledge"][0]["quote"] = "a real fact about the topic. A real fact"
+    monkeypatch.setattr(llm_client, "_generate", lambda system, user, **kw: "{}")
+    monkeypatch.setattr(llm_client, "_parse_json", lambda text: {"topic": "Sleep", "cases": [raw]})
+    builder._CACHE.clear()
+    case = builder.build("Why we need sleep")["cases"][0]
+    nodes = {n["id"]: n for n in case["knowledge"]["nodes"]}
+    assert nodes["n1"]["quote"] == "A real fact about the topic." and nodes["n1"]["from"] == "Sleep"
+    assert "quote" not in nodes["n2"]
+    assert nodes["rate"]["from"] == "Sleep"
+    assert builder.recheck(copy.deepcopy(case)) == case  # quotes survive the page sending the case back
+    builder._CACHE.clear()

@@ -44,7 +44,7 @@ PICTURES = {
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
          "idea": 35, "example": 40, "think": 30, "question": 25, "key_word": 4, "meaning": 12, "node": 35,
-         "label": 5}
+         "label": 5, "quote": 40}
 
 SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps university beginners practise critical thinking on any topic. A learner gives you a REQUEST: a topic name, a question, or a short reading. You write the material the tutor will use. You never write the questions; the tutor does that.
 
@@ -55,6 +55,7 @@ Facts:
 - If the REQUEST is a reading, take the facts from it in the same way.
 - If SOURCE comes from the learner's own file, REQUEST may say which part to focus on. If REQUEST is empty, write about the main ideas of SOURCE.
 - With neither, use only well known, widely agreed facts that a good textbook would state.
+- When there is a SOURCE or a reading, give each note and each more_knowledge item a quote, which is 5 to 25 words copied exactly from it, word for word, that backs the fact up. With neither, leave quote empty.
 - Never invent studies, quotes, names of real people or exact numbers you are not sure of. Round numbers are fine when they are well known.
 - Write chances and shares as percentages, like 50% or 33%, never as fractions or words like "half", "a third" or "one in three". Write numbers as digits inside normal sentences, not with symbols like →, = or ≠.
 
@@ -94,9 +95,9 @@ Otherwise reply with ONLY this JSON and nothing else:
 {"topic": "the topic in at most 8 words",
  "cases": [{"title": "", "mission": "", "tag": "", "scenario": "",
             "picture": "",
-            "notes": [{"text": "", "type": "", "label": ""}],
+            "notes": [{"text": "", "type": "", "label": "", "quote": ""}],
             "reading": {"idea": [""], "example": "", "key_words": [["", ""]], "think": ""},
-            "more_knowledge": [{"id": "", "text": "", "type": "", "label": ""}],
+            "more_knowledge": [{"id": "", "text": "", "type": "", "label": "", "quote": ""}],
             "links": [["n1", "supports", ""]]}]}"""
 
 
@@ -155,10 +156,29 @@ def clean_source(source):
     return {"kind": "wikipedia", "articles": articles} if articles else None
 
 
-def clean_case(raw, topic, case_id, source=None):
+def _quote(item, text):
+    """{"quote", "from"} for a node whose quote is really in the source text, else
+    {} (Goal 3, step 4). "from" is the Wikipedia article it sits in. With no text,
+    as in recheck(), a quote already on the node is kept, since it was checked
+    when the topic was built."""
+    quote = item.get("quote")
+    if not isinstance(quote, str) or len(quote.split()) < sources.MIN_QUOTE_WORDS:
+        return {}
+    where = sources.locate(quote, text) if text is not None else str(item.get("from") or "")[:120]
+    if where is None:
+        return {}
+    try:
+        quote = _text(quote, WORDS["quote"], "quote")
+    except TopicError:
+        return {}
+    return {"quote": quote, **({"from": where} if where else {})}
+
+
+def clean_case(raw, topic, case_id, source=None, text=None):
     """The case in the same shape as a content.CONCEPTS case, with its graph
-    under "knowledge" in the same shape as knowledge.KNOWLEDGE. Raises
-    TopicError when something important is missing or broken."""
+    under "knowledge" in the same shape as knowledge.KNOWLEDGE. text is the
+    source the Builder read, so each node's quote can be checked against it.
+    Raises TopicError when something important is missing or broken."""
     if not isinstance(raw, dict):
         raise TopicError("A case is broken.")
     notes = [n for n in raw.get("notes") or [] if isinstance(n, dict)][:NOTES_PER_CASE]
@@ -172,7 +192,8 @@ def clean_case(raw, topic, case_id, source=None):
         raise TopicError("A reading is too short.")
 
     nodes = [{"id": f"n{i + 1}", "type": _type(n.get("type")) or "factual", "note": i,
-              **({"label": lab} if (lab := _label(n.get("label"))) else {})} for i, n in enumerate(notes)]
+              **({"label": lab} if (lab := _label(n.get("label"))) else {}), **_quote(n, text)}
+             for i, n in enumerate(notes)]
     for extra in raw.get("more_knowledge") or []:
         if not isinstance(extra, dict):
             continue
@@ -181,7 +202,7 @@ def clean_case(raw, topic, case_id, source=None):
         if nid and kind and nid not in {n["id"] for n in nodes} and len(nodes) < NOTES_PER_CASE + 6:
             try:
                 nodes.append({"id": nid, "type": kind, "text": _text(extra.get("text"), WORDS["node"], "fact"),
-                              **({"label": lab} if (lab := _label(extra.get("label"))) else {})})
+                              **({"label": lab} if (lab := _label(extra.get("label"))) else {}), **_quote(extra, text)})
             except TopicError:
                 continue  # one broken extra fact is dropped, not the whole topic
     ids = {n["id"] for n in nodes}
@@ -213,7 +234,7 @@ def clean_case(raw, topic, case_id, source=None):
     }
 
 
-def clean_topic(data, request, source=None, count=CASES_PER_TOPIC, done=0):
+def clean_topic(data, request, source=None, count=CASES_PER_TOPIC, done=0, text=None):
     """The whole topic from the model reply, or TopicError. done: cases
     already made on this topic, so the new ids carry on after them."""
     if not isinstance(data, dict):
@@ -227,7 +248,7 @@ def clean_topic(data, request, source=None, count=CASES_PER_TOPIC, done=0):
     cases = []
     for i, raw in enumerate(raw_cases):
         try:
-            cases.append(clean_case(raw, topic, f"{tid}-{done + i + 1}", source))
+            cases.append(clean_case(raw, topic, f"{tid}-{done + i + 1}", source, text))
         except TopicError:
             continue  # keep the good cases if one is broken
     if not cases:
@@ -329,7 +350,7 @@ def recheck(case):
     notes = case.get("notes") or []
     by_note = {n.get("note"): n for n in texts.values() if "note" in n}
     raw = {**case,
-           "notes": [{"text": t, "type": by_note.get(i, {}).get("type"), "label": by_note.get(i, {}).get("label")}
+           "notes": [{"text": t, **{k: by_note.get(i, {}).get(k) for k in ("type", "label", "quote", "from")}}
                      for i, t in enumerate(notes)],
            "more_knowledge": [n for n in texts.values() if "text" in n],
            "links": case["knowledge"].get("edges") or []}
@@ -387,6 +408,7 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
         source = {"kind": "file", "name": file["name"]}
     else:
         source = {"kind": "reading"} if len(request) >= sources.READING_CHARS else None
+    text = ""  # no source, so no quote can be checked and every quote is dropped
     if llm_client.PROVIDER == "mock":
         data = _mock(request or file["name"], count)
     else:
@@ -396,22 +418,23 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
         payload = {"REQUEST": request, "COUNT": count, **({"AVOID": avoid} if avoid else {}),
                    **({"SOURCE": found["text"]} if found else {})}
         source = source or found
+        text = found["text"] if found else request if source else ""
         # Seen 21 October 2026: a long reply now and then comes back as broken
         # JSON, so a reply with no usable case is asked for once more. A
         # refusal is final.
         for attempt in range(2):
-            text = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False),
-                                        max_tokens=2200 * count, json_mode=True)
-            data = llm_client._parse_json(text)
+            reply = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False),
+                                         max_tokens=2600 * count, json_mode=True)  # quotes need about 400 more
+            data = llm_client._parse_json(reply)
             if isinstance(data, dict) and data.get("refuse"):
                 break
             try:
-                clean_topic(data, request_for_id, source, count, len(avoid))
+                clean_topic(data, request_for_id, source, count, len(avoid), text)
                 break
             except TopicError:
                 if attempt or not limits.budget_left():
                     raise
-    topic = clean_topic(data, request_for_id, source, count, len(avoid))
+    topic = clean_topic(data, request_for_id, source, count, len(avoid), text)
     topic["source"] = topic["cases"][0]["source"]
     with _lock:
         _CACHE[key] = topic

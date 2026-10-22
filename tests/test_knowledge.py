@@ -118,3 +118,29 @@ def test_session_summary_includes_reasoning():
     s = orc.new_session("pattern_or_luck", total_rounds=8)
     s["history"] = [{"assessment": _marked(["inductive"], ["factual"])}]
     assert orc.summarize(s)["reasoning"]["grid"]["factual"]["inductive"] == 1
+
+
+def test_every_quant_node_has_a_source():
+    from app.heuristics import TREES
+    from app.knowledge import BOOKS, SOURCES, grounded
+    from app.tools import TOOLS
+    assert set(SOURCES) == set(KNOWLEDGE)
+    for case_id, g in KNOWLEDGE.items():
+        assert set(SOURCES[case_id]) == {n["id"] for n in g["nodes"]}, case_id
+        assert grounded(case_id) == {"sourced": len(g["nodes"]), "nodes": len(g["nodes"])}
+        for node_id, found in SOURCES[case_id].items():
+            if isinstance(found, tuple):
+                assert found[0] in BOOKS and len(found[1].split()) >= 4, node_id
+            elif found.startswith("heuristic:"):
+                assert found.split(":")[1] in {n["id"] for n in TREES[case_id]["nodes"]}, node_id
+            else:
+                assert found == "case" or found in TOOLS, node_id
+
+
+def test_graph_shows_each_source():
+    nodes = {n["id"]: n for n in graph("pattern_or_luck")["nodes"]}
+    assert nodes["coin"]["source"]["title"] == "Random walk hypothesis"
+    assert "oldid=1378704873" in nodes["coin"]["source"]["url"]
+    assert nodes["count_500"]["source"] == {"kind": "data", "tool": "simulate_streaks"}
+    rain = {n["id"]: n for n in graph("together_not_cause")["nodes"]}
+    assert rain["do_not_buy"]["source"] == {"kind": "heuristic", "node": "d_do_not_buy"}

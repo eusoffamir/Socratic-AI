@@ -35,8 +35,8 @@ The Reasoning agent (Goal 1) already labels each answer as inductive, deductive 
 | 1 | This plan | Done 22 October 2026 |
 | 2 | Decision trees: one rule-of-thumb tree per quant case, with a walk function (the deductive move) | Done 22 October 2026 |
 | 3 | A Bayesian network per case, learned by counting over simulated data (the inductive move) and asked backwards (the abductive move) | Done 22 October 2026 |
-| 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Next |
-| 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | |
+| 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Done 22 October 2026 |
+| 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | Next |
 | 6 | A Knowledge panel on the page that shows the three forms | |
 | 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | |
 
@@ -61,6 +61,17 @@ Each network has 3 true or false nodes and learns its chances by counting over s
 
 The last case shows the hidden 3rd thing in numbers. Ice cream and sunburns move together, but once the weather is known, ice cream adds nothing.
 
+### Where each piece of knowledge comes from (step 4)
+
+Dr Ho has not named a quant textbook yet, so for now the "books" are 13 Wikipedia articles, fixed at one version each (for example Gambler's fallacy, Overfitting, Data dredging, Spurious relationship). Every node of the 3 quant graphs now has a source.
+
+- **Book:** 25 nodes quote an article word for word. For example, the 3% streak node quotes Gambler's fallacy, "a run of five heads has a probability of 1/32 = 0.03125 (a little over 3%)". A script (`eval/check_quotes.py`) checks every quote against the live article, and all 25 were found on 22 October 2026.
+- **Data:** 3 nodes are numbers counted by the simulations, such as "about 15 of 500 stocks streak by luck".
+- **Heuristic:** 1 node (do not buy without a reason and a repeat) is a decision from the rain case's decision tree.
+- **Case:** 1 node (no clear reason why rain would move a stock) comes from the case story itself.
+
+For any other topic, the Topic Builder now gives a quote from its Wikipedia source (or the learner's reading or file) for each fact, and plain code keeps only quotes that are really in that text. In a first test on "Photosynthesis", 18 of 21 facts kept a checked quote, and the other 3 were shown as having no source.
+
 ## 4. Choices made
 
 - **Plain Python, no new libraries.** The trees and networks are small (3 to 6 nodes), so exact counting and exact inference need little code. This keeps the free Render server light, and every step is easy to explain in the thesis. Libraries such as pgmpy and scikit-learn can check the results later.
@@ -71,7 +82,7 @@ The last case shows the hidden 3rd thing in numbers. Ice cream and sunburns move
 
 1. Is a small Bayesian network the "probabilistic graph model" you meant, or did you have another model in mind, such as a Markov network?
 2. Should the decision trees come from real experts, for example a short interview with a quant, or are drafted rules of thumb enough for now?
-3. Which book should the quant knowledge graph come from, so each node can cite a page?
+3. Which book should the quant knowledge graph come from, so each node can cite a page? Until then, Wikipedia is used (step 4).
 4. Is "deductive is a forward walk, inductive is counting over data, abductive is a backward walk" a good first definition of reasoning as graph traversal?
 
 ## 6. Honest limits

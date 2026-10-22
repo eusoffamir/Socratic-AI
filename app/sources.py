@@ -113,6 +113,33 @@ def _direct(request):
     return _article(name)
 
 
+MIN_QUOTE_WORDS = 4  # shorter than this, a "quote" could match almost any text
+_INVISIBLE = dict.fromkeys(map(ord, "⁠​­﻿"), None)
+_CURLY = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"', " ": " "})
+
+
+def _plain(text):
+    return re.sub(r"\s+", " ", text.translate(_INVISIBLE).translate(_CURLY)).strip().casefold()
+
+
+def locate(quote, text):
+    """Goal 3, step 4. Where an exact quote sits in a source text: the title of
+    the ARTICLE it is in, "" when the text has no article headings, or None
+    when the quote is not really in the text. Spaces, case, curly quotes and
+    invisible characters are ignored, but every word must match."""
+    if not isinstance(quote, str) or len(quote.split()) < MIN_QUOTE_WORDS or not text:
+        return None
+    q = _plain(quote).rstrip(".")
+    first, *articles = re.split(r"(?m)^ARTICLE: ", text)
+    if q in _plain(first):
+        return ""
+    for part in articles:
+        title, _, body = part.partition("\n")
+        if q in _plain(body):
+            return title.strip()
+    return None
+
+
 def find(request):
     """{"kind": "wikipedia", "articles": [{"title", "url"}], "text"} for the
     topic, or None. A long request is the learner's own reading, so it is used
