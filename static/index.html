@@ -143,6 +143,14 @@
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
   .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
+  /* a thin, see-through scrollbar that only shows on hover, so the green sidebar stays clean */
+  .sn-recents{scrollbar-width:thin; scrollbar-color:transparent transparent;}
+  .sn-recents:hover{scrollbar-color:rgba(255,255,255,.3) transparent;}
+  .sn-recents::-webkit-scrollbar{width:6px;}
+  .sn-recents::-webkit-scrollbar-track{background:transparent;}
+  .sn-recents::-webkit-scrollbar-button{display:none;}
+  .sn-recents::-webkit-scrollbar-thumb{background:transparent; border-radius:3px;}
+  .sn-recents:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);}
   .sn-chat{display:flex; align-items:center; border-radius:8px;}
   .sn-chat + .sn-chat{margin-top:3px;}
   .sn-chat:hover, .sn-chat.on{background:rgba(255,255,255,.12);}
