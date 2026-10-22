@@ -1,0 +1,62 @@
+id,run,clarity,accuracy,precision,relevance,depth,breadth,logic,significance,fairness,level,inductive,deductive,abductive,k_factual,k_conceptual,k_procedural,k_causal,k_relational,k_strategic,k_metacognitive,k_epistemic,graph_inductive,graph_deductive,graph_abductive,evidence_quote
+C17,1,1,1,0,1,0,0,0,1,0,none,0,0,0,0,0,1,0,0,1,0,1,,,,"I would test it on new data, check new data, and test again on new data for proof"
+R31,1,1,1,0,1,1,1,1,1,0,none,0,0,1,1,0,0,0,1,0,0,0,,,,it might go upward trend and go up.. but it also might go down
+R29,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,go down tomorrow
+C19,1,1,1,1,1,1,1,1,1,1,evidence,1,0,1,1,0,0,0,0,0,0,1,1,0,0,"about 19 of 100 random pairs move together strongly by luck, so one pair is weak proof. I might change my mind if it keeps happening on new data."
+C16,1,1,1,1,1,1,0,1,1,0,none,0,0,0,0,1,0,1,0,0,0,0,,,,"It is when the rule learns the random noise of the old prices instead of a real pattern, like memorising last year's exam answers instead of understanding the topic."
+R34,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,this thing is luck
+R25,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,then theres no correlation
+R30,1,1,1,0,1,0,0,1,1,0,assumption,0,0,1,0,0,0,0,0,0,0,1,,,,the trend is not forever and might be pure luck
+R03,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,A: Real pattern. Why: because it just is
+R36,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,then it might be a trend
+C12,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,1,0,0,0,0,0,0,,,,because overfitting
+R26,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,1,0,0,0,0,0,0,,,,low chance
+C14,1,1,1,0,1,1,0,1,1,0,assumption,0,0,1,0,0,0,1,0,0,0,1,,,,They assume that because it made money in the past it will make money in the future
+R10,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,A: Streak. Why: because in a row
+R33,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,the financial data or if the stock is hot from investments
+R07,1,0,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,idk
+R05,1,1,1,0,1,1,0,1,1,0,none,0,0,1,0,1,0,0,0,0,0,0,,,,A: Just chance. Why: because its not fixed.. the streak can end
+C21,1,1,1,1,1,1,0,1,1,0,evidence,0,0,1,0,0,1,1,1,1,0,1,0,1,0,"A clear reason, like the company selling umbrellas, and the link still working next year on data it has not seen."
+R15,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,it could be because its once in a lifetime occurance
+R13,1,1,1,0,1,0,0,1,1,0,assumption,0,0,1,0,0,0,0,0,1,0,0,,,,he keeps assuming that the price will go up again in a trend
+C23,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,1,0,0,0,0,0,0,,,,two things moving together
+C15,1,1,1,0,1,1,0,1,1,0,assumption,0,0,1,0,0,0,1,0,1,0,0,0,1,0,No. Why: it might just be lucky.
+R18,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,A: Real pattern. Why: upward trend
+C24,1,1,1,0,1,1,1,1,1,1,none,0,0,1,0,0,0,1,0,1,0,1,,,,"That it was probably luck or a hidden factor that changed, so I should not buy because of the rain, though one failed test does not prove it can never work."
+R37,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,its just luck
+C09,1,1,1,0,1,1,0,1,1,0,implication,0,1,0,0,0,0,1,0,1,0,0,0,1,0,"buying now is closer to a coin flip than a sure win, and I could lose money"
+C07,1,1,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,Stocks are really interesting and many people invest in them
+C08,1,1,1,0,1,1,0,1,1,1,assumption,0,0,1,0,1,0,1,0,0,0,1,,,,"He is assuming the past streak will continue, but stock prices do not remember yesterday, so that assumption may be wrong."
+R19,1,1,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,it might be right since my friend also says it
+R08,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,B: Just luck.
+C22,1,1,1,0,1,1,1,1,1,1,viewpoint,0,0,1,0,0,0,0,0,0,0,1,0,0,1,"They might say a whole year is a long time, so it cannot be luck. That is a fair point, but with many pairs to look at, some will still line up by chance."
+R14,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,1,0,0,0,0,,,,A: Real trend. Why: because the stocks are expecting people to buy ..so it creates a trend
+R01,1,0,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,I'm stuck and not sure how to answer this.
+C02,1,1,1,0,1,0,0,1,0,0,none,0,0,1,0,0,0,1,0,0,0,0,,,,He means the price will keep going up because it went up before.
+C18,1,1,1,0,1,1,0,1,1,0,assumption,0,0,1,0,0,0,1,1,0,0,0,0,0,1,"Maybe a hidden third thing, like the season. In the rainy season people stay home and shop online more"
+R04,1,1,1,1,1,1,0,1,1,0,evidence,0,1,0,1,0,1,0,1,0,0,0,0,1,0,0.5 ^ 5 = 0.03
+C10,1,1,1,0,1,1,1,1,1,0,viewpoint,0,0,1,0,0,0,0,1,1,0,1,,,,"Maybe the better question is whether this stock does better than the market over many months, since one week tells us very little either way."
+C20,1,1,0,0,1,0,0,0,0,0,none,0,0,0,1,0,0,0,0,0,0,0,,,,"Yes, because they moved together for a whole year."
+R28,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,theres low chance it might go up again
+C01,1,1,1,1,1,1,1,1,1,1,evidence,0,1,1,1,0,1,1,1,1,0,1,1,1,0,"going up 5 days in a row happens about 3% of the time, so with 500 stocks about 15 would do it by chance. I could be wrong if there was real news, so I would check the news first."
+R27,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,it might go down
+R24,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,1,0,0,0,0,0,0,,,,it might not be pure luck as well since there are correlations
+C05,1,0,0,0,1,0,0,0,0,0,none,0,0,0,1,0,0,0,0,0,0,0,,,,"Because 3% but maybe, so therefore however 500 stocks."
+R09,1,0,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,because just guessing
+R06,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,A: Real pattern. Why: cause its trending
+C13,1,1,1,0,1,1,1,1,1,1,evidence,0,1,0,0,0,1,0,0,1,0,1,0,1,0,Split the data. Use the first half to find the rule and the second half to test it.
+R23,1,0,0,0,1,0,0,0,0,0,evidence,0,0,0,0,0,1,0,0,0,0,0,,,,make a model prediction and see if the new data's error loss
+R02,1,0,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,I'm stuck and not sure how to answer this.
+R11,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,"if it keeps going up, it might go down"
+R17,1,1,0,0,1,0,0,1,0,0,none,0,1,0,0,0,0,0,0,0,0,0,,,,since my friend says it goes up.. i guess go up
+R22,1,1,1,0,1,1,0,1,1,0,none,0,0,1,0,0,0,1,1,0,0,0,,,,if the stock/ company is a solar company that is affected by rain... meaning if it rains the power output is less ... if it sunny then power output is high ... hence the correlation
+R12,1,1,1,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,it might go down
+R20,1,1,0,0,1,0,0,0,0,0,assumption,0,0,0,0,0,0,0,0,0,0,0,,,,he wont lie to me
+R32,1,1,0,0,1,0,0,1,0,0,implication,0,1,0,0,0,0,1,0,0,0,0,,,,then i lose money for gambling
+R16,1,1,0,0,0,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,i will buy
+R21,1,1,1,0,1,0,0,1,1,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,it might be pure coincidence
+R35,1,1,0,0,1,0,0,0,0,0,none,0,0,0,0,0,0,0,0,0,0,0,,,,A: Real pattern. Why: i think so
+C06,1,1,0,0,1,0,0,1,0,0,none,0,1,0,0,0,0,0,1,0,0,0,,,,"It is 50%, because each day is 50% so five days is also 50%."
+C04,1,1,1,1,1,1,0,1,1,0,evidence,0,1,0,1,0,0,0,0,1,0,1,,,,"A sceptic would say the streak is just luck, and they have a point, since about 3% of stocks do this anyway."
+C11,1,1,1,1,1,1,0,1,1,0,evidence,0,1,0,1,1,0,1,1,0,0,0,0,1,0,"Because with 200 rules, one will fit the old prices by luck, like +32%, but that luck does not repeat, so on new data it drops to about +8%."
+C03,1,1,1,1,1,1,0,1,1,0,evidence,0,0,1,0,0,1,1,0,1,0,1,0,1,0,"I would check whether the same stock keeps rising on new days it has not seen yet, for example the next 20 days"
