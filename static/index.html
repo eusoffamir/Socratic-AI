@@ -176,7 +176,7 @@
   .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
   .status-inner .report-grid{gap:36px;}
   /* Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data */
-  .know .am-map svg{margin:0 auto;}  /* the page is wide, so the map is drawn larger and centred */
+  .know .am-map svg{margin:0 auto;}  /* drawn 1.17 times larger and centred, so its 11.5px box text shows at 13.5px like the page */
   .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
   .know-pick select{font:inherit; font-size:14.5px; padding:6px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--panel); color:var(--ink); max-width:100%;}
   .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
@@ -2839,7 +2839,7 @@ async function renderKnowPane(c){
   if(know.tab === 'books'){
     const map = askMapHTML(c);
     pane.innerHTML = map ? `<p class="know-intro">Each box is one piece of knowledge, and each arrow shows how two pieces link. Tap a box to see where it comes from.</p>
-      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.5)}px`)}<div id="knowSrc"></div>`
+      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`
       : '<p class="know-none">This case has no knowledge map.</p>';
     return;
   }
