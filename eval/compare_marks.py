@@ -2,12 +2,18 @@
 
 Works for human vs human (are the rules clear?) and human vs AI (is the
 Assessor a good marker?). Both files need an "id" column and the 9 standard
-columns (1 or 0), like eval/marks_template.csv. A "level" column is compared
-too if both files have it.
+columns (1 or 0), like eval/marks_template.csv. The "level" column, the 3
+reasoning types (Goal 1) and the 8 knowledge types (k_...) are compared too
+when both files have them filled in.
+
+With --graph, the first file's reasoning types are compared with the second
+file's graph_... columns instead: what plain code read from the agent's steps
+on the knowledge graph (Goal 3 step 5), so a human can check that reading.
 
 Run from the project folder:
     python eval/compare_marks.py eval/marks_amir.csv eval/marks_drho.csv
     python eval/compare_marks.py eval/marks_amir.csv eval/ai_marks_2026-10-15.csv --split test
+    python eval/compare_marks.py eval/marks_amir.csv eval/ai_marks_<version>.csv --graph
 
 If a file has several runs (a "run" column from run_assessor.py --repeats),
 run 1 is compared, and the script also shows how often all runs agreed.
@@ -25,6 +31,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from app.content import STANDARDS  # noqa: E402
+from app.knowledge import KNOWLEDGE_TYPES  # noqa: E402
+from app.reasoning import REASONING_TYPES  # noqa: E402
+
+KNOWLEDGE_COLS = [f"k_{k}" for k in KNOWLEDGE_TYPES]
 
 
 def cohen_kappa(a, b):
@@ -58,6 +68,7 @@ def main():
     ap.add_argument("first")
     ap.add_argument("second")
     ap.add_argument("--split", choices=["tune", "test"], help="only rows of this split (from eval/test_set.csv)")
+    ap.add_argument("--graph", action="store_true", help="compare reasoning types with the second file's graph reading")
     args = ap.parse_args()
 
     keep = None
@@ -68,17 +79,20 @@ def main():
     b, b_runs = load(args.second, keep)
     _, a_runs = load(args.first, keep)
 
-    print(f"{'standard':13s} {'answers':>7s} {'agree':>6s} {'kappa':>6s} {'1s first':>9s} {'1s second':>10s}")
-    for col in [*STANDARDS, "level"]:
-        ids = [i for i in a if i in b and filled(a[i], col) and filled(b[i], col)]
+    # (column in the first file, column in the second file)
+    pairs = ([(k, f"graph_{k}") for k in REASONING_TYPES] if args.graph
+             else [(c, c) for c in [*STANDARDS, "level", *REASONING_TYPES, *KNOWLEDGE_COLS]])
+    print(f"{'mark':15s} {'answers':>7s} {'agree':>6s} {'kappa':>6s} {'1s first':>9s} {'1s second':>10s}")
+    for col, col_b in pairs:
+        ids = [i for i in a if i in b and filled(a[i], col) and filled(b[i], col_b)]
         if not ids:
             continue
         x = [a[i][col].strip().lower() for i in ids]
-        y = [b[i][col].strip().lower() for i in ids]
+        y = [b[i][col_b].strip().lower() for i in ids]
         agree = sum(p == q for p, q in zip(x, y)) / len(ids)
         k = cohen_kappa(x, y)
         ones = (f"{x.count('1'):>9d} {y.count('1'):>10d}" if col != "level" else f"{'':>9s} {'':>10s}")
-        print(f"{col:13s} {len(ids):>7d} {agree:>6.0%} {('n/a' if k is None else f'{k:.2f}'):>6s} {ones}")
+        print(f"{col:15s} {len(ids):>7d} {agree:>6.0%} {('n/a' if k is None else f'{k:.2f}'):>6s} {ones}")
 
     for name, runs in [("first", a_runs), ("second", b_runs)]:
         multi = {i: rs for i, rs in runs.items() if len(rs) > 1}

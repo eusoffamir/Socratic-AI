@@ -1,4 +1,4 @@
-# Marking guide: the 9 standards and the 6 levels
+# Marking guide: the 9 standards, the 6 levels, and the reasoning and knowledge types
 
 This guide is for the **human markers** who check the Socratic AI Assessor. You do not need to be an expert in critical thinking. You only need to apply the rules below the same way every time.
 
@@ -10,7 +10,8 @@ This guide is for the **human markers** who check the Socratic AI Assessor. You 
 2. For each row, read the **question first**, then the **answer**.
 3. For each of the 9 standards, write **1** if the answer clearly shows it, or **0** if it does not.
 4. In the `level` column, write the one move the answer mainly makes (see the end of this guide).
-5. If you are unsure, write **0** and add a short note in the `note` column. Notes are useful, because they show where the rules are unclear.
+5. In the 3 reasoning columns (`inductive`, `deductive`, `abductive`) and the 8 knowledge columns (`k_factual` to `k_epistemic`), write **1** if the answer clearly uses it, or **0** if not. More than one can be 1, and all can be 0. See "The reasoning types" and "The knowledge types" below. (Added 23 October 2026 for Goal 1 and Goal 3.)
+6. If you are unsure, write **0** and add a short note in the `note` column. Notes are useful, because they show where the rules are unclear.
 
 Rules that apply to every standard:
 
@@ -94,6 +95,36 @@ Write the **one** move the answer mainly makes:
 | `implication` | says what follows if something is true | "Then buying is closer to a coin flip." |
 | `question_the_question` | asks whether this is the right question | "The better question is whether it beats the market over months." |
 | `none` | none of these, or no real answer | "idk", "i will buy" |
+
+## The reasoning types (1 or 0 each)
+
+**Status: DRAFT (23 October 2026).** These use the same meanings as the Reasoning agent (`app/reasoning.py`), so a human and the agent mark against the same rules.
+
+| Column | Write 1 when the answer... | Example |
+|---|---|---|
+| `inductive` | goes from several cases or observations to a general idea or pattern | "Most of the 200 rules failed on new data, so rules found this way usually do not last." |
+| `deductive` | goes from a rule or known fact to a conclusion for this case | "Each day is like a coin flip, so 5 ups in a row is about a 3% chance." |
+| `abductive` | goes from what was seen to the best explanation of why it happened | "They moved together probably because a hidden third thing, like the season, drives both." |
+
+- Mark what the answer **does**, not the words it uses. "I think" does not make an answer abductive.
+- A bare claim with no step from one idea to another ("it is luck") is 0 on all three.
+
+## The knowledge types (1 or 0 each)
+
+Write 1 only when the answer **uses** that kind of knowledge, not just names it.
+
+| Column | Write 1 when the answer... |
+|---|---|
+| `k_factual` | states a specific fact, number or observation ("only 3%", "15 of 500") |
+| `k_conceptual` | uses or explains what an idea or term means ("overfitting is learning the noise") |
+| `k_procedural` | describes steps or a method to do or check something ("split the data, then test") |
+| `k_causal` | says why something happens, that one thing makes another happen |
+| `k_relational` | links two or more things, such as how one changes when another changes |
+| `k_strategic` | chooses what to do next, given the situation ("I would wait for new data before buying") |
+| `k_metacognitive` | reflects on how they know, or on their own thinking ("I assumed too fast") |
+| `k_epistemic` | judges how strong the evidence is, or what is justified to believe ("one streak is weak proof") |
+
+**Checking the graph reading (Goal 3, step 5).** The AI also names the steps of each answer as moves between boxes of the map of the ideas, and plain code turns those moves into reasoning types (`graph_inductive` and so on in the AI file). Your 3 reasoning columns are the human check for that too, so there is nothing extra to mark. Run `python eval/compare_marks.py eval/marks_<your name>.csv eval/ai_marks_<version>.csv --graph` to compare.
 
 ## Case notes (for checking Accuracy)
 
