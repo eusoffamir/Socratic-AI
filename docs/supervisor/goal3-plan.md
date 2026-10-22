@@ -34,11 +34,32 @@ The Reasoning agent (Goal 1) already labels each answer as inductive, deductive 
 |---|---|---|
 | 1 | This plan | Done 22 October 2026 |
 | 2 | Decision trees: one rule-of-thumb tree per quant case, with a walk function (the deductive move) | Done 22 October 2026 |
-| 3 | A Bayesian network per case, learned by counting over simulated data (the inductive move) and asked backwards (the abductive move) | Next |
-| 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | |
+| 3 | A Bayesian network per case, learned by counting over simulated data (the inductive move) and asked backwards (the abductive move) | Done 22 October 2026 |
+| 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Next |
 | 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | |
 | 6 | A Knowledge panel on the page that shows the three forms | |
 | 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | |
+
+### What the networks learned (step 3, `app/pgm.py`)
+
+Each network has 3 true or false nodes and learns its chances by counting over simulated data (20,000 stocks, 20,000 rules, 3,650 days of weather). The numbers below are what the networks give.
+
+| Case | Question asked of the network | Move | Answer |
+|---|---|---|---|
+| Pattern or luck | How often does a stock with no pattern go up 5 days in a row? | Inductive | 3% |
+| Pattern or luck | Chance the pattern is real, before seeing anything | Abductive | 2% |
+| Pattern or luck | Chance it is real, after a 5-day streak | Abductive | 18% |
+| Pattern or luck | Chance it is real, after the streak and a repeat in the next week | Abductive | 46% |
+| Will it work again? | Chance a rule with no edge makes more than 15% on old data | Inductive | 7% |
+| Will it work again? | Chance the rule is real, after a great old result | Abductive | 30% |
+| Will it work again? | Chance it is real, after a great old result and a win on new data | Abductive | 45% |
+| Will it work again? | Chance it is real, after a great old result and a loss on new data | Abductive | 4% |
+| Moving together | Chance of many sunburns on any day | Inductive | 27% |
+| Moving together | Chance of many sunburns when ice cream sales are high | Inductive | 47% |
+| Moving together | Chance of many sunburns on a hot day, with or without high ice cream sales | Deductive | 69% |
+| Moving together | Chance the day is hot, given high ice cream sales and many sunburns | Abductive | 93% |
+
+The last case shows the hidden 3rd thing in numbers. Ice cream and sunburns move together, but once the weather is known, ice cream adds nothing.
 
 ## 4. Choices made
 
