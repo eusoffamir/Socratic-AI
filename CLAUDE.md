@@ -70,7 +70,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 1. Goal 1 is built (21 October 2026). Next, Dr Ho checks the drafts (see `docs/supervisor/goal1-summary.md`), then check the Reasoning agent against a human marker.
 1. Goal 2 (any topic) is built (21 October 2026, see history file "Goal 2"). Next, try many topics on Gemini, tighten the Builder prompts from what goes wrong, and show Dr Ho.
-1. Goal 3 started 22 October 2026 (Dr Ho planned it for next semester). Steps 1 to 5 are done (plan, decision trees, Bayesian networks, sources and quotes, reasoning as graph moves; all plain Python; Wikipedia stands in for a quant book, since Dr Ho could not name one). Next is step 6, a Knowledge panel on the page. Steps in `docs/supervisor/goal3-plan.md`.
+1. Goal 3 started 22 October 2026 (Dr Ho planned it for next semester). Steps 1 to 5 are done (plan, decision trees, Bayesian networks, sources and quotes, reasoning as graph moves; all plain Python; Wikipedia stands in for a quant book, since Dr Ho could not name one). Step 6 is done too (a Knowledge page from the sidebar). Next is step 7, the Builder drafts trees and networks for any topic. Steps in `docs/supervisor/goal3-plan.md`.
 2. Improve prompts from real transcripts, keep every transcript.
 3. Real quant reading with Dr Ho, then simple RAG.
 4. Evaluation in FYP2 (R1 to R9, Assessor against human markers).

@@ -37,8 +37,8 @@ The Reasoning agent (Goal 1) already labels each answer as inductive, deductive 
 | 3 | A Bayesian network per case, learned by counting over simulated data (the inductive move) and asked backwards (the abductive move) | Done 22 October 2026 |
 | 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Done 22 October 2026 |
 | 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | Done 22 October 2026 |
-| 6 | A Knowledge panel on the page that shows the three forms | Next |
-| 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | |
+| 6 | A Knowledge page that shows the three forms | Done 22 October 2026 |
+| 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | Next |
 
 ### What the networks learned (step 3, `app/pgm.py`)
 
@@ -84,6 +84,16 @@ The Reasoning agent, still in the same single AI call as the Assessor, now also 
 So each answer now has two labels for its reasoning type: the agent's own judgement, and the one an algorithm reads from the graph. Where they differ is worth a look by a human marker.
 
 A first test on Gemini (22 October 2026) used 6 sample answers. In 5 of them the steps landed on graph links, and there the two labels agreed 4 of 5 times for deductive, 4 of 5 for abductive and 3 of 5 for inductive. Two answers that reasoned from counted data ("15 of 500 stocks", "lots of random pairs") were read as inductive by the graph but only as deductive by the agent, and the graph reading looks arguably right. Jumps showed links the graphs are missing, such as from "many tries" to "a streak is not proof", so the reading also shows where a graph needs another link.
+
+### The Knowledge page (step 6)
+
+A new sidebar item, **Knowledge**, opens its own page, so the chat and its Status panel do not change. The learner picks a case (the 3 quant cases, plus any case on their own topic in the open chat) and sees three tabs.
+
+- **From books:** the knowledge map. Tapping a box shows where it comes from, such as the exact Wikipedia quote with a link, a simulation, a rule of thumb or the case story.
+- **Rules of thumb:** the expert's yes or no questions. The learner answers one at a time until a decision is reached, which also shows the idea it rests on.
+- **From data:** the Bayesian network as a small picture, the chances it learned as bars, each marked inductive, deductive or abductive, and one sentence that sums them up.
+
+For a learner's own topic, only "From books" has content until step 7. The graph moves from step 5 are not shown to learners yet, because they need checking against a human marker first.
 
 ## 4. Choices made
 

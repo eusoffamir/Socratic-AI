@@ -167,6 +167,44 @@
   .status-inner .report h2{margin:12px 0 14px; line-height:1.3;}
   .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
   .status-inner .report-grid{gap:36px;}
+  /* Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data */
+  .know{max-width:880px;}
+  .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
+  .know-pick select{font:inherit; font-size:14.5px; padding:6px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--panel); color:var(--ink); max-width:100%;}
+  .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
+  .know-tabs button{background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:8px 12px; margin-bottom:-1px; color:var(--ink-soft); font-size:14.5px;}
+  .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
+  .know-intro, .know-none{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 16px;}
+  .know-quote, .know-lesson{font-size:14.5px; line-height:1.6; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:12px 14px;}
+  .know-quote .mono-label{margin-right:8px;}
+  .know-quote blockquote{margin:8px 0 0; padding-left:12px; border-left:3px solid var(--signal); color:var(--ink-soft); font-style:italic;}
+  .know-lesson{margin-top:18px; background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 25%, transparent);}
+  .know-tree{list-style:none; padding:0; margin:0 0 14px;}
+  .know-tree li{border:1px solid var(--rule); border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--panel);}
+  .know-tree li p{margin:0; font-size:15px; line-height:1.5;}
+  .know-tree li.done p{color:var(--ink-soft);}
+  .know-tree .know-ans{display:inline-block; margin-top:6px; font-size:12.5px; padding:2px 10px; border-radius:999px; background:var(--signal-soft); color:var(--signal);}
+  .know-tree .row{display:flex; gap:8px; margin-top:10px;}
+  .know-tree .row button{padding:6px 20px; border-radius:999px;}
+  .know-tree li.end{border-color:var(--signal); background:var(--signal-soft);}
+  .know-tree .why{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
+  .know-tree .why .mono-label{margin-right:8px;}
+  .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px;}
+  .know-net svg{display:block; width:100%; max-width:470px; height:auto; margin:0 auto 18px;}
+  .know-net rect{fill:var(--panel); stroke:var(--signal); stroke-width:1.5;}
+  .know-net text{font-size:12px; fill:var(--ink);}
+  .know-net .ed{stroke:var(--ink-faint); stroke-width:1.3; fill:none;}
+  .know-net .rel{font-size:10.5px; fill:var(--ink-faint); paint-order:stroke; stroke:var(--paper); stroke-width:5px;}  /* a halo, so the word stays clear of the arrow */
+  .know-quote a{color:var(--signal);}
+  .know-bar{display:grid; grid-template-columns:minmax(0, 1fr) 84px 150px 44px; gap:12px; align-items:center; padding:9px 0; border-bottom:1px solid var(--rule); font-size:14px;}
+  .know-bar .mv{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint);}
+  .know-bar .track{height:10px; background:var(--rule); border-radius:999px; overflow:hidden;}
+  .know-bar .track i{display:block; height:100%; background:var(--signal); border-radius:999px;}
+  .know-bar b{text-align:right; font-variant-numeric:tabular-nums;}
+  @media (max-width:700px){
+    .know-bar{grid-template-columns:auto minmax(0, 1fr) 44px;}
+    .know-bar .lab{grid-column:1 / -1;}
+  }
   /* Overall status: levels, standards and the Coach side by side, like the chat's Status panel */
   .report-grid.ov-three{grid-template-columns:minmax(0, .95fr) minmax(0, 1fr) minmax(0, 1fr);}
   .ov-three > div:nth-child(2){padding-left:28px;}  /* the standards sit a little to the right */
@@ -1121,6 +1159,7 @@
   <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4v16" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 5.5 4.5 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-stats" viewBox="0 0 24 24"><path d="M12 2.5 20.5 7.3v9.4L12 21.5 3.5 16.7V7.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5 16.5 10l-1.6 6.2-4.9-.9L7.8 10.3z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="8" r="2.6"/><circle cx="9" cy="18" r="2.6"/><path d="M8.5 6.6 15.4 7.6M7 8.5l1.3 7M16.4 10.2l-5.6 6"/></g></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="currentColor"/></symbol>
 </svg>
 
@@ -1140,6 +1179,7 @@
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
     <button class="sn-item" id="homeBtn" title="Home" aria-current="page"><svg><use href="#i-home"/></svg><span>Home</span></button>
     <button class="sn-item" id="overallBtn" title="My overall status"><svg><use href="#i-stats"/></svg><span>Overall status</span></button>
+    <button class="sn-item" id="knowBtn" title="How the knowledge fits"><svg><use href="#i-graph"/></svg><span>Knowledge</span></button>
     <div class="sn-label">Recents</div>
     <div class="sn-recents" id="recents"></div>
     <div class="sn-foot">
@@ -1207,6 +1247,10 @@
 
   <div class="status-main hidden" id="statusMain">
     <div class="status-scroll"><div class="status-inner" id="overallBody"></div></div>
+  </div>
+
+  <div class="status-main hidden" id="knowMain">
+    <div class="status-scroll"><div class="status-inner" id="knowBody"></div></div>
   </div>
 
   <div class="ask-main empty hidden" id="askMain">
@@ -1838,7 +1882,7 @@ const askViewing = () => ask.chatId || ask.pendKey;
 function askCtx(){ return {gen: ask.gen, chatId: ask.chatId, rounds: ask.rounds, ab: !!ask.ab, request: ask.request}; }
 
 // The pages beside the sidebar: Home, the Ask chat and Overall status.
-const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain'};
+const PAGES = {home: '#homeView .home-main', ask: '#askMain', status: '#statusMain', knowledge: '#knowMain'};
 // Browser back and forward: each page (and each chat) is one history step.
 // navRestoring is on while a back or forward press redraws a page, so it adds no new step.
 let navRestoring = false;
@@ -1857,6 +1901,7 @@ function showPage(name){
   const mark = (id, on) => on ? $(id).setAttribute('aria-current', 'page') : $(id).removeAttribute('aria-current');
   mark('homeBtn', name === 'home');
   mark('overallBtn', name === 'status');
+  mark('knowBtn', name === 'knowledge');
   mark('askBtn', name === 'ask' && !ask.sid);
   renderRecents();
   $('homeView').classList.remove('nav-open');  // phones: close the drawer
@@ -2724,6 +2769,134 @@ async function openOverall(){
 }
 
 $('overallBtn').addEventListener('click', openOverall);
+
+// ---------- Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data ----------
+const know = {id: null, tab: 'books', views: {}, answers: {}};
+const KNOW_TABS = [['books', 'From books'], ['rules', 'Rules of thumb'], ['data', 'From data']];
+const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
+// the 3 quant cases, then the cases on the learner's own topic in the open chat
+function knowCases(){
+  const mine = ask.cases.filter(c => c.generated);
+  return [...quantCases, ...mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i)];
+}
+function openKnowledge(){
+  showPage('knowledge');
+  const cases = knowCases(), last = ask.cases[ask.cases.length - 1];
+  if(last) know.id = last.id;  // the case the open chat is on
+  if(!cases.some(c => c.id === know.id)) know.id = (cases[0] || {}).id;
+  renderKnowledge();
+}
+function renderKnowledge(){
+  const cases = knowCases(), c = cases.find(x => x.id === know.id), body = $('knowBody');
+  if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
+  body.innerHTML = `<div class="report know">
+    <h2>How the knowledge fits</h2>
+    <p class="lead">Knowledge comes from books, from the rules of thumb experts use, and from data. Here you can see all three for one case.</p>
+    <label class="know-pick"><span class="mono-label">Case</span><select id="knowCase">${cases.map(x =>
+      `<option value="${esc(x.id)}"${x.id === c.id ? ' selected' : ''}>${esc(x.title)}${x.generated ? ' (your topic)' : ''}</option>`).join('')}</select></label>
+    <div class="know-tabs" role="tablist">${KNOW_TABS.map(([k, name]) =>
+      `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === know.tab}">${name}</button>`).join('')}</div>
+    <div id="knowPane" role="tabpanel"></div></div>`;
+  renderKnowPane(c);
+}
+async function renderKnowPane(c){
+  const pane = $('knowPane');
+  if(know.tab === 'books'){
+    const map = askMapHTML(c);
+    pane.innerHTML = map ? `<p class="know-intro">Each box is one piece of knowledge, and each arrow shows how two pieces link. Tap a box to see where it comes from.</p>
+      ${map.replace('Tap a box to read it.', '')}<div id="knowSrc"></div>` : '<p class="know-none">This case has no knowledge map.</p>';
+    return;
+  }
+  if(c.generated){
+    pane.innerHTML = `<p class="know-none">Only the built-in quant topic has ${know.tab === 'rules' ? 'rules of thumb' : 'a model learned from data'} so far. For your own topics, it comes later.</p>`;
+    return;
+  }
+  if(!know.views[c.id]){
+    pane.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
+    try { know.views[c.id] = await api(`/api/knowledge/${encodeURIComponent(c.id)}`); }
+    catch(e){ pane.innerHTML = ''; note('error', e.message, pane); return; }
+    if(know.id === c.id && $('knowPane')) renderKnowPane(c);
+    return;
+  }
+  const v = know.views[c.id];
+  pane.innerHTML = know.tab === 'rules' ? knowTreeHTML(v.tree, know.answers[c.id] || {}) : knowNetHTML(v.network);
+}
+// The decision tree, walked one answer at a time. Reaching a decision is deductive reasoning.
+function knowTreeHTML(t, answers){
+  const nodes = Object.fromEntries(t.nodes.map(n => [n.id, n])), done = [];
+  let at = t.root;
+  while(nodes[at].kind === 'question' && answers[at]){
+    const next = t.edges.find(([a, ans]) => a === at && ans === answers[at]);
+    if(!next) break;
+    done.push(`<li class="done"><p>${esc(nodes[at].text)}</p><span class="know-ans">${esc(capFirst(answers[at]))}</span></li>`);
+    at = next[2];
+  }
+  const n = nodes[at];
+  const now = n.kind === 'question'
+    ? `<li><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
+        `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
+    : `<li class="end"><p><b>${esc(n.text)}</b></p>${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</li>`;
+  return `<p class="know-intro">These are the questions an expert asks, one after another. Answer each one to see where it leads. Following fixed rules to a decision like this is deductive reasoning.</p>
+    <ol class="know-tree">${done.join('')}${now}</ol>
+    ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
+}
+// The Bayesian network: causes on top, what they cause below, then the chances it learned.
+function knowNetHTML(v){
+  const tops = v.nodes.filter(n => !n.parents.length), lows = v.nodes.filter(n => n.parents.length);
+  const W = 200, H = 50, GAP = 36, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
+  [tops, lows].forEach((row, r) => row.forEach((n, i) => {
+    pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * 116};
+  }));
+  const lines = v.edges.map(([a, rel, b]) => {
+    const p = pos[a], q = pos[b], x1 = p.x + W / 2, y1 = p.y + H, x2 = q.x + W / 2, y2 = q.y - 2;
+    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 34} ${x2} ${y2 - 34} ${x2} ${y2}" marker-end="url(#netArrow)"/>
+      <text class="rel" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${(y1 + y2) / 2 + 4}" text-anchor="${x2 > x1 ? 'start' : 'end'}">${esc(rel)}</text>`;
+  }).join('');
+  const boxes = v.nodes.map(n => {
+    const {x, y} = pos[n.id], label = wrap2(n.text.replace(/\.$/, ''), 26);
+    return `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
+      `<text x="${x + W / 2}" y="${y + (label.length === 1 ? 29 : 21 + k * 15)}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
+  }).join('');
+  const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
+    <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
+  return `<div class="know-net"><p class="know-intro">This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.</p>
+    <svg viewBox="0 0 ${width} ${4 + 116 + H + 4}" aria-label="What causes what in this case">
+      <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg>
+    <span class="mono-label">The chance that</span>${bars}
+    <div class="know-lesson">${esc(v.lesson)}</div></div>`;
+}
+// Where one box of the map comes from: a book quote, a simulation, a rule of thumb or the case story.
+function knowSourceHTML(c, n){
+  const s = n.source || (n.quote ? {kind: 'book', title: n.from || '', quote: n.quote} : null);
+  const line = (label, text) => `<div class="know-quote"><span class="mono-label">${label}</span>${esc(text)}</div>`;
+  if(!s) return line('No source', 'No exact quote was found for this one, so check it yourself.');
+  if(s.kind === 'data') return line('From data', 'This number was counted by a simulation of this case.');
+  if(s.kind === 'heuristic') return line('From a rule of thumb', 'This is one of the decisions in the Rules of thumb tab.');
+  if(s.kind === 'case') return line('From the case', 'This comes from the case story itself.');
+  const art = ((c.source || {}).articles || []).find(a => a.title === s.title), url = s.url || (art && art.url);
+  const where = s.title ? (url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Wikipedia, ${esc(s.title)}</a>` : `Wikipedia, ${esc(s.title)}`)
+    : (c.source || {}).kind === 'file' ? `Your file, ${esc(c.source.name)}` : 'Your own reading';
+  return `<div class="know-quote"><span class="mono-label">From a book</span>${where}<blockquote>"${esc(s.quote)}"</blockquote></div>`;
+}
+$('knowBtn').addEventListener('click', openKnowledge);
+$('knowBody').addEventListener('change', e => {
+  if(e.target.id === 'knowCase'){ know.id = e.target.value; renderKnowledge(); }
+});
+$('knowBody').addEventListener('click', e => {
+  const c = knowCases().find(x => x.id === know.id);
+  const tab = e.target.closest('[data-tab]');
+  if(tab){ know.tab = tab.dataset.tab; renderKnowledge(); return; }
+  const nd = e.target.closest('.am-map .nd');
+  if(nd && c){ mapPick(nd); $('knowSrc').innerHTML = knowSourceHTML(c, c.knowledge.nodes[Number(nd.dataset.i)] || {}); return; }
+  const ans = e.target.closest('[data-ans]');
+  if(ans && c){ know.answers[c.id] = {...(know.answers[c.id] || {}), [ans.dataset.q]: ans.dataset.ans}; renderKnowPane(c); return; }
+  if(e.target.closest('[data-restart]') && c){ know.answers[c.id] = {}; renderKnowPane(c); }
+});
+$('knowBody').addEventListener('keydown', e => {
+  const nd = e.target.closest('.am-map .nd');
+  if(nd && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); nd.dispatchEvent(new MouseEvent('click', {bubbles: true})); }
+});
 $('overallBody').addEventListener('click', e => {
   const b = e.target.closest('[data-open-chat]');
   if(b) askOpen(b.dataset.openChat);
@@ -4111,6 +4284,7 @@ addEventListener('popstate', e => {
   navRestoring = true;
   try {
     if(s.page === 'status') openOverall();
+    else if(s.page === 'knowledge') openKnowledge();
     else if(s.page === 'home') showPage('home');
     else if(s.chat && askChats().some(x => x.id === s.chat)) askOpen(s.chat);
     else { askReset(); showPage('ask'); }

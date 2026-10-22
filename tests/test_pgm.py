@@ -58,3 +58,15 @@ def test_graph_has_the_shared_shape():
     streak = next(n for n in g["nodes"] if n["id"] == "streak")
     assert streak["parents"] == ["real"] and len(streak["chances"]) == 2
     assert all(n["text"].endswith(".") for n in g["nodes"])
+
+
+def test_knowledge_page_gets_the_tree_and_the_network():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    client = TestClient(app)
+    body = client.get("/api/knowledge/pattern_or_luck").json()
+    assert body["tree"]["root"] == "q_beats_luck"
+    assert all("why_text" in n for n in body["tree"]["nodes"])
+    assert body["network"]["counted"] and body["network"]["lesson"]
+    assert all(f["label"] and 0 <= f["percent"] <= 100 for f in body["network"]["findings"])
+    assert client.get("/api/knowledge/t0123456789-1").status_code == 404

@@ -17,7 +17,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import builder, copycheck, files, explainer, graph, knowledge, limits, llm_client, orchestrator, skillcheck, stats, storage, tutorial
+from . import (builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
+               skillcheck, stats, storage, tutorial)
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
 
@@ -236,6 +237,16 @@ def list_concepts():
     return [{"id": k, "title": v["title"], "mission": v["mission"], "scenario": v["scenario"], "tag": v["tag"],
              "reading": v["reading"], "knowledge": knowledge.graph(k)}  # the graph for the Ask chat's diagram
             for k, v in CONCEPTS.items()]
+
+
+@app.get("/api/knowledge/{case_id}")
+def knowledge_view(case_id: str):
+    """Goal 3: the rules of thumb (decision tree) and the data model (Bayesian
+    network) of a built-in case, for the Knowledge page. The book graph comes
+    with /api/concepts. Generated topics do not have these yet (step 7)."""
+    if case_id not in CONCEPTS:
+        raise HTTPException(404, "Only the built-in quant cases have rules of thumb and a data model so far.")
+    return {"tree": heuristics.view(case_id), "network": pgm.view(case_id)}
 
 
 @app.post("/api/topic")

@@ -109,6 +109,15 @@ def case_tree(case):
     return case.get("heuristics") or TREES[case["id"]]
 
 
+def view(case):
+    """The tree for the Knowledge page, with the text of the knowledge node each node rests on."""
+    from .knowledge import case_graph, node_text  # late import, knowledge imports nothing from here
+    tree = case_tree(case)
+    texts = {n["id"]: node_text(case, n) for n in case_graph(case)["nodes"]}
+    return {"root": tree["root"], "edges": [list(e) for e in tree["edges"]],
+            "nodes": [{**n, "why_text": texts.get(n.get("why"), "")} for n in tree["nodes"]]}
+
+
 def branches(tree, node_id):
     """The answers out of a node, as {answer: next node id}."""
     return {answer: b for a, answer, b in tree["edges"] if a == node_id}

@@ -67,7 +67,8 @@ def _weather_data(rows=3650, hot_share=0.3):
     return data
 
 
-# "asks" are the questions worth putting to each network, with the move they show.
+# "asks" are the questions worth putting to each network, with the move they show
+# and a label for the page, read as "the chance that <label>". "lesson" sums them up.
 NETWORKS = {
     "pattern_or_luck": {
         "data": _streak_data,
@@ -77,12 +78,17 @@ NETWORKS = {
             {"id": "repeats", "why": "check_repeat", "text": "It went up on at least 4 of the next 5 days."},
         ],
         "edges": [["real", "causes", "streak"], ["real", "causes", "repeats"]],
+        "counted": "20,000 simulated stocks",
         "asks": [
-            {"move": "inductive", "target": "streak", "given": {"real": False}},
-            {"move": "abductive", "target": "real", "given": {}},
-            {"move": "abductive", "target": "real", "given": {"streak": True}},
-            {"move": "abductive", "target": "real", "given": {"streak": True, "repeats": True}},
+            {"move": "inductive", "target": "streak", "given": {"real": False},
+             "label": "a stock with no pattern goes up 5 days in a row"},
+            {"move": "abductive", "target": "real", "given": {}, "label": "the pattern is real, before seeing anything"},
+            {"move": "abductive", "target": "real", "given": {"streak": True},
+             "label": "the pattern is real, after a 5-day streak"},
+            {"move": "abductive", "target": "real", "given": {"streak": True, "repeats": True},
+             "label": "the pattern is real, after the streak and a good next week"},
         ],
+        "lesson": "A streak alone is weak evidence, but a good next week makes a real pattern much more likely.",
     },
     "holds_on_new_data": {
         "data": _rule_data,
@@ -92,12 +98,18 @@ NETWORKS = {
             {"id": "wins_new", "why": "new_data_proof", "text": "It made money on new data."},
         ],
         "edges": [["edge", "causes", "great_old"], ["edge", "causes", "wins_new"]],
+        "counted": "20,000 simulated trading rules",
         "asks": [
-            {"move": "inductive", "target": "great_old", "given": {"edge": False}},
-            {"move": "abductive", "target": "edge", "given": {"great_old": True}},
-            {"move": "abductive", "target": "edge", "given": {"great_old": True, "wins_new": True}},
-            {"move": "abductive", "target": "edge", "given": {"great_old": True, "wins_new": False}},
+            {"move": "inductive", "target": "great_old", "given": {"edge": False},
+             "label": "a rule with no edge makes more than 15% on old data"},
+            {"move": "abductive", "target": "edge", "given": {"great_old": True},
+             "label": "the rule is real, after more than 15% on old data"},
+            {"move": "abductive", "target": "edge", "given": {"great_old": True, "wins_new": True},
+             "label": "the rule is real, after that and a win on new data"},
+            {"move": "abductive", "target": "edge", "given": {"great_old": True, "wins_new": False},
+             "label": "the rule is real, after that and a loss on new data"},
         ],
+        "lesson": "A great result on old data says little, but new data says much more.",
     },
     "together_not_cause": {
         "data": _weather_data,
@@ -107,13 +119,19 @@ NETWORKS = {
             {"id": "sunburn", "why": "ice_cream", "text": "Many people get sunburnt."},
         ],
         "edges": [["hot", "causes", "ice_cream"], ["hot", "causes", "sunburn"]],
+        "counted": "3,650 simulated days",
         "asks": [
-            {"move": "inductive", "target": "sunburn", "given": {}},
-            {"move": "inductive", "target": "sunburn", "given": {"ice_cream": True}},
-            {"move": "deductive", "target": "sunburn", "given": {"ice_cream": True, "hot": True}},
-            {"move": "deductive", "target": "sunburn", "given": {"hot": True}},
-            {"move": "abductive", "target": "hot", "given": {"ice_cream": True, "sunburn": True}},
+            {"move": "inductive", "target": "sunburn", "given": {}, "label": "many people get sunburnt, on any day"},
+            {"move": "inductive", "target": "sunburn", "given": {"ice_cream": True},
+             "label": "many people get sunburnt, when ice cream sales are high"},
+            {"move": "deductive", "target": "sunburn", "given": {"ice_cream": True, "hot": True},
+             "label": "many people get sunburnt, on a hot day with high ice cream sales"},
+            {"move": "deductive", "target": "sunburn", "given": {"hot": True},
+             "label": "many people get sunburnt, on a hot day"},
+            {"move": "abductive", "target": "hot", "given": {"ice_cream": True, "sunburn": True},
+             "label": "the day is hot, given high ice cream sales and many sunburns"},
         ],
+        "lesson": "Ice cream and sunburns move together, but once you know the day is hot, ice cream adds nothing, so the heat is the hidden cause.",
     },
 }
 
@@ -190,6 +208,12 @@ def findings(case_id):
     net, table = NETWORKS[case_id], model(case_id)
     return [{**ask, "percent": round(100 * chance(net, table, ask["target"], ask["given"]))}
             for ask in net["asks"]]
+
+
+def view(case_id):
+    """Everything the Knowledge page shows for one network."""
+    net = NETWORKS[case_id]
+    return {**graph(case_id), "counted": net["counted"], "lesson": net["lesson"], "findings": findings(case_id)}
 
 
 def graph(case_id):
