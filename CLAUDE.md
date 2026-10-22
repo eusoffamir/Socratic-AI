@@ -26,6 +26,7 @@ Eusoff works from his PC, his laptop and his phone (Claude Code cloud sessions).
   - `app/env.py` skips encrypted values when the app runs without dotenvx, so Render keeps using its dashboard values and defaults.
 - Not synced, set up by hand per device: `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
 - **Cloud sessions (phone or claude.ai/code):** none of the private files are there. Without `DOTENV_PRIVATE_KEY` in the cloud environment, run tests and servers with `PROVIDER=mock`. Ask Eusoff before work that needs the live database or the private docs.
+- **Phone and cloud sessions** (Claude app or claude.ai/code) usually work on their own branch (for example `claude/...`) and open a pull request, instead of pushing to `main`. That is fine: phone changes are untested, so they should not redeploy Render before Eusoff checks them. At the end of a cloud session, say clearly which branch and pull request to look at. Back on the PC or laptop, Eusoff tests the branch, merges the pull request on GitHub, then runs `git pull`.
 - If `git` is not found, use `& "C:\Program Files\Git\cmd\git.exe"`.
 
 ## Saving tokens (rules for Claude)
