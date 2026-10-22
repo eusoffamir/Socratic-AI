@@ -10,14 +10,17 @@ Short version. Full history, details, audits and dated findings are in `docs/pro
 - Work one step at a time, explain in plain words, ask before large new features.
 - Be honest about uncertainty. Never invent citations.
 
-## Two laptops: keep in sync (IMPORTANT)
+## Three devices: keep in sync (IMPORTANT)
+
+Eusoff works from his PC, his laptop and his phone (Claude Code cloud sessions). GitHub is the single source of truth.
 
 - **Start of every chat:** `git pull`. If it fails or conflicts, stop and explain.
 - **After every finished, tested change:** commit and `git push` without asking, and say so (a push redeploys Render). Never force push.
 - A commit that only changes docs or the thesis gets `[skip render]` in its message, so Render does not rebuild and restart the app.
 - Render free plan sleeps after 15 minutes idle. A cron-job.org job ("Socratic AI wake", Eusoff's account) pings `/api/health` every 10 minutes to keep it awake. A "Service waking up" page right after a push is the redeploy, not a broken ping.
 - Project knowledge goes in this file or `docs/project-history.md`, not only in Claude's memory.
-- Not synced, set up by hand per laptop: `.env`, `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
+- Not synced, set up by hand per device: `.env`, `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
+- **Cloud sessions (phone or claude.ai/code):** there is no `.env` and none of the private files, so run tests and servers with `PROVIDER=mock`. Ask Eusoff before work that needs a real Gemini key, the live database or the private docs.
 - If `git` is not found, use `& "C:\Program Files\Git\cmd\git.exe"`.
 
 ## Saving tokens (rules for Claude)
