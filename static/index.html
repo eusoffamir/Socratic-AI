@@ -2218,7 +2218,7 @@ function askMapHTML(c){
     return `<g class="nd" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="9" stroke="${color}"/>
       <rect x="${x}" y="${y}" width="5" height="${H}" rx="2" fill="${color}" stroke="none"/>
-      ${label.map((l, k) => `<text x="${x + 14}" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
+      ${label.map((l, k) => `<text x="${x + W / 2 + 2}" text-anchor="middle" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
   }).join('');
   const types = [...new Set(nodes.map(n => n.type))];
   return `<div class="am-map" data-texts="${esc(JSON.stringify(nodes.map(n => `${n.type}. ${n.text}`)))}">
