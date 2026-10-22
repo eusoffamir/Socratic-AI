@@ -2143,26 +2143,76 @@ function askMapHTML(c){
   const g = c.knowledge;
   if(!g || !(g.nodes || []).length) return '';
   const nodes = g.nodes.map(n => ({...n, text: n.text || (c.notes || [])[n.note] || ''}));
-  const ids = new Set(nodes.map(n => n.id)), edges = (g.edges || []).filter(([a, , b]) => ids.has(a) && ids.has(b));
+  const ids = new Set(nodes.map(n => n.id)), seen = {}, edges = [];
+  for(const [a, rel, b] of g.edges || []){  // one arrow per pair, so two links between the same boxes do not sit on top of each other
+    if(!ids.has(a) || !ids.has(b) || a === b) continue;
+    const k = a + '>' + b;
+    if(seen[k]) seen[k][1] += ', ' + rel; else edges.push(seen[k] = [a, rel, b]);
+  }
   const depth = Object.fromEntries(nodes.map(n => [n.id, 0]));
   for(let k = 0; k < nodes.length; k++)  // longest path from a start; a loop stops after nodes.length rounds
     for(const [a, , b] of edges) if(depth[b] < depth[a] + 1) depth[b] = Math.min(depth[a] + 1, 4);
   const cols = [];
   nodes.forEach(n => (cols[depth[n.id]] = cols[depth[n.id]] || []).push(n));
-  const W = 136, H = 42, CX = 172, RY = 56, used = cols.filter(Boolean);
+  const W = 136, H = 42, CX = 172, RY = 60, PAD = 14, used = cols.filter(Boolean);
   const rows = Math.max(...used.map(col => col.length));
   const pos = {};
-  used.forEach((col, x) => col.forEach((n, y) => {
-    pos[n.id] = {x: 8 + x * CX, y: 8 + y * RY + (rows - col.length) * RY / 2};
+  const place = () => used.forEach((col, x) => col.forEach((n, y) => {
+    pos[n.id] = {x: 8 + x * CX, y: PAD + y * RY + (rows - col.length) * RY / 2, c: x};
   }));
-  const width = 16 + (used.length - 1) * CX + W, height = 16 + (rows - 1) * RY + H;
+  place();
+  for(let pass = 0; pass < 2; pass++){  // order each column by where its links come from, so fewer lines cross
+    used.forEach((col, x) => {
+      if(!x) return;
+      const at = n => { const ys = edges.filter(([a, , b]) => b === n.id && pos[a].c < x).map(([a]) => pos[a].y);
+                        return ys.length ? ys.reduce((s, v) => s + v, 0) / ys.length : pos[n.id].y; };
+      const key = new Map(col.map(n => [n, at(n)]));
+      col.sort((m, n) => key.get(m) - key.get(n));
+    });
+    place();
+  }
+  let width = 16 + (used.length - 1) * CX + W;
+  const height = 2 * PAD + (rows - 1) * RY + H;
+  // where an arrow leaves or joins a box: spread along the side when a box has several
+  const port = {};
+  const spread = (list, side) => {
+    list.sort((e, f) => e.o - f.o).forEach((e, i) => { e[side] = (i - (list.length - 1) / 2) * Math.min(10, (H - 12) / Math.max(1, list.length - 1)); });
+  };
+  const fwd = edges.map(([a, rel, b]) => ({a, rel, b})).filter(e => pos[e.b].c > pos[e.a].c);
+  nodes.forEach(n => {
+    spread(fwd.filter(e => e.a === n.id).map(e => Object.assign(e, {o: pos[e.b].y})), 'dy1');
+    spread(fwd.filter(e => e.b === n.id).map(e => Object.assign(e, {o: pos[e.a].y})), 'dy2');
+  });
+  // a line that skips a column runs through the nearest gap between that column's boxes, not behind a box
+  const lane = (c1, c2, y1, y2) => {
+    const mids = used.slice(c1 + 1, c2).map(col => col.map(n => pos[n.id].y));
+    const free = y => mids.every(ys => ys.every(by => y < by - 5 || y > by + H + 5));
+    const tries = [y1, y2, (y1 + y2) / 2, PAD / 2, height - PAD / 2];
+    mids.flat().forEach(by => tries.push(by - (RY - H) / 2, by + H + (RY - H) / 2));
+    return tries.filter(free).sort((u, v) => Math.abs(u - y1) + Math.abs(u - y2) - Math.abs(v - y1) - Math.abs(v - y2))[0] ?? (y1 + y2) / 2;
+  };
+  let loops = false;
   const lines = edges.map(([a, rel, b]) => {
-    const p = pos[a], q = pos[b];
-    const x1 = p.x + W, y1 = p.y + H / 2, x2 = q.x, y2 = q.y + H / 2;
-    const d = x2 > x1 ? `M${x1} ${y1} C${x1 + 30} ${y1} ${x2 - 30} ${y2} ${x2 - 2} ${y2}`
-                      : `M${p.x + W / 2} ${p.y + H} C${p.x + W / 2} ${p.y + H + 30} ${q.x + W / 2} ${q.y - 30} ${q.x + W / 2} ${q.y - 2}`;
-    return `<path class="ed" d="${d}" marker-end="url(#mapArrow)"><title>${esc(rel.replace('_', ' '))}</title></path>`;
+    const p = pos[a], q = pos[b], e = fwd.find(f => f.a === a && f.b === b);
+    let d;
+    if(e){
+      const x1 = p.x + W, y1 = p.y + H / 2 + e.dy1, x2 = q.x - 2, y2 = q.y + H / 2 + e.dy2;
+      if(q.c - p.c === 1) d = `M${x1} ${y1} C${x1 + 30} ${y1} ${x2 - 30} ${y2} ${x2} ${y2}`;
+      else {
+        const ly = lane(p.c, q.c, y1, y2), xa = 8 + (p.c + 1) * CX, xb = 8 + (q.c - 1) * CX + W;
+        d = `M${x1} ${y1} C${x1 + 24} ${y1} ${xa - 12} ${ly} ${xa} ${ly} L${xb} ${ly} C${xb + 12} ${ly} ${x2 - 24} ${y2} ${x2} ${y2}`;
+      }
+    } else if(q.c === p.c && Math.abs(q.y - p.y) === RY){  // the box right above or below: a short straight arrow
+      const down = q.y > p.y, x = p.x + W / 2;
+      d = `M${x} ${down ? p.y + H : p.y} L${x} ${down ? q.y - 2 : q.y + H + 2}`;
+    } else {  // further up, down or back: a loop round the right side of the boxes
+      const x1 = p.x + W, x2 = q.x + W + 2, y1 = p.y + H / 2 + 6, y2 = q.y + H / 2 - 6, bow = 30;
+      loops = true;
+      d = `M${x1} ${y1} C${x1 + bow} ${y1} ${x2 + bow} ${y2} ${x2} ${y2}`;
+    }
+    return `<path class="ed" d="${d}" marker-end="url(#mapArrow)"><title>${esc(rel.replace(/_/g, ' '))}</title></path>`;
   }).join('');
+  if(loops) width += 30;  // room for a loop round the right side
   const boxes = nodes.map((n, i) => {
     const {x, y} = pos[n.id], color = MAP_COLORS[n.type] || 'var(--ink-faint)', label = wrap2(mapLabel(n, n.text));
     return `<g class="nd" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}">
