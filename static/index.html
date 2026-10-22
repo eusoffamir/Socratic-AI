@@ -208,12 +208,17 @@
   details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
   .am-more-body{display:flex; flex-direction:column; gap:14px; margin:16px 0 0; padding:16px 18px; background:var(--panel); color:var(--ink); border-radius:10px; cursor:auto;}
   .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
+  .am-more-body .am-map{border-color:color-mix(in srgb, var(--signal) 25%, transparent);}
+  .am-more-body .am-map .mono-label{color:var(--signal);}
   .am-more-body .am-lead{margin:0; font-size:14px; line-height:1.6; color:var(--ink);}
-  .am-think{background:var(--signal-soft); border-radius:10px; padding:10px 14px; font-size:13.5px; line-height:1.55; color:var(--ink);}
+  .am-sec .mono-label{display:block; color:var(--signal); margin-bottom:6px;}
+  .am-sec + .am-sec{border-top:1px solid var(--rule); padding-top:14px;}
+  .am-ex{border-left:3px solid var(--signal); padding:2px 0 2px 12px;}
+  .am-think{background:var(--signal-soft); border-left:3px solid var(--signal); border-radius:4px 10px 10px 4px; padding:10px 14px; font-size:13.5px; line-height:1.55; color:var(--ink);}
   .am-think b{display:block; font-size:12px; font-weight:600; color:var(--signal); margin-bottom:2px;}
   .am-glossary{display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px;}
-  .am-glossary div{background:var(--panel-2); border:1px solid var(--rule); border-radius:10px; padding:8px 12px;}
-  .am-glossary b{display:block; font-size:13.5px; font-weight:600; color:var(--ink);}
+  .am-glossary div{background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 25%, transparent); border-radius:10px; padding:8px 12px;}
+  .am-glossary b{display:block; font-size:13.5px; font-weight:600; color:var(--signal);}
   .am-glossary span{display:block; font-size:13px; line-height:1.45; color:var(--ink-soft); margin-top:2px;}
   .am-more-body a{color:var(--signal);}
   .am-case{font-family:var(--sans); background:var(--rail); color:var(--rail-ink);
@@ -2090,10 +2095,11 @@ function askCaseHTML(c){
   return `<details class="am-case"><summary>${card}<span class="am-case-more">Read more
       <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
       <div class="am-more-body">
-      ${ideas.length ? `<p class="am-lead">${ideas.map(esc).join(' ')}</p>` : ''}
-      ${r.example ? `<p class="am-lead">${esc(r.example)}</p>` : ''}
+      ${ideas.length || r.example ? `<div class="am-sec">
+        ${ideas.length ? `<span class="mono-label">The idea</span><p class="am-lead">${ideas.map(esc).join(' ')}</p>` : ''}
+        ${r.example ? `<span class="mono-label"${ideas.length ? ' style="margin-top:12px"' : ''}>Example</span><p class="am-lead am-ex">${esc(r.example)}</p>` : ''}</div>` : ''}
       ${r.think ? `<div class="am-think"><b>Think about</b>${esc(r.think)}</div>` : ''}
-      ${words.length ? `<div class="am-glossary">${words.map(([w, m]) => `<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>` : ''}
+      ${words.length ? `<div class="am-sec"><span class="mono-label">Key words</span><div class="am-glossary">${words.map(([w, m]) => `<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div></div>` : ''}
       ${map}${src}</div></details>`;
 }
 
