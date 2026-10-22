@@ -186,17 +186,29 @@
   .know-quote .mono-label{margin-right:8px;}
   .know-quote blockquote{margin:8px 0 0; padding-left:12px; border-left:3px solid var(--signal); color:var(--ink-soft); font-style:italic;}
   .know-lesson{margin-top:18px; background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 25%, transparent);}
-  .know-tree{list-style:none; padding:0; margin:0 0 14px;}
-  .know-tree li{border:1px solid var(--rule); border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--panel);}
-  .know-tree li p{margin:0; font-size:15px; line-height:1.5;}
-  .know-tree li.done p{color:var(--ink-soft);}
-  .know-tree .know-ans{display:inline-block; margin-top:6px; font-size:12.5px; padding:2px 10px; border-radius:999px; background:var(--signal-soft); color:var(--signal);}
-  .know-tree .row{display:flex; gap:8px; margin-top:10px;}
-  .know-tree .row button{padding:6px 20px; border-radius:999px;}
-  .know-tree li.end{border-color:var(--signal); background:var(--signal-soft);}
-  .know-tree .why{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
-  .know-tree .why .mono-label{margin-right:8px;}
-  .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px;}
+  /* rules of thumb: a path of numbered steps joined by a line, ending in the decision */
+  .know-tree{list-style:none; padding:0; margin:0 0 18px; max-width:760px; counter-reset:step;}
+  .know-tree li{position:relative; padding:0 0 18px 44px; counter-increment:step;}
+  .know-tree li::before{content:counter(step); position:absolute; left:0; top:0; width:28px; height:28px; border-radius:50%;
+    display:grid; place-items:center; font-size:12px; font-weight:600; background:var(--signal); color:var(--paper);}
+  .know-tree li:not(:last-child)::after{content:""; position:absolute; left:13px; top:32px; bottom:4px; width:2px; background:color-mix(in srgb, var(--signal) 30%, transparent);}
+  .know-tree li.done{display:flex; align-items:flex-start; gap:16px;}
+  .know-tree li.done::before{background:var(--signal-soft); color:var(--signal);}
+  .know-tree li p{margin:0; padding-top:4px; line-height:1.5;}
+  .know-tree li.done p{flex:1; color:var(--ink-soft);}
+  .know-tree .know-ans{flex:none; margin-top:2px; font-weight:600; padding:3px 12px; border-radius:999px; background:var(--signal-soft); color:var(--signal);}
+  .know-tree li.now p{font-weight:600; color:var(--ink);}
+  .know-tree .row{display:flex; gap:10px; margin-top:12px;}
+  .know-tree .row button{min-width:96px; padding:9px 22px; border-radius:12px; font-weight:600; background:var(--signal-soft); color:var(--signal);
+    border:2px solid transparent;}
+  .know-tree .row button:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .know-tree li.end::before{content:"\2713"; font-size:14px;}
+  .know-tree li.end .card{border:1px solid var(--signal); background:var(--signal-soft); border-radius:12px; padding:12px 16px;}
+  .know-tree li.end .card .mono-label{display:block; margin-bottom:4px;}
+  .know-tree li.end p{padding-top:0;}
+  .know-tree .why{margin-top:8px; color:var(--ink-soft);}
+  .know-tree .why .mono-label{display:inline; margin-right:8px;}
+  .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px; margin-left:44px;}
   .know-net svg{display:block; width:100%; max-width:640px; height:auto; margin:0 auto 18px;}
   .know-net rect{fill:var(--panel); stroke:var(--signal); stroke-width:1.5;}
   .know-net text{font-size:12px; fill:var(--ink);}
@@ -1177,7 +1189,7 @@
   #knowBody :is(.know-tree .know-ans, .know-bar .mv, .am-map .legend){font-size:12px;}
   #knowBody :is(.know-bar .mv, .am-map .mono-label){font-family:var(--sans);}
   #knowBody .am-map .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
-  #knowBody :is(.am-map, .know-quote, .know-tree li:not(.end)){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
+  #knowBody :is(.am-map, .know-quote){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
   #knowBody .know-restart{color:var(--signal); background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
   #knowBody .know-bar .track{background:var(--signal-soft);}
 </style>
@@ -2885,9 +2897,9 @@ function knowTreeHTML(t, answers){
   }
   const n = nodes[at];
   const now = n.kind === 'question'
-    ? `<li><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
+    ? `<li class="now"><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
         `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
-    : `<li class="end"><p><b>${esc(n.text)}</b></p>${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</li>`;
+    : `<li class="end"><div class="card"><span class="mono-label">Decision</span><p><b>${esc(n.text)}</b></p>${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
   return `<p class="know-intro">These are the questions an expert asks, one after another. Answer each one to see where it leads. Following fixed rules to a decision like this is deductive reasoning.</p>
     <ol class="know-tree">${done.join('')}${now}</ol>
     ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
