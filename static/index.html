@@ -260,7 +260,8 @@
     .ask-stats .coach-comment{grid-column:1 / -1;}  /* not enough room for 3, so the Coach goes below */
   }
   .ask-stats .coach-comment p.wait{color:var(--ink-faint); font-size:14px; margin-top:auto; padding-top:18px;}  /* sits at the bottom of the Coach column */
-  .am-thought{font-family:var(--sans); font-size:13px; color:var(--ink-faint); margin:0 0 6px;}
+  .am-thought{font-family:var(--sans); font-size:12px; color:var(--ink-faint); margin:0 0 2px;}
+  .am-thought + .am-qrow, .am-thought + * .am-qrow:first-child{margin-top:0;}
   /* one quiet row, "Thought process"; the feedback is the first line inside it */
   .am-thought summary{cursor:pointer; display:flex; align-items:baseline; gap:20px; list-style:none; opacity:.7;}
   .am-thought summary:hover, .am-thought[open] summary{opacity:1;}
