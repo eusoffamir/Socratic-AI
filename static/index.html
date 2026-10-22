@@ -201,7 +201,7 @@
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
   details.am-case summary{list-style:none; cursor:pointer; position:relative;}
   details.am-case summary::-webkit-details-marker{display:none;}
-  details.am-case:hover{border-color:var(--signal);}
+  details.am-case:hover{border-color:var(--blue);}
   .am-case-more{position:absolute; top:2px; right:0; display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:400; color:var(--ink-faint); opacity:.7; transition:opacity .15s;}
   details.am-case:hover .am-case-more, details.am-case[open] .am-case-more{opacity:1;}
   .am-case-more svg{width:11px; height:11px; transition:transform .15s;}
@@ -216,8 +216,8 @@
   .am-glossary b{display:block; font-size:13.5px; font-weight:600; color:var(--ink);}
   .am-glossary span{display:block; font-size:13px; line-height:1.45; color:var(--ink-soft); margin-top:2px;}
   .am-more-body a{color:var(--signal);}
-  .am-case{font-family:var(--sans); background:color-mix(in srgb, var(--signal-soft) 30%, var(--panel));
-           border:1px solid var(--rule);
+  .am-case{font-family:var(--sans); background:var(--blue-soft);
+           border:1px solid color-mix(in srgb, var(--blue) 30%, transparent); border-left:4px solid var(--blue);
            border-radius:14px; padding:20px 24px; margin:4px 0 28px;}
   .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:14.5px; margin:0 0 10px; padding-right:90px;}
   .am-case .s{font-size:14px; color:var(--ink-soft); margin:0;}
