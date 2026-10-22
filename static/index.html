@@ -1150,6 +1150,18 @@
     .entry.tutor .card{grid-column:1 / -1;}
     #log{gap:24px;}
   }
+  /* Overall status and the chat's status panel: one font (sans), three sizes (15 text, 13 small, 12 tiny),
+     soft green boxes instead of beige, so they match the chat */
+  :is(#overallBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
+  :is(#overallBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
+  :is(#overallBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .report .lead, .rk-msg){font-size:15px;}
+  :is(#overallBody, .ask-stats) :is(.meta, .lvl, .ov-filter > button, .ov-menu button, .ms-row .nm, .rk table, .rk-sub,
+     .ov-open, details.rk-more > summary, details.rk-more > summary small, .note, .ov-case .t small){font-size:13px;}
+  :is(#overallBody, .ask-stats) :is(.ms-row .st, .ms-row .nm small, .ms-axis, .rk th, .rk tfoot td, .rung .rn, .rung .here){font-size:12px;}
+  :is(#overallBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
+  :is(#overallBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
+  :is(#overallBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
+  :is(#overallBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
 </style>
 </head>
 <body>
