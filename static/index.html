@@ -349,8 +349,8 @@
   .mode-btn[aria-pressed="true"] .on-text{display:inline;}
   /* fixed colors (not theme tokens) so it stays vibrant, with white text readable, in light and dark */
   .mode-btn[aria-pressed="true"]{
-    background:linear-gradient(135deg, #2f5aa8, #b5602b); color:#fff; border-color:transparent;
-    box-shadow:0 4px 16px rgba(47,90,168,.35);
+    background:var(--signal); color:#fff; border-color:transparent;
+    box-shadow:0 4px 16px color-mix(in srgb, var(--signal) 35%, transparent);
   }
   .mode-btn[aria-pressed="true"]:hover:not(:disabled){color:#fff;}
   /* Question style menu beside + in the Ask box, like Claude's mode menu */
@@ -605,9 +605,8 @@
   .composer{flex:none; padding:0 24px 18px;}
   .composer-inner{max-width:780px; margin:0 auto;}
   .choices{display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
-  /* A = blue, B = orange, so the two sides are easy to tell apart */
-  .choice{--c:var(--blue); --c-soft:var(--blue-soft);}
-  .choice + .choice{--c:var(--caution); --c-soft:var(--caution-soft);}
+  /* A and B both use the theme green; the letter badge tells them apart */
+  .choice{--c:var(--signal); --c-soft:var(--signal-soft);}
   .choice{
     flex:1; min-width:150px; text-align:left; background:var(--c-soft); color:var(--ink);
     border:2px solid transparent; font-weight:600; font-size:16.5px; padding:14px 18px;
@@ -615,7 +614,7 @@
   }
   .choice .l{
     width:32px; height:32px; flex:none; display:grid; place-items:center; border-radius:9px;
-    background:var(--c); color:var(--paper); font-family:var(--mono); font-size:14px; font-weight:600;
+    background:var(--c); color:var(--paper); font-family:var(--sans); font-size:14px; font-weight:600;
   }
   .choice:hover:not(:disabled){border-color:var(--c); opacity:1;}
   .choice[aria-pressed="true"]{border-color:var(--c); box-shadow:0 0 0 3px var(--c-soft), 0 2px 10px rgba(22,33,28,.10);}
