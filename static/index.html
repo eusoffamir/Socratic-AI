@@ -2432,11 +2432,11 @@ function mapUnpick(map){
   const cap = map.querySelector('.cap');
   map.querySelectorAll('.nd.on').forEach(g => g.classList.remove('on'));
   cap.classList.remove('on');
-  cap.textContent = cap.dataset.tip || '';
+  cap.textContent = cap.dataset.hint || '';
 }
 function mapPick(nd){
   const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts), cap = map.querySelector('.cap');
-  if(cap.dataset.tip === undefined) cap.dataset.tip = cap.textContent;
+  if(cap.dataset.hint === undefined) cap.dataset.hint = cap.textContent;
   if(nd.classList.contains('on')){ mapUnpick(map); return false; }
   map.querySelectorAll('.nd').forEach(g => g.classList.toggle('on', g === nd));
   const t = texts[Number(nd.dataset.i)] || '', cut = t.indexOf('. ');
