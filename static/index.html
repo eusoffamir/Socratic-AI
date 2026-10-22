@@ -342,7 +342,7 @@
   .am-card .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
   .am-card .row button{font-size:13.5px; padding:7px 14px; border-radius:999px;}
   .am-card .row .ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--rule);}
-  .ask-next{font-size:13px; padding:6px 12px; border-radius:999px; background:var(--signal-soft); border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal); font-weight:500;}
+  .ask-next{font-size:13.5px; padding:6px 12px; border-radius:999px; background:var(--signal-soft); border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal); font-weight:500;}
   .ask-next:hover:not(:disabled){border-color:var(--signal); opacity:1;}
   /* the knowledge map of a case: boxes coloured by knowledge type, arrows for the links */
   .am-map{font-family:var(--sans); margin:2px 0 14px; background:var(--panel); border:1px solid var(--rule); border-radius:14px; padding:12px 14px 10px;}
@@ -364,7 +364,7 @@
            padding:10px 10px 8px; transition:border-color .15s ease, background .15s ease;}
   .ask-box:focus-within{border-color:var(--signal);}
   .ask-box.drop{border-color:var(--signal); border-style:dashed; background:var(--signal-soft);}
-  .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:15px; line-height:1.5; color:var(--ink);
+  .ask-box textarea{display:block; width:100%; resize:none; font:inherit; font-size:13.5px; line-height:1.5; color:var(--ink);
                     background:transparent; border:none; outline:none; padding:4px 6px 4px; min-height:28px; max-height:240px;}
   .ask-box textarea::placeholder{color:var(--ink-faint);}
   @media (max-width:700px){ .ask-box textarea{font-size:16px;} }  /* under 16px, phones zoom in when typing */
@@ -418,7 +418,7 @@
   #askRound .inf{font-size:1.5em; line-height:0; vertical-align:-.08em;}
   #askRound .sl{margin:0 3px;}
   .ask-rounds .ask-mode-menu{width:300px;}
-  #askModeBtn, #askRoundsBtn{display:inline-flex; align-items:center; gap:5px; font-size:13px; padding:6px 10px; border-radius:999px;
+  #askModeBtn, #askRoundsBtn{display:inline-flex; align-items:center; gap:5px; font-size:13.5px; padding:6px 10px; border-radius:999px;
               background:transparent; border:1px solid transparent; color:var(--signal);}
   #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"],
   #askRoundsBtn:hover:not(:disabled), #askRoundsBtn[aria-expanded="true"]{background:var(--signal-soft); opacity:1;}
@@ -426,12 +426,12 @@
   #askModeBtn svg, #askRoundsBtn svg{width:11px; height:11px;}
   .ask-mode-menu{position:absolute; right:0; bottom:calc(100% + 8px); z-index:20; width:400px; max-width:calc(100vw - 32px); padding:6px;
                  background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.14);}
-  .ask-mode-menu .mm-head{font-size:12.5px; color:var(--ink-faint); padding:6px 10px 4px;}
+  .ask-mode-menu .mm-head{font-size:12px; color:var(--ink-faint); padding:6px 10px 4px;}
   .ask-mode-menu button{display:block; width:100%; text-align:left; position:relative; padding:8px 34px 8px 10px; border-radius:10px;
                         background:transparent; border:0; color:var(--ink);}
   .ask-mode-menu button:hover:not(:disabled){background:var(--panel-2); opacity:1;}
-  .ask-mode-menu b{display:block; font-size:14px; font-weight:600;}
-  .ask-mode-menu span{display:block; font-size:12.5px; line-height:1.4; color:var(--ink-soft); margin-top:2px;}
+  .ask-mode-menu b{display:block; font-size:13.5px; font-weight:600;}
+  .ask-mode-menu span{display:block; font-size:12px; line-height:1.4; color:var(--ink-soft); margin-top:2px;}
   .ask-mode-menu [aria-checked="true"]::after{content:""; position:absolute; right:12px; top:50%; width:10px; height:5px; margin-top:-5px;
                         border:solid var(--signal); border-width:0 0 2px 2px; transform:rotate(-45deg);}
   .home-scroll{flex:1; overflow:auto; padding:28px 32px 40px;}
@@ -488,7 +488,7 @@
     background:transparent; color:var(--ink-faint); border:none; padding:2px 6px; border-radius:6px; font-size:15px; line-height:1;
   }
   .tb-file button:hover:not(:disabled){color:var(--ink); background:var(--rule); opacity:1;}
-  .tb-privacy{margin:8px 2px 0; font-size:12.5px; color:var(--ink-faint);}
+  .tb-privacy{margin:8px 2px 0; font-size:12px; color:var(--ink-faint);}
   .section-head .ov-filter{min-width:0;}
   .section-head .ov-filter > button span{max-width:min(520px, 70vw); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .ov-menu .topic-item{display:flex; align-items:center; gap:2px;}
