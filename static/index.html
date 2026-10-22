@@ -176,7 +176,7 @@
   .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
   .status-inner .report-grid{gap:36px;}
   /* Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data */
-  .know{max-width:880px;}
+  .know .am-map svg{margin:0 auto;}  /* the page is wide, so the map is drawn larger and centred */
   .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
   .know-pick select{font:inherit; font-size:14.5px; padding:6px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--panel); color:var(--ink); max-width:100%;}
   .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
@@ -198,7 +198,7 @@
   .know-tree .why{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
   .know-tree .why .mono-label{margin-right:8px;}
   .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px;}
-  .know-net svg{display:block; width:100%; max-width:470px; height:auto; margin:0 auto 18px;}
+  .know-net svg{display:block; width:100%; max-width:640px; height:auto; margin:0 auto 18px;}
   .know-net rect{fill:var(--panel); stroke:var(--signal); stroke-width:1.5;}
   .know-net text{font-size:12px; fill:var(--ink);}
   .know-net .ed{stroke:var(--ink-faint); stroke-width:1.3; fill:none;}
@@ -1159,6 +1159,9 @@
      .ov-open, details.rk-more > summary, details.rk-more > summary small, .note, .ov-case .t small){font-size:13px;}
   :is(#overallBody, .ask-stats) :is(.ms-row .st, .ms-row .nm small, .ms-axis, .rk th, .rk tfoot td, .rung .rn, .rung .here){font-size:12px;}
   :is(#overallBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
+  :is(#overallBody, .ask-stats) .ov-case{background:var(--panel); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
+  :is(#overallBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
+  :is(#overallBody, .ask-stats) .ov-case-more{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-top:0;}
   :is(#overallBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
   :is(#overallBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
   :is(#overallBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
@@ -2823,11 +2826,20 @@ async function renderKnowPane(c){
   if(know.tab === 'books'){
     const map = askMapHTML(c);
     pane.innerHTML = map ? `<p class="know-intro">Each box is one piece of knowledge, and each arrow shows how two pieces link. Tap a box to see where it comes from.</p>
-      ${map.replace('Tap a box to read it.', '')}<div id="knowSrc"></div>` : '<p class="know-none">This case has no knowledge map.</p>';
+      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.5)}px`)}<div id="knowSrc"></div>`
+      : '<p class="know-none">This case has no knowledge map.</p>';
     return;
   }
-  if(c.generated){
-    pane.innerHTML = `<p class="know-none">Only the built-in quant topic has ${know.tab === 'rules' ? 'rules of thumb' : 'a model learned from data'} so far. For your own topics, it comes later.</p>`;
+  if(c.generated){  // drafted by the Topic Builder with the case, so nothing to fetch
+    const what = know.tab === 'rules' ? c.heuristics : c.model;
+    if(!what){
+      pane.innerHTML = `<p class="know-none">This case has no ${know.tab === 'rules' ? 'rules of thumb' : 'model'}, because it was made before they were added or the draft did not pass the checks. A new case on your topic will have one.</p>`;
+      return;
+    }
+    const texts = Object.fromEntries((c.knowledge.nodes || []).map(n => [n.id, n.text || (c.notes || [])[n.note] || '']));
+    pane.innerHTML = know.tab === 'rules'
+      ? knowTreeHTML({...what, nodes: what.nodes.map(n => ({...n, why_text: texts[n.why] || ''}))}, know.answers[c.id] || {})
+      : knowNetHTML(what);
     return;
   }
   if(!know.views[c.id]){
@@ -2878,7 +2890,10 @@ function knowNetHTML(v){
   }).join('');
   const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
     <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
-  return `<div class="know-net"><p class="know-intro">This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.</p>
+  const intro = v.guessed
+    ? 'The AI guessed these chances, because there is no data to count for this topic, so treat them as a rough sketch. Asking the model backwards, from the signs to their likely cause, is abductive reasoning.'
+    : `This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.`;
+  return `<div class="know-net"><p class="know-intro">${intro}</p>
     <svg viewBox="0 0 ${width} ${4 + 116 + H + 4}" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg>
