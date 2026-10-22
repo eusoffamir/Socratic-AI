@@ -36,8 +36,8 @@ The Reasoning agent (Goal 1) already labels each answer as inductive, deductive 
 | 2 | Decision trees: one rule-of-thumb tree per quant case, with a walk function (the deductive move) | Done 22 October 2026 |
 | 3 | A Bayesian network per case, learned by counting over simulated data (the inductive move) and asked backwards (the abductive move) | Done 22 October 2026 |
 | 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Done 22 October 2026 |
-| 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | Next |
-| 6 | A Knowledge panel on the page that shows the three forms | |
+| 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | Done 22 October 2026 |
+| 6 | A Knowledge panel on the page that shows the three forms | Next |
 | 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | |
 
 ### What the networks learned (step 3, `app/pgm.py`)
@@ -71,6 +71,19 @@ Dr Ho has not named a quant textbook yet, so for now the "books" are 13 Wikipedi
 - **Case:** 1 node (no clear reason why rain would move a stock) comes from the case story itself.
 
 For any other topic, the Topic Builder now gives a quote from its Wikipedia source (or the learner's reading or file) for each fact, and plain code keeps only quotes that are really in that text. In a first test on "Photosynthesis", 18 of 21 facts kept a checked quote, and the other 3 were shown as having no source.
+
+### Reading an answer as moves on the graph (step 5, `app/traverse.py`)
+
+The Reasoning agent, still in the same single AI call as the Assessor, now also names the steps of the learner's answer as moves between knowledge graph nodes, at most 4. Plain code then reads each step against the graph's links.
+
+- A step that goes with a link is **forward**, and a step that goes against a link is **backward**. A step between two nodes with no link is a **jump**.
+- **Inductive** is a forward step out of a counted result (a data node), or two or more nodes leading into the same node.
+- **Deductive** is any other forward step.
+- **Abductive** is a backward step, from what was seen back to what explains it.
+
+So each answer now has two labels for its reasoning type: the agent's own judgement, and the one an algorithm reads from the graph. Where they differ is worth a look by a human marker.
+
+A first test on Gemini (22 October 2026) used 6 sample answers. In 5 of them the steps landed on graph links, and there the two labels agreed 4 of 5 times for deductive, 4 of 5 for abductive and 3 of 5 for inductive. Two answers that reasoned from counted data ("15 of 500 stocks", "lots of random pairs") were read as inductive by the graph but only as deductive by the agent, and the graph reading looks arguably right. Jumps showed links the graphs are missing, such as from "many tries" to "a streak is not proof", so the reading also shows where a graph needs another link.
 
 ## 4. Choices made
 

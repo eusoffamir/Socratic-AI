@@ -14,7 +14,7 @@ import os
 import random
 import time
 
-from . import limits, reasoning, tools
+from . import limits, reasoning, tools, traverse
 from .content import FORMATS, MOVES, STANDARDS, case_of
 from .prompts import (AB_FORMAT, CHECKER_SYSTEM, COACH_OVERALL_SYSTEM, COACH_SYSTEM, PLANNER_SYSTEM, TUTOR_SYSTEM,
                       assessor_system, assessor_user, checker_user, coach_overall_user, coach_user, planner_user, tutor_user)
@@ -291,6 +291,13 @@ def clean_assessment(data):
             "confidence": confidence}
 
 
+def _add_graph_reading(out, session, steps):
+    """Goal 3, step 5. The agent's graph steps read by plain code (traverse.py),
+    kept next to the agent's own reasoning labels. Cases only, not the tutorial."""
+    if out.get("reasoning") is not None and session.get("concept_id"):
+        out["reasoning"]["graph"] = traverse.read(case_of(session), steps)
+
+
 def call_assessor(session, answer, with_plan=False):
     """The Assessor, plus the Reasoning agent in the same call when it is on.
     "reasoning" is None when the Reasoning agent is switched off. With
@@ -300,13 +307,15 @@ def call_assessor(session, answer, with_plan=False):
     user_payload = assessor_user(session, answer, with_reasoning, with_plan)
     if PROVIDER == "mock":
         out = {**_mock_assessor(answer), "reasoning": reasoning.mock(answer) if with_reasoning else None}
+        _add_graph_reading(out, session, [])
         return {**out, "plan": _mock_planner(session, out)} if with_plan else out
-    max_tokens = (650 if with_reasoning else 400) + (150 if with_plan else 0)
+    max_tokens = (750 if with_reasoning else 400) + (150 if with_plan else 0)
     data = _parse_json(_generate(assessor_system(with_reasoning, with_plan), user_payload, max_tokens=max_tokens,
                                  json_mode=True, seed=ASSESSOR_SEED))
     if data is None or "standards" not in data:
         raise LLMError("The assessor returned a reply that isn't valid JSON. Try sending your answer again.")
     out = {**clean_assessment(data), "reasoning": reasoning.clean(data) if with_reasoning else None}
+    _add_graph_reading(out, session, data.get("graph_steps"))
     if with_plan:
         out["plan"] = data["plan"] if isinstance(data.get("plan"), dict) else None
     return out

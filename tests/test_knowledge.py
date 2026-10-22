@@ -83,7 +83,7 @@ def test_assessor_adds_reasoning_and_can_be_switched_off(monkeypatch):
     s = orc.new_session("pattern_or_luck", total_rounds=8)
     s["last_tutor"] = "Why might this streak be luck?"
     monkeypatch.setattr(llm_client, "PROVIDER", "mock")
-    assert set(llm_client.call_assessor(s, "Many stocks do this by luck")["reasoning"]) == {"types", "knowledge", "evidence"}
+    assert set(llm_client.call_assessor(s, "Many stocks do this by luck")["reasoning"]) == {"types", "knowledge", "evidence", "graph"}
     assert "NOTE_TYPES" in prompts.assessor_user(s, "x", with_reasoning=True)
     monkeypatch.setenv("AGENT_REASONING", "0")
     assert llm_client.call_assessor(s, "Many stocks do this by luck")["reasoning"] is None

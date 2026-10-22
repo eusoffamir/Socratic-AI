@@ -1,6 +1,6 @@
 import json
 
-from . import reasoning
+from . import knowledge, reasoning
 from .content import FORMATS, LEVELS, STANDARDS, case_of
 from .tools import TOOLS
 
@@ -191,11 +191,17 @@ def _coach_pairs(session):
     return pairs
 
 
+def _graph_for_agent(case):
+    """The case knowledge graph, small, for the Reasoning agent's graph_steps (Goal 3, step 5)."""
+    g = knowledge.graph(case)
+    return {"nodes": {n["id"]: n["text"] for n in g["nodes"]}, "links": g["edges"]}
+
+
 def assessor_user(session, answer, with_reasoning=False, with_plan=False):
     payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
     if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
         c = case_of(session)
-        extra = {"NOTE_TYPES": reasoning.note_types(c)} if with_reasoning else {}
+        extra = {"NOTE_TYPES": reasoning.note_types(c), "GRAPH": _graph_for_agent(c)} if with_reasoning else {}
         payload = {"case_story": c["scenario"], "NOTES": c["notes"], **extra, **payload}
     if with_plan:
         payload["PLANNER_STATE"] = planner_state(session)

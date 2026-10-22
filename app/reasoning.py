@@ -46,11 +46,12 @@ Rules for this job:
 - Naming a word is not using that knowledge. "It is causal" with no cause named is 0 for causal.
 - Repeating a fact from the question is not factual knowledge of the learner's own.
 - NOTE_TYPES gives the knowledge type of each item in NOTES, as a guide only.
-reasoning_evidence: a short quote from the answer that shows the reasoning type, or "" if none."""
+reasoning_evidence: a short quote from the answer that shows the reasoning type, or "" if none.
+graph_steps: GRAPH is the case knowledge as nodes and links. List the steps of the learner's thinking as moves between GRAPH nodes, each as [from_id, to_id], in the order the learner thought, from the idea they started with to the idea they reached. Use only ids from GRAPH and only ideas the answer really uses, at most 4 steps. Give [] if the answer uses fewer than 2 GRAPH ideas."""
 
 JSON_FIELDS = ('"reasoning_types": {' + ", ".join(f'"{k}": 0' for k in REASONING_TYPES) + '}, '
                '"knowledge_used": {' + ", ".join(f'"{k}": 0' for k in KNOWLEDGE_TYPES) + '}, '
-               '"reasoning_evidence": ""')
+               '"reasoning_evidence": "", "graph_steps": []')
 
 
 def enabled():
