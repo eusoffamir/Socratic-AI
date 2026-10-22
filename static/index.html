@@ -193,16 +193,16 @@
   .ask-main:not(.empty) .ask-greet, .ask-main:not(.empty) .ask-chips{display:none;}
   /* messages: the learner on the right in a bubble, Socratic AI as plain text, like Claude */
   .am-user{align-self:flex-end; max-width:80%; background:var(--panel); border:1px solid var(--rule);
-           border-radius:16px; padding:10px 16px; font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
+           border-radius:16px; padding:10px 16px; font-size:15px; white-space:pre-wrap; overflow-wrap:anywhere;}
   .am-status{color:var(--ink-faint); font-size:14.5px; display:flex; align-items:center; gap:8px;}
-  .am-ai{font-family:var(--sans); font-size:15.5px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
+  .am-ai{font-family:var(--sans); font-size:15px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
   .am-ai p{margin:0 0 12px;}
   .am-ai .am-words{display:flex; flex-wrap:wrap; gap:6px 14px; margin:0 0 12px; font-family:var(--sans); font-size:14px; color:var(--ink-soft);}
   .am-ai .am-words b{color:var(--ink); font-weight:600;}
   details.am-case summary{list-style:none; cursor:pointer; position:relative;}
   details.am-case summary::-webkit-details-marker{display:none;}
   details.am-case:hover{border-color:var(--signal);}
-  .am-case-more{position:absolute; top:2px; right:0; display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:400; color:var(--rail-ink); opacity:.7; transition:opacity .15s;}
+  .am-case-more{position:absolute; top:2px; right:0; display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:400; color:var(--rail-ink); opacity:.7; transition:opacity .15s;}
   details.am-case:hover .am-case-more, details.am-case[open] .am-case-more{opacity:1;}
   .am-case-more svg{width:11px; height:11px; transition:transform .15s;}
   details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
@@ -224,8 +224,8 @@
   .am-case{font-family:var(--sans); background:var(--rail); color:var(--rail-ink);
            border:1px solid var(--rail);
            border-radius:14px; padding:20px 24px; margin:4px 0 28px;}
-  .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:14.5px; margin:0 0 10px; padding-right:90px;}
-  .am-case .s{font-size:14px; color:var(--rail-ink); opacity:.88; margin:0;}
+  .am-case .t{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; font-weight:600; font-size:15px; margin:0 0 10px; padding-right:90px;}
+  .am-case .s{font-size:15px; line-height:1.6; color:var(--rail-ink); opacity:.88; margin:0;}
   .am-case .t .tag{background:var(--rail-ink); color:var(--rail);}
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
@@ -260,7 +260,7 @@
     .ask-stats .coach-comment{grid-column:1 / -1;}  /* not enough room for 3, so the Coach goes below */
   }
   .ask-stats .coach-comment p.wait{color:var(--ink-faint); font-size:14px; margin-top:auto; padding-top:18px;}  /* sits at the bottom of the Coach column */
-  .am-thought{font-family:var(--sans); font-size:13.5px; color:var(--ink-faint); margin:0 0 18px;}
+  .am-thought{font-family:var(--sans); font-size:13px; color:var(--ink-faint); margin:0 0 18px;}
   /* one quiet row, "Thought process"; the feedback is the first line inside it */
   .am-thought summary{cursor:pointer; display:flex; align-items:baseline; gap:20px; list-style:none; opacity:.7;}
   .am-thought summary:hover, .am-thought[open] summary{opacity:1;}
@@ -363,7 +363,7 @@
               background:transparent; border:1px solid transparent; color:var(--ink-soft);}
   #askModeBtn:hover:not(:disabled), #askModeBtn[aria-expanded="true"],
   #askRoundsBtn:hover:not(:disabled), #askRoundsBtn[aria-expanded="true"]{background:var(--panel-2); color:var(--ink); opacity:1;}
-  #askModeBtn.on{color:#2f5aa8;}
+  #askModeBtn.on{color:var(--signal);}
   #askModeBtn svg, #askRoundsBtn svg{width:11px; height:11px;}
   .ask-mode-menu{position:absolute; right:0; bottom:calc(100% + 8px); z-index:20; width:400px; max-width:calc(100vw - 32px); padding:6px;
                  background:var(--panel); border:1px solid var(--rule); border-radius:14px; box-shadow:var(--shadow), 0 12px 32px rgba(0,0,0,.14);}
@@ -516,7 +516,7 @@
     height:56px; flex:none; display:flex; align-items:center; gap:14px; padding:0 20px;
     border-bottom:1px solid var(--rule);
   }
-  .status{font-family:var(--mono); font-size:16px; font-weight:500; letter-spacing:.05em; color:var(--ink); white-space:nowrap;}
+  .status{font-family:var(--sans); font-size:13px; font-weight:600; letter-spacing:.06em; color:var(--ink); white-space:nowrap;}
   .status .sep{color:var(--ink-faint); margin:0 6px;}
   .status .lv{color:var(--signal);}
   .status .lv-label{color:var(--ink-faint);}
