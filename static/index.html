@@ -2224,7 +2224,7 @@ async function askStatsLoad(){
         <p class="wait">${due ? `${DOTS}The coach is writing a new comment...`
           : comment ? `The next comment comes in ${left} answer${left === 1 ? '' : 's'}.`
           : `The coach comments after ${every} answers, so ${left} more to go.`}</p>`;
-    box.innerHTML = `<section><span class="mono-label">6 Socratic Question Categories</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
+    box.innerHTML = `<section><span class="mono-label">6 Socratic Questions</span>${ladderHTML(d.levels, reached, 'Highest level')}</section>
       <section><span class="mono-label">9 Intellectual Standards</span>${standardsRadarSVG(d.standards, d.summary.standards_met_count, d.summary.rounds_completed)}</section>
       <div class="coach-comment">${coachHTML(d.comment, d.coach_due)}</div>`;
     // the charts are drawn, so the Coach's AI call no longer holds up the panel
@@ -2712,7 +2712,7 @@ function overallHTML(d){
     <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
     <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
     <div class="report-grid ov-three">
-      <div><div class="ov-std-head"><span class="mono-label">6 Socratic Question Categories</span>${caseFilterHTML(d.cases, 'ovLevelFilter')}</div>
+      <div><div class="ov-std-head"><span class="mono-label">6 Socratic Questions</span>${caseFilterHTML(d.cases, 'ovLevelFilter')}</div>
         <div id="ovLadder">${ladderHTML(d.levels, reachedIdx, 'Highest level')}</div></div>
       <div><div class="ov-std-head"><span class="mono-label">9 Intellectual Standards</span>${caseFilterHTML(d.cases, 'ovFilter')}</div>
         <div id="ovRadar">${standardsRadarSVG(d.standards, s.standards_met_count, n)}</div></div>
@@ -3672,7 +3672,7 @@ function reportHTML(data, final){
 
     <div class="report-grid">
       <div>
-        <div class="mono-label">6 Socratic Question Categories</div>
+        <div class="mono-label">6 Socratic Questions</div>
         ${ladder}
       </div>
       <div>
