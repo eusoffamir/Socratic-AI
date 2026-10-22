@@ -38,7 +38,7 @@ The Reasoning agent (Goal 1) already labels each answer as inductive, deductive 
 | 4 | Knowledge graph from books: every node keeps its source and an exact quote, and code checks the quote is really in the reading | Done 22 October 2026 |
 | 5 | Reasoning as traversal: map an answer onto the graph and check the reasoning label | Done 22 October 2026 |
 | 6 | A Knowledge page that shows the three forms | Done 22 October 2026 |
-| 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | Next |
+| 7 | The Topic Builder agent drafts all three forms for any topic (links to Goal 2) | Done 22 October 2026 |
 
 ### What the networks learned (step 3, `app/pgm.py`)
 
@@ -93,7 +93,18 @@ A new sidebar item, **Knowledge**, opens its own page, so the chat and its Statu
 - **Rules of thumb:** the expert's yes or no questions. The learner answers one at a time until a decision is reached, which also shows the idea it rests on.
 - **From data:** the Bayesian network as a small picture, the chances it learned as bars, each marked inductive, deductive or abductive, and one sentence that sums them up.
 
-For a learner's own topic, only "From books" has content until step 7. The graph moves from step 5 are not shown to learners yet, because they need checking against a human marker first.
+The page uses the full width of the screen. The graph moves from step 5 are not shown to learners yet, because they need checking against a human marker first.
+
+### Any topic gets all three forms (step 7)
+
+The Topic Builder agent, in the same single call, now also drafts for each case:
+
+- **A rules of thumb tree** with 2 to 4 yes or no questions and 3 to 5 decisions, each resting on a node of the case's knowledge graph. Plain code checks it is a proper tree (the same check as the quant trees) and drops it if not.
+- **A cause and signs model**, a hidden cause and 2 signs it makes more likely, with the chances **guessed by the AI**, because a topic like fake news has no data to count. Plain code checks the numbers, then works out the chances in both directions with the same exact sums as the quant networks. The page says clearly that these chances are guesses, and a guess never shows as 0% or 100%.
+
+In 4 test builds on Gemini (22 October 2026, 12 cases on homework, fake news twice and sleep), 9 of 12 trees and 11 of 12 models passed the checks. One fake news build lost all 3 trees, while the next build of the same topic kept all 3, so the AI is not always consistent. A case whose draft fails simply has no tree or model, and the page says so.
+
+So for a generated topic, "From data" is honestly "from the AI's best guess". Real data for any topic would need a data source per topic, which is a question for FYP2.
 
 ## 4. Choices made
 

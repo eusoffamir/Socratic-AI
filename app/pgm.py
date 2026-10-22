@@ -219,9 +219,51 @@ def view(case_id):
 def graph(case_id):
     """The network in the shared shape, nodes and edges, with each node's learned
     chances in percent, ready for an agent or the page."""
-    net, table = NETWORKS[case_id], model(case_id)
-    nodes = [{"id": n["id"], "why": n["why"], "text": n["text"], "parents": parents(net, n["id"]),
+    return _shape(NETWORKS[case_id], model(case_id))
+
+
+def _shape(net, table):
+    nodes = [{"id": n["id"], "why": n.get("why"), "text": n["text"], "parents": parents(net, n["id"]),
               "chances": [{"given": dict(zip(parents(net, n["id"]), values)), "percent": round(100 * p)}
                           for values, p in table[n["id"]].items()]}
              for n in net["nodes"]]
     return {"nodes": nodes, "edges": [list(e) for e in net["edges"]]}
+
+
+def _clause(text):
+    """A statement as part of a sentence: "The day is hot." becomes "the day is hot".
+    A first word in capitals, like "AI", keeps its capital."""
+    text = text.strip().rstrip(".")
+    return text if text[1:2].isupper() else text[:1].lower() + text[1:]
+
+
+def guessed(guess):
+    """Goal 3, step 7. A model for a generated topic, where there is no data to
+    count. The Topic Builder guesses the chances (one cause, two signs it causes),
+    and the same exact sums then answer questions in both directions. The page
+    says the chances are guesses. guess: {"cause": {"text", "why", "chance"},
+    "signs": [{"text", "why", "if_cause", "if_not"}] x 2}, percentages already
+    checked by builder.py."""
+    cause, signs = guess["cause"], guess["signs"]
+    ids = ["cause"] + [f"sign{i + 1}" for i in range(len(signs))]
+    net = {"nodes": [{"id": i, "text": n["text"], **({"why": n["why"]} if n.get("why") else {})}
+                     for i, n in zip(ids, [cause, *signs])],
+           "edges": [["cause", "causes", i] for i in ids[1:]]}
+    table = {"cause": {(): cause["chance"] / 100},
+             **{i: {(True,): s["if_cause"] / 100, (False,): s["if_not"] / 100} for i, s in zip(ids[1:], signs)}}
+    c, s1, s2 = (_clause(n["text"]) for n in (cause, *signs))
+    asks = [
+        {"move": "deductive", "target": "sign1", "given": {"cause": True}, "label": f"{s1}, when {c}"},
+        {"move": "abductive", "target": "cause", "given": {}, "label": f"{c}, before seeing any sign"},
+        {"move": "abductive", "target": "cause", "given": {"sign1": True}, "label": f"{c}, after seeing that {s1}"},
+        {"move": "abductive", "target": "cause", "given": {"sign1": True, "sign2": True},
+         "label": f"{c}, after seeing that {s1} and {s2}"},
+        {"move": "abductive", "target": "cause", "given": {"sign1": False, "sign2": False},
+         "label": f"{c}, when neither sign shows"},
+    ]
+    # A guess is never certain, so it never shows as 0% or 100%.
+    found = [{**a, "percent": max(1, min(99, round(100 * chance(net, table, a["target"], a["given"]))))} for a in asks]
+    before, both, neither = found[1]["percent"], found[3]["percent"], found[4]["percent"]
+    lesson = (f"Seeing both signs moves the chance that {c} from {before}% to {both}%, "
+              f"and seeing neither moves it to {neither}%.")
+    return {**_shape(net, table), "findings": found, "lesson": lesson, "guessed": True, "guess": guess}

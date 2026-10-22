@@ -14,6 +14,7 @@ import re
 import threading
 
 from . import limits, llm_client, sources
+from . import heuristics, pgm
 from .knowledge import KNOWLEDGE_TYPES, RELATIONS
 from .llm_client import LLMError
 from .reasoning import CORE_KNOWLEDGE, KNOWLEDGE_SIGNS, REASONING_TYPES
@@ -44,7 +45,7 @@ PICTURES = {
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
          "idea": 35, "example": 40, "think": 30, "question": 25, "key_word": 4, "meaning": 12, "node": 35,
-         "label": 5, "quote": 40}
+         "label": 5, "quote": 40, "rule": 30}
 
 SYSTEM = """You are the Topic Builder for Socratic AI, a calm tutor that helps university beginners practise critical thinking on any topic. A learner gives you a REQUEST: a topic name, a question, or a short reading. You write the material the tutor will use. You never write the questions; the tutor does that.
 
@@ -78,6 +79,8 @@ Each case has:
   - think: 1 question to think about while reading
 - more_knowledge: 3 to 5 extra facts or steps, each with an id, text, knowledge type and a label of 2 to 4 words, so the knowledge graph is complete
 - links: 6 to 12 links [from_id, relation, to_id] between the notes (ids n1 to n5) and the more_knowledge ids. Every note and every extra fact is in at least 1 link.
+- rules: the rules of thumb an expert uses in this case, as a small yes or no decision tree with 2 to 4 questions and 3 to 5 decisions. Each node has an id, a kind ("question" or "decision"), a text (a question ending with "?", or a decision of what to do or believe, at most 25 words) and a why (the id of the note or more_knowledge item it rests on). links are [question_id, "yes" or "no", next_id]. Every question has exactly 1 yes and 1 no link, the tree starts at root, and every path ends in a decision.
+- model: a tiny cause and signs model for the case. cause is a hidden cause that matters in the case, and signs are exactly 2 things it makes more likely that a person could see. Each has a text (a full statement with a verb, at most 12 words, like "The day is hot.") and a why (a note or more_knowledge id). The cause has chance, the percent of such situations where it is true. Each sign has if_cause and if_not, the percent chance the sign shows when the cause is true and when it is not, with if_cause higher. These are rough guesses, so use round numbers between 5 and 95.
 
 PICTURES (use these names only):
 """ + "\n".join(f"- {k}: {v}" for k, v in PICTURES.items()) + """
@@ -98,7 +101,10 @@ Otherwise reply with ONLY this JSON and nothing else:
             "notes": [{"text": "", "type": "", "label": "", "quote": ""}],
             "reading": {"idea": [""], "example": "", "key_words": [["", ""]], "think": ""},
             "more_knowledge": [{"id": "", "text": "", "type": "", "label": "", "quote": ""}],
-            "links": [["n1", "supports", ""]]}]}"""
+            "links": [["n1", "supports", ""]],
+            "rules": {"root": "q1", "nodes": [{"id": "q1", "kind": "question", "text": "", "why": "n1"}], "links": [["q1", "yes", ""]]},
+            "model": {"cause": {"text": "", "why": "", "chance": 0},
+                      "signs": [{"text": "", "why": "", "if_cause": 0, "if_not": 0}]}}]}"""
 
 
 class TopicError(ValueError):
@@ -130,6 +136,59 @@ def _label(value):
         return _text(value, WORDS["label"], "label")
     except TopicError:
         return None
+
+
+def _id(value):
+    return re.sub(r"[^a-z0-9_]", "_", str(value or "").strip().lower())[:30]
+
+
+def _rules(raw, ids):
+    """Goal 3, step 7. The drafted decision tree, or None when it is not a proper
+    tree (heuristics.problems). A "why" that names no node of the graph is dropped."""
+    if not isinstance(raw, dict):
+        return None
+    nodes = []
+    for n in (raw.get("nodes") or [])[:9]:
+        if isinstance(n, dict) and (nid := _id(n.get("id"))) and n.get("kind") in heuristics.KINDS:
+            try:
+                nodes.append({"id": nid, "kind": n["kind"], "text": _text(n.get("text"), WORDS["rule"], "rule"),
+                              **({"why": w} if (w := _id(n.get("why"))) in ids else {})})
+            except TopicError:
+                return None
+    edges = [[_id(a), str(ans).strip().lower(), _id(b)] for a, ans, b in
+             (e for e in raw.get("links") or raw.get("edges") or [] if isinstance(e, list) and len(e) == 3)]
+    tree = {"root": _id(raw.get("root")), "nodes": nodes,
+            "edges": [e for e in edges if e[1] in ("yes", "no")]}
+    return tree if nodes and not heuristics.problems(tree) else None
+
+
+def _percent(value):
+    try:
+        return max(1, min(99, round(float(value))))
+    except (TypeError, ValueError):
+        return None
+
+
+def _model(raw, ids):
+    """Goal 3, step 7. The drafted cause and signs model with its guessed chances,
+    as pgm.guessed() shows it, or None when anything is missing."""
+    raw = raw.get("guess", raw) if isinstance(raw, dict) else None  # recheck() sends the shown model back
+    if not isinstance(raw, dict) or not isinstance(raw.get("cause"), dict):
+        return None
+    signs = [x for x in raw.get("signs") or [] if isinstance(x, dict)][:2]
+    try:
+        def part(x, *chances):
+            got = {k: _percent(x.get(k)) for k in chances}
+            if None in got.values():
+                raise TopicError("A chance is missing.")
+            return {"text": _text(x.get("text"), WORDS["mission"], "model"),
+                    "why": w if (w := _id(x.get("why"))) in ids else None, **got}
+        guess = {"cause": part(raw["cause"], "chance"), "signs": [part(x, "if_cause", "if_not") for x in signs]}
+    except TopicError:
+        return None
+    if len(guess["signs"]) != 2 or any(x["if_cause"] <= x["if_not"] for x in guess["signs"]):
+        return None
+    return pgm.guessed(guess)
 
 
 def _type(value):
@@ -231,6 +290,8 @@ def clean_case(raw, topic, case_id, source=None, text=None):
         "knowledge": {"nodes": nodes, "edges": edges},
         "generated": True,  # a DRAFT no expert has checked
         "source": clean_source(source),
+        **({"heuristics": tree} if (tree := _rules(raw.get("rules") or raw.get("heuristics"), {n["id"] for n in nodes})) else {}),
+        **({"model": model} if (model := _model(raw.get("model"), {n["id"] for n in nodes})) else {}),
     }
 
 
@@ -374,6 +435,14 @@ def _mock(request, count=CASES_PER_TOPIC):
                         "key_words": [["Claim", "something said to be true"]], "think": "[mock] What would you check first?"},
             "more_knowledge": [{"id": "check", "text": "[mock] Then check the evidence.", "type": "procedural"}],
             "links": [["n1", "supports", "n2"], ["n3", "then", "check"], ["n4", "causes", "n1"], ["n5", "weakens", "n2"]],
+            "rules": {"root": "q1", "nodes": [
+                {"id": "q1", "kind": "question", "text": "[mock] Is there evidence for the claim?", "why": "n5"},
+                {"id": "d1", "kind": "decision", "text": "[mock] Look for evidence before you believe it.", "why": "check"},
+                {"id": "d2", "kind": "decision", "text": "[mock] Weigh the evidence before you decide.", "why": "n3"}],
+                "links": [["q1", "no", "d1"], ["q1", "yes", "d2"]]},
+            "model": {"cause": {"text": "[mock] The claim is true.", "why": "n1", "chance": 30},
+                      "signs": [{"text": "[mock] A study backs it.", "why": "n5", "if_cause": 70, "if_not": 20},
+                                {"text": "[mock] Experts agree.", "why": "n2", "if_cause": 80, "if_not": 30}]},
         }
     return {"topic": name, "cases": [case(i) for i in range(1, count + 1)]}
 
@@ -424,7 +493,7 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
         # refusal is final.
         for attempt in range(2):
             reply = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False),
-                                         max_tokens=2600 * count, json_mode=True)  # quotes need about 400 more
+                                         max_tokens=3200 * count, json_mode=True)  # quotes, rules and model need about 1000 more
             data = llm_client._parse_json(reply)
             if isinstance(data, dict) and data.get("refuse"):
                 break

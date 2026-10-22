@@ -199,3 +199,33 @@ def test_every_picture_has_an_icon_on_the_page():
     assert set(re.findall(r"^\s+(\w+): '", block, re.M)) == set(builder.PICTURES)
     assert builder.clean_case(raw_case(picture="Leaf"), "x", "t0123456789-1")["picture"] == "leaf"
     assert builder.clean_case(raw_case(picture="dragon"), "x", "t0123456789-1")["picture"] == "bulb"
+
+
+def test_a_generated_case_gets_rules_and_a_guessed_model():
+    """Goal 3, step 7: the Builder drafts a decision tree and a cause and signs model."""
+    from app import heuristics
+    case = builder.build("Fake news")["cases"][0]
+    assert heuristics.walk(case, {"q1": "no"})["at"] == "d1"
+    model = case["model"]
+    assert model["guessed"] and [n["id"] for n in model["nodes"]] == ["cause", "sign1", "sign2"]
+    assert model["findings"][1]["percent"] == 30 < model["findings"][3]["percent"]
+    assert "chance that [mock] The claim is true from 30%" in model["lesson"]
+    assert builder.recheck(copy.deepcopy(case)) == case  # both survive the page sending the case back
+
+
+def test_broken_rules_or_model_are_dropped_not_the_case():
+    rules = {"root": "q1", "nodes": [{"id": "q1", "kind": "question", "text": "Is it true?", "why": "n1"},
+                                     {"id": "d1", "kind": "decision", "text": "Believe it.", "why": "nowhere"}],
+             "links": [["q1", "yes", "d1"]]}  # a question with only 1 answer
+    model = {"cause": {"text": "It is true.", "chance": 30},
+             "signs": [{"text": "A sign shows.", "if_cause": 20, "if_not": 60},
+                       {"text": "Another sign shows.", "if_cause": 80, "if_not": 10}]}
+    case = builder.clean_case(raw_case(rules=rules, model=model), "Sugar", "t0123456789-1")
+    assert "heuristics" not in case and "model" not in case
+    rules["links"].append(["q1", "no", "d2"])
+    rules["nodes"].append({"id": "d2", "kind": "decision", "text": "Doubt it.", "why": "rate"})
+    model["signs"][0].update(if_cause=60, if_not=20)
+    case = builder.clean_case(raw_case(rules=rules, model=model), "Sugar", "t0123456789-1")
+    assert [n.get("why") for n in case["heuristics"]["nodes"]] == ["n1", None, "rate"]
+    assert case["model"]["findings"][3]["percent"] > 30
+    assert case["model"]["findings"][3]["label"] == "it is true, after seeing that a sign shows and another sign shows"
