@@ -351,11 +351,16 @@
   /* each box: a soft tint of its type colour with a thin edge of the same colour */
   .am-map .nd rect{fill:color-mix(in srgb, var(--c) 11%, var(--panel)); stroke:color-mix(in srgb, var(--c) 40%, transparent); stroke-width:1; transition:fill .15s;}
   .am-map .nd:hover rect{fill:color-mix(in srgb, var(--c) 18%, var(--panel));}
-  .am-map .nd.on rect{fill:color-mix(in srgb, var(--c) 22%, var(--panel)); stroke:var(--c); stroke-width:1.6;}
+  .am-map .nd.on rect{fill:var(--c); stroke:var(--c);}  /* the picked box: solid colour with white text, easy to spot */
+  .am-map .nd.on text{fill:#fff;}
   .am-map .nd:focus{outline:none;} .am-map .nd:focus-visible rect{stroke:var(--c); stroke-width:1.6;}
   .am-map .nd text{font-size:11.5px; font-weight:500; fill:var(--ink);}
   .am-map .ed{fill:none; stroke:var(--ink-faint); stroke-width:1.2; opacity:.55;}
   .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
+  .am-map .cap.on{margin:10px 0 0; padding:10px 14px; line-height:1.5; color:var(--ink); background:var(--panel); border-radius:10px;
+                  border:1px solid color-mix(in srgb, var(--c) 30%, transparent); border-left:3px solid var(--c);}  /* the picked box's text, in a card of its colour */
+  .am-map .cap .tag{display:inline-block; margin-right:8px; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600;
+                    color:#fff; background:var(--c);}
   .am-map .legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--ink-faint); margin:6px 2px 0;}
   .am-map .legend i{display:inline-block; width:9px; height:9px; border-radius:3px; opacity:.75; margin-right:5px; vertical-align:-1px;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
@@ -2126,7 +2131,7 @@ function askChatting(on){
 
 // The knowledge map: one box per piece of knowledge, placed in columns by how
 // far down the links it sits, so arrows run left to right. Plain SVG, no AI call.
-const MAP_COLORS = {factual: '#4a6f9c', conceptual: 'var(--signal)', procedural: '#a88039', causal: '#b0614f',
+const MAP_COLORS = {factual: '#4a6f9c', conceptual: '#2f7a66', procedural: '#a88039', causal: '#b0614f',
                     relational: '#7a689e', strategic: '#6d7c84', metacognitive: '#6d7c84', epistemic: '#6d7c84'};  // muted, so they sit with the theme green
 function mapLabel(n, text){
   if(n.label) return n.label;
@@ -2420,8 +2425,11 @@ function askShowTurn(data, intro){
 function mapPick(nd){
   const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts);
   map.querySelectorAll('.nd').forEach(g => g.classList.toggle('on', g === nd));
-  const t = texts[Number(nd.dataset.i)] || '';
-  map.querySelector('.cap').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+  const t = texts[Number(nd.dataset.i)] || '', cut = t.indexOf('. '), cap = map.querySelector('.cap');
+  const type = cut > 0 ? t.slice(0, cut) : '', text = cut > 0 ? t.slice(cut + 2) : t;
+  cap.classList.add('on');
+  cap.style.setProperty('--c', nd.style.getPropertyValue('--c'));
+  cap.innerHTML = (type ? `<span class="tag">${esc(type.charAt(0).toUpperCase() + type.slice(1))}</span>` : '') + esc(text);
 }
 $('askThread').addEventListener('keydown', e => {
   const nd = e.target.closest('.am-map .nd');
