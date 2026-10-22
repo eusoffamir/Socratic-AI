@@ -209,11 +209,15 @@
   .know-tree .why{margin-top:8px; color:var(--ink-soft);}
   .know-tree .why .mono-label{display:inline; margin-right:8px;}
   .know-restart{background:transparent; color:var(--ink-soft); border:1px solid var(--rule); padding:6px 14px; border-radius:999px; font-size:13.5px; display:block; margin:0 auto;}
-  .know-net svg{display:block; width:100%; max-width:640px; height:auto; margin:0 auto 18px;}
-  .know-net rect{fill:var(--panel); stroke:var(--signal); stroke-width:1.5;}
-  .know-net text{font-size:12px; fill:var(--ink);}
-  .know-net .ed{stroke:var(--ink-faint); stroke-width:1.3; fill:none;}
-  .know-net .rel{font-size:10.5px; fill:var(--ink-faint); paint-order:stroke; stroke:var(--paper); stroke-width:5px;}  /* a halo, so the word stays clear of the arrow */
+  /* drawn 1.17 times larger, like the map of the ideas, so its 11.5px text shows at about 13.5px; same green panel and tinted boxes */
+  .know-net-fig{--bg:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); background:var(--bg); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);
+                border-radius:14px; padding:16px 14px; margin:0 0 18px;}
+  .know-net svg{display:block; width:100%; height:auto; margin:0 auto;}
+  .know-net rect{fill:color-mix(in srgb, var(--signal) 8%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 35%, transparent); stroke-width:1;}
+  .know-net rect.cause{fill:color-mix(in srgb, var(--signal) 16%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 50%, transparent);}
+  .know-net text{font-size:11.5px; font-weight:500; fill:var(--ink);}
+  .know-net .ed{stroke:var(--ink-faint); stroke-width:1.2; opacity:.6; fill:none;}
+  .know-net .rel{font-size:10px; fill:var(--ink-faint); paint-order:stroke; stroke:var(--bg); stroke-width:5px;}  /* a halo, so the word stays clear of the arrow */
   .know-quote a{color:var(--signal);}
   .know-bar{display:grid; grid-template-columns:minmax(0, 1fr) 84px 150px 44px; gap:12px; align-items:center; padding:9px 0; border-bottom:1px solid var(--rule); font-size:14px;}
   .know-bar .mv{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-faint);}
@@ -2985,19 +2989,19 @@ function knowTreeHTML(t, answers){
 // The Bayesian network: causes on top, what they cause below, then the chances it learned.
 function knowNetHTML(v){
   const tops = v.nodes.filter(n => !n.parents.length), lows = v.nodes.filter(n => n.parents.length);
-  const W = 200, H = 50, GAP = 36, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
+  const W = 184, H = 44, GAP = 28, ROW = 96, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
   [tops, lows].forEach((row, r) => row.forEach((n, i) => {
-    pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * 116};
+    pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * ROW};
   }));
   const lines = v.edges.map(([a, rel, b]) => {
     const p = pos[a], q = pos[b], x1 = p.x + W / 2, y1 = p.y + H, x2 = q.x + W / 2, y2 = q.y - 2;
-    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 34} ${x2} ${y2 - 34} ${x2} ${y2}" marker-end="url(#netArrow)"/>
+    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 28} ${x2} ${y2 - 28} ${x2} ${y2}" marker-end="url(#netArrow)"/>
       <text class="rel" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${(y1 + y2) / 2 + 4}" text-anchor="${x2 > x1 ? 'start' : 'end'}">${esc(rel)}</text>`;
   }).join('');
   const boxes = v.nodes.map(n => {
-    const {x, y} = pos[n.id], label = wrap2(n.text.replace(/\.$/, ''), 26);
-    return `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
-      `<text x="${x + W / 2}" y="${y + (label.length === 1 ? 29 : 21 + k * 15)}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
+    const {x, y} = pos[n.id], label = wrap2(n.text.replace(/\.$/, ''), 27);
+    return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
+      `<text x="${x + W / 2}" y="${y + (label.length === 1 ? 26 : 19 + k * 14)}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
   }).join('');
   const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
     <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
@@ -3005,9 +3009,9 @@ function knowNetHTML(v){
     ? 'The AI guessed these chances, because there is no data to count for this topic, so treat them as a rough sketch. Asking the model backwards, from the signs to their likely cause, is abductive reasoning.'
     : `This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.`;
   return `<div class="know-net"><p class="know-intro">${intro}</p>
-    <svg viewBox="0 0 ${width} ${4 + 116 + H + 4}" aria-label="What causes what in this case">
+    <div class="know-net-fig"><svg viewBox="0 0 ${width} ${4 + ROW + H + 4}" style="max-width:${Math.round(width * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg>
+        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
     <span class="mono-label">The chance that</span>${bars}
     <div class="know-lesson">${esc(v.lesson)}</div></div>`;
 }
