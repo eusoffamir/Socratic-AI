@@ -90,6 +90,13 @@ Eusoff wants it to work like ChatGPT: the learner types ANY topic and practises 
 - **Honest limits:** generated cases are drafts no expert checked (the page says so and asks the learner to question them). Facts come from the model, so one test topic had an overstated fact. Simulation tools exist only for quant. Some generated "inductive" questions gave only one case, so the skill check prompt can be tightened from real use.
 - **For the paper (Goals 1 and 2):** the same agents, scoring and dashboards ran unchanged on vaccines, the French Revolution and climate change. A fair test still to do is to compare Assessor marks on quant and on a generated topic against a human marker.
 
+## Goal 3: one way to represent knowledge (started 22 October 2026)
+
+Plan for Dr Ho: `docs/supervisor/goal3-plan.md` (7 steps, 4 questions for him). Books become knowledge graphs, human heuristics become decision trees, data becomes a small Bayesian network, all as nodes and links. Reasoning is a move on the graph: deductive is a forward walk, inductive is counting over data, abductive is a backward walk from what was seen to its likely cause.
+
+- **Choices (22 October 2026, Eusoff):** plain Python, no new libraries (pgmpy pulls in torch, too heavy for Render free). Data for the networks is simulated first, like `app/tools.py`.
+- **Step 2, decision trees** (`app/heuristics.py`, tests `tests/test_heuristics.py`). One rule-of-thumb tree per quant case (2 to 4 yes or no questions, 3 to 5 decisions), DRAFT by Claude for Dr Ho. Every node has a "why" that names a knowledge graph node. `walk()` is the deductive move and stops at the next unanswered question, `rules()` reads the tree as IF-THEN rules, `problems()` checks any tree (so Builder drafts can be checked in step 7). A case dict can carry its own tree under "heuristics". Not used by the app yet.
+
 ## Findings from the student's own testing (Gemini Gem, September 2026)
 
 - Test #1, online "Socratic Tutor" gem: refused answers, but asked the learner to invent the tracking method with no teaching first (learner said "i dont know" twice), lost context, no purpose or end.
