@@ -178,7 +178,6 @@
   /* Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data */
   .know .am-map svg{margin:0 auto;}  /* drawn 1.17 times larger and centred, so its 11.5px box text shows at 13.5px like the page */
   .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
-  .know-pick select{font:inherit; font-size:14.5px; padding:6px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--panel); color:var(--ink); max-width:100%;}
   .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
   .know-tabs button{background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:8px 12px; margin-bottom:-1px; color:var(--ink-soft); font-size:14.5px;}
   .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
@@ -1173,12 +1172,12 @@
   :is(#overallBody, #knowBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
   :is(#overallBody, #knowBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
   /* Knowledge page: the same two sizes and green boxes */
-  #knowBody :is(.know-pick select, .know-tabs button, .know-intro, .know-none, .know-quote, .know-lesson, .know-tree li p,
+  #knowBody :is(.know-tabs button, .know-intro, .know-none, .know-quote, .know-lesson, .know-tree li p,
      .know-tree .why, .know-restart, .know-bar, .am-map .cap){font-size:13.5px;}
   #knowBody :is(.know-tree .know-ans, .know-bar .mv, .am-map .legend){font-size:12px;}
   #knowBody :is(.know-bar .mv, .am-map .mono-label){font-family:var(--sans);}
   #knowBody .am-map .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
-  #knowBody :is(.am-map, .know-quote, .know-tree li:not(.end), .know-pick select){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
+  #knowBody :is(.am-map, .know-quote, .know-tree li:not(.end)){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
   #knowBody .know-restart{color:var(--signal); background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
   #knowBody .know-bar .track{background:var(--signal-soft);}
 </style>
@@ -2824,17 +2823,23 @@ function openKnowledge(){
   if(!cases.some(c => c.id === know.id)) know.id = (cases[0] || {}).id;
   renderKnowledge();
 }
+const knowName = x => `${x.title}${x.generated ? ' (your topic)' : ''}`;
 function renderKnowledge(){
   const cases = knowCases(), c = cases.find(x => x.id === know.id), body = $('knowBody');
   if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
   body.innerHTML = `<div class="report know">
     <h2>How the knowledge fits</h2>
     <p class="lead">Knowledge comes from books, from the rules of thumb experts use, and from data. Here you can see all three for one case.</p>
-    <label class="know-pick"><span class="mono-label">Case</span><select id="knowCase">${cases.map(x =>
-      `<option value="${esc(x.id)}"${x.id === c.id ? ' selected' : ''}>${esc(x.title)}${x.generated ? ' (your topic)' : ''}</option>`).join('')}</select></label>
+    <div class="know-pick"><span class="mono-label">Case</span><div class="ov-filter" id="knowCase">
+      <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(knowName(c))}</span>
+        <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="ov-menu" role="menu">${cases.map((x, i) =>
+        `<button type="button" role="menuitemradio" aria-checked="${x.id === c.id}" data-i="${i}">${esc(knowName(x))}</button>`).join('')}</div></div></div>
     <div class="know-tabs" role="tablist">${KNOW_TABS.map(([k, name]) =>
       `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === know.tab}">${name}</button>`).join('')}</div>
     <div id="knowPane" role="tabpanel"></div></div>`;
+  // the same green pill menu as the "All cases" filter on Overall status
+  wireCaseFilter($('knowCase'), cases, x => { know.id = x.id; renderKnowledge(); });
   renderKnowPane(c);
 }
 async function renderKnowPane(c){
@@ -2930,9 +2935,6 @@ function knowSourceHTML(c, n){
   return `<div class="know-quote"><span class="mono-label">From a book</span>${where}<blockquote>"${esc(s.quote)}"</blockquote></div>`;
 }
 $('knowBtn').addEventListener('click', openKnowledge);
-$('knowBody').addEventListener('change', e => {
-  if(e.target.id === 'knowCase'){ know.id = e.target.value; renderKnowledge(); }
-});
 $('knowBody').addEventListener('click', e => {
   const c = knowCases().find(x => x.id === know.id);
   const tab = e.target.closest('[data-tab]');
