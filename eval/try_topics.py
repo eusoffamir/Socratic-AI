@@ -21,9 +21,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from dotenv import load_dotenv  # noqa: E402
+from app.env import load_env  # noqa: E402
 
-load_dotenv(ROOT / ".env")
+load_env(ROOT / ".env")
 
 from app import builder  # noqa: E402
 from app.reasoning import CORE_KNOWLEDGE, REASONING_TYPES  # noqa: E402

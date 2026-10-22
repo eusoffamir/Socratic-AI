@@ -1,5 +1,10 @@
-# secrets: never upload the real API key
+# secrets: never upload the real API key.
+# .env stays ignored so a plain one is never added by accident. The dotenvx
+# ENCRYPTED .env is added once with `git add -f .env` (see CLAUDE.md), after
+# that git tracks it. tests/test_env.py fails if it ever holds a plain value.
 .env
+# the private key that unlocks .env: NEVER upload, keep in a password manager
+.env.keys
 
 # local Python files
 .venv/

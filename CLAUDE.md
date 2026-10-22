@@ -19,8 +19,12 @@ Eusoff works from his PC, his laptop and his phone (Claude Code cloud sessions).
 - A commit that only changes docs or the thesis gets `[skip render]` in its message, so Render does not rebuild and restart the app.
 - Render free plan sleeps after 15 minutes idle. A cron-job.org job ("Socratic AI wake", Eusoff's account) pings `/api/health` every 10 minutes to keep it awake. A "Service waking up" page right after a push is the redeploy, not a broken ping.
 - Project knowledge goes in this file or `docs/project-history.md`, not only in Claude's memory.
-- Not synced, set up by hand per device: `.env`, `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
-- **Cloud sessions (phone or claude.ai/code):** there is no `.env` and none of the private files, so run tests and servers with `PROVIDER=mock`. Ask Eusoff before work that needs a real Gemini key, the live database or the private docs.
+- **`.env` is shared through git, encrypted with dotenvx** (the repo is public). Each device has the private key once as the `DOTENV_PRIVATE_KEY` environment variable (Windows: `setx`; cloud sessions: environment settings). Backup of the key: Eusoff's password manager. `.env.keys` is never committed.
+  - Run anything that needs the keys through dotenvx: `dotenvx run -- uvicorn app.main:app --reload`, `dotenvx run -- pytest`.
+  - Change a value: `dotenvx set KEY value` (encrypts it). Never type a plain value into `.env` and commit it; `tests/test_env.py` fails if the shared `.env` holds a plain value.
+  - `app/env.py` skips encrypted values when the app runs without dotenvx, so Render keeps using its dashboard values and defaults.
+- Not synced, set up by hand per device: `.claude/settings.local.json`, Dr Ho's private proposal docx, his Module 7 and 8 PDFs.
+- **Cloud sessions (phone or claude.ai/code):** none of the private files are there. Without `DOTENV_PRIVATE_KEY` in the cloud environment, run tests and servers with `PROVIDER=mock`. Ask Eusoff before work that needs the live database or the private docs.
 - If `git` is not found, use `& "C:\Program Files\Git\cmd\git.exe"`.
 
 ## Saving tokens (rules for Claude)
@@ -59,7 +63,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 - Providers: `mock`, `gemini` (free, model `gemini-3.5-flash-lite`), `anthropic`.
 - Server `app/main.py` (FastAPI, `GET /api/health`). Page `static/index.html`. Eval tools in `eval/`, plans in `docs/evaluation/`.
 - Live: https://socratic-ai-qlk6.onrender.com (deploys from `main`).
-- Run: `uvicorn app.main:app --reload`. Tests: `pytest`. For a no-cost test server use `PROVIDER=mock` (`MOCK=1` is ignored when `.env` sets `PROVIDER`).
+- Run: `dotenvx run -- uvicorn app.main:app --reload`. Tests: `pytest` (or `dotenvx run -- pytest`). For a no-cost test server use `PROVIDER=mock` (`MOCK=1` is ignored when `.env` sets `PROVIDER`).
 
 Design requirements R1 to R9 and honest status: see history file.
 

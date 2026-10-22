@@ -65,8 +65,8 @@ def main():
     ap.add_argument("--split", choices=["tune", "test"], help="only rows of this split")
     args = ap.parse_args()
 
-    from dotenv import load_dotenv
-    load_dotenv(ROOT / ".env")
+    from app.env import load_env
+    load_env(ROOT / ".env")
     from app import llm_client, prompts
     if llm_client.PROVIDER == "mock":
         sys.exit("No AI key found in .env, so this would only mark with fake mock replies. Set GOOGLE_API_KEY first.")

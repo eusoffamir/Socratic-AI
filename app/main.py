@@ -7,9 +7,9 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from dotenv import load_dotenv
+from .env import load_env
 
-load_dotenv()  # must run before `from . import graph` below, since llm_client
+load_env()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
 from fastapi import FastAPI, HTTPException, Query

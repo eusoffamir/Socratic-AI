@@ -73,8 +73,8 @@ def export(out):
 
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv
-    load_dotenv(ROOT / ".env")
+    from app.env import load_env
+    load_env(ROOT / ".env")
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "eval" / "exports" / f"answers_{date.today()}.csv"
     rows = export(out)
     from app import storage
