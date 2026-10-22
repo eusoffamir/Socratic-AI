@@ -194,6 +194,7 @@
   /* messages: the learner on the right in a bubble, Socratic AI as plain text, like Claude */
   .am-user{align-self:flex-end; max-width:80%; background:var(--panel); border:1px solid var(--rule);
            border-radius:16px; padding:10px 16px; font-size:15px; white-space:pre-wrap; overflow-wrap:anywhere;}
+  .am-user + .am-ai{margin-top:16px;}  /* more room after an answer, before the next Thought process */
   .am-status{color:var(--ink-faint); font-size:14.5px; display:flex; align-items:center; gap:8px;}
   .am-ai{font-family:var(--sans); font-size:15px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
   .am-ai p{margin:0 0 12px;}
