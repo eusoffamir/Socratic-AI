@@ -226,6 +226,7 @@
   /* mastery and the skill check grid side by side */
   .ov-two{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:72px; align-items:start;}
   .ov-two > .rk:only-child{grid-column:1 / -1;}
+  .report-grid + .ov-two{margin-top:30px;}  /* a clear break between the levels row and the skills row */
   @media (max-width:1100px){ .ov-two{grid-template-columns:1fr; gap:0;} }
 
   /* Ask: a Claude-style start page (chat icon in the rail). Home is untouched. */
