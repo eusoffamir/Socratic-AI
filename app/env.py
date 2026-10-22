@@ -21,6 +21,19 @@ ENCRYPTED_PREFIX = "encrypted:"
 
 def load_env(path: Path | None = None) -> None:
     """Copy plain values from .env into os.environ, never overriding what is set."""
+    # If `dotenvx run` could not decrypt (wrong or missing DOTENV_PRIVATE_KEY),
+    # it still passes the scrambled "encrypted:..." text on. Drop it, so the
+    # app falls back to its defaults (mock mode) instead of crashing.
+    failed = [k for k, v in os.environ.items() if v.startswith(ENCRYPTED_PREFIX)]
+    for key in failed:
+        del os.environ[key]
+    if failed:
+        print(
+            f"[env] Could not decrypt {len(failed)} value(s) from .env, so they "
+            "were ignored and the app uses its defaults. Check that "
+            "DOTENV_PRIVATE_KEY is set and matches the key on your other devices."
+        )
+
     env_file = path or ROOT / ".env"
     if not env_file.exists():
         return

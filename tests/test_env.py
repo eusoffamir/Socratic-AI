@@ -54,3 +54,9 @@ def test_load_env_skips_encrypted_and_keeps_existing(tmp_path: Path, monkeypatch
     assert "SECRET_ONE" not in os.environ
     assert os.environ["ALREADY_SET"] == "from_environment"
     monkeypatch.delenv("PLAIN_ONE", raising=False)
+
+
+def test_load_env_drops_values_dotenvx_could_not_decrypt(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PROVIDER", "encrypted:garbled")
+    load_env(tmp_path / "missing.env")
+    assert "PROVIDER" not in os.environ
