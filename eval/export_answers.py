@@ -20,9 +20,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app.content import STANDARDS  # noqa: E402
+from app.content import CONCEPTS, QUANT_TOPIC, STANDARDS  # noqa: E402
 
-COLUMNS = (["session_id", "participant_code", "last_saved", "case", "total_rounds", "ab_only", "reading_seconds", "ended",
+COLUMNS = (["session_id", "participant_code", "last_saved", "case", "topic", "case_title", "total_rounds", "ab_only", "reading_seconds", "ended",
             "round", "level_asked", "format", "question", "hint_opened", "answer", "answer_words"]
            + list(STANDARDS)
            + ["standards_met", "reasoning_move", "confused_or_frustrated", "copied_hint", "assessor_version"])
@@ -33,6 +33,8 @@ def rows_of(sid, session, saved):
     if session.get("mode") == "skill_check":
         return  # skill checks have their own shape; their export comes with the statistics (Goal 1 step 5)
     turns = session.get("turns", [])
+    case = session.get("case") or CONCEPTS.get(session.get("concept_id")) or {}
+    topic = case.get("topic") or (QUANT_TOPIC if session.get("concept_id") in CONCEPTS else "")
     for prev, t in zip(turns, turns[1:]):
         if t.get("answer") is None:
             continue
@@ -46,6 +48,7 @@ def rows_of(sid, session, saved):
         yield {
             "session_id": sid, "participant_code": session.get("participant_code") or "",  # blank outside study mode
             "last_saved": saved, "case": session.get("concept_id"),
+            "topic": topic, "case_title": case.get("title", ""),  # what the learner typed, or the quant topic
             "total_rounds": session.get("total_rounds"),  # 0 = no limit
             "ab_only": int(bool(session.get("ab_only"))), "reading_seconds": session.get("reading_seconds", 0),
             "ended": int(bool(session.get("ended"))), "round": prev.get("round"),  # the round of the question answered

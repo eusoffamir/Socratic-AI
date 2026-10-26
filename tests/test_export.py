@@ -27,4 +27,5 @@ def test_export_writes_one_row_per_answer(monkeypatch, tmp_path):
     assert rows[0]["question"] == first_question and rows[0]["hint_opened"] == "1"
     assert rows[0]["level_asked"] == "Clarify" and rows[0]["assessor_version"]
     assert [r["round"] for r in rows] == ["1", "2"]
+    assert rows[0]["topic"] == export_answers.QUANT_TOPIC and rows[0]["case_title"] == "Pattern or luck?"
     assert int(rows[0]["standards_met"]) == sum(int(rows[0][k]) for k in export_answers.STANDARDS)
