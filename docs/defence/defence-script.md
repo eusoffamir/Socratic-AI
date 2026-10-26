@@ -10,7 +10,7 @@ The same words are in the speaker notes of each slide.
 
 ## Slide 1, Cover (25 s)
 
-Good afternoon, Dr Ho and members of the panel. My name is Muhammad Eusoff Amir bin Hazri. My project is Socratic AI, Agentic AI for Fostering Critical Thinking Education, and my supervisor is Dr Ho Tatt Wei. In one sentence, it is an AI tutor that asks instead of answers, and then measures how well the student thinks.
+Good afternoon, Dr Ho, Dr Syaimaa', and everyone here. My name is Muhammad Eusoff Amir bin Hazri. My project is Socratic AI, Agentic AI for Fostering Critical Thinking Education, and my supervisor is Dr Ho Tatt Wei. In one sentence, it is an AI tutor that asks instead of answers, and then measures how well the student thinks.
 
 ## Slide 2, Outline (10 s)
 
