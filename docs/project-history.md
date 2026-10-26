@@ -114,7 +114,7 @@ Eusoff asked for a profile login with Google so his chats follow him across devi
   1. Google Cloud Console, APIs and Services, Credentials, Create credentials, OAuth client ID, type Web application. Authorised JavaScript origins `https://socratic-ai-qlk6.onrender.com`, `http://localhost:8000` and `http://localhost`. No redirect URI is needed. The OAuth consent screen can stay in Testing with Eusoff as a test user, or be published for students.
   2. Supabase, SQL Editor, run the `profiles` part at the end of `deploy/supabase.sql`.
   3. Render, Environment, add `GOOGLE_CLIENT_ID` (the client id) and `AUTH_SECRET` (the value from `npx.cmd dotenvx get AUTH_SECRET`). Locally, `dotenvx set GOOGLE_CLIENT_ID ...`.
-- **Switched on live (28 October 2026, about 2.30 am).** OAuth client "Socratic-AI" made, profiles table run in Supabase, `GOOGLE_CLIENT_ID` and `AUTH_SECRET` set on Render and in `.env`. Eusoff signed in with his own Google account on localhost. The Google client is still in Testing, so only listed test users can sign in; publish it (Google Auth Platform, Audience) before students use it.
+- **Switched on live (27 October 2026, about 2.30 am).** OAuth client "Socratic-AI" made, profiles table run in Supabase, `GOOGLE_CLIENT_ID` and `AUTH_SECRET` set on Render and in `.env`. Eusoff signed in with his own Google account on localhost. The Google client is still in Testing, so only listed test users can sign in; publish it (Google Auth Platform, Audience) before students use it.
 - **Open.** Ethics: if students sign in during the study, the consent form should mention it. Study mode still uses participant codes.
 
 ## Findings from the student's own testing (Gemini Gem, September 2026)
