@@ -54,7 +54,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 ## Supervisor
 
-- Internal examiner for the proposal defence: **Dr Syaimaa' Solehah M Radzi**, lecturer in Electrical and Electronics Engineering, Faculty of Engineering, UTP (research area not known yet). Named on the cover slide.
+- Internal examiner for the proposal defence: **Dr Syaimaa' Solehah M Radzi**, lecturer in Electrical and Electronics Engineering, Faculty of Engineering, UTP (research area not known yet). Named on the cover slide. Defence slot Wednesday 28 October 2026, 2.20 pm to 2.40 pm.
 - Messages: `docs/supervisor/dr-ho-messages.md`. Parent SoTL grant details in the history file.
 - **Meeting 2 (19 October 2026):** read `docs/supervisor/meeting2-notes.md` before any Goal 1 work. Goal 1 (mid November 2026): attainment in reasoning type, knowledge type and quality, with new Reasoning and Explainer agents. All 6 steps of section 8 are done.
 

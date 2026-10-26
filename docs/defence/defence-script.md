@@ -1,5 +1,7 @@
 # Proposal defence script (word for word)
 
+Defence slot is Wednesday 28 October 2026, 2.20 pm to 2.40 pm, with Dr Ho and Dr Syaimaa'. That is 20 minutes in all, and the next student starts at 2.40 pm, so stop talking by about 2.35 pm.
+
 About 1482 words, about 13 min 00 s at a calm pace. The limit is 15 minutes of talking, then 5 minutes of questions, so this leaves about 2 minutes spare for nerves and clicks.
 
 Speak slowly. If you run short of time, shorten slides 9, 10 and 14 first. On the Gantt chart, point only to the green rows and the milestones.
