@@ -2642,8 +2642,8 @@ async function askTopic(text){
 async function askAnswer(typed){
   let answer = typed;
   if(ask.picked != null){
-    const pick = `${'AB'[ask.picked]}: ${ask.options[ask.picked]}.`;
-    answer = answer ? `${pick} Why: ${answer}` : pick;
+    if(!answer.trim()) return askWhy($('askInput'));  // a bare pick is a guess, so the why is needed
+    answer = `${'AB'[ask.picked]}: ${ask.options[ask.picked]}. Why: ${answer}`;
   }
   if(!answer) return;
   const line = askAdd('am-user', esc(answer));
@@ -3397,6 +3397,12 @@ $('choices').addEventListener('click', e => {
 
 // ---------- sending ----------
 
+// The learner picked A or B but wrote no reason: ask for it in the box.
+function askWhy(box){
+  box.placeholder = 'Say why you picked it, then send.';
+  box.focus();
+}
+
 function setBusy(busy){
   state.busy = busy;
   $('sendBtn').disabled = busy;
@@ -3415,8 +3421,8 @@ async function sendAnswer(text){
   const typed = box.value;  // kept so it can be put back if sending fails
   let answer = (text ?? typed).trim();
   if(fromBox && state.picked != null){
-    const pick = `${'AB'[state.picked]}: ${state.options[state.picked]}.`;
-    answer = answer ? `${pick} Why: ${answer}` : pick;
+    if(!answer) return askWhy(box);  // a bare pick is a guess, so the why is needed
+    answer = `${'AB'[state.picked]}: ${state.options[state.picked]}. Why: ${answer}`;
   }
   if(!answer || state.ended || state.busy) return;
   const entry = addLearner(answer);
