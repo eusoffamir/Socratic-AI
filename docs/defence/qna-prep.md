@@ -82,7 +82,7 @@ Yes, it is my next fix, and I show it on slide 19 on purpose. Answers that only 
 
 ### 17. What if Gemini changes or stops its free plan?
 
-The code keeps the AI provider separate from the rest of the system, so switching is one setting. It already works with Gemini, with Claude, and with a mock mode, and Dr Ho has asked about a paid Claude subscription for the project.
+The code keeps the AI provider separate from the rest of the system, so switching is one setting. It already works with Gemini, with Claude, and with a mock mode, and a paid Claude subscription for the project has been requested through Dr Ho.
 
 ### 18. What is LangGraph, and why use it?
 
