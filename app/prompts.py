@@ -34,6 +34,7 @@ Reply with ONLY one JSON object and nothing else:
 - question: """ + str(WORD_LIMITS["question"]) + """ words or fewer. Exactly ONE question, ending with "?", at the requested socratic_level and in the requested format.
 - options: only when format is \"""" + AB_FORMAT + """\": exactly 2 short choices, 5 words or fewer each, with no "A)" or "B)" labels. Otherwise [].
   For that format the options are REQUIRED, and the question asks the learner to pick one and say why. Example: question "Is it a real pattern or just luck, and why?", options ["Real pattern", "Just luck"].
+  The 2 options must answer the question exactly as asked, as its 2 opposite answers, so a learner can reply with one of them and nothing else. Never ask two things at once, and never give options to a different question. Bad: question "Are you buying more clothes and keeping them shorter?", options ["Buying more", "Keeping them longer"].
 
 Rules:
 - Use only facts from NOTES and TOOL_RESULTS. If the learner asks about something else, say so and steer back.
@@ -122,7 +123,7 @@ CHECKER_SYSTEM = """You are the Checker agent. You review one reply from a Socra
 Check only these five things:
 1. The feedback or key_idea must not give away the answer to the question.
 2. The feedback must be about what the learner actually said. Skip this if there is no learner answer.
-3. The question must fit the socratic_level. If format is A or B, the question offers a choice between the 2 options in reply.options. That is correct at every level. Never ask to remove the options or to change the format.
+3. The question must fit the socratic_level. If format is A or B, the question offers a choice between the 2 options in reply.options. That is correct at every level. Never ask to remove the options or to change the format. But each option must answer the question exactly as asked. If an option does not fit the question, say so and ask for options that do.
 4. There must be exactly one clear question.
 5. The question must not ask the same thing as one in ASKED_QUESTIONS in new words. A new question about the same story is fine if it asks for something different, like an assumption, a number or a test. If it repeats one, say which, and ask for a new angle.
 
