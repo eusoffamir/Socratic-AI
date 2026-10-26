@@ -6,6 +6,7 @@ Short version. Full history, details, audits and dated findings are in `docs/pro
 
 - **Muhammad Eusoff Amir bin Hazri**, ID **22010491**, goes by Eusoff. Course **EFB4042** (FYP I), UTP. Project "Agentic AI for Fostering Critical Thinking Education", code **26S005**, supervisor Dr Ho Tatt Wei.
 - **Student-facing and thesis text: easy English, short sentences. Never use "--" or em dashes.**
+- **No colons (":") in slides, scripts or other text Eusoff presents**, not even "Label: text" or "Title: subtitle". Use plain spoken English instead ("Next, ...", "so ..."). Reference lists keep their colons.
 - No money for APIs. Default to free options (Gemini free tier, mock mode, local tools).
 - Work one step at a time, explain in plain words, ask before large new features.
 - Be honest about uncertainty. Never invent citations.
