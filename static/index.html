@@ -1857,7 +1857,12 @@ function setActiveTopic(id){
 
 // Topics the Ask chat offers with one click. A click only fills the box, so
 // nothing is built (and no AI call is made) until the learner presses Enter.
-const SUGGESTED_TOPICS = ['How vaccines work', 'Banning homework', 'Fake news'];
+// Three are picked at random each time the page opens or a new chat starts.
+const SUGGESTED_TOPICS = ['How vaccines work', 'Banning homework', 'Fake news', 'Is coffee bad for you?',
+  'Self-driving cars', 'A four-day work week', 'Phones in class', 'Nuclear power', 'Lab-grown meat',
+  'Electric cars', 'Video games and violence', 'AI in exams', 'Sugar tax', 'Fast fashion', 'Remote work',
+  'Universal basic income', 'Space exploration', 'Recycling plastic', 'Daylight saving time', 'School uniforms'];
+const pickTopics = n => [...SUGGESTED_TOPICS].sort(() => Math.random() - 0.5).slice(0, n);
 
 // The topic filter beside "Cases": the same teal pill as the "All cases" filter.
 function renderTopics(){
@@ -2057,8 +2062,11 @@ $('recents').addEventListener('click', e => {
 });
 renderRecents();
 
-$('askChips').innerHTML = `<button type="button" class="checked" data-quant title="The checked example topic">${esc(QUANT_TOPIC.topic)}</button>`
-  + SUGGESTED_TOPICS.map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
+function renderAskChips(){
+  $('askChips').innerHTML = `<button type="button" class="checked" data-quant title="The checked example topic">${esc(QUANT_TOPIC.topic)}</button>`
+    + pickTopics(3).map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
+}
+renderAskChips();
 $('askChips').addEventListener('click', e => {
   const b = e.target.closest('button');
   if(!b || $('askSend').disabled) return;
@@ -2677,6 +2685,7 @@ function askReset(){
   askModeOpen(false);
   askChatting(false);
   setAskFile(null);
+  renderAskChips();
 }
 
 // Open a chat from Recents: read each case's session back and draw every turn again.
