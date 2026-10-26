@@ -26,3 +26,17 @@ alter table public.transcript_lines enable row level security;
 
 revoke all on table public.sessions, public.transcript_lines from anon, authenticated;
 grant select, insert, update, delete on table public.sessions, public.transcript_lines to service_role;
+
+-- Signed-in learners (Sign in with Google, optional). Added 27 October 2026.
+-- If the two tables above already exist, you can run just this part.
+-- id is a one-way hash of the Google account id, so no name or email is stored.
+-- data holds the learner's chat list, built topics and session and check ids.
+create table if not exists public.profiles (
+  id         text primary key,
+  data       jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+revoke all on table public.profiles from anon, authenticated;
+grant select, insert, update, delete on table public.profiles to service_role;

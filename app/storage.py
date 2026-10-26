@@ -20,6 +20,7 @@ import httpx
 ROOT = Path(__file__).resolve().parent.parent
 SESSION_DIR = ROOT / "sessions"
 TRANSCRIPT_DIR = ROOT / "transcripts"
+PROFILE_DIR = ROOT / "profiles"  # signed-in learners only (see auth.py)
 
 # The project URL, e.g. https://abc.supabase.co. If the API address was pasted
 # instead (ending in /rest/v1/), that end is cut off, since it is added below.
@@ -49,6 +50,18 @@ def _file_append(sid, line):
     TRANSCRIPT_DIR.mkdir(exist_ok=True)
     with open(TRANSCRIPT_DIR / f"{sid}.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(line, ensure_ascii=False) + "\n")
+
+
+def _file_save_profile(uid, data):
+    PROFILE_DIR.mkdir(exist_ok=True)
+    tmp = PROFILE_DIR / f"{uid}.json.tmp"
+    tmp.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(PROFILE_DIR / f"{uid}.json")
+
+
+def _file_load_profile(uid):
+    path = PROFILE_DIR / f"{uid}.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
 
 
 # ---------- supabase ----------
@@ -82,6 +95,16 @@ def _db_load_many(sids):
 def _db_append(sid, line):
     _db("POST", "transcript_lines", headers=_headers({"Prefer": "return=minimal"}),
         json={"session_id": sid, "line": line})
+
+
+def _db_save_profile(uid, data):
+    _db("POST", "profiles", headers=_headers({"Prefer": "resolution=merge-duplicates,return=minimal"}),
+        json={"id": uid, "data": data, "updated_at": datetime.now(timezone.utc).isoformat()})
+
+
+def _db_load_profile(uid):
+    rows = _db("GET", "profiles", headers=_headers(), params={"select": "data", "id": f"eq.{uid}"}).json()
+    return rows[0]["data"] if rows else None
 
 
 # ---------- what main.py calls ----------
@@ -120,6 +143,28 @@ def load_sessions(sids):
 
 def load_session(sid):
     return load_sessions([sid]).get(sid)
+
+
+# Profiles of signed-in learners, keyed by a hash (see auth.user_id). Unlike a
+# session, a failed profile save is reported, so the page can say it did not sync.
+
+def save_profile(uid, data):
+    """True when saved."""
+    try:
+        (_db_save_profile if BACKEND == "supabase" else _file_save_profile)(uid, data)
+        return True
+    except (httpx.HTTPError, OSError) as e:
+        log.error("Saving a profile failed: %s", e)
+        return False
+
+
+def load_profile(uid):
+    """The saved profile, {} for a new learner, or None when it could not be read."""
+    try:
+        return (_db_load_profile if BACKEND == "supabase" else _file_load_profile)(uid) or {}
+    except (httpx.HTTPError, OSError, json.JSONDecodeError) as e:
+        log.error("Loading a profile failed: %s", e)
+        return None
 
 
 def all_sessions():

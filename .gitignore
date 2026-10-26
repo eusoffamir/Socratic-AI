@@ -15,6 +15,7 @@ __pycache__/
 # learner data (saved sessions and transcripts stay on this computer)
 sessions/
 transcripts/
+profiles/
 
 # supervisor's grant proposal (Word and PDF, any folder): private, never upload
 **/2026_EdEx SoTL Grant Proposal*

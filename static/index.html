@@ -165,6 +165,19 @@
   @keyframes snPulse{from{opacity:.25;} to{opacity:.9;}}
   .sn-empty{font-size:13px; opacity:.55; padding:4px 12px; white-space:normal;}
   .sn-foot{display:flex; gap:6px; padding-top:10px;}
+  /* optional Sign in with Google: guests see Google's button, a signed-in learner sees their name */
+  .sn-account{flex:none; margin-top:8px; padding-top:10px; border-top:1px solid rgba(255,255,255,.12);}
+  .sn-account:empty{display:none;}
+  .sn-account .g-wrap{display:flex; justify-content:center; min-height:32px;}
+  .sn-account .why{font-size:11.5px; opacity:.6; padding:6px 8px 0; text-align:center; white-space:normal;}
+  .sn-user{display:flex; align-items:center; gap:10px; padding:2px 6px;}
+  .sn-user .face{width:28px; height:28px; border-radius:50%; flex:none; object-fit:cover; background:rgba(255,255,255,.18);
+                 display:grid; place-items:center; font-size:13px; font-weight:600;}
+  .sn-user .who{flex:1; min-width:0; font-size:13.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sn-user .who small{display:block; font-size:11.5px; font-weight:400; opacity:.6;}
+  .sn-user button{flex:none; background:none; border:1px solid rgba(255,255,255,.3); color:var(--rail-ink); border-radius:999px;
+                  font:inherit; font-size:12px; padding:4px 10px;}
+  .sn-user button:hover{background:rgba(255,255,255,.12);}
   .nav-menu, .nav-backdrop{display:none;}
 
   /* Overall status as its own page */
@@ -1247,6 +1260,7 @@
     <button class="sn-item" id="knowBtn" title="How the knowledge fits"><svg><use href="#i-graph"/></svg><span>Knowledge</span></button>
     <div class="sn-label">Recents</div>
     <div class="sn-recents" id="recents"></div>
+    <div class="sn-account" id="account"></div>  <!-- Sign in with Google, only when the server has a client id -->
     <div class="sn-foot">
       <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
       <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
@@ -1804,12 +1818,14 @@ function rememberSession(sid){
   const ids = mySessions().filter(x => x !== sid);
   ids.push(sid);
   try { localStorage.setItem('my-sessions', JSON.stringify(ids.slice(-300))); } catch(e){}
+  profileDirty();
 }
 
 function setSaved(conceptId, sid){
   const m = savedSessions();
   if(sid) m[conceptId] = sid; else delete m[conceptId];
   try { localStorage.setItem('saved-sessions', JSON.stringify(m)); } catch(e){}
+  profileDirty();
 }
 
 async function loadProgress(){
@@ -1840,6 +1856,7 @@ function myTopics(){
 }
 function saveTopics(list){
   try { localStorage.setItem('my-topics', JSON.stringify(list.slice(-12))); } catch(e){}
+  profileDirty();
 }
 function activeTopic(){
   let id = 'quant';
@@ -2006,7 +2023,7 @@ function askChats(){
       .map(c => ({...c, id: c.id || c.sid, sids: c.sids || [c.sid]}));
   } catch(e){ return []; }
 }
-function saveAskChats(list){ try { localStorage.setItem('ask-chats', JSON.stringify(list.slice(0, MAX_RECENTS))); } catch(e){} }
+function saveAskChats(list){ try { localStorage.setItem('ask-chats', JSON.stringify(list.slice(0, MAX_RECENTS))); } catch(e){} profileDirty(); }
 // Save a new case's session into its chat in Recents, even when that chat is not shown.
 function askKeep(sid, name, ctx){
   rememberSession(sid);
@@ -3644,6 +3661,7 @@ function rememberCheck(id){
   const ids = myChecks().filter(x => x !== id);
   ids.push(id);
   try { localStorage.setItem('my-checks', JSON.stringify(ids.slice(-100))); } catch(e){}
+  profileDirty();
 }
 
 const check = {id: null, busy: false, ended: false, shownAt: 0};
@@ -4416,9 +4434,120 @@ $('studyGo').addEventListener('click', async () => {
   $('studyModal').classList.add('hidden');
   homeTourOnce();
 });
+// ---------- optional Sign in with Google (app/auth.py) ----------
+// Guests keep everything in this browser, as before. A signed-in learner's lists
+// (chats, topics, session and check ids) are merged with the copy saved online,
+// so they follow them to any device. Mastery and the overall status are worked
+// out from those ids on the server, so they follow too.
+const SYNC_KEYS = ['ask-chats', 'my-topics', 'my-sessions', 'my-checks', 'saved-sessions'];
+// canSave stays false when the online copy could not be read, so a failed read
+// never lets this device overwrite the lists saved from another one.
+const account = {user: null, timer: null, canSave: false, failed: false};
+
+function readKey(k, empty){ try { return JSON.parse(localStorage.getItem(k)) ?? empty; } catch(e){ return empty; } }
+// Joins two lists, keeping the last copy of each id, so the local one wins.
+function joinLast(a, b, id = x => x){
+  const seen = new Set(), out = [];
+  [...a, ...b].reverse().forEach(x => { if(!seen.has(id(x))){ seen.add(id(x)); out.unshift(x); } });
+  return out;
+}
+function mergeProfile(online){
+  // Newest first, in the online order, since every device sends its changes there;
+  // chats only this browser has (made before signing in) come after. For the same
+  // chat keep the copy with more cases.
+  const chats = new Map();
+  [...(online['ask-chats'] || []), ...readKey('ask-chats', [])].forEach(c => {
+    const key = c && (c.id || c.sid), had = chats.get(key);
+    if(key && (!had || (c.sids || []).length > (had.sids || []).length)) chats.set(key, c);
+  });
+  return {
+    'ask-chats': [...chats.values()].slice(0, MAX_RECENTS),
+    'my-topics': joinLast(online['my-topics'] || [], readKey('my-topics', []), t => t.id).slice(-12),
+    'my-sessions': joinLast(online['my-sessions'] || [], readKey('my-sessions', [])).slice(-300),
+    'my-checks': joinLast(online['my-checks'] || [], readKey('my-checks', [])).slice(-100),
+    'saved-sessions': {...(online['saved-sessions'] || {}), ...readKey('saved-sessions', {})},
+  };
+}
+function applyProfile(online){
+  const merged = mergeProfile(online || {});
+  SYNC_KEYS.forEach(k => { try { localStorage.setItem(k, JSON.stringify(merged[k])); } catch(e){} });
+  renderRecents();
+  if(quantCases.length){ renderTopics(); loadProgress(); }
+}
+// Called by every save of a synced list; sends the lists a moment later, in one go.
+function profileDirty(){
+  if(!account.canSave) return;
+  clearTimeout(account.timer);
+  account.timer = setTimeout(profilePush, 1500);
+}
+async function profilePush(){
+  if(!account.canSave) return;
+  const data = Object.fromEntries(SYNC_KEYS.map(k => [k, readKey(k, k === 'saved-sessions' ? {} : [])]));
+  try { await postJSON('/api/me/profile', {data}); account.failed = false; }
+  catch(e){ account.failed = true; }
+  renderAccount();
+}
+function renderAccount(){
+  const box = $('account');
+  if(!account.clientId){ box.innerHTML = ''; return; }
+  if(!account.user){
+    box.innerHTML = '<div class="g-wrap" id="gButton"></div><div class="why">Keep your chats on every device.</div>';
+    if(window.google?.accounts?.id) google.accounts.id.renderButton($('gButton'),
+      {type: 'standard', theme: 'outline', size: 'medium', shape: 'pill', text: 'signin_with', width: 220});
+    return;
+  }
+  const u = account.user, first = (u.name || 'You').trim();
+  const face = u.picture ? `<img class="face" src="${esc(u.picture)}" alt="" referrerpolicy="no-referrer">`
+                         : `<span class="face">${esc(first[0].toUpperCase())}</span>`;
+  box.innerHTML = `<div class="sn-user">${face}<span class="who">${esc(first)}<small>${account.failed
+    ? 'Not saved yet' : 'Saved online'}</small></span><button type="button" id="signOut">Sign out</button></div>`;
+}
+function signedIn(d){
+  account.user = d.user;
+  account.canSave = d.synced !== false;
+  account.failed = !account.canSave;
+  applyProfile(d.profile);
+  renderAccount();
+}
+async function onGoogleSignIn(resp){
+  try {
+    const d = await postJSON('/api/auth/google', {credential: resp.credential});
+    signedIn(d);
+    await profilePush();  // the joined lists, so this device's guest chats are kept online too
+  } catch(e){ note('error', e.message, $('homeStatus')); renderAccount(); }
+}
+$('account').addEventListener('click', async e => {
+  if(e.target.id !== 'signOut') return;
+  clearTimeout(account.timer);
+  await profilePush();
+  try { await postJSON('/api/auth/logout', {}); } catch(e){}
+  window.google?.accounts?.id?.disableAutoSelect();
+  // they are saved in the account, so a shared computer keeps nothing of this learner
+  SYNC_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+  location.replace('/');
+});
+async function initAccount(clientId){
+  account.clientId = clientId;
+  if(!clientId) return;
+  try {
+    const d = await api('/api/me');
+    if(d.user){ signedIn(d); profilePush(); }
+  } catch(e){}
+  renderAccount();
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.async = true;
+  s.onload = () => {
+    google.accounts.id.initialize({client_id: clientId, callback: onGoogleSignIn, auto_select: false});
+    renderAccount();
+  };
+  document.head.appendChild(s);
+}
+
 async function initStudy(){
   try {
     const cfg = await api('/api/config');
+    initAccount(cfg.google_client_id || '');
     study.on = cfg.study_mode;
     CHECK_ALLOW_PASTE = cfg.ai_guard === false;
   } catch(e){ study.on = false; }

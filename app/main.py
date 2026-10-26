@@ -12,12 +12,12 @@ from .env import load_env
 load_env()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import (builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
+from . import (auth, builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
                skillcheck, stats, storage, tutorial)
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
@@ -224,8 +224,74 @@ def health():
 @app.get("/api/config")
 def config():
     """What the page needs to know at start: is study mode on (consent and code
-    first), and is the AI guard on (then paste is off in the skill check)?"""
-    return {"study_mode": bool(study_codes()), "ai_guard": copycheck.ai_guard_on()}
+    first), is the AI guard on (then paste is off in the skill check), and is
+    Sign in with Google set up (an empty id hides the button)?"""
+    return {"study_mode": bool(study_codes()), "ai_guard": copycheck.ai_guard_on(),
+            "google_client_id": auth.client_id()}
+
+
+# ---------- optional sign-in (auth.py) ----------
+
+class GoogleLogin(BaseModel):
+    credential: str
+
+
+class ProfileSave(BaseModel):
+    data: dict
+
+
+def _user(request: Request):
+    return auth.read_cookie(request.cookies.get(auth.COOKIE))
+
+
+def _me(user):
+    return {"name": user["name"], "picture": user["picture"]}
+
+
+@app.post("/api/auth/google")
+def login_google(req: GoogleLogin, response: Response):
+    """Checks the Google sign-in, sets the app's own cookie and returns the saved profile."""
+    try:
+        claims = auth.verify_google(req.credential)
+    except auth.AuthError as e:
+        raise HTTPException(401, str(e))
+    cookie = auth.make_cookie(claims)
+    user = auth.read_cookie(cookie)
+    profile = storage.load_profile(user["uid"])
+    response.set_cookie(auth.COOKIE, cookie, max_age=auth.MAX_AGE, httponly=True, samesite="lax",
+                        secure=bool(os.getenv("RENDER")))
+    return {"user": _me(user), "profile": profile or {}, "synced": profile is not None}
+
+
+@app.get("/api/me")
+def me(request: Request):
+    """The signed-in learner and their profile, or user None for a guest."""
+    user = _user(request)
+    if not user:
+        return {"user": None}
+    profile = storage.load_profile(user["uid"])
+    return {"user": _me(user), "profile": profile or {}, "synced": profile is not None}
+
+
+@app.post("/api/me/profile")
+def save_me(req: ProfileSave, request: Request):
+    """Saves the page's merged lists. The page merges first, so this just replaces."""
+    user = _user(request)
+    if not user:
+        raise HTTPException(401, "Please sign in again.")
+    try:
+        data = auth.clean_profile(req.data)
+    except ValueError as e:
+        raise HTTPException(413, str(e))
+    if not storage.save_profile(user["uid"], data):
+        raise HTTPException(503, "Your chats could not be saved online just now.")
+    return {"ok": True}
+
+
+@app.post("/api/auth/logout")
+def logout(response: Response):
+    response.delete_cookie(auth.COOKIE)
+    return {"ok": True}
 
 
 @app.post("/api/participant/check")
