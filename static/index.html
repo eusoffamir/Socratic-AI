@@ -66,6 +66,7 @@
   }
   button:hover:not(:disabled){opacity:.88;}
   button:disabled{opacity:.4; cursor:default;}
+  .send.nowhy{opacity:.4; pointer-events:none;}  /* A or B picked, why still empty */
   button.ghost{background:transparent; color:var(--ink); border-color:var(--rule);}
   button.ghost:hover:not(:disabled){background:var(--panel-2); opacity:1;}
   .icon-btn{
@@ -2137,6 +2138,7 @@ $('askInput').addEventListener('input', () => {  // the box grows with the text
   const t = $('askInput');
   t.style.height = 'auto';
   t.style.height = `${t.scrollHeight}px`;
+  syncWhy();
 });
 $('askInput').addEventListener('keydown', e => {  // Enter starts, Shift+Enter is a new line
   if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); $('askForm').requestSubmit(); }
@@ -2153,6 +2155,7 @@ function askStatus(text){ return askAdd('am-status', `${DOTS}${esc(text)}`); }
 function askLock(on){
   ask.busy = on;
   $('askSend').disabled = $('askInput').disabled = $('askAdd').disabled = on;
+  syncWhy();
 }
 function askChatting(on){
   $('askMain').classList.toggle('empty', !on);
@@ -2442,6 +2445,7 @@ function askShowTurn(data, intro){
   askStrip(data.level_idx, data.round);
   ask.options = parts.options && parts.options.length === 2 ? parts.options : [];
   ask.picked = null;
+  syncWhy();
   $('askThread').querySelectorAll('.am-opts').forEach(o => o.remove());  // old choices are done, the answer shows the pick
   const feedback = parts.feedback;
   delete parts.feedback;  // it is the first line inside "Thought process" instead
@@ -2501,6 +2505,7 @@ $('askThread').addEventListener('click', e => {
   ask.picked = ask.picked === i ? null : i;
   b.parentElement.querySelectorAll('.choice').forEach(c => c.setAttribute('aria-pressed', String(Number(c.dataset.i) === ask.picked)));
   $('askInput').placeholder = ask.picked == null ? 'Pick A or B, then say why...' : 'Why?';
+  syncWhy();
   $('askInput').focus();
 });
 
@@ -3377,6 +3382,7 @@ function updateHud(){
 function setChoices(options){
   state.options = options.length === 2 ? options : [];
   state.picked = null;
+  syncWhy();
   const box = $('choices');
   box.innerHTML = state.options.map((o, i) =>
     `<button class="choice" type="button" aria-pressed="false" data-i="${i}"><span class="l">${'AB'[i]}</span>${esc(o)}</button>`).join('');
@@ -3392,6 +3398,7 @@ $('choices').addEventListener('click', e => {
   state.picked = state.picked === i ? null : i;
   $('choices').querySelectorAll('.choice').forEach(c => c.setAttribute('aria-pressed', String(Number(c.dataset.i) === state.picked)));
   $('answerBox').placeholder = state.picked == null ? 'Pick A or B, then say why...' : 'Why?';
+  syncWhy();
   $('answerBox').focus();
 });
 
@@ -3403,9 +3410,16 @@ function askWhy(box){
   box.focus();
 }
 
+// A pick with no why cannot be sent, so its send button is greyed out.
+function syncWhy(){
+  $('sendBtn').classList.toggle('nowhy', state.picked != null && !$('answerBox').value.trim());
+  $('askSend').classList.toggle('nowhy', ask.picked != null && !$('askInput').value.trim());
+}
+
 function setBusy(busy){
   state.busy = busy;
   $('sendBtn').disabled = busy;
+  syncWhy();  // a failed send puts the typed why back
   $('stuckBtn').disabled = busy;
   $('choices').querySelectorAll('.choice').forEach(c => c.disabled = busy);
 }
@@ -3891,7 +3905,7 @@ function autosize(){
 
 $('sendBtn').addEventListener('click', () => sendAnswer());
 $('stuckBtn').addEventListener('click', () => sendAnswer("I'm not sure how to answer this."));
-$('answerBox').addEventListener('input', autosize);
+$('answerBox').addEventListener('input', () => { autosize(); syncWhy(); });
 $('answerBox').addEventListener('keydown', e => {
   if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendAnswer(); }
 });
