@@ -48,7 +48,7 @@ Studies in schools, nursing and healthcare show that Socratic questions improve 
 
 ## Slide 10, Existing Tutors (25 s)
 
-All the existing tutors refuse to give answers. But none of them have a question ladder, marks against a framework, and a clear goal with progress and an end. And none of them show which type of reasoning the learner used. Socratic AI covers all five columns.
+All the existing tutors refuse to give answers. But none of them have a full question ladder, marks against a framework, and a clear goal with progress and an end. And none of them show which type of reasoning the learner used. Socratic AI covers all five columns.
 
 ## Slide 11, Research Gap and Justification (40 s)
 
@@ -88,7 +88,7 @@ I also ran the Assessor on 61 test answers. Strong answers met about 8 or 9 stan
 
 ## Slide 20, Conclusions (30 s)
 
-To sum up, current Socratic AI tutors have no ladder, no measurement and no adaptation. I have built a working tutor with many agents. It follows the six levels, marks every answer on the nine standards, shows the type of reasoning and knowledge, and never gives the answer away. Next, I will check its marks against human markers. My main message is that this tool trains thinking, it is not an answer machine. Thank you.
+To sum up, the Socratic AI tutors I tested have no ladder, no measurement and no adaptation. I have built a working tutor with many agents. It follows the six levels, marks every answer on the nine standards, shows the type of reasoning and knowledge, and never gives the answer away. Next, I will check its marks against human markers. My main message is that this tool trains thinking, it is not an answer machine. Thank you.
 
 ## Slides 21 and 22, References (0 s)
 

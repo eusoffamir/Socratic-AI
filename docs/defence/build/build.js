@@ -255,7 +255,7 @@ function table(s, hdr, rows, opts) {
     ["Socratic AI (this project)", "Yes", "Yes, 6 levels", "Yes, 9 standards", "Yes", "Planned"],
   ], { x: M, y: 1.7, w: W - 2 * M, colW: [3.6, 1.6, 1.6, 2.15, 1.65, 1.63], rowH: 0.85, size: 14, center: [1, 2, 3, 4, 5], boldLast: true });
   s.addText("* From public descriptions, not tested in this project.", { x: M, y: 5.95, w: 9, h: 0.35, fontFace: F, fontSize: 12, italic: true, color: C.grey, margin: 0 });
-  s.addText("No tested tool combines a question ladder, framework assessment and a clear session, and none shows which type of reasoning a learner used.",
+  s.addText("No tested tool combines a full question ladder, framework assessment and a clear session, and none shows which type of reasoning a learner used.",
     { x: M, y: 6.35, w: W - 2 * M, h: 0.7, fontFace: F, fontSize: 16, bold: true, color: C.navy, margin: 0 });
   s.addNotes(SCRIPT[n].text || "Here is the comparison of existing tutors. They refuse to give answers, but none combine a principled question ladder, assessment against a framework, and a clear goal with progress and an end. None show which type of reasoning the learner used. Socratic AI covers these, and the last column is the next stage.");
 }
