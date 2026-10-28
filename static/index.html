@@ -196,6 +196,14 @@
   .know-tabs button{background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:8px 12px; margin-bottom:-1px; color:var(--ink-soft); font-size:14.5px;}
   .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
   .know-intro, .know-none{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 16px;}
+  /* see one knowledge type, or one reasoning move, on the map */
+  .know-views{display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; margin:0 0 12px;}
+  .know-views .row{display:flex; flex-wrap:wrap; gap:6px;}
+  .know-views button{border:1px solid var(--rule); background:var(--panel); border-radius:999px; padding:4px 12px; font-size:13px; color:var(--ink-soft);}
+  .know-views button:hover{color:var(--ink);}
+  .know-views button[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:#fff;}
+  .know-says{color:var(--ink); background:var(--signal-soft); border-radius:10px; padding:10px 14px;}
+  @media (max-width:560px){ .know-views{grid-template-columns:1fr;} }
   .know-quote, .know-lesson{font-size:14.5px; line-height:1.6; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:12px 14px;}
   .know-quote .mono-label{margin-right:8px;}
   .know-quote blockquote{margin:8px 0 0; padding-left:12px; border-left:3px solid var(--signal); color:var(--ink-soft); font-style:italic;}
@@ -372,7 +380,14 @@
   .am-map .nd.on text{fill:#fff;}
   .am-map .nd:focus{outline:none;} .am-map .nd:focus-visible rect{stroke:var(--c); stroke-width:1.6;}
   .am-map .nd text{font-size:11.5px; font-weight:500; fill:var(--ink);}
-  .am-map .ed{fill:none; stroke:var(--ink-faint); stroke-width:1.2; opacity:.55;}
+  .am-map .ed{fill:none; stroke:var(--ink-faint); stroke-width:1.3; opacity:.7;}
+  .am-map .ed.lit{opacity:1; stroke-width:2.3;}
+  .am-map .rl{font-size:10.5px; font-weight:500; fill:var(--ink-soft); paint-order:stroke; stroke:var(--panel); stroke-width:4px; stroke-linejoin:round;}
+  .am-map .rl.lit{fill:var(--ink); font-weight:600;}
+  .am-map :is(.ed, .rl).dim{opacity:.12;}
+  .am-map .nd.dim{opacity:.3;}
+  .am-map .legend.rels{margin-top:4px;}
+  .am-map .legend i.ln{width:14px; height:3px; border-radius:2px; opacity:1; vertical-align:3px;}
   .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
   .am-map .cap.on{margin:10px 0 0; padding:10px 14px; line-height:1.5; color:var(--ink); background:var(--signal-soft); border-radius:10px;
                   border:1px solid color-mix(in srgb, var(--signal) 25%, transparent);}  /* the picked box's text, a shade greener than the map */
@@ -2169,6 +2184,14 @@ function askChatting(on){
 // far down the links it sits, so arrows run left to right. Plain SVG, no AI call.
 const MAP_COLORS = {factual: '#4a6f9c', conceptual: '#2f7a66', procedural: '#a88039', causal: '#b0614f',
                     relational: '#7a689e', strategic: '#6d7c84', metacognitive: '#6d7c84', epistemic: '#6d7c84'};  // muted, so they sit with the theme green
+// What each arrow means, the same words as knowledge.RELATIONS, so an arrow is never just a line (Dr Ho, 28 October 2026)
+const REL_MEANING = {causes: 'makes the other happen', then: 'is the next step after', defines: 'gives the meaning of',
+                     supports: 'is a reason to believe', weakens: 'is a reason to doubt', tests: 'is a way to check', leads_to: 'points to the choice'};
+const REL_COLORS = {causes: '#b0614f', then: '#a88039', defines: '#2a8c9c', supports: '#3f7f4a',
+                    weakens: '#b04a4a', tests: '#4a6f9c', leads_to: '#7a689e'};
+const KNOW_QUESTION = {factual: 'What is true?', conceptual: 'What does it mean?', procedural: 'How do I do it?', causal: 'Why does it happen?',
+                       relational: 'How are things connected?', strategic: 'What should I do, given the situation?',
+                       metacognitive: 'How do I know, and how reliable is my knowing?', epistemic: 'What is justified for me to believe?'};
 function mapLabel(n, text){
   if(n.label) return n.label;
   if(!/^n\d+$/.test(n.id)) return (n.id.charAt(0).toUpperCase() + n.id.slice(1)).replace(/_/g, ' ');
@@ -2183,7 +2206,9 @@ function wrap2(label, max = 17){
   }
   return lines.map(l => l.length > max + 3 ? l.slice(0, max + 1) + '...' : l);
 }
-function askMapHTML(c){
+// opts.labels writes each arrow's meaning on it (Knowledge page). opts.focus (a knowledge type) or
+// opts.move (a reasoning type) lights the arrows that belong to it and dims the rest.
+function askMapHTML(c, opts = {}){
   const g = c.knowledge;
   if(!g || !(g.nodes || []).length) return '';
   const nodes = g.nodes.map(n => ({...n, text: n.text || (c.notes || [])[n.note] || ''}));
@@ -2198,7 +2223,7 @@ function askMapHTML(c){
     for(const [a, , b] of edges) if(depth[b] < depth[a] + 1) depth[b] = Math.min(depth[a] + 1, 4);
   const cols = [];
   nodes.forEach(n => (cols[depth[n.id]] = cols[depth[n.id]] || []).push(n));
-  const W = 136, H = 42, CX = 172, RY = 60, PAD = 14, used = cols.filter(Boolean);
+  const W = 136, H = 42, CX = opts.labels ? 236 : 172, RY = 60, PAD = 14, used = cols.filter(Boolean);  // wider gaps leave room for the arrow words
   const rows = Math.max(...used.map(col => col.length));
   const pos = {};
   const place = () => used.forEach((col, x) => col.forEach((n, y) => {
@@ -2235,42 +2260,63 @@ function askMapHTML(c){
     mids.flat().forEach(by => tries.push(by - (RY - H) / 2, by + H + (RY - H) / 2));
     return tries.filter(free).sort((u, v) => Math.abs(u - y1) + Math.abs(u - y2) - Math.abs(v - y1) - Math.abs(v - y2))[0] ?? (y1 + y2) / 2;
   };
-  let loops = false;
+  // Which arrows a view lights, by the same rules as app/traverse.py. Inductive starts from a counted
+  // result or joins several pieces into one, deductive is any other forward step, abductive walks back.
+  const typeOf = Object.fromEntries(nodes.map(n => [n.id, n.type]));
+  const dataIds = new Set(nodes.filter(n => (n.source || {}).kind === 'data').map(n => n.id)), into = {};
+  edges.forEach(([, , b]) => { into[b] = (into[b] || 0) + 1; });
+  const focus = opts.focus && nodes.some(n => n.type === opts.focus) ? opts.focus : null, move = focus ? null : opts.move;
+  const inductive = (a, b) => dataIds.has(a) || into[b] >= 2;
+  const lit = (a, b) => focus ? typeOf[a] === focus || typeOf[b] === focus
+    : move === 'inductive' ? inductive(a, b) : move === 'deductive' ? !inductive(a, b) : move === 'abductive' ? true : null;
+  let loops = false, litCount = 0;
   const lines = edges.map(([a, rel, b]) => {
     const p = pos[a], q = pos[b], e = fwd.find(f => f.a === a && f.b === b);
-    let d;
+    let d, lx, ly, anchor = 'middle';
     if(e){
       const x1 = p.x + W, y1 = p.y + H / 2 + e.dy1, x2 = q.x - 2, y2 = q.y + H / 2 + e.dy2;
-      if(q.c - p.c === 1) d = `M${x1} ${y1} C${x1 + 30} ${y1} ${x2 - 30} ${y2} ${x2} ${y2}`;
-      else {
-        const ly = lane(p.c, q.c, y1, y2), xa = 8 + (p.c + 1) * CX, xb = 8 + (q.c - 1) * CX + W;
-        d = `M${x1} ${y1} C${x1 + 24} ${y1} ${xa - 12} ${ly} ${xa} ${ly} L${xb} ${ly} C${xb + 12} ${ly} ${x2 - 24} ${y2} ${x2} ${y2}`;
+      if(q.c - p.c === 1){
+        d = `M${x1} ${y1} C${x1 + 30} ${y1} ${x2 - 30} ${y2} ${x2} ${y2}`;
+        [lx, ly] = [(x1 + x2) / 2, (y1 + y2) / 2 - 5];
+      } else {
+        const laneY = lane(p.c, q.c, y1, y2), xa = 8 + (p.c + 1) * CX, xb = 8 + (q.c - 1) * CX + W;
+        d = `M${x1} ${y1} C${x1 + 24} ${y1} ${xa - 12} ${laneY} ${xa} ${laneY} L${xb} ${laneY} C${xb + 12} ${laneY} ${x2 - 24} ${y2} ${x2} ${y2}`;
+        [lx, ly] = [(xa + xb) / 2, laneY - 5];
       }
     } else if(q.c === p.c && Math.abs(q.y - p.y) === RY){  // the box right above or below: a short straight arrow
       const down = q.y > p.y, x = p.x + W / 2;
       d = `M${x} ${down ? p.y + H : p.y} L${x} ${down ? q.y - 2 : q.y + H + 2}`;
+      [lx, ly, anchor] = [x + 6, (p.y + q.y + H) / 2 + 4, 'start'];
     } else {  // further up, down or back: a loop round the right side of the boxes
       const x1 = p.x + W, x2 = q.x + W + 2, y1 = p.y + H / 2 + 6, y2 = q.y + H / 2 - 6, bow = 30;
       loops = true;
       d = `M${x1} ${y1} C${x1 + bow} ${y1} ${x2 + bow} ${y2} ${x2} ${y2}`;
+      [lx, ly, anchor] = [x2 + bow - 4, (y1 + y2) / 2 + 4, 'start'];
     }
-    return `<path class="ed" d="${d}" marker-end="url(#mapArrow)"><title>${esc(rel.replace(/_/g, ' '))}</title></path>`;
+    const r0 = rel.split(', ')[0], on = lit(a, b), cls = on === null ? '' : on ? ' lit' : ' dim';
+    if(on) litCount++;
+    const end = move === 'abductive' ? `marker-start="url(#mapArrow-${r0})"` : `marker-end="url(#mapArrow-${r0})"`;  // abductive turns the arrows round
+    const words = opts.labels ? `<text class="rl${cls}" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(rel.replace(/_/g, ' '))}</text>` : '';
+    return `<path class="ed${cls}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>${words}`;
   }).join('');
-  if(loops) width += 30;  // room for a loop round the right side
+  if(loops) width += opts.labels ? 70 : 30;  // room for a loop round the right side, and its word
   const boxes = nodes.map((n, i) => {
     const {x, y} = pos[n.id], color = MAP_COLORS[n.type] || 'var(--ink-faint)', label = wrap2(mapLabel(n, n.text));
-    return `<g class="nd" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
+    return `<g class="nd${focus && n.type !== focus ? ' dim' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>
       ${label.map((l, k) => `<text x="${x + W / 2}" text-anchor="middle" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
   }).join('');
   const types = [...new Set(nodes.map(n => n.type))];
-  return `<div class="am-map" data-texts="${esc(JSON.stringify(nodes.map(n => `${n.type}. ${n.text}`)))}">
+  const rels = [...new Set(edges.flatMap(([, rel]) => rel.split(', ')))];
+  const markers = rels.map(r => `<marker id="mapArrow-${esc(r)}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10z" fill="${REL_COLORS[r] || 'var(--ink-faint)'}"/></marker>`).join('');
+  return `<div class="am-map" data-lit="${litCount}" data-texts="${esc(JSON.stringify(nodes.map(n => `${n.type}. ${n.text}`)))}">
     <span class="mono-label">Map of the ideas</span>
     <svg viewBox="0 0 ${width} ${height}" style="max-width:${width}px" aria-label="A map of how the ideas in this case link">
-      <defs><marker id="mapArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg>
+      <defs>${markers}</defs>${lines}${boxes}</svg>
     <p class="cap">Tap a box to read it.</p>
-    <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div></div>`;
+    <div class="legend">${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(t)}</span>`).join('')}</div>
+    <div class="legend rels">${rels.map(r => `<span><i class="ln" style="background:${REL_COLORS[r] || 'var(--ink-faint)'}"></i>${esc(r.replace(/_/g, ' '))}, ${esc(REL_MEANING[r] || '')}</span>`).join('')}</div></div>`;
 }
 
 // The first message is only the case card. Tapping it opens the reading (the idea, an example,
@@ -2932,7 +2978,7 @@ async function openOverall(){
 $('overallBtn').addEventListener('click', openOverall);
 
 // ---------- Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data ----------
-const know = {id: null, tab: 'books', views: {}, answers: {}};
+const know = {id: null, tab: 'books', views: {}, answers: {}, view: null};  // view is {focus: type} or {move: reasoning type}
 const KNOW_TABS = [['books', 'From books'], ['rules', 'Rules of thumb'], ['data', 'From data']];
 const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
 // the 3 quant cases, then the cases on the learner's own topic in the open chat
@@ -2969,10 +3015,22 @@ function renderKnowledge(){
 async function renderKnowPane(c){
   const pane = $('knowPane');
   if(know.tab === 'books'){
-    const map = askMapHTML(c);
-    pane.innerHTML = map ? `<p class="know-intro">Each box is one piece of knowledge, and each arrow shows how two pieces link. Tap a box to see where it comes from.</p>
-      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`
-      : '<p class="know-none">This case has no knowledge map.</p>';
+    const v = know.view || {}, map = askMapHTML(c, {labels: true, ...v});
+    if(!map){ pane.innerHTML = '<p class="know-none">This case has no knowledge map.</p>'; return; }
+    const nodes = c.knowledge.nodes, types = KNOWLEDGE_NAMES.filter(t => nodes.some(n => n.type === t));
+    const lit = Number((map.match(/data-lit="(\d+)"/) || [])[1] || 0);
+    const pick = (attr, val, label, on) => `<button type="button" ${attr}="${val}" aria-pressed="${on}">${label}</button>`;
+    const says = v.focus ? `${capFirst(v.focus)} knowledge answers the question "${KNOW_QUESTION[v.focus]}", and ${(k => `${k} of the ${nodes.length} pieces here ${k === 1 ? 'is' : 'are'}`)(nodes.filter(n => n.type === v.focus).length)} ${v.focus}. The bright arrows show how they link to the rest.`
+      : v.move === 'deductive' ? 'Deductive reasoning walks forward along the arrows, from facts and rules to a conclusion. The bright arrows are the forward steps it can take.'
+      : v.move === 'inductive' ? (lit ? 'Inductive reasoning counts many cases to reach a general idea. The bright arrows start from a counted result, or join several pieces into one idea.'
+                                      : 'Inductive reasoning counts many cases to reach a general idea, but this map has no counted result or joined pieces yet.')
+      : v.move === 'abductive' ? 'Abductive reasoning walks the arrows backwards, from what was seen to what best explains it, so every arrow is turned round. This is also how a system can trace a fault back to its cause.'
+      : 'Each box is one piece of knowledge, and each arrow says how two pieces link. Tap a box to see where it comes from, or pick a type or a reasoning move to see it on its own.';
+    pane.innerHTML = `<div class="know-views">
+        <span class="mono-label">Knowledge type</span><div class="row">${pick('data-kfocus', '', 'All', !v.focus && !v.move)}${types.map(t => pick('data-kfocus', t, capFirst(t), v.focus === t)).join('')}</div>
+        <span class="mono-label">Reasoning move</span><div class="row">${['deductive', 'inductive', 'abductive'].map(m => pick('data-kmove', m, capFirst(m), v.move === m)).join('')}</div></div>
+      <p class="know-intro${v.focus || v.move ? ' know-says' : ''}">${esc(says)}</p>
+      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
     return;
   }
   if(c.generated){  // drafted by the Topic Builder with the case, so nothing to fetch
@@ -3063,6 +3121,12 @@ $('knowBody').addEventListener('click', e => {
   const c = knowCases().find(x => x.id === know.id);
   const tab = e.target.closest('[data-tab]');
   if(tab){ know.tab = tab.dataset.tab; renderKnowledge(); return; }
+  const kf = e.target.closest('[data-kfocus]'), km = e.target.closest('[data-kmove]');
+  if((kf || km) && c){
+    know.view = kf ? (kf.dataset.kfocus ? {focus: kf.dataset.kfocus} : null)
+      : (know.view || {}).move === km.dataset.kmove ? null : {move: km.dataset.kmove};  // a second tap on a move turns it off
+    renderKnowPane(c); return;
+  }
   const nd = e.target.closest('.am-map .nd');
   if(nd && c){ $('knowSrc').innerHTML = mapPick(nd) ? knowSourceHTML(c, c.knowledge.nodes[Number(nd.dataset.i)] || {}) : ''; return; }
   const x = e.target.closest('.am-map .cap-x');
