@@ -39,3 +39,36 @@ Eusoff sent Dr Ho a YouTube video about a Socratic tutor made with Gemini Gems (
 > I hope this clarifies? The potential innovation is in the prompts designed to guide the AI.
 
 What came from this: the two Gemini Gem tests (Test #1 and Test #2 in the thesis), the six-level question ladder ending in "question the question", the separate Assessor against the Paul-Elder framework, and the comparison table of other tools (Section 2.7).
+
+## 28 October 2026: feedback on the proposal defence
+
+Sent after the defence (slot 2.20 pm). Dr Ho's words, unchanged:
+
+> Hi Eusoff, some feedback on your presentation. Good opening but maybe tone it down "no one is thinking critically"...for problem statement, consider giving some illustrative example that the audience can connect with... Objective is incorrect. you have to fully flesh out your project objectives - don't have to anchor on fyp project objectives... three verbs on objectives is not good, be more specific, full sentences
+>
+> scope of study is a bit scattered ... you have mixed methodology with scope.... objectives is the big picture, no methods inside, must be able to answer was it achieved or not. Scope is a limitation ( you claim you achieved obj 1 under specific limitations or constraints which is the scope).
+>
+> Literature review is not effective as a table. you need to think of a better way to visualize the literature. The agentic elements. Your narrative style of presenting for literature review is effective though
+>
+> The research gap is clear... the tool justification should be in methodology
+>
+> your success measures for the tool R1-R9 is good!
+>
+> the 6 socratic questions and 9 intellectual standards, types of reasoning and types of knowledge not clearly explained... hence a lot of questions raised because audience not able to understand what you are measuring, what is being achieved... you might need to spend more time during literature review talking/describing critical thinking
+>
+> lets chat a bit more about non engineering domain questions... i have more to share
+>
+> don't worry you did very well, but it is my practice to be more critical of good students so you get good feedback to improve
+>
+> marks wise you shouldn't worry, but take the feedback as points for further improvement during presentation
+
+What to change (for the interim report, Chapter 1 to 3, and later talks):
+1. Opening, softer claim. Not "no one is thinking critically".
+2. Problem statement, add one example the audience can relate to.
+3. Objectives, rewrite fully in our own words, not anchored on the FYP listing. Full, specific sentences, no "Teach, Assess, Adapt" verb labels, no methods inside, and each one must be checkable as achieved or not.
+4. Scope, rewrite as the limits and conditions under which the objectives are claimed (topic, users, model, time). Move method content out.
+5. Literature review, replace the tutor comparison table with a better picture, focused on the agentic elements. Keep the narrative style.
+6. Tool justification (the "Justification" half of the research gap slide) moves to Methodology.
+7. Keep R1 to R9 as the success measures (Dr Ho liked them).
+8. Explain critical thinking much more in the literature review, meaning the 6 Socratic question types, the 9 standards, the reasoning types and the knowledge types, each with a plain example, so the audience knows what is measured.
+9. Ask Dr Ho about the non-engineering domain questions (he has more to share).
