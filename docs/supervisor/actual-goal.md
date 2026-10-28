@@ -37,13 +37,17 @@ Updated on 20 October 2026 (evening) so that it starts from the official listing
 
 Other alignments with the listing made at the same time: RAG with a knowledge graph is "planned for FYP2" (a listed deliverable), not "future work"; the tools say Claude AI is supported and the free Gemini tier is used for now; the quant topic is marked as set by the supervisor.
 
-## 6. New objectives (3, written as end states)
+## 6. Objectives (rewritten 28 October 2026 after the defence)
 
-1. **Teach:** Undergraduates new to a topic build their own reasoning, guided step by step up Paul's six levels of Socratic questioning, without being given the answers.
-2. **Assess:** Each learner's critical thinking attainment is measured from the conversation against the Paul-Elder framework (the nine intellectual standards, plus the type of reasoning and knowledge used), with marks that agree with human markers.
-3. **Adapt:** The support and difficulty match each learner's gaps, and the learner can see what they have mastered and what to work on next.
+Dr Ho's defence feedback: objectives in our own words (not anchored on the FYP listing), full and specific sentences, no "Teach, Assess, Adapt" verb labels, no methods inside, and each must be judged as achieved or not in this project.
 
-The old objective "evaluate the prototype against the baseline tutors" is now part of the methodology (the evaluation plan), because Dr Ho said it is a task, not an objective.
+1. Undergraduates who are new to a body of knowledge reach higher levels of Paul's six levels of Socratic questioning during a session with the tutor, without the tutor giving them the answer.
+2. The tutor's marks of each learner's critical thinking, on Paul and Elder's nine intellectual standards and on the type of reasoning and knowledge the learner used, agree with the marks of human markers.
+3. Each learner gets questions and hints that match the gaps in their critical thinking, and can see which reasoning and knowledge skills they have mastered and which still need work.
+
+Scope (the limits of the claim, no methods). Learners are beginner undergraduates at UTP, in short English text chats. Knowledge is any body of knowledge given as text, tested on a few topics from different fields; quant, set by Dr Ho, is the first worked topic and the only one checked by hand. Critical thinking is as defined by Paul and Elder, measured only inside the sessions. Outside the scope are long-term change in thinking and a full class study (later grant phases). The free model and time limits go in Limitations.
+
+Previous version (20 October 2026) had "Teach", "Assess" and "Adapt" labels. The old objective "evaluate the prototype against the baseline tutors" is now part of the methodology (the evaluation plan), because Dr Ho said it is a task, not an objective.
 
 ## 7. How each objective is checked (methodology, not objectives)
 

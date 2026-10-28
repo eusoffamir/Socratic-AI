@@ -10,6 +10,8 @@ Open the live site about 5 minutes early so Render is awake, and keep the pictur
 
 The same words are in the speaker notes of each slide.
 
+Updated 28 October 2026 after Dr Ho's defence feedback. Slides 3 to 6 now have a softer opening, an example in the problem statement, full-sentence objectives and a scope that only sets limits. Say "we" for the project, because it is Eusoff's and Dr Ho's work together.
+
 ## Slide 1, Cover (25 s)
 
 Good afternoon, Dr Ho, Dr Syaimaa', and everyone here. My name is Muhammad Eusoff Amir bin Hazri. My project is Socratic AI, Agentic AI for Fostering Critical Thinking Education, and my supervisor is Dr Ho Tatt Wei. In one sentence, it is an AI tutor that asks instead of answers, and then measures how well the student thinks.
@@ -20,19 +22,19 @@ I will cover the problem and my objectives, the past work, my method and timelin
 
 ## Slide 3, Introduction (50 s)
 
-Today a student can ask an AI for a full answer and copy it in seconds. A QS report found that 62 percent of students use AI every week. A study of 319 office workers found that the more people trust AI, the less they think for themselves. Microsoft Research says this costs us ideas, effort, memory and reflection. My idea is to turn the same AI around. Instead of giving answers, my tutor asks questions in a set order, so the student builds the understanding, and then it measures how good that thinking is.
+Today a student can ask an AI for a full answer and copy it in seconds. A QS report found that 62 percent of students use AI every week. A study of 319 office workers found that the more people trust AI, the less they think for themselves. Microsoft Research says this costs us ideas, effort, memory and reflection. Our idea is to turn the same AI around. Instead of giving answers, our tutor asks questions in a set order, so the student builds the understanding, and then it measures how good that thinking is.
 
-## Slide 4, Problem Statement (60 s)
+## Slide 4, Problem Statement (70 s)
 
-AI can now do a lot of the analysis and coding that engineers used to do. So engineering students need strong critical thinking, so that AI helps them think instead of thinking for them. When I tested two Socratic AI tutors that refuse to give answers, I found three gaps. First, there is no ladder. Their questions only lead to an answer, and they never ask the learner if it is the right question. Second, there is no measurement. They cannot say how well the learner thought, against any framework. Third, there is no adaptation. They do not notice what the learner is missing. One tester even wrote, "I've explained this before." So engineering students need an agentic AI tool that builds their critical thinking.
+AI can now do a lot of the analysis and coding that engineers used to do. Here is an example. A student asks a chatbot why a circuit keeps overheating, gets a confident fix in seconds, and copies it. The fix may even work, but the student never asked what caused the fault or what the chatbot assumed. So engineering students need strong critical thinking, so that AI helps them think instead of thinking for them. When we tested two Socratic AI tutors that refuse to give answers, we found three gaps. First, there is no ladder. Their questions only lead to an answer, and they never ask the learner if it is the right question. Second, there is no measurement. They cannot say how well the learner thought, against any framework. Third, there is no adaptation. They do not notice what the learner is missing. One tester even wrote, "I've explained this before." So engineering students need an agentic AI tool that builds their critical thinking.
 
 ## Slide 5, Objectives (45 s)
 
-So I have three objectives. One, teach. Students build their own reasoning, step by step up the six levels of Socratic questions, without being given the answer. Two, assess. The tool measures each student's critical thinking from the chat, using the Paul and Elder framework, and its marks should agree with human markers. Three, adapt. The help matches each student's gaps, and students can see what they have mastered and what to work on next. These match the official project listing.
+So we have three objectives, and each one can be judged as met or not met at the end of the project. First, undergraduates who are new to a body of knowledge reach higher levels of Paul's six levels of Socratic questioning, without the tutor giving them the answer. Second, the tutor's marks of each learner's critical thinking, on the nine standards and on the type of reasoning and knowledge used, agree with human markers. Third, each learner gets questions and hints that match their gaps, and can see which skills they have mastered and which still need work.
 
-## Slide 6, Scope of Study (40 s)
+## Slide 6, Scope of Study (35 s)
 
-The main topic is quant, set by Dr Ho. It is about telling a real pattern in data from luck, for beginners, with three short cases. Any other topic can now be drafted by a Topic Builder agent, but only quant has been checked by hand. The tutor is a team of AI agents, and plain code keeps them in check. In FYP2, I will check the agents against human markers and add real reading material.
+Our scope sets the limits of these claims. The learners are beginner undergraduates at UTP, in short English text chats. The knowledge can be any body of knowledge given as text, and we test it on a few topics from different fields. Quant, set by Dr Ho, is the first worked topic and the only one checked by hand. Critical thinking is defined by Paul and Elder, and we measure it only inside the sessions. Long-term change in how learners think, and a full class study, belong to the later phases of the parent grant.
 
 ## Slide 7, Past Work on Agentic AI (40 s)
 
