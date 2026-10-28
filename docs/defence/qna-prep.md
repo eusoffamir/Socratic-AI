@@ -20,7 +20,7 @@ The official listing for 26S005 sets the goal of building an agentic AI tool for
 
 ### 2. How do you know the Assessor's marks are correct?
 
-I do not know yet, and I say so on slide 19. So far I only have AI marks on 61 test answers, and they go in the right direction, because strong answers score high and trick answers score low. In FYP2, human markers will mark the same answers, and I will compare them with Cohen's kappa. The grant aims for 0.8.
+I do not know yet, and I say so on slide 21. So far I only have AI marks on 61 test answers, and they go in the right direction, because strong answers score high and trick answers score low. In FYP2, human markers will mark the same answers, and I will compare them with Cohen's kappa. The grant aims for 0.8.
 
 ### 3. What makes it "agentic"? Is it not just a chatbot with a long prompt?
 
@@ -78,7 +78,7 @@ Sign in with Google is optional. The app does not store the name or the email, o
 
 ### 16. Your Assessor gives keyword answers about 4 out of 9. Is that a problem?
 
-Yes, it is my next fix, and I show it on slide 19 on purpose. Answers that only repeat key words should score lower. I will add clear examples of such answers to the Assessor's instructions and test it on the same 61 answers again.
+Yes, it is my next fix, and I show it on slide 21 on purpose. Answers that only repeat key words should score lower. I will add clear examples of such answers to the Assessor's instructions and test it on the same 61 answers again.
 
 ### 17. What if Gemini changes or stops its free plan?
 
