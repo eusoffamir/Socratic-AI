@@ -72,3 +72,12 @@ What to change (for the interim report, Chapter 1 to 3, and later talks):
 7. Keep R1 to R9 as the success measures (Dr Ho liked them).
 8. Explain critical thinking much more in the literature review, meaning the 6 Socratic question types, the 9 standards, the reasoning types and the knowledge types, each with a plain example, so the audience knows what is measured.
 9. Ask Dr Ho about the non-engineering domain questions (he has more to share).
+
+### Talk with Dr Ho after the feedback (28 October 2026, from Eusoff's account)
+
+- Critical thinking. Eusoff held back on explaining it because he did not fully understand it yet. Dr Ho said to push credibility and not be scared, because Paul and Elder is a framework with a very strong background.
+- Say "we", not "I". This is a project of Eusoff and Dr Ho together, since Dr Ho is the supervisor. Dr Ho said Eusoff has integrity.
+- The knowledge graph is "amazing". Next, the arrows must have clear meaning, showing how the pieces link. Dr Ho linked this to machines that make errors and go back along the links to fix them ("self heal"), and to knowledge that comes from a person with 25 years of experience, with the arrows showing the relationships. Eusoff did not fully follow this part yet, so ask Dr Ho to explain it again.
+- Dr Ho said this could become a startup and set Eusoff up for a masters.
+- He wants to see the knowledge graph together with inductive and deductive reasoning, and to see each knowledge type (conceptual, factual, causal, epistemic, relational, procedural, strategic) on its own graph.
+- Note. `app/knowledge.py` already has all 7 of these types plus "metacognitive" (8 in all), and 7 arrow meanings (causes, then, defines, supports, weakens, tests, leads to). Ask Dr Ho whether metacognitive stays.
