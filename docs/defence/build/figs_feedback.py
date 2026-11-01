@@ -83,9 +83,8 @@ levels = [("Clarify", "What do you mean by too small?"),
           ("Question the question", "Is overheating the real problem?")]
 for k, (lv, q) in enumerate(levels):
     y = 0.35 + k * 0.72          # level 1 at the bottom, so it reads as a ladder
-    x = 0.25 + k * 0.12
-    shade = 0.25 + 0.75 * k / 5
-    rbox(ax, x, y, 6.75, 0.58, TEAL_L if k < 5 else AMBER_L, TEAL if k < 5 else AMBER)
+    x = 0.25                     # all bars start at the same edge, so the ladder stands straight
+    rbox(ax, x, y, 6.95, 0.58, TEAL_L if k < 5 else AMBER_L, TEAL if k < 5 else AMBER)
     ax.add_patch(Circle((x + 0.32, y + 0.29), 0.2, fc=TEAL if k < 5 else AMBER, ec="none"))
     ax.text(x + 0.32, y + 0.29, str(k + 1), ha="center", va="center", color="white", weight="bold", fontsize=10)
     ax.text(x + 0.65, y + 0.29, lv, fontsize=10.5, weight="bold", color=INK, va="center")
