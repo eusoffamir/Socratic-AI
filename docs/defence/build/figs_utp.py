@@ -57,11 +57,12 @@ box(ax, 8.1, 9.0, 2.6, 0.9, "Session state", "saved every turn\n(Supabase databa
 ax.plot([X + W / 2, 8.1 - 1.3], [9.0, 9.0], color=GREY, lw=1, ls=":")
 box(ax, 8.1, 1.8, 2.6, 0.8, "Coach agent", "end of session only,\none comment", "ai")
 arrow(ax, X + W / 2, 1.8, 8.1 - 1.3, 1.8)
-box(ax, 8.1, 7.6, 2.6, 0.8, "Reasoning agent", "planned: reasoning type\nand knowledge used", "plan", dashed=True)
-box(ax, 8.1, 3.3, 2.6, 0.8, "Explainer agent", "planned: why this\nskill matters", "plan", dashed=True)
-arrow(ax, X + W / 2, 8.8, 8.1 - 1.3, 7.6, color=AMBER, ls="--")
-for i, (k, lab) in enumerate([("ai", "AI agent (Gemini)"), ("code", "plain code, no AI"), ("plan", "planned for Goal 1")]):
-    box(ax, 1.5 + i * 3.1, 0.5, 2.7, 0.42, lab, "", k, dashed=(k == "plan"), tsize=9)
+# Built on 21 October 2026 (Goal 1), so they are drawn as agents now.
+box(ax, 8.1, 7.6, 2.6, 0.8, "Reasoning agent", "same AI call: reasoning\ntype, knowledge, graph moves", "ai")
+box(ax, 8.1, 3.3, 2.6, 0.8, "Explainer agent", "on request: why this\nskill matters", "ai")
+arrow(ax, X + W / 2, 8.8, 8.1 - 1.3, 7.6, color=TEAL)
+for i, (k, lab) in enumerate([("ai", "AI agent (Gemini)"), ("code", "plain code, no AI")]):
+    box(ax, 1.5 + i * 3.1, 0.5, 2.7, 0.42, lab, "", k, tsize=9)
 fig.savefig(f"{out}/agent_flow.png", dpi=200, bbox_inches="tight"); plt.close(fig)
 
 # ---------- Figure B: framework ----------

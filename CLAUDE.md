@@ -75,7 +75,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## Thesis and docs
 
-- `docs/thesis/FYP1.docx` is the full thesis draft. `docs/thesis/Interim-Report.docx` (1 November 2026) is the copy for the interim report (draft due on Turnitin Friday 13 November 2026, 11.59 pm), with the defence feedback and Goal 3 updates as tracked changes; work on this file for the report. Edit as **tracked changes by "Claude"**. UTP format (Times New Roman 12, 1.5 spacing, left margin 4 cm, APA). Without Word automation, edit the XML with a script (lxml) and set `updateFields` so Word refreshes the contents on open.
+- `docs/thesis/FYP1.docx` is the full thesis draft. `docs/thesis/Interim-Report.docx` (1 November 2026) is the interim report (draft due on Turnitin Friday 13 November 2026, 11.59 pm). On 1 November 2026 its main text was cut from 53 to 16 pages (Chapters 1 to 5, 6 figures, 1 table) as tracked changes by "Claude", after the earlier changes were accepted; FYP1.docx keeps the full text for the FYP2 dissertation. Work on this file for the report. Edit as **tracked changes by "Claude"**. UTP format (Times New Roman 12, 1.5 spacing, left margin 4 cm, APA). Without Word automation, edit the XML with a script (lxml) and set `updateFields` so Word refreshes the contents on open.
 - Interim report must be at most 20 pages without appendices; main text is about 50, cut only after asking.
 - Folder guide: `docs/README.md`.
 
