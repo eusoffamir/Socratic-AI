@@ -24,40 +24,49 @@ def save(fig, name):
 
 
 # ---------- A. Agentic building blocks and where each one lives ----------
-fig, ax = plt.subplots(figsize=(12.2, 5.4))
-ax.set_xlim(0, 12.2); ax.set_ylim(-0.45, 5.4); ax.axis("off")
-ideas = [("Prompting", "2025", "instruction plus context", "[15]"),
-         ("Chain of Thought", "2022", "think in steps first", "[16]"),
-         ("ReAct", "2023", "reason, act, observe", "[17]"),
-         ("Multi-agent systems", "2024", "MetaGPT, AgileCoder", "[20], [21]"),
-         ("RAG", "2023", "answer from retrieved text", "[14], [18]"),
-         ("Model Context Protocol", "2024", "standard tool access", "[19]")]
 uses = [("Every agent", "structured JSON prompts", "ai"),
         ("Planner", "reasons before the next move", "ai"),
         ("Tutor", "runs a simulation, reads it, replies", "ai"),
         ("Assessor, Planner, Tutor, Checker", "one job each, joined in a graph", "ai"),
         ("Topic Builder", "Wikipedia or the learner's file now, knowledge graph RAG in FYP2", "plan"),
         ("Knowledge graph and learner records", "planned", "plan")]
-ax.text(2.2, 5.15, "Idea from the literature", ha="center", fontsize=12, weight="bold", color=TEAL)
-ax.text(9.0, 5.15, "Where it lives in our tutor", ha="center", fontsize=12, weight="bold", color=TEAL)
-for k, ((name, year, idea, ref), (who, what, kind)) in enumerate(zip(ideas, uses)):
-    y = 4.35 - k * 0.82
-    rbox(ax, 0.1, y - 0.3, 4.2, 0.62, "white", TEAL)
-    ax.text(0.3, y + 0.08, name, fontsize=11, weight="bold", color=INK, va="center")
-    ax.text(0.3, y - 0.16, f"{idea}  {ref}", fontsize=8.6, color=GREY, va="center")
-    ax.text(4.1, y + 0.08, year, fontsize=9, color=GREY, ha="right", va="center")
-    fc, ec = (TEAL_L, TEAL) if kind == "ai" else (AMBER_L, AMBER)
-    rbox(ax, 5.9, y - 0.3, 6.2, 0.62, fc, ec)
-    ax.text(6.1, y + 0.08, who, fontsize=11, weight="bold", color=INK, va="center")
-    ax.text(6.1, y - 0.16, what, fontsize=8.6, color=GREY, va="center")
-    ax.annotate("", xy=(5.85, y), xytext=(4.35, y),
-                arrowprops=dict(arrowstyle="-|>", color=TEAL if kind == "ai" else AMBER, lw=1.6,
-                                ls="-" if kind == "ai" else "--"))
-ax.add_patch(FancyBboxPatch((6.0, -0.42), 0.3, 0.18, boxstyle="round,pad=0,rounding_size=0.04", fc=TEAL_L, ec=TEAL))
-ax.text(6.4, -0.33, "built", fontsize=9, va="center", color=GREY)
-ax.add_patch(FancyBboxPatch((7.3, -0.42), 0.3, 0.18, boxstyle="round,pad=0,rounding_size=0.04", fc=AMBER_L, ec=AMBER))
-ax.text(7.7, -0.33, "planned or partly built", fontsize=9, va="center", color=GREY)
-save(fig, "lit_agentic")
+# The slides cite by number, the thesis cites in APA, so the figure is drawn twice.
+ideas_slides = [("Prompting", "2025", "instruction plus context", "[15]"),
+                ("Chain of Thought", "2022", "think in steps first", "[16]"),
+                ("ReAct", "2023", "reason, act, observe", "[17]"),
+                ("Multi-agent systems", "2024", "MetaGPT, AgileCoder", "[20], [21]"),
+                ("RAG", "2023", "answer from retrieved text", "[14], [18]"),
+                ("Model Context Protocol", "2024", "standard tool access", "[19]")]
+ideas_thesis = [("Prompting", "2025", "instruction plus context, Ho (2025a)", ""),
+                ("Chain of Thought", "2022", "think in steps first, Wei et al. (2022)", ""),
+                ("ReAct", "2023", "reason, act, observe, Yao et al. (2023b)", ""),
+                ("Multi-agent systems", "2024", "MetaGPT, AgileCoder, Hong et al. (2024)", ""),
+                ("RAG", "2020", "answer from retrieved text, Lewis et al. (2020)", ""),
+                ("Model Context Protocol", "2024", "standard tool access, Anthropic (2024)", "")]
+uses_thesis = uses[:5] + [("Knowledge graph and learner records", "graph and records built, MCP access planned for FYP2", "plan")]
+for ideas, uses_, fname in [(ideas_slides, uses, "lit_agentic"), (ideas_thesis, uses_thesis, "lit_agentic_apa")]:
+  fig, ax = plt.subplots(figsize=(12.2, 5.4))
+  ax.set_xlim(0, 12.2); ax.set_ylim(-0.45, 5.4); ax.axis("off")
+  ax.text(2.2, 5.15, "Idea from the literature", ha="center", fontsize=12, weight="bold", color=TEAL)
+  ax.text(9.0, 5.15, "Where it lives in our tutor", ha="center", fontsize=12, weight="bold", color=TEAL)
+  for k, ((name, year, idea, ref), (who, what, kind)) in enumerate(zip(ideas, uses_)):
+      y = 4.35 - k * 0.82
+      rbox(ax, 0.1, y - 0.3, 4.2, 0.62, "white", TEAL)
+      ax.text(0.3, y + 0.08, name, fontsize=11, weight="bold", color=INK, va="center")
+      ax.text(0.3, y - 0.16, f"{idea}  {ref}", fontsize=8.6, color=GREY, va="center")
+      ax.text(4.1, y + 0.08, year, fontsize=9, color=GREY, ha="right", va="center")
+      fc, ec = (TEAL_L, TEAL) if kind == "ai" else (AMBER_L, AMBER)
+      rbox(ax, 5.9, y - 0.3, 6.2, 0.62, fc, ec)
+      ax.text(6.1, y + 0.08, who, fontsize=11, weight="bold", color=INK, va="center")
+      ax.text(6.1, y - 0.16, what, fontsize=8.6, color=GREY, va="center")
+      ax.annotate("", xy=(5.85, y), xytext=(4.35, y),
+                  arrowprops=dict(arrowstyle="-|>", color=TEAL if kind == "ai" else AMBER, lw=1.6,
+                                  ls="-" if kind == "ai" else "--"))
+  ax.add_patch(FancyBboxPatch((6.0, -0.42), 0.3, 0.18, boxstyle="round,pad=0,rounding_size=0.04", fc=TEAL_L, ec=TEAL))
+  ax.text(6.4, -0.33, "built", fontsize=9, va="center", color=GREY)
+  ax.add_patch(FancyBboxPatch((7.3, -0.42), 0.3, 0.18, boxstyle="round,pad=0,rounding_size=0.04", fc=AMBER_L, ec=AMBER))
+  ax.text(7.7, -0.33, "planned or partly built", fontsize=9, va="center", color=GREY)
+  save(fig, fname)
 
 
 # ---------- B. What the tutor asks and what the Assessor marks ----------
