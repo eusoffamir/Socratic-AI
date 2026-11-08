@@ -13,3 +13,9 @@ To stop the AI from making up facts, it can first look up verified information, 
 ## 2.1, paragraph 3 (done)
 
 Brand (2026) warns that not every task needs an AI agent, because fixed and predictable jobs may be better done by plain automation. This project follows that advice. An AI does not give the same answer twice, so it should not decide fixed things. The learner chooses how long the session runs, and plain code makes sure that choice is kept, because it is the learner's decision and not the AI's. AI is used where judgement is needed, such as writing the questions, while simple rules handle fixed checks, such as the copy check. Figure 1 shows each idea and the part of this project where it is used.
+
+## 2.5, Research Gap (done)
+
+The literature shows that using AI a lot can make people think less (Gerlich, 2025; H.-P. Lee et al., 2025), and that an AI that asks questions instead of giving answers can protect learning (Bastani et al., 2025; Sarkar, 2024, 2025). However, the evidence is still weak in places. Bastani et al. (2025) measured exam marks and not critical thinking, Liu et al. (2024) tested SocraticLM on simulated students, and Degen and Asanov (2025) asked students whether the tutor helped their thinking. A student does not really know whether their thinking improved, and they may simply say that it helped when it did not. Existing Socratic tutors also only ask questions. They have no ladder for the learner to climb, they do not adapt to the learner's level, and they do not mark the learner, so the learner does not know what level they are at or how to improve. This project works more like a real teacher. It asks a question, assesses where the learner is, shows which type of reasoning and knowledge they used, and guides them to where they need to improve, with quant as the first worked topic.
+
+Sections 2.2 to 2.4 were left as they were (Eusoff chose to stop here, 8 November 2026).
