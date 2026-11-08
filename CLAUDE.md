@@ -1,4 +1,4 @@
-﻿# CLAUDE.md: Socratic AI (FYP project 26S005)
+# CLAUDE.md: Socratic AI (FYP project 26S005)
 
 Short version. Full history, details, audits and dated findings are in `docs/project-history.md` (same section names as here). Open only the section a task needs.
 
@@ -50,7 +50,7 @@ A Socratic tutor that develops critical thinking, measures it against a framewor
 
 - Tutor tone calm and helpful, like Jarvis. No slang, emoji or exclamation marks (only exception "Congratulations! You reached ...").
 - Keep all text short (limits in `prompts.WORD_LIMITS`). Smooth sentences joined with "because", "so", "and", "but". No clipped style, no colons joining parts.
-- Numbers inside sentences, not â†’, = or â‰  (chart titles may). **Chances always as percentages, never fractions.**
+- Numbers inside sentences, not →, = or ≠ (chart titles may). **Chances always as percentages, never fractions.**
 
 ## Supervisor
 
