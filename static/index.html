@@ -838,6 +838,7 @@
   .report-actions{display:flex; flex-direction:row-reverse; flex-wrap:wrap; gap:16px; margin-top:36px;}
   .report-actions button{padding:13px 24px; font-size:15.5px; border-radius:10px;}
   .note{font-size:12.5px; color:var(--ink-faint); margin-top:32px; padding-top:16px; border-top:1px solid var(--rule);}
+  .rk .note, .rk .rk-q{margin-top:12px; padding-top:0; border-top:0; text-align:left;}  /* small lines under a grid, no divider */
   .backdrop{display:none;}
 
   /* ---------- profile panel (slides in from the right) ---------- */
@@ -913,7 +914,6 @@
   .ms-row .st-not-sure-yet{background:var(--signal-soft); color:var(--signal);}
   .ms-row .st-not-enough-answers{background:none; color:var(--ink-faint);}
   .rk th small, .ms-row .nm small{display:block; font-size:11px; font-weight:400; color:var(--ink-faint); white-space:normal; line-height:1.3; margin-top:1px;}
-  .rk .rk-q{margin:16px 0 0; text-align:center;}
   @media (max-width:700px){
     .ms-row{grid-template-columns:minmax(0, 1fr) auto; grid-template-areas:"nm st" "bar bar"; gap:6px 10px;}  /* name and label on top, a full-width bar below */
     .ms-row .nm{grid-area:nm;} .ms-row .st{grid-area:st; align-self:start; font-size:11.5px;} .ms-row .ms-track{grid-area:bar;}
@@ -2939,7 +2939,7 @@ $('startRow').addEventListener('click', e => {
 // ---------- overall status ----------
 // Highest level and the 9 standards across every case played in this browser.
 
-const SKILL_GRID_TITLE = 'Where you used each way of reasoning', SKILL_GRID_SUB = 'From your skill checks. 1 of 2 means you answered 1 of 2 questions on that mix well.';
+const SKILL_GRID_TITLE = 'Reasoning in your skill checks', SKILL_GRID_SUB = '';
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
@@ -2980,7 +2980,6 @@ function overallHTML(d){
         <div class="thinking">${DOTS}Reading all your answers...</div></div>
     </div>
     ${ovSkillsHTML(d)}
-    <div class="note">Only chats in this browser count, not the tutorial.</div>
   </div>`;
 }
 
@@ -3752,8 +3751,7 @@ function skillGridHTML(r, title, sub){
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">${title}</span>${msgs}${sub ? `<p class="rk-sub">${sub}</p>` : ''}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr><th class="row">Total</th>${foot}</tr></tfoot></table>
-    <div class="note">Darker is stronger, and a dash means not asked yet. Click a box for an example.</div></div>`;
+    <tfoot><tr><th class="row">Total</th>${foot}</tr></tfoot></table></div>`;
 }
 
 // Short, plain meanings shown under each skill name, so a learner does not need the terms
@@ -3784,7 +3782,7 @@ function skillsSimpleHTML(m, withButton = true){
   return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
     <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : ''}</p>
     <div class="sk-cols">
-      <div class="sk-col ok"><h4>Strong at</h4>${strong.length || almost.length
+      <div class="sk-col ok"><h4>Going well</h4>${strong.length || almost.length
         ? `<ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul>`
         : '<p class="sk-none">Nothing yet, so keep going.</p>'}</div>
       <div class="sk-col"><h4>Practise next</h4>${next.length
@@ -3808,8 +3806,7 @@ function masteryHTML(m){
   const msgs = m.messages.length ? `<div class="rk-msg">${m.messages.map(x => `<p>${esc(x)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Your thinking skills</span>${msgs}
     <div class="ms-rows">${group('reasoning', 'Ways of reasoning')}${group('knowledge', 'Kinds of knowledge')}</div>
-    <div class="ms-axis"><span></span><span><i>0%</i><i class="goal" style="left:${m.mastery_level}%">goal</i><i>100%</i></span><span></span></div>
-    <div class="note">The bar is your score. Pass the goal line at ${m.mastery_level}% to master a skill. Tap a row for details.</div></div>`;
+    <div class="ms-axis"><span></span><span><i>0%</i><i class="goal" style="left:${m.mastery_level}%">goal</i><i>100%</i></span><span></span></div></div>`;
 }
 
 // Explainer agent: why a reasoning type matters with 1 or 2 knowledge types.
@@ -4006,12 +4003,10 @@ function reasoningGridHTML(r){
         return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}" data-r="${t}" data-k="${k}"
           data-tip="${esc(`${v} answers used ${t} reasoning on ${k} knowledge. Click for an example.`)}">${v || '–'}</td>`; }).join('') + '</tr>').join('');
   const q = types.filter(t => r.quality[t] !== null).map(t => `${t} answers met ${r.quality[t]}`);
-  const quality = q.length ? `<p class="rk-sub rk-q">On average, your ${q.length > 1 ? q.slice(0, -1).join(', ') + ' and ' + q[q.length - 1] : q[0]} of the 9 thinking standards.</p>` : '';
+  const quality = q.length ? `<p class="note rk-q">On average, your ${q.length > 1 ? q.slice(0, -1).join(', ') + ' and ' + q[q.length - 1] : q[0]} of the 9 thinking standards.</p>` : '';
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Reasoning in your chats</span>${msgs}
-    <p class="rk-sub">How many of your ${r.answers} chat answers used each mix. This is from chats, not skill checks.</p>
-    <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table>${quality}
-    <div class="note">Darker is used more, and a dash means not yet. Click a box for an example.</div></div>`;
+    <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table>${quality}</div>`;
 }
 
 // Builds the profile. Used twice: in the right-side panel ("Profile" button,
