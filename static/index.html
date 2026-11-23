@@ -566,6 +566,13 @@
   #askTicks .tick + .tick::before{content:""; position:absolute; right:100%; top:50%; width:16px; height:2px; margin-top:-1px; background:var(--rule);}
   #askTicks .tick.done, #askTicks .tick.done::before, #askTicks .tick.now::before{background:var(--signal);}
   #askTicks .tick.now{background:var(--caution); box-shadow:0 0 0 3px var(--caution-soft);}
+  /* the same soft glow as the A and B choices, on the bright parts of the progress panel */
+  #askTicks .tick.done{box-shadow:0 0 6px color-mix(in srgb, var(--signal) 70%, transparent);}
+  #askTicks .tick.now{box-shadow:0 0 0 3px var(--caution-soft), 0 0 10px color-mix(in srgb, var(--caution) 75%, transparent);}
+  .rung.on{box-shadow:0 0 12px color-mix(in srgb, var(--signal) 20%, transparent);}
+  .rung.top{box-shadow:0 0 18px color-mix(in srgb, var(--signal) 45%, transparent);}
+  .sradar .shape{filter:drop-shadow(0 0 6px color-mix(in srgb, var(--signal) 55%, transparent));}
+  .sradar .dot{filter:drop-shadow(0 0 4px var(--signal));}
   .tick{flex:1; height:7px; background:var(--rule); border-radius:3px;}
   .tick.done{background:var(--signal);}
   .tick.now{background:var(--caution);}
