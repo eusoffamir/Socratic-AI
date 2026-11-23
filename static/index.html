@@ -2918,7 +2918,9 @@ async function openCheck(){
     if(last){ try { d = await api(`/api/check/${last}`); } catch(e){} }  // continue an unfinished check
     // a check on another topic than the one picked on Home is not continued
     const topic = activeTopic(), mine = topic.id !== 'quant';
-    if(!d || d.ended || (d.topic || null) !== (mine ? topic.topic : null)){
+    // a check started before 23 November 2026 has the old quant questions (ids without "e-"), so start a new one
+    const oldQuant = d && !d.topic && d.question && !d.question.id.startsWith('e-');
+    if(!d || d.ended || oldQuant || (d.topic || null) !== (mine ? topic.topic : null)){
       if(mine) $('ckBody').innerHTML = `<div class="thinking">${DOTS}Writing questions on your topic...</div>`;
       d = await postJSON('/api/check', {past_check_ids: myChecks(), cases: mine ? topic.cases : []});
       rememberCheck(d.check_id);
