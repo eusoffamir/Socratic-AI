@@ -1558,9 +1558,8 @@ async function postSteps(url, body, wait, key, failText){
     const detail = data && data.detail;
     throw new Error(typeof detail === 'string' ? detail : `Server error (${res.status}).`);
   }
-  const steps = [];
-  const draw = () => wait.innerHTML = `<ul class="build-steps">${steps.map((t, i) => i < steps.length - 1
-    ? `<li class="done">${esc(t)}</li>` : `<li class="now">${DOTS}${esc(t)}</li>`).join('')}</ul>`;
+  const steps = [];  // only the step running now shows, finished steps are not listed
+  const draw = () => wait.innerHTML = `<ul class="build-steps"><li class="now">${DOTS}${esc(steps[steps.length - 1])}</li></ul>`;
   const reader = res.body.getReader(), dec = new TextDecoder();
   let buf = '';
   for(;;){
