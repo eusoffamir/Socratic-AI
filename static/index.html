@@ -382,8 +382,6 @@
   .am-card .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
   .am-card .row button{font-size:13.5px; padding:7px 14px; border-radius:999px;}
   .am-card .row .ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--rule);}
-  .ask-next{font-size:13.5px; padding:6px 12px; border-radius:999px; background:var(--signal-soft); border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal); font-weight:500;}
-  .ask-next:hover:not(:disabled){border-color:var(--signal); opacity:1;}
   /* the knowledge map of a case: boxes coloured by knowledge type, arrows for the links */
   .am-map{font-family:var(--sans); margin:2px 0 14px; background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:12px 14px 10px;}
   .am-map svg{display:block; width:100%; height:auto;}
@@ -1011,7 +1009,6 @@
         <div class="ask-tools">
           <button type="button" class="tb-add" id="askAdd" title="Add a file (PDF, Word or text)" aria-label="Add a file">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button type="button" class="ask-next hidden" id="askNext" title="A new case on the same topic">New case</button>
           <span class="spacer"></span>
           <div class="ask-mode ask-rounds">
             <button type="button" id="askRoundsBtn" aria-haspopup="menu" aria-expanded="false" title="Rounds per case">
@@ -1461,7 +1458,6 @@ function askLock(on){
 }
 function askChatting(on){
   $('askMain').classList.toggle('empty', !on);
-  askNextButton();
   $('askAdd').classList.toggle('hidden', on);  // a file starts a topic, so it is not needed mid-chat
   $('askRoundsMenu').parentElement.classList.toggle('hidden', on);  // a case's length is set when the chat starts
   $('askInput').placeholder = on ? 'Your answer...' : 'Type any topic, a question or a short reading';
@@ -1760,7 +1756,9 @@ $('askRoundsMenu').parentElement.addEventListener('keydown', e => {
 function askDone(){
   ask.done = true;
   $('askSend').disabled = $('askInput').disabled = true;
-  $('askInput').placeholder = askCanNext() ? 'This case is done. Press New case for another one.' : 'This case is done.';
+  $('askInput').placeholder = 'This case is done.';
+  if(askCanNext()) askAdd('am-card', `This case is done. You can try a new case on the same topic.
+    <div class="row"><button type="button" data-next>New case</button></div>`);
 }
 $('askModeBtn').addEventListener('click', e => {
   e.stopPropagation();
@@ -1931,8 +1929,7 @@ async function askStart(c, name, ctx = askCtx()){
       askPending.delete(key);
       renderRecents();
       askLock(false);
-      askNextButton();
-      $('askInput').focus();
+          $('askInput').focus();
     } else askPendingDone(key, rec && rec.id, error);
   }
 }
@@ -1946,8 +1943,6 @@ function askCanNext(){
   if(ask.cases[0] && !ask.cases[0].generated) return quantCases.some(q => !ask.cases.some(c => c.id === q.id));
   return !!ask.request;
 }
-function askNextButton(){ $('askNext').classList.toggle('hidden', !askCanNext()); }
-$('askNext').addEventListener('click', () => { if(!ask.busy) askNext(); });
 
 async function askNext(){
   if(ask.busy || !askCanNext()) return;
@@ -2180,7 +2175,6 @@ async function askOpen(id){
     return;
   }
   askLock(false);
-  askNextButton();
   if(ended){ askDone(); return; }
   $('askInput').focus();
 }
