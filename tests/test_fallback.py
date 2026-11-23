@@ -43,6 +43,12 @@ def test_busy_and_missing_fallbacks_are_skipped(fake):
     assert models.asked == ["main", "main", "second", "third"]  # a busy model gets one quick retry
 
 
+def test_timeout_moves_to_the_next_model(fake):
+    models = fake({"main": 504})
+    assert llm_client._generate_gemini("s", "u", 50, False) == "reply from second"
+    assert models.asked == ["main", "second"]
+
+
 def test_busy_everywhere_gives_the_busy_message(fake):
     fake({"main": 429, "second": 503, "third": 503})
     with pytest.raises(llm_client.LLMError, match="used up or busy"):

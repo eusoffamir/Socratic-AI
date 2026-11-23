@@ -129,7 +129,9 @@ def _gemini_call(model, user, config, last):
                 continue
             if e.code == 429:
                 _gemini_resting[model] = time.time() + GEMINI_COOLDOWN_SECONDS
-            if e.code in (429, 503) or (e.code == 404 and model != GEMINI_MODEL):
+            # 504 (Google timed out) also counts as busy: on 23 November 2026 flash-lite gave
+            # 504 every time while gemini-3.6-flash answered in 5s
+            if e.code in (429, 503, 504) or (e.code == 404 and model != GEMINI_MODEL):
                 raise _GeminiBusy(e.code) from e
             if e.code == 404:
                 raise LLMError(f"Gemini model {model!r} not found. Check GEMINI_MODEL in .env.") from e
