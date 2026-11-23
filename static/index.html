@@ -2384,10 +2384,7 @@ function knowNetHTML(v){
   }).join('');
   const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
     <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
-  const intro = v.guessed
-    ? 'The AI guessed these chances, because there is no data for this topic, so treat them as rough. Asking backwards, from signs to cause, is abductive reasoning.'
-    : `This model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking backwards, from signs to cause, is abductive reasoning.`;
-  return `<div class="know-net"><p class="know-intro">${intro}</p>
+  return `<div class="know-net">
     <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
