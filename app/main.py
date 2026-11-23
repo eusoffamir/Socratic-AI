@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from . import (auth, builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
-               skillcheck, stats, storage)
+               skillcheck, sources, stats, storage)
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
 
@@ -66,6 +66,7 @@ class TopicRequest(BaseModel):
     file: TopicFile | None = None  # the learner's own PDF, Word or text file (never saved)
     count: int = 3  # how many cases; the Ask chat asks for 1 at a time
     avoid: list[str] = []  # titles of the cases already done on this topic (the Ask chat's next case)
+    article: str = ""  # the Wikipedia title picked in "Which one do you mean?"
 
 
 class CodeRequest(BaseModel):
@@ -322,6 +323,13 @@ def knowledge_view(case_id: str):
     return {"tree": heuristics.view(case_id), "network": pgm.view(case_id)}
 
 
+@app.post("/api/topic/meanings")
+def topic_meanings(req: TopicRequest):
+    """The articles an unclear topic could mean, so the learner picks one
+    before a case is written. [] when the topic is clear."""
+    return {"meanings": sources.meanings(req.text)}
+
+
 @app.post("/api/topic")
 def make_topic(req: TopicRequest):
     """Goal 2: 3 new cases on any topic the learner types, from the Topic
@@ -336,7 +344,7 @@ def make_topic(req: TopicRequest):
             msg = str(e) if isinstance(e, files.FileError) else "This file could not be read, so please try again."
             raise HTTPException(400, msg)
     try:
-        return builder.build(req.text, file, req.count, req.avoid)
+        return builder.build(req.text, file, req.count, req.avoid, req.article)
     except builder.TopicError as e:
         raise HTTPException(400, str(e))
     except LLMError as e:

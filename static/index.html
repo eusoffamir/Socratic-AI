@@ -191,6 +191,8 @@
   .know .am-map svg{margin:0 auto;}
   .know .am-map > .mono-label{display:none;}  /* the page title already says what this is */  /* drawn 1.17 times larger and centred, so its 11.5px box text shows at 13.5px like the page */
   .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
+  .know-head{display:flex; align-items:center; flex-wrap:wrap; gap:8px 14px; margin:0 0 20px;}
+  .report .know-head h2{margin:0;}
   .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
   .know-tabs button{background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:8px 12px; margin-bottom:-1px; color:var(--ink-soft); font-size:14.5px;}
   .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
@@ -1257,7 +1259,7 @@ function fileBase64(file){
 // not changed; the topic also shows there, the same as one built on Home.
 let askFile = null;
 const ask = {sid: null, busy: false, rounds: 0, total: 0, done: false, caseAnswers: 0, options: [], picked: null, cases: [], hintOpened: false,
-             chatId: null, pendKey: null, sids: [], request: null, answers: 0, offered: [], gen: 0};
+             chatId: null, pendKey: null, sids: [], request: null, article: '', answers: 0, offered: [], gen: 0};
 // The learner may switch chats while a reply is on its way. Each switch bumps
 // ask.gen, so a late reply sees it belongs to a chat that is no longer shown and
 // is not drawn. What the server saved (an answer, a built topic) is kept.
@@ -1268,7 +1270,7 @@ const askLive = gen => gen === ask.gen;
 const askPending = new Map();
 let askPendingNo = 0;
 const askViewing = () => ask.chatId || ask.pendKey;
-function askCtx(){ return {gen: ask.gen, chatId: ask.chatId, rounds: ask.rounds, ab: !!ask.ab, request: ask.request}; }
+function askCtx(){ return {gen: ask.gen, chatId: ask.chatId, rounds: ask.rounds, ab: !!ask.ab, request: ask.request, article: ask.article}; }
 
 // The pages beside the sidebar: the chat, Overall status and Knowledge.
 const PAGES = {ask: '#askMain', status: '#statusMain', knowledge: '#knowMain'};
@@ -1329,7 +1331,7 @@ function askKeep(sid, name, ctx){
   rememberSession(sid);
   const list = askChats(), had = ctx.chatId && list.find(x => x.id === ctx.chatId);
   const rec = had ? {...had, sid, sids: [...had.sids, sid]}
-                  : {id: sid, sid, sids: [sid], name: String(name).slice(0, 80), request: ctx.request};
+                  : {id: sid, sid, sids: [sid], name: String(name).slice(0, 80), request: ctx.request, article: ctx.article || ''};
   saveAskChats([rec, ...list.filter(x => x.id !== rec.id)]);
   return rec;
 }
@@ -1773,11 +1775,21 @@ $('askModeMenu').addEventListener('click', async e => {
   $('askModeBtn').focus();
   if(on === was) return;
   setAskMode(on);
-  if(!on && ask.options.length && !ask.busy){  // Open questions at once: the A and B buttons go, the question stays
-    $('askThread').querySelectorAll('.am-opts').forEach(o => o.remove());
+  if(!on && ask.options.length && !ask.busy){  // Open questions at once: the A and B buttons hide, the question stays
+    $('askThread').querySelectorAll('.am-opts').forEach(o => {
+      o.classList.add('hidden');
+      o.querySelectorAll('.choice').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    });
+    ask.shelved = ask.options;
     ask.options = [];
     ask.picked = null;
     $('askInput').placeholder = 'Your answer...';
+    syncWhy();
+  } else if(on && (ask.shelved || []).length && !ask.busy){  // back to A or B: the same buttons come back
+    $('askThread').querySelectorAll('.am-opts.hidden').forEach(o => o.classList.remove('hidden'));
+    ask.options = ask.shelved;
+    ask.shelved = [];
+    $('askInput').placeholder = 'Pick A or B, then say why...';
     syncWhy();
   }
   if(!ask.sid) return;
@@ -1798,6 +1810,7 @@ function askShowTurn(data, intro){
   askStrip(data.level_idx, data.round);
   ask.options = parts.options && parts.options.length === 2 ? parts.options : [];
   ask.picked = null;
+  ask.shelved = [];
   syncWhy();
   $('askThread').querySelectorAll('.am-opts').forEach(o => o.remove());  // old choices are done, the answer shows the pick
   const feedback = parts.feedback;
@@ -1946,7 +1959,7 @@ async function askNext(){
   const wait = askStatus('Writing a new case. This takes 20 to 40 seconds.');
   let t;
   try {
-    t = await postJSON('/api/topic', {text: ask.request, count: 1, avoid: ask.cases.map(c => c.title)});
+    t = await postJSON('/api/topic', {text: ask.request, article: ask.article || '', count: 1, avoid: ask.cases.map(c => c.title)});
   } catch(err){
     if(!askLive(gen)) return askPendingDone(ctx.chatId, null, err.message);
     askPending.delete(ctx.chatId);
@@ -1971,6 +1984,22 @@ function askProgress(){
 }
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
+// "Which one do you mean?" with one button per Wikipedia title and Something else.
+// Resolves to the picked title, or null for Something else.
+function askChoose(titles){
+  return new Promise(done => {
+    const card = askAdd('am-card', `Which one do you mean?<div class="row">${titles.map(t =>
+      `<button type="button" data-mean="${esc(t)}">${esc(t)}</button>`).join('')}<button type="button" class="ghost" data-mean-other>Something else</button></div>`);
+    card.addEventListener('click', e => {
+      const b = e.target.closest('[data-mean], [data-mean-other]');
+      if(!b) return;
+      e.stopPropagation();
+      card.remove();
+      if(b.dataset.mean) askAdd('am-user', esc(b.dataset.mean));
+      done(b.dataset.mean || null);
+    });
+  });
+}
 async function askTopic(text){
   const ctx = askCtx(), gen = ctx.gen;
   ctx.key = `new-${++askPendingNo}`;
@@ -1980,12 +2009,31 @@ async function askTopic(text){
   askChatting(true);
   askAdd('am-user', esc(text || askFile.name));
   askLock(true);
+  let article = '';
+  if(!askFile){  // an unclear topic ("mercury") asks which one first, so the case is on the right thing
+    const look = askStatus('Checking your topic...');
+    let means = [];
+    try { means = (await postJSON('/api/topic/meanings', {text})).meanings || []; } catch(err){}  // no check, so just go on
+    look.remove();
+    if(means.length >= 2 && askLive(gen)){
+      const pick = await askChoose(means);
+      if(pick == null){  // none of them, so the learner says more
+        askPending.delete(ctx.key);
+        renderRecents();
+        askLock(false);
+        $('askInput').placeholder = 'Say a bit more about your topic';
+        $('askInput').focus();
+        return;
+      }
+      article = pick;
+    }
+  }
   const wait = askStatus(askFile ? `Reading ${askFile.name} and writing a case...`
                                   : 'Writing a case. This takes 20 to 40 seconds.');
   let t;
   const askFileUsed = !!askFile;
   try {
-    const body = {text, count: 1};
+    const body = {text, article, count: 1};
     if(askFile) body.file = {name: askFile.name, data: await fileBase64(askFile)};
     t = await postJSON('/api/topic', body);
   } catch(err){
@@ -2001,9 +2049,11 @@ async function askTopic(text){
   wait.remove();
   saveTopics([...myTopics().filter(x => x.id !== t.id), t]);
   ctx.request = askFileUsed ? null : text;  // a file is not kept, so it cannot make another case
+  ctx.article = article;
   if(askLive(gen)){
     setAskFile(null);
     ask.request = ctx.request;
+    ask.article = article;
   }
   await askStart(t.cases[0], t.topic, ctx);
 }
@@ -2016,7 +2066,7 @@ async function askAnswer(typed){
   }
   if(!answer) return;
   const line = askAdd('am-user', esc(answer));
-  const opts = [...$('askThread').querySelectorAll('.am-opts')];
+  const opts = [...$('askThread').querySelectorAll('.am-opts:not(.hidden)')];
   opts.forEach(o => o.classList.add('hidden'));  // the answer line shows the pick, so the choices go
   $('askInput').value = '';
   $('askInput').style.height = '';
@@ -2060,8 +2110,8 @@ $('askForm').addEventListener('submit', e => {
 });
 
 function askReset(){
-  Object.assign(ask, {sid: null, options: [], picked: null, cases: [], hintOpened: false,
-                     chatId: null, pendKey: null, sids: [], request: null, answers: 0, offered: [], total: 0, done: false, gen: ask.gen + 1});
+  Object.assign(ask, {sid: null, options: [], shelved: [], picked: null, cases: [], hintOpened: false,
+                     chatId: null, pendKey: null, sids: [], request: null, article: '', answers: 0, offered: [], total: 0, done: false, gen: ask.gen + 1});
   askLock(false);
   $('askThread').innerHTML = '';
   $('askRound').textContent = $('askLevel').innerHTML = $('askTicks').innerHTML = $('askStats').innerHTML = '';
@@ -2081,7 +2131,7 @@ async function askOpen(id){
   askReset();
   askChatting(true);
   showPage('ask');
-  Object.assign(ask, {chatId: rec.id, request: rec.request || null});
+  Object.assign(ask, {chatId: rec.id, request: rec.request || null, article: rec.article || ''});
   navSetChat(rec.id);
   const gen = ask.gen;
   renderRecents();
@@ -2282,7 +2332,7 @@ const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
 // the 3 quant cases, then the cases on the learner's own topic in the open chat
 function knowCases(){
   const mine = ask.cases.filter(c => c.generated);
-  return [...quantCases, ...mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i)];
+  return mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i);
 }
 function openKnowledge(){
   showPage('knowledge');
@@ -2294,10 +2344,9 @@ function openKnowledge(){
 const knowName = x => x.title;
 function renderKnowledge(){
   const cases = knowCases(), c = cases.find(x => x.id === know.id), body = $('knowBody');
-  if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
+  if(!c){ body.innerHTML = '<div class="report know"><h2>How the knowledge fits</h2><p class="know-none">Start a chat on any topic, and its map shows here.</p></div>'; return; }
   body.innerHTML = `<div class="report know">
-    <h2>How the knowledge fits</h2>
-    <div class="know-pick"><span class="mono-label">Case</span><div class="ov-filter" id="knowCase">
+    <div class="know-head"><h2>How the knowledge fits</h2><div class="ov-filter" id="knowCase">
       <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(knowName(c))}</span>
         <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="ov-menu" role="menu">${cases.map((x, i) =>
@@ -2316,12 +2365,6 @@ async function renderKnowPane(c){
     if(!map){ pane.innerHTML = '<p class="know-none">This case has no knowledge map.</p>'; return; }
     const nodes = c.knowledge.nodes, types = KNOWLEDGE_NAMES.filter(t => nodes.some(n => n.type === t));
     const lit = Number((map.match(/data-lit="(\d+)"/) || [])[1] || 0);
-    const says = v.focus ? `${capFirst(v.focus)} knowledge answers "${KNOW_QUESTION[v.focus]}" The bright arrows show how it links to the rest.`
-      : v.move === 'deductive' ? 'Deductive reasoning moves forward along the arrows, from rules to a conclusion.'
-      : v.move === 'inductive' ? (lit ? 'Inductive reasoning goes from many cases to a general idea. The bright arrows show where.'
-                                      : 'Inductive reasoning goes from many cases to a general idea, but this map has none yet.')
-      : v.move === 'abductive' ? 'Abductive reasoning goes backwards, from what was seen to its best explanation, so the arrows turn round.'
-      : '';
     const opts = [{label: 'All ideas', view: null}, ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
     const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
     const item = (o, i) => `<button type="button" role="menuitemradio" aria-checked="${on(o)}" data-i="${i}">${o.dot ? `<i class="kdot" style="background:${o.dot}"></i>` : ''}${esc(o.label)}</button>`;
@@ -2329,7 +2372,6 @@ async function renderKnowPane(c){
         <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div></div>
-      ${says ? `<p class="know-intro know-says">${esc(says)}</p>` : ''}
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
     wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
     return;

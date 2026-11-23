@@ -140,3 +140,26 @@ def test_build_keeps_only_quotes_that_are_really_in_the_source(wiki, monkeypatch
     assert nodes["rate"]["from"] == "Sleep"
     assert builder.recheck(copy.deepcopy(case)) == case  # quotes survive the page sending the case back
     builder._CACHE.clear()
+
+
+def test_meanings_ask_only_when_the_topic_is_unclear(monkeypatch):
+    def fake_get(params):
+        if params.get("generator") == "search":
+            return {"query": {"pages": [
+                {"title": "Mercury (planet)", "index": 2}, {"title": "Mercury", "index": 1, "pageprops": {"disambiguation": ""}},
+                {"title": "Mercury (element)", "index": 3}, {"title": "Freddie Mercury", "index": 4}, {"title": "Extra", "index": 5}]}}
+        return {"query": {"pages": [PAGES.get(params["titles"], {"missing": True})]}}
+    monkeypatch.setattr(sources, "_get", fake_get)
+    assert sources.meanings("Mercury") == ["Mercury (planet)", "Mercury (element)", "Freddie Mercury"]  # disambiguation page
+    assert sources.meanings("Sleep") == []  # a real article of that name is clear
+    assert sources.meanings("Why do we sleep?") == []  # a question is clear
+    assert sources.meanings("batman vs superman") == ["Mercury (planet)", "Mercury (element)", "Freddie Mercury"]  # no such article
+    def down(params):
+        raise httpx.ConnectError("offline")
+    monkeypatch.setattr(sources, "_get", down)
+    assert sources.meanings("Mercury") == []
+
+
+def test_find_tries_the_picked_article_first(wiki):
+    found = sources.find("mercury", article="Mercury (planet)")
+    assert found["articles"][0]["title"] == "Mercury (planet)"

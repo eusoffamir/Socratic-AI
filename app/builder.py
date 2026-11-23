@@ -423,14 +423,15 @@ def _mock(request, count=CASES_PER_TOPIC):
     return {"topic": name, "cases": [case(i) for i in range(1, count + 1)]}
 
 
-def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
+def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
     """3 cases for any topic, written from 1 or 2 Wikipedia articles when they
     can be found (sources.py), from the learner's own reading, or from their
     own file. file: {"name", "text"} from files.read(); then request is
     optional and says which part to focus on. count: how many cases (the
     Ask chat asks for 1, so the wait is about a third). avoid: titles of the
     cases already done on this topic, so a new case tests a new idea; the new
-    case ids then carry on after them. Raises TopicError (or LLMError if the
+    case ids then carry on after them. article: the Wikipedia title the
+    learner picked when the topic was unclear. Raises TopicError (or LLMError if the
     model fails)."""
     count = max(1, min(int(count), CASES_PER_TOPIC))
     avoid = [str(a)[:80] for a in avoid if isinstance(a, str) and a.strip()][:MAX_AVOID]
@@ -445,6 +446,9 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
         request_for_id = key
     else:
         key = request_for_id = _key(request)
+    article = (article or "").strip()[:200] if not file else ""
+    if article:
+        key = request_for_id = _key(f"{request}|{article}")  # "mercury" the planet is another topic from the metal
     key = f"{key}|{count}|{'|'.join(avoid)}"  # the topic id stays the same for every case on it
     with _lock:
         if key in _CACHE:
@@ -459,7 +463,7 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=()):
     else:
         if not limits.budget_left():
             raise TopicError(limits.FULL_MESSAGE)
-        found = {"text": picked} if file else None if source else sources.find(request)
+        found = {"text": picked} if file else None if source else sources.find(request, article)
         payload = {"REQUEST": request, "COUNT": count, **({"AVOID": avoid} if avoid else {}),
                    **({"SOURCE": found["text"]} if found else {})}
         source = source or found

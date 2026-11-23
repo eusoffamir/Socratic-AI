@@ -140,15 +140,44 @@ def locate(quote, text):
     return None
 
 
-def find(request):
+MEANINGS = 3  # at most this many choices in the "Which one do you mean?" step
+
+
+def meanings(request):
+    """Up to 3 article titles a short topic could mean, when it is unclear
+    which one the learner wants: the name is a disambiguation page ("Mercury")
+    or no article has that name ("batman vs superman"). [] when the topic is
+    clear (an article of that exact name), a question, a long request, or when
+    Wikipedia does not answer. Friends testing the app (23 November 2026) saw
+    the Builder guess the wrong topic, so the page asks first. No model call."""
+    name = _FILLER.sub("", (request or "").strip().rstrip(".!")).strip()
+    if not name or _QUESTION.search(name) or len(name.split()) > DIRECT_WORDS:
+        return []
+    try:
+        pages = _get({"action": "query", "titles": name, "redirects": 1, "prop": "pageprops",
+                      "ppprop": "disambiguation"})["query"].get("pages") or [{}]
+        if not pages[0].get("missing") and "disambiguation" not in (pages[0].get("pageprops") or {}):
+            return []
+        hits = _get({"action": "query", "generator": "search", "gsrsearch": name[:200], "gsrlimit": 6,
+                     "prop": "pageprops", "ppprop": "disambiguation"})["query"].get("pages") or []
+    except (httpx.HTTPError, KeyError, ValueError) as e:
+        log.warning("Wikipedia failed, so the topic is not checked: %s", e)
+        return []
+    hits.sort(key=lambda h: h.get("index", 0))
+    titles = [h["title"] for h in hits if "disambiguation" not in (h.get("pageprops") or {})][:MEANINGS]
+    return titles if len(titles) >= 2 else []
+
+
+def find(request, article=None):
     """{"kind": "wikipedia", "articles": [{"title", "url"}], "text"} for the
     topic, or None. A long request is the learner's own reading, so it is used
-    as it is and nothing is fetched."""
+    as it is and nothing is fetched. article: the title the learner picked in
+    the "Which one do you mean?" step, tried first."""
     request = (request or "").strip()
     if len(request) >= READING_CHARS:
         return None
     try:
-        direct = _direct(request)
+        direct = (_article(article) if article else None) or _direct(request)
         articles = [direct] if direct else []
         for title in [] if direct else _titles(request) or _search(request)[:MAX_ARTICLES]:
             a = _article(title)
