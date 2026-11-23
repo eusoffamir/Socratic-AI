@@ -191,16 +191,6 @@ def test_explainer_uses_the_learners_topic():
     assert "stock" not in explainer.explain("inductive", ["causal"], "Volcanoes")["scenario"]
 
 
-def test_every_picture_has_an_icon_on_the_page():
-    import re
-    from pathlib import Path
-    page = Path(main.STATIC_DIR, "index.html").read_text(encoding="utf-8")
-    block = page[page.index("const PICTURE_ICONS = {"):page.index("};", page.index("const PICTURE_ICONS = {"))]
-    assert set(re.findall(r"^\s+(\w+): '", block, re.M)) == set(builder.PICTURES)
-    assert builder.clean_case(raw_case(picture="Leaf"), "x", "t0123456789-1")["picture"] == "leaf"
-    assert builder.clean_case(raw_case(picture="dragon"), "x", "t0123456789-1")["picture"] == "bulb"
-
-
 def test_a_generated_case_gets_rules_and_a_guessed_model():
     """Goal 3, step 7: the Builder drafts a decision tree and a cause and signs model."""
     from app import heuristics

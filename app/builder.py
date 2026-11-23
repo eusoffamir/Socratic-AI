@@ -24,23 +24,6 @@ CASES_PER_TOPIC = 3
 NOTES_PER_CASE = 5
 MAX_AVOID = 30  # earlier case titles sent with a request for one more case
 
-# The picture of a generated case is one of these icons, drawn by the page
-# (PICTURE_ICONS in static/index.html), so no image is generated or paid for.
-PICTURES = {
-    "leaf": "plants, nature, farming", "sun": "light, energy, weather, summer", "water": "water, rain, rivers, drinks",
-    "fire": "fire, heat, burning, energy use", "globe": "the world, countries, climate, travel",
-    "heart": "the body, health, feelings, care", "atom": "physics, chemistry, matter",
-    "scales": "law, justice, fairness, ethics", "columns": "history, government, old empires",
-    "book": "reading, language, learning, stories", "people": "society, groups, families, culture",
-    "chart": "data, statistics, economics, growth", "coin": "money, prices, trade, business",
-    "flask": "experiments, science labs, medicine making", "gear": "engineering, machines, technology",
-    "shield": "safety, defence, immunity, security", "crown": "kings, power, rulers, war",
-    "clock": "time, habits, schedules, ageing", "bulb": "ideas, the mind, inventions, thinking",
-    "moon": "sleep, night, space, the sky", "mountain": "geography, the earth, volcanoes, climbing",
-    "virus": "germs, disease, cells, biology", "music": "music, art, sound, creativity",
-    "apple": "food, eating, diet, cooking",
-}
-
 # Word limits for each part, a little above what the prompt asks, so one extra
 # word does not throw a whole topic away.
 WORDS = {"topic": 12, "title": 6, "mission": 12, "tag": 2, "scenario": 45, "note": 35,
@@ -69,7 +52,6 @@ Each case has:
 - title: 2 to 5 words, often a question, like "Pattern or luck?"
 - mission: at most 8 words, what the learner will learn, like "Tell a real pattern from luck."
 - tag: 1 word
-- picture: the 1 word from PICTURES that best fits the case
 - scenario: at most 35 words, the situation in which a person SAYS a claim or makes a choice, with their words in quotes, so there is something to question. Never only describe facts. Like "A stock went up 5 days in a row. Your friend says, \\"It is a pattern, so buy it now.\\""
 - notes: exactly 5 facts the tutor may use, at most 25 words each, in teaching order. Each has a knowledge type and a label of 2 to 4 words for a diagram box, like "Green light reflects".
 - reading: what the learner reads before the case
@@ -81,9 +63,6 @@ Each case has:
 - links: 6 to 12 links [from_id, relation, to_id] between the notes (ids n1 to n5) and the more_knowledge ids. Every note and every extra fact is in at least 1 link.
 - rules: the rules of thumb an expert uses in this case, as a small yes or no decision tree with 2 to 4 questions and 3 to 5 decisions. Each node has an id, a kind ("question" or "decision"), a text (a question ending with "?", or a decision of what to do or believe, at most 25 words) and a why (the id of the note or more_knowledge item it rests on). links are [question_id, "yes" or "no", next_id]. Every question has exactly 1 yes and 1 no link, the tree starts at root, and every path ends in a decision.
 - model: a tiny cause and signs model for the case. cause is a hidden cause that matters in the case, and signs are exactly 2 things it makes more likely that a person could see. Each has a text (a full statement with a verb, at most 12 words, like "The day is hot.") and a why (a note or more_knowledge id). The cause has chance, the percent of such situations where it is true. Each sign has if_cause and if_not, the percent chance the sign shows when the cause is true and when it is not, with if_cause higher. These are rough guesses, so use round numbers between 5 and 95.
-
-PICTURES (use these names only):
-""" + "\n".join(f"- {k}: {v}" for k, v in PICTURES.items()) + """
 
 Knowledge types (use these names only):
 """ + "\n".join(f"- {k}: {v}" for k, v in KNOWLEDGE_TYPES.items()) + """
@@ -97,7 +76,6 @@ If the REQUEST asks for help to harm people, such as weapons, hurting someone or
 Otherwise reply with ONLY this JSON and nothing else:
 {"topic": "the topic in at most 8 words",
  "cases": [{"title": "", "mission": "", "tag": "", "scenario": "",
-            "picture": "",
             "notes": [{"text": "", "type": "", "label": "", "quote": ""}],
             "reading": {"idea": [""], "example": "", "key_words": [["", ""]], "think": ""},
             "more_knowledge": [{"id": "", "text": "", "type": "", "label": "", "quote": ""}],
@@ -282,7 +260,6 @@ def clean_case(raw, topic, case_id, source=None, text=None):
         "mission": _text(raw.get("mission"), WORDS["mission"], "mission"),
         "tag": _text(raw.get("tag"), WORDS["tag"], "tag").capitalize(),
         "tool": None,
-        "picture": picture if (picture := str(raw.get("picture") or "").strip().lower()) in PICTURES else "bulb",
         "scenario": _text(raw.get("scenario"), WORDS["scenario"], "story"),
         "notes": [_text(n.get("text"), WORDS["note"], "note") for n in notes],
         "reading": {"idea": ideas, "example": _text(r.get("example"), WORDS["example"], "example"),
@@ -427,7 +404,6 @@ def _mock(request, count=CASES_PER_TOPIC):
     def case(i):
         return {
             "title": f"Case {i} on {' '.join(name.split()[-2:])[:20]}", "mission": "Question a claim about this topic.", "tag": "Claims",
-            "picture": "book",
             "scenario": f"[mock] A friend makes a bold claim about {name[:30]}, and says everyone agrees.",
             "notes": [{"text": f"[mock] Fact {j} about the topic.", "type": t}
                       for j, t in enumerate(["factual", "conceptual", "procedural", "causal", "epistemic"], 1)],
