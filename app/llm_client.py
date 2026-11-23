@@ -48,6 +48,12 @@ GEMINI_FALLBACK_MODELS = [m.strip() for m in os.getenv(
 # A model that said "quota used up" is skipped for this many seconds, so each
 # call does not ask it again first. The per-minute limit is back by then.
 GEMINI_COOLDOWN_SECONDS = 60
+# A model whose daily limit is used up is skipped for an hour, so calls do not wait on it.
+GEMINI_DAILY_REST_SECONDS = 3600
+# When no model answers, the main model is asked once more after this wait, because a busy
+# spell is often over a few seconds later (seen 24 November 2026: the main model was back
+# while the fallback models had used up their daily limit).
+GEMINI_LAST_TRY_WAIT = 5
 
 # Gemini 3.x models "think" before answering, and those thinking tokens count
 # against max_output_tokens. With a tight cap the visible reply gets cut off
@@ -129,7 +135,9 @@ def _gemini_call(model, user, config, last):
                 time.sleep(2 ** attempt if not last else 2 ** (attempt + 1))
                 continue
             if e.code == 429:
-                _gemini_resting[model] = time.time() + GEMINI_COOLDOWN_SECONDS
+                # a daily limit does not come back in a minute, so that model rests longer
+                rest = GEMINI_DAILY_REST_SECONDS if "PerDay" in str(e) else GEMINI_COOLDOWN_SECONDS
+                _gemini_resting[model] = time.time() + rest
             # 504 (Google timed out) also counts as busy: on 23 November 2026 flash-lite gave
             # 504 every time while gemini-3.6-flash answered in 5s
             if e.code in (429, 503, 504) or (e.code == 404 and model != GEMINI_MODEL):
@@ -137,6 +145,21 @@ def _gemini_call(model, user, config, last):
             if e.code == 404:
                 raise LLMError(f"Gemini model {model!r} not found. Check GEMINI_MODEL in .env.") from e
             raise LLMError(f"Gemini error {e.code}: {e.message}") from e
+
+
+def _gemini_last_try(user, config, problems):
+    """No model answered. Unless the main model's daily limit is used up, wait a few
+    seconds and ask it once more. Returns the reply, or None."""
+    if _gemini_resting.get(GEMINI_MODEL, 0) > time.time() + GEMINI_COOLDOWN_SECONDS:
+        return None  # its daily limit is used up
+    time.sleep(GEMINI_LAST_TRY_WAIT)
+    try:
+        resp = _gemini_call(GEMINI_MODEL, user, config, last=True)
+    except _GeminiBusy as e:
+        problems[GEMINI_MODEL] = e
+        return None
+    logging.getLogger(__name__).warning("Gemini: %s answered on the last try", GEMINI_MODEL)
+    return resp
 
 
 def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="low"):
@@ -162,6 +185,8 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
         except _GeminiBusy as e:
             problems[model] = e  # used up or overloaded: try the next model
     else:
+        resp = _gemini_last_try(user, config, problems)
+    if resp is None:
         logging.getLogger(__name__).warning("Gemini: no model answered %s",
                                             {m: e.code for m, e in problems.items()})
         problem = next(iter(problems.values()))

@@ -59,3 +59,19 @@ def test_all_used_up_gives_the_quota_message(fake):
     fake({"main": 429, "second": 429, "third": 429})
     with pytest.raises(llm_client.LLMError, match="quota used up"):
         llm_client._generate_gemini("s", "u", 50, False)
+
+
+def test_main_model_is_asked_once_more_when_all_are_busy(monkeypatch):
+    monkeypatch.setattr(llm_client, "GEMINI_LAST_TRY_WAIT", 0)
+    calls = []
+    def call(model, user, config, last):
+        calls.append(model)
+        if len(calls) <= 2:
+            raise llm_client._GeminiBusy(503)
+        return type("R", (), {"text": "late reply"})()
+    monkeypatch.setattr(llm_client, "GEMINI_MODEL", "main")
+    monkeypatch.setattr(llm_client, "GEMINI_FALLBACK_MODELS", ["second"])
+    monkeypatch.setattr(llm_client, "_gemini_resting", {})
+    monkeypatch.setattr(llm_client, "_gemini_call", call)
+    assert llm_client._generate_gemini("s", "u", 50, False) == "late reply"
+    assert calls == ["main", "second", "main"]
