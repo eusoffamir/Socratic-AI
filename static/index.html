@@ -154,7 +154,7 @@
   .sn-item svg{width:18px; height:18px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
-  .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:20vh; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
+  .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:24px; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   /* a thin, see-through scrollbar that only shows on hover, so the green sidebar stays clean */
   .sn-recents{scrollbar-width:thin; scrollbar-color:transparent transparent;}
@@ -214,8 +214,8 @@
   .know-views button{border:1px solid var(--rule); background:var(--panel); border-radius:999px; padding:4px 12px; font-size:13px; color:var(--ink-soft);}
   .know-views button:hover{color:var(--ink);}
   .know-views button[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:#fff;}
-  .know-views .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:0;}
-  .know .am-map .legend:not(.rels){display:none;}  /* the type buttons above carry the colours, so no second key */
+  .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:0;}
+  .ov-menu-h{font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint); padding:10px 12px 4px;}
   .know-says{color:var(--ink); background:var(--signal-soft); border-radius:10px; padding:10px 14px;}
   @media (max-width:560px){ .know-views{grid-template-columns:1fr;} }
   .know-quote, .know-lesson{font-size:14.5px; line-height:1.6; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:12px 14px;}
@@ -281,7 +281,8 @@
 
   /* Ask: a Claude-style start page (chat icon in the rail). Home is untouched. */
   .ask-main{display:flex; flex-direction:column; align-items:center; min-width:0; min-height:0;}
-  .ask-main.empty{justify-content:center; overflow-y:auto; padding:32px 24px 12vh;}
+  .ask-main.empty{justify-content:center; overflow-y:auto; padding:32px 24px 12vh; position:relative;}
+  .ask-main.empty .ask-dock > .privacy-note{position:absolute; left:24px; right:24px; bottom:16px; margin:0 auto;}  /* at the bottom, out of the way */
   .ask-main.empty .ask-scroll{display:none;}
   .ask-inner{width:100%; max-width:760px;}
   .ask-scroll{flex:1; width:100%; overflow-y:auto; padding:28px 24px 36px;}
@@ -438,16 +439,11 @@
   .privacy-note{margin:18px auto 0; max-width:520px; text-align:center; font-size:12px; line-height:1.5; color:var(--ink-faint);}
   .privacy-note.left{margin:22px 0 0; max-width:none; text-align:left;}
   .ask-main:not(.empty) .privacy-note, .ask-main:not(.empty) .ask-start{display:none;}
-  /* the tutorial and the skill check as two cards under the chat box, so there is one place to start */
-  .ask-start{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:22px auto 0; width:100%;}
-  .ask-card{display:flex; align-items:center; gap:12px; text-align:left; padding:12px 14px; border-radius:14px;
-            background:var(--panel); border:1px solid var(--rule); color:var(--ink); font:inherit; cursor:pointer; transition:border-color .15s;}
-  .ask-card:hover:not(:disabled){border-color:var(--signal); opacity:1;}
-  .ask-card .ic{flex:none; width:36px; height:36px; display:grid; place-items:center; border-radius:10px; background:var(--signal-soft); color:var(--signal);}
-  .ask-card .ic svg{width:18px; height:18px;}
-  .ask-card b{display:block; font-size:14px; font-weight:600;}
-  .ask-card small{display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; line-height:1.4;}
-  @media (max-width:560px){ .ask-start{grid-template-columns:1fr;} }
+  /* the tutorial and the skill check as one quiet line under the chat box */
+  .ask-start{margin:26px 0 0; font-size:13.5px; color:var(--ink-soft); text-align:center;}
+  .ask-start button{background:none; border:0; padding:0; font:inherit; font-weight:600; color:var(--signal); cursor:pointer;
+                    text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--signal) 35%, transparent); text-underline-offset:3px;}
+  .ask-start button:hover:not(:disabled){text-decoration-color:var(--signal); opacity:1;}
   .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px;}
   .ask-chips button{font-size:12px; padding:4px 11px; border-radius:999px; background:var(--signal-soft);
                     border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal);}
@@ -1380,9 +1376,9 @@
         </div>
 
         <div class="section-head cases-head"><h3>Cases</h3><div class="ov-filter" id="topicFilter"></div>
-          <span class="draft-note hidden" id="draftNote">These cases were generated by AI and have not been reviewed by an expert. Please verify important facts.</span></div>
+          <span class="draft-note hidden" id="draftNote">Made by AI and not checked by an expert, so check important facts.</span></div>
         <div class="cases three" id="cases"></div>
-        <p class="privacy-note left">Your answers are saved without your name, to improve the tutor and for our final year project study. Please do not type private details.</p>
+        <p class="privacy-note left">Answers are saved without your name for our study. Please do not type private details.</p>
 
       </div>
     </div>
@@ -1460,15 +1456,10 @@
         </div>
         <input type="file" id="askFile" accept=".pdf,.docx,.txt,.md" hidden>
       </form>
-      <p class="tb-privacy hidden" id="askPrivacy">The file is read by the AI and not saved. Please do not upload private or confidential files.</p>
+      <p class="tb-privacy hidden" id="askPrivacy">The AI reads the file but does not save it. Please do not upload private files.</p>
       <div class="ask-chips" id="askChips"></div>
-      <div class="ask-start">
-        <button type="button" class="ask-card" id="askTut"><span class="ic"><svg><use href="#i-play"/></svg></span>
-          <span><b>New here? Take the tutorial</b><small>Learn how to answer critically, in about 2 minutes</small></span></button>
-        <button type="button" class="ask-card" id="askCheck"><span class="ic"><svg><use href="#i-stats"/></svg></span>
-          <span><b>What kind of thinker are you?</b><small>6 questions to see your reasoning skills</small></span></button>
-      </div>
-      <p class="privacy-note">Your answers are saved without your name, to improve the tutor and for our final year project study. Please do not type private details.</p>
+      <p class="ask-start">New here? <button type="button" id="askTut">Take the tutorial</button> or <button type="button" id="askCheck">find your thinking style</button></p>
+      <p class="privacy-note">Answers are saved without your name for our study. Please do not type private details.</p>
       <div id="askStatus" aria-live="polite"></div>
     </div>
   </div>
@@ -1670,7 +1661,7 @@ function inline(text){
 // message, and the learner knows the page is not stuck.
 const DOTS = '<span class="dots"><i></i><i></i><i></i></span>';
 const SLOW_MS = 8000;
-const SLOW_TEXT = 'This is taking longer than usual, because the free server may be waking up. It can take up to a minute.';
+const SLOW_TEXT = 'The free server may be waking up, so this can take up to a minute.';
 function whenSlow(show){ return setTimeout(show, SLOW_MS); }
 
 function scrollToEnd(){ const s = $('chatScroll'); s.scrollTo({top: s.scrollHeight, behavior: 'smooth'}); }
@@ -1974,8 +1965,8 @@ function renderTopics(){
   const src = mine && active.cases[0] && active.cases[0].source;
   const from = !src ? '' : src.kind === 'reading' ? ' from your reading' : src.kind === 'file' ? ` from your file (${src.name})`
     : ` from Wikipedia (${src.articles.map(a => a.title).join(' and ')})`;
-  $('draftNote').textContent = all ? 'Cases outside the quant topic were generated by AI and have not been reviewed by an expert. Please verify important facts.'
-    : `These cases were generated by AI${from} and have not been reviewed by an expert. Please verify important facts.`;
+  $('draftNote').textContent = all ? 'Cases outside quant are made by AI and not checked by an expert.'
+    : `Made by AI${from} and not checked by an expert, so check important facts.`;
   $('draftNote').classList.toggle('hidden', !mine && !(all && myTopics().length));
   renderCases();
 }
@@ -2689,7 +2680,7 @@ async function askNext(){
   askPending.set(ctx.chatId, {name: (askChats().find(x => x.id === ctx.chatId) || {}).name || ask.cases[0].title});
   renderRecents();
   askLock(true);
-  const wait = askStatus('Writing a new case on the same topic. This takes about 20 to 40 seconds.');
+  const wait = askStatus('Writing a new case. This takes 20 to 40 seconds.');
   let t;
   try {
     t = await postJSON('/api/topic', {text: ask.request, count: 1, avoid: ask.cases.map(c => c.title)});
@@ -2728,7 +2719,7 @@ async function askTopic(text){
   askAdd('am-user', esc(text || askFile.name));
   askLock(true);
   const wait = askStatus(askFile ? `Reading ${askFile.name} and writing a case...`
-                                  : 'Finding a source and writing a case. This takes about 20 to 40 seconds.');
+                                  : 'Writing a case. This takes 20 to 40 seconds.');
   let t;
   const askFileUsed = !!askFile;
   try {
@@ -2927,7 +2918,7 @@ $('startRow').addEventListener('click', e => {
 // ---------- overall status ----------
 // Highest level and the 9 standards across every case played in this browser.
 
-const SKILL_GRID_TITLE = 'Where you used each way of reasoning', SKILL_GRID_SUB = 'From your skill checks. Each box shows how many questions on that mix you answered well, so 1 of 2 means 1 out of 2.';
+const SKILL_GRID_TITLE = 'Where you used each way of reasoning', SKILL_GRID_SUB = 'From your skill checks. 1 of 2 means you answered 1 of 2 questions on that mix well.';
 function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
@@ -2954,7 +2945,7 @@ function overallHTML(d){
       <div class="ov-case-more">
         <p class="meta">${c.finished ? 'Finished' : 'Not finished yet'} · played ${c.sessions === 1 ? 'once' : `${c.sessions} times`}</p>
         ${c.comment ? `<div class="coach-comment"><div class="mono-label">Coach</div><p>${esc(c.comment)}</p></div>`
-                    : '<p class="meta">The coach comments after 2 answers, so there is no comment for this case yet.</p>'}
+                    : '<p class="meta">The coach comments after 2 answers.</p>'}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
       </div></details>`;
   }).join('');
@@ -2971,9 +2962,9 @@ function overallHTML(d){
     </div>
     <div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
     ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
-      <small>How you reasoned in the case chats. This counts chat answers, not skill checks, so it can differ from the grid above.</small></summary>
+      <small>From your chats, not skill checks, so it can differ from above.</small></summary>
       ${reasoningGridHTML(s.reasoning)}</details>` : ''}
-    <div class="note">Only cases played in this browser count. The tutorial is practice, so it is not included.</div>
+    <div class="note">Only chats in this browser count, not the tutorial.</div>
   </div>`;
 }
 
@@ -3065,7 +3056,7 @@ function renderKnowledge(){
   if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
   body.innerHTML = `<div class="report know">
     <h2>How the knowledge fits</h2>
-    <p class="lead">Knowledge comes from books, from the rules of thumb experts use, and from data. Here you can see all three for one case.</p>
+    <p class="lead">Knowledge from books, rules of thumb and data, for one case.</p>
     <div class="know-pick"><span class="mono-label">Case</span><div class="ov-filter" id="knowCase">
       <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(knowName(c))}</span>
         <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -3085,24 +3076,30 @@ async function renderKnowPane(c){
     if(!map){ pane.innerHTML = '<p class="know-none">This case has no knowledge map.</p>'; return; }
     const nodes = c.knowledge.nodes, types = KNOWLEDGE_NAMES.filter(t => nodes.some(n => n.type === t));
     const lit = Number((map.match(/data-lit="(\d+)"/) || [])[1] || 0);
-    const pick = (attr, val, label, on, dot) => `<button type="button" ${attr}="${val}" aria-pressed="${on}">${dot ? `<i class="kdot" style="background:${dot}"></i>` : ''}${label}</button>`;
-    const says = v.focus ? `${capFirst(v.focus)} knowledge answers the question "${KNOW_QUESTION[v.focus]}", and ${(k => `${k} of the ${nodes.length} pieces here ${k === 1 ? 'is' : 'are'}`)(nodes.filter(n => n.type === v.focus).length)} ${v.focus}. The bright arrows show how they link to the rest.`
-      : v.move === 'deductive' ? 'Deductive reasoning walks forward along the arrows, from facts and rules to a conclusion. The bright arrows are the forward steps it can take.'
-      : v.move === 'inductive' ? (lit ? 'Inductive reasoning counts many cases to reach a general idea. The bright arrows start from a counted result, or join several pieces into one idea.'
-                                      : 'Inductive reasoning counts many cases to reach a general idea, but this map has no counted result or joined pieces yet.')
-      : v.move === 'abductive' ? 'Abductive reasoning walks the arrows backwards, from what was seen to what best explains it, so every arrow is turned round. This is also how a system can trace a fault back to its cause.'
-      : 'Each box is one idea, and each arrow shows how two ideas link. Tap a box to see where it comes from.';
-    pane.innerHTML = `<div class="know-views">
-        <span class="mono-label">Knowledge type</span><div class="row">${pick('data-kfocus', '', 'All', !v.focus && !v.move)}${types.map(t => pick('data-kfocus', t, capFirst(t), v.focus === t, MAP_COLORS[t] || 'var(--ink-faint)')).join('')}</div>
-        <span class="mono-label">Reasoning move</span><div class="row">${['deductive', 'inductive', 'abductive'].map(m => pick('data-kmove', m, capFirst(m), v.move === m)).join('')}</div></div>
+    const says = v.focus ? `${capFirst(v.focus)} knowledge answers "${KNOW_QUESTION[v.focus]}" The bright arrows show how it links to the rest.`
+      : v.move === 'deductive' ? 'Deductive reasoning moves forward along the arrows, from rules to a conclusion.'
+      : v.move === 'inductive' ? (lit ? 'Inductive reasoning goes from many cases to a general idea. The bright arrows show where.'
+                                      : 'Inductive reasoning goes from many cases to a general idea, but this map has none yet.')
+      : v.move === 'abductive' ? 'Abductive reasoning goes backwards, from what was seen to its best explanation, so the arrows turn round.'
+      : 'Each box is one idea, and arrows show how ideas link. Tap a box for its source.';
+    const opts = [{label: 'All ideas', view: null}, ...types.map(t => ({label: capFirst(t), view: {focus: t}, dot: MAP_COLORS[t] || 'var(--ink-faint)'})),
+                  ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
+    const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
+    const item = (o, i) => `<button type="button" role="menuitemradio" aria-checked="${on(o)}" data-i="${i}">${o.dot ? `<i class="kdot" style="background:${o.dot}"></i>` : ''}${esc(o.label)}</button>`;
+    pane.innerHTML = `<div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
+        <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
+          <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="ov-menu" role="menu">${item(opts[0], 0)}<div class="ov-menu-h">Knowledge type</div>${opts.slice(1, types.length + 1).map((o, i) => item(o, i + 1)).join('')}
+          <div class="ov-menu-h">Reasoning</div>${opts.slice(types.length + 1).map((o, i) => item(o, i + types.length + 1)).join('')}</div></div></div>
       <p class="know-intro${v.focus || v.move ? ' know-says' : ''}">${esc(says)}</p>
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
+    wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
     return;
   }
   if(c.generated){  // drafted by the Topic Builder with the case, so nothing to fetch
     const what = know.tab === 'rules' ? c.heuristics : c.model;
     if(!what){
-      pane.innerHTML = `<p class="know-none">This case has no ${know.tab === 'rules' ? 'rules of thumb' : 'model'}, because it was made before they were added or the draft did not pass the checks. A new case on your topic will have one.</p>`;
+      pane.innerHTML = `<p class="know-none">This case has no ${know.tab === 'rules' ? 'rules of thumb' : 'model'} yet. A new case on your topic will have one.</p>`;
       return;
     }
     const texts = Object.fromEntries((c.knowledge.nodes || []).map(n => [n.id, n.text || (c.notes || [])[n.note] || '']));
@@ -3136,7 +3133,7 @@ function knowTreeHTML(t, answers){
     ? `<li class="now"><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
         `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
     : `<li class="end"><div class="card"><span class="mono-label">Decision</span><p><b>${esc(n.text)}</b></p>${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
-  return `<p class="know-intro">These are the questions an expert asks, one after another. Answer each one to see where it leads. Following fixed rules to a decision like this is deductive reasoning.</p>
+  return `<p class="know-intro">An expert asks these questions in order. Answer each to see where it leads. Following fixed rules like this is deductive reasoning.</p>
     <ol class="know-tree">${done.join('')}${now}</ol>
     ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
 }
@@ -3160,8 +3157,8 @@ function knowNetHTML(v){
   const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
     <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
   const intro = v.guessed
-    ? 'The AI guessed these chances, because there is no data to count for this topic, so treat them as a rough sketch. Asking the model backwards, from the signs to their likely cause, is abductive reasoning.'
-    : `This small model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking it backwards, from what was seen to its likely cause, is abductive reasoning.`;
+    ? 'The AI guessed these chances, because there is no data for this topic, so treat them as rough. Asking backwards, from signs to cause, is abductive reasoning.'
+    : `This model learned its chances by counting ${esc(v.counted)}, which is inductive reasoning. Asking backwards, from signs to cause, is abductive reasoning.`;
   return `<div class="know-net"><p class="know-intro">${intro}</p>
     <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -3719,7 +3716,7 @@ function skillGridHTML(r, title, sub){
   return `<div class="rk"><span class="mono-label">${title}</span>${msgs}${sub ? `<p class="rk-sub">${sub}</p>` : ''}
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody>
     <tfoot><tr><th class="row">Total</th>${foot}</tr></tfoot></table>
-    <div class="note">A darker box is stronger, and a dash means no question on it yet. Click a box to see why that mix matters.</div></div>`;
+    <div class="note">Darker is stronger, and a dash means not asked yet. Click a box for an example.</div></div>`;
 }
 
 // Short, plain meanings shown under each skill name, so a learner does not need the terms
@@ -3734,7 +3731,7 @@ const skillName = w => `${w[0].toUpperCase() + w.slice(1)}<small>${esc(SKILL_PLA
 function masteryHTML(m){
   if(!m || !m.answers) return '';
   const label = {'mastered': 'Mastered', 'not sure yet': 'Almost there', 'not mastered yet': 'Keep practising', 'not enough answers': 'Need more answers'};
-  const row = r => `<div class="ms-row" data-tip="${esc(`You showed it in ${r.attained} of ${r.asked} questions. Your score is about ${r.mean}%, and probably between ${r.low}% and ${r.high}%. The chance you have mastered it is ${r.chance_mastered}%.`)}">
+  const row = r => `<div class="ms-row" data-tip="${esc(`Shown in ${r.attained} of ${r.asked} questions. Score about ${r.mean}%, likely ${r.low}% to ${r.high}%.`)}">
       <span class="nm">${skillName(r.skill)}</span>
       <span class="ms-track"><span class="ms-fill${r.status === 'mastered' ? ' ok' : ''}" style="width:${r.asked ? r.mean : 0}%"></span>
         <span class="ms-line" style="left:${m.mastery_level}%"></span></span>
@@ -3744,7 +3741,7 @@ function masteryHTML(m){
   return `<div class="rk"><span class="mono-label">Your thinking skills</span>${msgs}
     <div class="ms-rows">${group('reasoning', 'Ways of reasoning')}${group('knowledge', 'Kinds of knowledge')}</div>
     <div class="ms-axis"><span></span><span><i>0%</i><i class="goal" style="left:${m.mastery_level}%">goal</i><i>100%</i></span><span></span></div>
-    <div class="note">The bar is your score so far. Reach the goal line at ${m.mastery_level}% to master a skill. Each skill needs a few answers first. Hover or tap a row for the details.</div></div>`;
+    <div class="note">The bar is your score. Pass the goal line at ${m.mastery_level}% to master a skill. Tap a row for details.</div></div>`;
 }
 
 // Explainer agent: why a reasoning type matters with 1 or 2 knowledge types.
@@ -3940,14 +3937,14 @@ function reasoningGridHTML(r){
   const rows = shown.map(k => `<tr class="${kinds.indexOf(k) >= 5 ? 'derived' : ''}"><th class="row" data-tip="${esc(`${cap(k)} knowledge answers ${r.knowledge_types[k].toLowerCase()}`)}">${skillName(k)}</th>`
     + types.map(t => { const v = r.grid[k][t];
         return `<td class="${v ? '' : 'zero'}" style="--a:${(v / top).toFixed(2)}" data-r="${t}" data-k="${k}"
-          data-tip="${esc(`${v} of your answers used ${t} reasoning on ${k} knowledge. Click to see why it matters.`)}">${v || '–'}</td>`; }).join('') + '</tr>').join('');
+          data-tip="${esc(`${v} answers used ${t} reasoning on ${k} knowledge. Click for an example.`)}">${v || '–'}</td>`; }).join('') + '</tr>').join('');
   const q = types.filter(t => r.quality[t] !== null).map(t => `${t} answers met ${r.quality[t]}`);
   const quality = q.length ? `<p class="rk-sub rk-q">On average, your ${q.length > 1 ? q.slice(0, -1).join(', ') + ' and ' + q[q.length - 1] : q[0]} of the 9 thinking standards.</p>` : '';
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
   return `<div class="rk"><span class="mono-label">Where you used each way of reasoning</span>${msgs}
-    <p class="rk-sub">Each number is how many of your ${r.answers} chat answers used that mix. One answer can count in more than one box.</p>
+    <p class="rk-sub">How many of your ${r.answers} chat answers used each mix.</p>
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table>${quality}
-    <div class="note">A darker box is used more, and a dash means not used yet. Click a box to see why that mix matters.</div></div>`;
+    <div class="note">Darker is used more, and a dash means not yet. Click a box for an example.</div></div>`;
 }
 
 // Builds the profile. Used twice: in the right-side panel ("Profile" button,
@@ -4174,7 +4171,7 @@ async function showRoundStats(){
   const lvl = tut.data.levels.findIndex(l => l.name === state.level) + 1;
   TOURS.tutStats = [
     {title: `You reached ${state.level}`, side: 'left', target: '#profileBody .report-grid > div:first-child',
-     text: `This is Socratic level ${lvl} of 6. Two good answers in a row, or one strong answer, move you up one level.`},
+     text: `Level ${lvl} of 6. Two good answers in a row, or one strong one, move you up.`},
     {title: 'Our main goal', button: 'Done', side: 'left',
      target: '#profileBody .report-grid > div:last-child',
      text: met.length === keys.length
@@ -4393,11 +4390,11 @@ function tutRetry(){
 const lastOf = sel => [...document.querySelectorAll(sel)].pop();
 const TOURS = {
   ask: [
-    {title: 'Welcome', text: 'New here? Take the tutorial first. It is a quick 3-round tour that takes about 2 minutes.', target: '#askTut'},
-    {title: 'Pick a topic', text: 'Then type any topic or question here, or tap one of the ideas below the box.', target: '.ask-box'},
-    {title: 'Rounds', text: 'Choose how many rounds you want, or No limit to keep going.', target: '#askRoundsBtn'},
-    {title: 'Mode', text: 'Choose open questions, or A or B questions that give you 2 choices.', target: '#askModeBtn'},
-    {title: 'Overall status', text: 'See your thinking skills across every chat.', target: '#overallBtn'},
+    {title: 'Welcome', text: 'New here? Start with this 2-minute tutorial.', target: '#askTut'},
+    {title: 'Pick a topic', text: 'Then type any topic or question, or tap an idea below.', target: '.ask-box'},
+    {title: 'Rounds', text: 'Pick how many rounds, or No limit.', target: '#askRoundsBtn'},
+    {title: 'Mode', text: 'Pick open questions, or A or B choices.', target: '#askModeBtn'},
+    {title: 'Overall status', text: 'See your skills across all chats.', target: '#overallBtn'},
   ],
   home: [
     {title: 'Welcome', text: 'New here? Start with Socrates for a quick 3-round tour that takes about 2 minutes.', target: '.case-row.tut'},
