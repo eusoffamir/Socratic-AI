@@ -91,6 +91,7 @@ Design requirements R1 to R9 and honest status: see history file.
 ## Open items
 
 - **Pilot ready (checked live 23 November 2026).** `AI_GUARD=1` in `.env` and on Render, so the AI-style answer check is on and paste is off (live `/api/config` shows `"ai_guard": true`). Render keeps its dashboard values, so changing `render.yaml` alone does not change a live setting; set it in the Render Environment tab too. If Eusoff sets it to 0 for testing, remind him to set it back to 1 before any pilot or study session. Before a pilot, open `/api/health` and `/api/config`. Same day: a Gemini 504 now moves to the next model, an unfinished check with the old quant questions is not continued, and voice typing picks the guess closest to the question's words. Study mode is off (no participant codes).
+- **Skill check results (23 November 2026).** The results screen shows this check first (right thinking in X of 6), then each question with a tick or a fixed tip on how to answer it (`skillcheck.review()`, `REASONING_TIPS`, no model call), then skills so far and a Take another check button. A skill counts as mastered only after 3 or more answers on it (`stats.MIN_TRIALS`), so one check can never show a mastered skill. The A and B choices glow like the topic suggestions.
 
 - Remind Dr Ho about the Claude and Render subscription requests.
 - Full list of questions for Dr Ho and things to verify: history file, "Open items".
