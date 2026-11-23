@@ -1121,6 +1121,7 @@ async function api(url, opts){
   let res;
   try { res = await fetch(url, opts); }
   catch(e){ throw new Error('No connection. Is the server running?'); }
+  lastReply = Date.now();
   let data = null;
   try { data = await res.json(); } catch(e){}
   if(!res.ok){
@@ -1150,7 +1151,13 @@ function inline(text){
 // message, and the learner knows the page is not stuck.
 const DOTS = '<span class="dots"><i></i><i></i><i></i></span>';
 const SLOW_MS = 8000;
-const SLOW_TEXT = 'The free server may be waking up, so this can take up to a minute.';
+// Render sleeps after 15 minutes idle, so only blame a sleeping server when nothing answered for that long.
+let lastReply = 0;
+function slowText(){
+  return Date.now() - lastReply < 15 * 60000
+    ? 'The AI is taking a little longer than usual, so please wait a few more seconds.'
+    : 'The free server may be waking up, so this can take up to a minute.';
+}
 function whenSlow(show){ return setTimeout(show, SLOW_MS); }
 
 function scrollToEnd(){ const s = $('chatScroll'); s.scrollTo({top: s.scrollHeight, behavior: 'smooth'}); }
@@ -1900,7 +1907,7 @@ async function askStart(c, name, ctx = askCtx()){
     askLock(true);
     if(ask.cases.length) askAdd('am-divider', `Case ${ask.cases.length + 1}`);
     wait = askStatus('Reading the case and writing the first question...');
-    slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
+    slow = whenSlow(() => wait.innerHTML = DOTS + esc(slowText()));
   }
   try {
     const data = await postJSON('/api/session', {concept_id: c.id, total_rounds: ctx.rounds,
@@ -2070,7 +2077,7 @@ async function askAnswer(typed){
   const gen = ask.gen;
   askLock(true);
   const wait = askStatus('Thinking...');
-  const slow = whenSlow(() => wait.innerHTML = DOTS + esc(SLOW_TEXT));
+  const slow = whenSlow(() => wait.innerHTML = DOTS + esc(slowText()));
   try {
     const data = await postJSON(`/api/session/${ask.sid}/answer`, {answer, hint_opened: !!ask.hintOpened});
     if(!askLive(gen)) return;  // saved on the server, so it shows when that chat is opened again
@@ -2814,7 +2821,7 @@ async function sendCheck(){
   if(wordCount(answer) > CHECK_MAX_WORDS){ $('ckStatus').textContent = `Please keep it under ${CHECK_MAX_WORDS} words.`; return; }
   check.busy = true; $('ckGo').disabled = true;
   $('ckStatus').innerHTML = `<div class="thinking">${DOTS}Reading your answer...</div>`;
-  const slow = whenSlow(() => $('ckStatus').innerHTML = `<div class="thinking">${DOTS}${SLOW_TEXT}</div>`);
+  const slow = whenSlow(() => $('ckStatus').innerHTML = `<div class="thinking">${DOTS}${slowText()}</div>`);
   const seconds = Math.round((Date.now() - check.shownAt) / 1000);
   try { showCheck(await postJSON(`/api/check/${check.id}/answer`, {answer, seconds})); }
   catch(e){ $('ckStatus').innerHTML = ''; note('error', e.message, $('ckStatus')); }
