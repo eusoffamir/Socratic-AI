@@ -2961,9 +2961,7 @@ function overallHTML(d){
         <div class="thinking">${DOTS}Reading all your answers...</div></div>
     </div>
     <div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
-    ${s.reasoning && s.reasoning.answers ? `<details class="rk-more"><summary>Details from your chat answers
-      <small>From your chats, not skill checks, so it can differ from above.</small></summary>
-      ${reasoningGridHTML(s.reasoning)}</details>` : ''}
+    ${s.reasoning && s.reasoning.answers ? reasoningGridHTML(s.reasoning) : ''}
     <div class="note">Only chats in this browser count, not the tutorial.</div>
   </div>`;
 }
@@ -3941,8 +3939,8 @@ function reasoningGridHTML(r){
   const q = types.filter(t => r.quality[t] !== null).map(t => `${t} answers met ${r.quality[t]}`);
   const quality = q.length ? `<p class="rk-sub rk-q">On average, your ${q.length > 1 ? q.slice(0, -1).join(', ') + ' and ' + q[q.length - 1] : q[0]} of the 9 thinking standards.</p>` : '';
   const msgs = r.messages.length ? `<div class="rk-msg">${r.messages.map(m => `<p>${esc(m)}</p>`).join('')}</div>` : '';
-  return `<div class="rk"><span class="mono-label">Where you used each way of reasoning</span>${msgs}
-    <p class="rk-sub">How many of your ${r.answers} chat answers used each mix.</p>
+  return `<div class="rk"><span class="mono-label">Reasoning in your chats</span>${msgs}
+    <p class="rk-sub">How many of your ${r.answers} chat answers used each mix. This is from chats, not skill checks.</p>
     <table><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table>${quality}
     <div class="note">Darker is used more, and a dash means not yet. Click a box for an example.</div></div>`;
 }
