@@ -448,9 +448,21 @@
                     text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--signal) 35%, transparent); text-underline-offset:3px;}
   .ask-start button:hover:not(:disabled){text-decoration-color:var(--signal); opacity:1;}
   .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px;}
-  .ask-chips button{font-size:12px; padding:4px 11px; border-radius:999px; background:var(--signal-soft);
-                    border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal);}
-  .ask-chips button:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  /* A soft glow and a light that sweeps across each pill now and then, one after another */
+  .ask-chips button{position:relative; overflow:hidden; font-size:12px; padding:5px 12px; border-radius:999px;
+                    background:linear-gradient(135deg, color-mix(in srgb, var(--signal) 22%, var(--signal-soft)), var(--signal-soft));
+                    border:1px solid color-mix(in srgb, var(--signal) 55%, transparent); color:var(--signal);
+                    box-shadow:0 0 10px color-mix(in srgb, var(--signal) 22%, transparent);
+                    transition:box-shadow .2s, transform .2s, border-color .2s;}
+  .ask-chips button::after{content:""; position:absolute; top:0; bottom:0; left:-60%; width:40%; pointer-events:none;
+                    background:linear-gradient(100deg, transparent, color-mix(in srgb, #fff 28%, transparent), transparent);
+                    transform:skewX(-20deg); animation:chipShine 6s ease-in-out infinite;}
+  .ask-chips button:nth-child(2)::after{animation-delay:.5s;}
+  .ask-chips button:nth-child(3)::after{animation-delay:1s;}
+  @keyframes chipShine{0%{left:-60%;} 25%, 100%{left:130%;}}
+  .ask-chips button:hover:not(:disabled){border-color:var(--signal); opacity:1; transform:translateY(-1px);
+                    box-shadow:0 0 16px color-mix(in srgb, var(--signal) 45%, transparent);}
+  @media (prefers-reduced-motion: reduce){ .ask-chips button::after{animation:none; display:none;} }
   #askStatus{margin-top:16px; text-align:center;}
   #askStatus .thinking{justify-content:center;}
 
