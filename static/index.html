@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Socratic AI</title>
+<meta name="description" content="A Socratic tutor that asks questions, step by step, to build your critical thinking on any topic.">
+<meta name="theme-color" content="#1f6f5c">
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Socratic AI">
+<meta property="og:description" content="A tutor that asks, so you learn to think. Practise critical thinking on any topic.">
+<meta property="og:image" content="/static/img/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -133,6 +144,8 @@
   .nav{align-items:stretch; gap:3px; padding:14px 12px; min-height:0; overflow:hidden;}
   .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px 0 12px; margin:-14px 0 8px; height:56px; flex:none;}  /* as tall as the chat's top bar, so the name lines up with ROUND */
   .nav .logo{margin:0; flex:none;}
+  .brand-mark{width:22px; height:20px; flex:none; vertical-align:-3px; margin-right:9px; color:var(--rail-ink);}  /* the logo beside the name */
+  .nav-menu .brand-mark{margin-right:-2px;}
   .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1; cursor:pointer;}
   .nav-menu b{cursor:pointer;}
   .nav .sn-fold{width:34px; height:34px; flex:none;}
@@ -791,10 +804,10 @@
   /* ---------- profile panel (slides in from the right) ---------- */
   .profile-panel{
     position:fixed; top:0; right:0; bottom:0; width:min(440px, 92vw); z-index:30;
-    background:var(--panel); border-left:1px solid var(--rule); box-shadow:-8px 0 32px rgba(0,0,0,.12);
-    display:flex; flex-direction:column; transform:translateX(100%); transition:transform .22s ease;
+    background:var(--panel); border-left:1px solid var(--rule);
+    display:flex; flex-direction:column; transform:translateX(100%); transition:transform .22s ease, box-shadow .22s;
   }
-  .profile-panel.open{transform:none;}
+  .profile-panel.open{transform:none; box-shadow:-8px 0 32px rgba(0,0,0,.12);}
   .pp-backdrop{
     position:fixed; inset:0; z-index:25; background:rgba(0,0,0,.25);
     opacity:0; pointer-events:none; transition:opacity .22s;
@@ -1094,9 +1107,9 @@
     #sessionView, #sessionView.collapsed{grid-template-columns:minmax(0, 1fr);}
     .side{
       position:fixed; inset:0 auto 0 0; width:min(320px, 86vw); z-index:20; transform:translateX(-100%);
-      transition:transform .2s; box-shadow:4px 0 24px rgba(0,0,0,.15);
+      transition:transform .2s;
     }
-    #sessionView.drawer-open .side{transform:none;}
+    #sessionView.drawer-open .side{transform:none; box-shadow:4px 0 24px rgba(0,0,0,.15);}  /* shadow only when open, so no grey edge when closed */
     #sessionView.drawer-open .backdrop{display:block; position:fixed; inset:0; z-index:15; background:rgba(0,0,0,.35);}
     .side-body, .side-foot{min-width:0;}
     #openSide{display:grid;}
@@ -1110,8 +1123,8 @@
     .nav-menu .icon-btn{width:38px; height:38px; color:var(--rail-ink);}
     .nav-menu b{font-family:var(--serif); font-size:17px;}
     .nav{position:fixed; inset:0 auto 0 0; width:min(290px, 86vw); z-index:30; transform:translateX(-100%);
-         transition:transform .2s; box-shadow:4px 0 24px rgba(0,0,0,.2);}
-    #homeView.nav-open .nav{transform:none;}
+         transition:transform .2s;}
+    #homeView.nav-open .nav{transform:none; box-shadow:4px 0 24px rgba(0,0,0,.2);}
     #homeView.nav-open .nav-backdrop{display:block; position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.35);}
     .nav .sn-fold{display:none;}
     #homeView.folded .nav{visibility:visible; padding:14px 12px;}
@@ -1261,13 +1274,13 @@
 <div id="homeView" class="view">
   <div class="nav-menu">  <!-- phones only -->
     <button class="icon-btn" id="navOpen" title="Menu" aria-label="Open the menu"><svg><use href="#i-side"/></svg></button>
-    <b>Socratic AI</b>
+    <svg class="brand-mark" viewBox="8 12 48 44" aria-hidden="true"><path d="M14 16h36a5 5 0 0 1 5 5v20a5 5 0 0 1-5 5H30l-10 8v-8h-6a5 5 0 0 1-5-5V21a5 5 0 0 1 5-5z" fill="currentColor"/><path d="M26.5 26a5.5 5.5 0 1 1 8.2 4.8c-1.7 1-2.7 2-2.7 3.7v1" fill="none" stroke="var(--rail)" stroke-width="4.2" stroke-linecap="round"/><circle cx="32" cy="41.2" r="2.6" fill="var(--rail)"/></svg><b>Socratic AI</b>
   </div>
   <div class="nav-backdrop" id="navBackdrop"></div>
   <button class="icon-btn nav-unfold" id="navUnfold" title="Open the sidebar" aria-label="Open the sidebar"><svg><use href="#i-side"/></svg></button>
   <nav class="rail nav" aria-label="Main">
     <div class="sn-head">
-      <span class="sn-name">Socratic AI</span>
+      <span class="sn-name"><svg class="brand-mark" viewBox="8 12 48 44" aria-hidden="true"><path d="M14 16h36a5 5 0 0 1 5 5v20a5 5 0 0 1-5 5H30l-10 8v-8h-6a5 5 0 0 1-5-5V21a5 5 0 0 1 5-5z" fill="currentColor"/><path d="M26.5 26a5.5 5.5 0 1 1 8.2 4.8c-1.7 1-2.7 2-2.7 3.7v1" fill="none" stroke="var(--rail)" stroke-width="4.2" stroke-linecap="round"/><circle cx="32" cy="41.2" r="2.6" fill="var(--rail)"/></svg>Socratic AI</span>
       <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
     </div>
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>

@@ -13,7 +13,7 @@ load_env()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -198,8 +198,18 @@ def _turn_response(session, result):
 
 
 @app.get("/")
-def index():
-    return FileResponse(STATIC_DIR / "index.html")
+def index(request: Request):
+    # link previews (WhatsApp, Telegram) need a full image address, so fill in this site's own address
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("host", request.url.netloc)
+    html = html.replace('content="/static/img/og-card.png"', f'content="{proto}://{host}/static/img/og-card.png"')
+    return HTMLResponse(html)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse(STATIC_DIR / "img" / "favicon-32.png", media_type="image/png")
 
 
 @app.get("/api/health")
