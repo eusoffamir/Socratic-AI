@@ -682,6 +682,7 @@
   .ck-question{font-size:16.5px; line-height:1.5; margin:0 0 16px;}
   .ck-body .composer-box{margin-bottom:18px;}
   .ck-tools{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
+  .ck-acts{display:flex; align-items:center; gap:6px;}
   .ck-status{padding:0 28px; min-height:4px;}
   .ck-status:not(:empty){padding-bottom:14px;}
   .ck-body textarea{min-height:90px;}
@@ -2518,28 +2519,40 @@ function syncWhy(){
 // Voice typing with the browser's own speech to text (free, Chrome, Edge and Safari).
 // The words go into the box, so the learner can fix them before sending.
 const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-var micRec = null;  // var, because askLock may run before this line
+var micRec = null, micBtn = null;  // var, because askLock may run before this line
 function micStop(){ if(micRec){ micRec.stop(); } }
+// One microphone for any answer box (the chat and the skill check). Speech is
+// added to what is already typed, and a second click stops it.
+function micToggle(btn, box, denied){
+  if(micRec){ const same = micBtn === btn; micStop(); if(same) return; }
+  const before = box.value.replace(/\s*$/, '');
+  const rec = new Speech();
+  Object.assign(rec, {continuous: true, interimResults: true, lang: navigator.language || 'en-US'});
+  rec.onresult = e => {
+    const said = [...e.results].map(r => r[0].transcript).join(' ').replace(/\s+/g, ' ').trim();
+    box.value = (before ? before + ' ' : '') + said;
+    box.dispatchEvent(new Event('input', {bubbles: true}));
+  };
+  rec.onend = () => {
+    if(micRec === rec){ micRec = null; micBtn = null; }
+    btn.classList.remove('rec'); btn.setAttribute('aria-pressed', 'false');
+  };
+  rec.onerror = e => { if(e.error === 'not-allowed') denied('Please allow the microphone to speak your answer.'); };
+  micRec = rec; micBtn = btn;
+  btn.classList.add('rec');
+  btn.setAttribute('aria-pressed', 'true');
+  rec.start();
+}
+const MIC_BUTTON = id => Speech ? `<button type="button" class="tb-add mic" id="${id}" title="Speak your answer" aria-label="Speak your answer" aria-pressed="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>` : '';
 if(Speech){
   $('askMic').classList.remove('hidden');
-  $('askMic').addEventListener('click', () => {
-    if(micRec){ micStop(); return; }
-    const box = $('askInput'), before = box.value.replace(/\s*$/, '');
-    const rec = new Speech();
-    Object.assign(rec, {continuous: true, interimResults: true, lang: navigator.language || 'en-US'});
-    rec.onresult = e => {
-      const said = [...e.results].map(r => r[0].transcript).join(' ').replace(/\s+/g, ' ').trim();
-      box.value = (before ? before + ' ' : '') + said;
-      box.dispatchEvent(new Event('input'));
-    };
-    rec.onend = () => { micRec = null; $('askMic').classList.remove('rec'); $('askMic').setAttribute('aria-pressed', 'false'); };
-    rec.onerror = e => { if(e.error === 'not-allowed') askAdd('am-status', 'Please allow the microphone to speak your answer.'); };
-    micRec = rec;
-    $('askMic').classList.add('rec');
-    $('askMic').setAttribute('aria-pressed', 'true');
-    rec.start();
-  });
+  $('askMic').addEventListener('click', () => micToggle($('askMic'), $('askInput'), t => askAdd('am-status', t)));
   $('askForm').addEventListener('submit', micStop, true);
+  $('ckBody').addEventListener('click', e => {
+    const b = e.target.closest('#ckMic');
+    if(b && $('ckAnswer')) micToggle(b, $('ckAnswer'), t => $('ckStatus').textContent = t);
+  });
 }
 
 // ---------- thinking profile ----------
@@ -2788,7 +2801,7 @@ function showCheck(d){
   $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-question">${esc([q.situation, q.question].filter(Boolean).join(' '))}</p>
     <div class="composer-box ck-box"><textarea id="ckAnswer" rows="3" placeholder="Your answer"></textarea>
       <div class="ck-tools"><span class="ck-count" id="ckCount">${countText(0)}</span>
-        <button type="button" class="send" id="ckGo" title="Send (Enter)" aria-label="Send"><svg><use href="#i-up"/></svg></button></div></div></div>`;
+        <span class="ck-acts">${MIC_BUTTON('ckMic')}<button type="button" class="send" id="ckGo" title="Send (Enter)" aria-label="Send"><svg><use href="#i-up"/></svg></button></span></div></div></div>`;
   $('ckFoot').classList.add('hidden');
   check.shownAt = Date.now();
   $('ckAnswer').focus();
@@ -2815,6 +2828,7 @@ async function openCheck(){
 
 async function sendCheck(){
   if(check.busy) return;
+  micStop();
   if(check.ended){ closeCheck(); return; }
   const box = $('ckAnswer');
   if(!box) return;
@@ -2832,6 +2846,7 @@ async function sendCheck(){
 
 function closeCheck(){
   if(check.busy) return;
+  micStop();
   $('checkModal').classList.add('hidden');
 }
 
