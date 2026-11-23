@@ -420,6 +420,9 @@
   .am-map .legend{display:flex; flex-wrap:wrap; align-items:center; gap:6px 16px; font-size:12.5px; color:var(--ink-soft); margin:10px 2px 0;}
   .am-map .legend b{font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint); margin-right:-4px;}
   .am-map:has(.cap.on) .legend{display:none;}  /* once a box is picked, its card names the type, so the key goes */
+  .am-map .lg-t{font:inherit; color:inherit; background:none; border:1px solid transparent; border-radius:999px; padding:2px 8px; margin:0 -8px; cursor:pointer;}
+  .am-map .lg-t:hover{color:var(--ink); background:var(--panel-2);}
+  .am-map .lg-t[aria-pressed="true"]{color:var(--ink); border-color:var(--signal); background:var(--signal-soft);}
   .am-map .legend i{display:inline-block; width:9px; height:9px; border-radius:3px; opacity:.75; margin-right:5px; vertical-align:-1px;}
   .am-key{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); background:var(--signal-soft);
           border-radius:10px; padding:12px 16px; margin:0 0 6px; scroll-margin-bottom:28px;}  /* opened near the end, it stops above the answer box */
@@ -1583,13 +1586,13 @@ function askMapHTML(c, opts = {}){
     const r0 = rel.split(', ')[0], on = lit(a, b), cls = on === null ? '' : on ? ' lit' : ' dim';
     if(on) litCount++;
     const end = move === 'abductive' ? `marker-start="url(#mapArrow-${r0})"` : `marker-end="url(#mapArrow-${r0})"`;  // abductive turns the arrows round
-    const words = opts.labels ? `<text class="rl${cls}" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(rel.replace(/_/g, ' '))}</text>` : '';
-    return `<path class="ed${cls}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>${words}`;
+    const words = opts.labels ? `<text class="rl${cls}" data-t="${typeOf[a]} ${typeOf[b]}" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(rel.replace(/_/g, ' '))}</text>` : '';
+    return `<path class="ed${cls}" data-t="${typeOf[a]} ${typeOf[b]}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>${words}`;
   }).join('');
   if(loops) width += opts.labels ? 70 : 30;  // room for a loop round the right side, and its word
   const boxes = nodes.map((n, i) => {
     const {x, y} = pos[n.id], color = MAP_COLORS[n.type] || 'var(--ink-faint)', label = wrap2(mapLabel(n, n.text));
-    return `<g class="nd${focus && n.type !== focus ? ' dim' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
+    return `<g class="nd${focus && n.type !== focus ? ' dim' : ''}" data-t="${n.type}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>
       ${label.map((l, k) => `<text x="${x + W / 2}" text-anchor="middle" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
   }).join('');
@@ -1602,7 +1605,7 @@ function askMapHTML(c, opts = {}){
     <div class="map-scroll"><svg viewBox="0 0 ${width} ${height}" style="max-width:${width}px; --mw:${width}px" aria-label="A map of how the ideas in this case link">
       <defs>${markers}</defs>${lines}${boxes}</svg></div>
     <p class="cap"><span class="swipe-hint">Swipe sideways to see the whole map.</span></p>
-    <div class="legend"><b>Box colours</b>${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(capFirst(t))}</span>`).join('')}</div>
+    <div class="legend"><b>Box colours</b>${types.map(t => `<button type="button" class="lg-t" data-kfocus="${t}" aria-pressed="${t === focus}"><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(capFirst(t))}</button>`).join('')}</div>
     ${opts.labels ? '' : `<div class="legend rels"><b>Arrows</b>${rels.map(r => `<span><i class="ln" style="background:${REL_COLORS[r] || 'var(--ink-faint)'}"></i>${esc(r.replace(/_/g, ' '))}, ${esc(REL_MEANING[r] || '')}</span>`).join('')}</div>`}</div>`;
 }
 
@@ -1806,6 +1809,16 @@ function mapUnpick(map){
   cap.classList.remove('on');
   cap.innerHTML = cap.dataset.hint || '';  // keeps the phone-only swipe hint hidden on big screens
 }
+// Light one knowledge type in a chat map (or all, with t null), as the Knowledge page does.
+function mapFocus(map, t){
+  map.querySelectorAll('[data-kfocus]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kfocus === t)));
+  map.querySelectorAll('.nd').forEach(g => g.classList.toggle('dim', !!t && g.dataset.t !== t));
+  map.querySelectorAll('.ed, .rl').forEach(l => {
+    const on = !t || l.dataset.t.split(' ').includes(t);
+    l.classList.toggle('lit', !!t && on);
+    l.classList.toggle('dim', !on);
+  });
+}
 function mapPick(nd){
   const map = nd.closest('.am-map'), texts = JSON.parse(map.dataset.texts), cap = map.querySelector('.cap');
   if(cap.dataset.hint === undefined) cap.dataset.hint = cap.innerHTML;
@@ -1826,6 +1839,8 @@ $('askThread').addEventListener('keydown', e => {
 $('askThread').addEventListener('click', e => {
   const nd = e.target.closest('.am-map .nd');
   if(nd){ mapPick(nd); return; }
+  const lg = e.target.closest('.am-map [data-kfocus]');
+  if(lg){ mapFocus(lg.closest('.am-map'), lg.getAttribute('aria-pressed') === 'true' ? null : lg.dataset.kfocus); return; }
   const x = e.target.closest('.am-map .cap-x');
   if(x){ mapUnpick(x.closest('.am-map')); return; }
   if(e.target.closest('[data-next]')){ e.target.closest('.am-card').remove(); askNext(); return; }
@@ -2266,7 +2281,7 @@ function openKnowledge(){
   if(!cases.some(c => c.id === know.id)) know.id = (cases[0] || {}).id;
   renderKnowledge();
 }
-const knowName = x => `${x.title}${x.generated ? ' (your topic)' : ''}`;
+const knowName = x => x.title;
 function renderKnowledge(){
   const cases = knowCases(), c = cases.find(x => x.id === know.id), body = $('knowBody');
   if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
@@ -2297,15 +2312,13 @@ async function renderKnowPane(c){
                                       : 'Inductive reasoning goes from many cases to a general idea, but this map has none yet.')
       : v.move === 'abductive' ? 'Abductive reasoning goes backwards, from what was seen to its best explanation, so the arrows turn round.'
       : '';
-    const opts = [{label: 'All ideas', view: null}, ...types.map(t => ({label: capFirst(t), view: {focus: t}, dot: MAP_COLORS[t] || 'var(--ink-faint)'})),
-                  ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
+    const opts = [{label: 'All ideas', view: null}, ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
     const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
     const item = (o, i) => `<button type="button" role="menuitemradio" aria-checked="${on(o)}" data-i="${i}">${o.dot ? `<i class="kdot" style="background:${o.dot}"></i>` : ''}${esc(o.label)}</button>`;
     pane.innerHTML = `<div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
         <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="ov-menu" role="menu">${item(opts[0], 0)}<div class="ov-menu-h">Knowledge type</div>${opts.slice(1, types.length + 1).map((o, i) => item(o, i + 1)).join('')}
-          <div class="ov-menu-h">Reasoning</div>${opts.slice(types.length + 1).map((o, i) => item(o, i + types.length + 1)).join('')}</div></div></div>
+        <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div></div>
       ${says ? `<p class="know-intro know-says">${esc(says)}</p>` : ''}
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
     wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
@@ -2401,7 +2414,7 @@ $('knowBody').addEventListener('click', e => {
   if(tab){ know.tab = tab.dataset.tab; renderKnowledge(); return; }
   const kf = e.target.closest('[data-kfocus]'), km = e.target.closest('[data-kmove]');
   if((kf || km) && c){
-    know.view = kf ? (kf.dataset.kfocus ? {focus: kf.dataset.kfocus} : null)
+    know.view = kf ? (kf.dataset.kfocus && (know.view || {}).focus !== kf.dataset.kfocus ? {focus: kf.dataset.kfocus} : null)
       : (know.view || {}).move === km.dataset.kmove ? null : {move: km.dataset.kmove};  // a second tap on a move turns it off
     renderKnowPane(c); return;
   }
