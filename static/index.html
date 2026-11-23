@@ -202,7 +202,8 @@
   .status-inner .report .lead{margin:0 0 32px; line-height:1.6;}
   .status-inner .report-grid{gap:36px;}
   /* Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data */
-  .know .am-map svg{margin:0 auto;}  /* drawn 1.17 times larger and centred, so its 11.5px box text shows at 13.5px like the page */
+  .know .am-map svg{margin:0 auto;}
+  .know .am-map > .mono-label{display:none;}  /* the page title already says what this is */  /* drawn 1.17 times larger and centred, so its 11.5px box text shows at 13.5px like the page */
   .know-pick{display:flex; align-items:center; gap:10px; margin:0 0 20px;}
   .know-tabs{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:20px;}
   .know-tabs button{background:none; border:0; border-bottom:2px solid transparent; border-radius:0; padding:8px 12px; margin-bottom:-1px; color:var(--ink-soft); font-size:14.5px;}
@@ -228,6 +229,7 @@
   .sk-col.ok li::before{content:"\2713"; color:var(--signal);}
   .sk-col.ok li.almost::before{content:"\25CB"; font-weight:400;}
   .sk-col li small{display:block; font-size:13px; color:var(--ink-soft); margin-top:1px;}
+  .sk-flat .sk-card{border:0; background:none; padding:0;}  /* inside the pop-up, no second box */
   .sk-none{margin:0; font-size:14px; color:var(--ink-faint);}
   .sk-go{margin-top:18px; border-radius:999px; padding:8px 16px; background:var(--signal); border-color:var(--signal); color:var(--paper); font-weight:600;}
   @media (max-width:700px){ .sk-cols{grid-template-columns:1fr;} }
@@ -344,7 +346,7 @@
   .am-case .t .tag{background:var(--rail-ink); color:var(--rail);}
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
-  .am-ai .am-opts{display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 10px; font-family:var(--sans);}  /* side by side, like the tutorial */
+  .am-ai .am-opts{display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 10px; font-family:var(--sans);}  /* side by side */
   .am-ai .am-opts .choice{font-size:14px; font-weight:400; padding:12px 16px; gap:18px;}
   .am-ai .am-opts .choice .l{width:28px; height:28px; font-size:13px;}
   .am-qrow{display:flex; align-items:center; gap:16px; margin:4px 0 14px;}
@@ -456,7 +458,7 @@
   .privacy-note{margin:18px auto 0; max-width:520px; text-align:center; font-size:12px; line-height:1.5; color:var(--ink-faint);}
   .privacy-note.left{margin:22px 0 0; max-width:none; text-align:left;}
   .ask-main:not(.empty) .privacy-note, .ask-main:not(.empty) .ask-start{display:none;}
-  /* the tutorial and the skill check as one quiet line under the chat box */
+  /* the skill check as one quiet line under the chat box */
   .ask-start{margin:26px 0 0; font-size:13.5px; color:var(--ink-soft); text-align:center;}
   .ask-start button{background:none; border:0; padding:0; font:inherit; font-weight:600; color:var(--signal); cursor:pointer;
                     text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--signal) 35%, transparent); text-underline-offset:3px;}
@@ -756,7 +758,7 @@
   #log .card .q{font-size:15px;}
   #log .entry.tutor .mark{display:none;}
   #log{gap:24px;}
-  #log .entry.learner .bubble:not(.example){background:color-mix(in srgb, var(--signal-soft) 55%, var(--paper)); border:1px solid color-mix(in srgb, var(--signal) 12%, transparent); font-size:15px;}
+  #log .entry.learner .bubble{background:color-mix(in srgb, var(--signal-soft) 55%, var(--paper)); border:1px solid color-mix(in srgb, var(--signal) 12%, transparent); font-size:15px;}
 
   .composer{flex:none; padding:0 24px 18px;}
   .composer-inner{max-width:780px; margin:0 auto;}
@@ -872,16 +874,10 @@
   details.ov-case-d > summary:hover{outline:1px solid var(--signal); outline-offset:-1px;}
   details.ov-case-d[open] > summary{border-radius:10px 10px 0 0;}
   .ov-case-more{padding:4px 14px 16px; background:var(--panel-2); border-radius:0 0 10px 10px; border-top:1px solid var(--rule);}
-  .ov-tiles{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin:14px 0 0;}
-  .ov-tiles > div{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px 14px;}
-  .ov-tiles span{display:block; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint);}
-  .ov-tiles b{display:block; font-size:17px; font-weight:600; margin-top:3px;}
-  .ov-tiles small{display:block; font-size:12.5px; color:var(--ink-soft);}
-  .ov-coach{margin-top:12px; padding:12px 16px; border-left:3px solid var(--signal); background:var(--panel); border-radius:4px 10px 10px 4px;}
-  .ov-coach .mono-label{display:block; margin-bottom:6px;}
-  .ov-coach p{margin:0; font-size:14.5px; line-height:1.6; max-width:760px;}
-  .ov-nocoach{margin:12px 0 0; font-size:13.5px; color:var(--ink-faint);}
-  @media (max-width:560px){ .ov-tiles{gap:6px;} .ov-tiles > div{padding:8px 10px;} .ov-tiles span{font-size:10px;} .ov-tiles b{font-size:14px;} .ov-tiles small{font-size:11.5px;} }
+  .ov-pills{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 0;}
+  .ov-pills span{font-size:13px; padding:3px 10px; border-radius:999px; background:var(--panel); border:1px solid var(--rule); color:var(--ink-soft);}
+  .ov-coach{margin:12px 0 0; font-size:14.5px; line-height:1.6; max-width:780px;}
+  .ov-coach b{color:var(--signal); font-weight:600; margin-right:4px;}
   .ov-open{margin-top:14px; font:inherit; font-size:13.5px; font-weight:600; padding:7px 16px; border-radius:999px;
            border:1px solid var(--signal); background:none; color:var(--signal); cursor:pointer;}
   .ov-open:hover{background:var(--signal-soft);}
@@ -1011,7 +1007,6 @@
   .rm-idea li::before{content:""; position:absolute; left:4px; top:9px; width:8px; height:8px; border-radius:50%; background:var(--signal);}
   .rm-body .rm-example{font-size:15.5px; line-height:1.55; margin:0 0 6px;}
   .rm-chart{max-width:380px; margin:0 auto;}  /* centred in the reading */
-  .rm-chart.small{max-width:300px;}  /* the tutorial coins are a simple picture, not a chart */
   .rm-chart svg{display:block; width:100%; height:auto; margin-top:8px;}
   .rm-words{margin:0; display:grid; gap:8px;}
   /* "Streak: the same move..." on one line, the word right next to its meaning */
@@ -1104,23 +1099,7 @@
   .tour-pop.center .arrow{display:none;}
   @media (prefers-reduced-motion: reduce){ .tour-ring{transition:none;} .tour-pop{animation:none;} }
 
-  /* ---------- tutorial: "Learn with Socrates" ---------- */
-  /* same screens as a case; only these small extras */
-  /* the tutorial card stands out: solid teal with white text (fixed colors, so it pops in light and dark) */
-  .case-row.tut{
-    background:linear-gradient(120deg, #1f6f5c, #2e9a7e); color:#fff; border-color:transparent;
-    box-shadow:0 6px 22px rgba(31,111,92,.35);
-  }
-  .case-row.tut:hover:not(:disabled){border-color:#fff;}
-  .case-row.tut .m{color:rgba(255,255,255,.88);}
-  .case-row.tut .num{color:rgba(255,255,255,.72);}
-  .case-row.tut .tag{background:#fff; color:#1f6f5c;}
-  .case-row.tut .resume{background:#f3b562; color:#16211c;}
-  .case-row.tut .go{border-color:#fff; color:#fff;}
-  .case-row.tut:hover .go{background:#fff; color:#1f6f5c;}
-  /* white coins on the teal card */
-  .case-row.tut .thumb{background:rgba(255,255,255,.14); --signal:#fff; --signal-soft:rgba(255,255,255,.2); --caution:#ffd08a; --panel:transparent;}
-  /* the skill check: a blue card beside the teal tutorial */
+  /* the skill check card */
   .case-row.chk{
     background:linear-gradient(120deg, #2f5aa8, #4f7fd0); color:#fff; border-color:transparent;
     box-shadow:0 6px 22px rgba(47,90,168,.32);
@@ -1132,27 +1111,11 @@
   .case-row.chk .go{border-color:#fff; color:#fff;}
   .case-row.chk:hover .go{background:#fff; color:#2f5aa8;}
   .case-row.chk .thumb{background:rgba(255,255,255,.14);}
-  .tut-mode #stuckBtn{display:none !important;}
-  .tut-mode .composer-row{justify-content:flex-end;}
   /* Socrates's example answer, on the learner side: what a good answer looks like */
-  .entry.learner .bubble.example{background:var(--panel); border:1px dashed var(--ink-faint); white-space:normal; width:88%; max-width:88%;}
-  .bubble.example .mono-label{display:block; margin-bottom:6px;}
-  .bubble.example p{margin:0; line-height:1.65;}
   /* Status after rounds 1 and 2: level blocks and the standards graph fill in */
-  #profileBody.grow .sradar .shape, #profileBody.grow .sradar .dot{animation:sradarGrow .9s ease-out; transform-origin:230px 195px;}
-  @keyframes sradarGrow{from{transform:scale(0); opacity:0;}}
   .tour-pop.left .arrow{right:-8px; border-left:none; border-bottom:none;}
   /* same size and shape as the answer box, so it sits where the learner types in a case */
   /* Socrates's answer is typed in the box: Send pulses when it is ready to send */
-  .send.ready{animation:sendPulse 1.4s ease-in-out infinite;}
-  .tut-mode .choice:disabled{opacity:1;}  /* locked after the pick, but still easy to read */
-  @keyframes sendPulse{50%{box-shadow:0 0 0 7px var(--signal-soft);}}
-  /* score line above the normal profile at the end */
-  .tut-score{display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 14px; margin:4px 0 22px; padding-bottom:18px; border-bottom:1px solid var(--rule);}
-  .tut-score b{font-family:var(--serif); font-size:30px; font-weight:600;}
-  .tut-score .stars{font-size:24px; letter-spacing:3px; color:var(--rule);}
-  .tut-score .stars .on{color:var(--caution);}
-  @media (prefers-reduced-motion: reduce){ .send.ready{animation:none;} #profileBody.grow .sradar .shape, #profileBody.grow .sradar .dot{animation:none;}  }
 
   /* ---------- smaller screens ---------- */
   @media (max-width:1100px){
@@ -1229,7 +1192,6 @@
     .stats-tab .ic{width:28px; height:28px;}
     .chat-inner{padding:20px 14px 12px;}
     .composer{padding:0 12px 12px;}
-    .entry.learner .bubble.example{width:100%; max-width:100%;}
 
     /* ----- phone layout (15 October 2026: on a phone the cases were hidden below
        a tall top card, and the Status tab covered the chat) ----- */
@@ -1458,13 +1420,13 @@
               <span id="askRoundsName">No limit</span>
               <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <div class="ask-mode-menu hidden" id="askRoundsMenu" role="menu" aria-label="Rounds per case">
-              <div class="mm-head">Rounds per case, from the next case</div>
+              <div class="mm-head">Rounds</div>
               <button type="button" role="menuitemradio" aria-checked="false" data-rounds="3">
-                <b>3 rounds</b><span>A short case with 3 questions.</span></button>
+                <b>3 rounds</b></button>
               <button type="button" role="menuitemradio" aria-checked="false" data-rounds="6">
-                <b>6 rounds</b><span>The usual length, with 6 questions.</span></button>
+                <b>6 rounds</b></button>
               <button type="button" role="menuitemradio" aria-checked="true" data-rounds="0">
-                <b>No limit</b><span>Keep going for as long as you like.</span></button>
+                <b>No limit</b></button>
             </div>
           </div>
           <div class="ask-mode">
@@ -1474,9 +1436,9 @@
             <div class="ask-mode-menu hidden" id="askModeMenu" role="menu" aria-label="Question style">
               <div class="mm-head">Question style</div>
               <button type="button" role="menuitemradio" aria-checked="true" data-ab="1">
-                <b>A or B?</b><span>Every question gives you 2 choices, then you say why.</span></button>
+                <b>A or B?</b></button>
               <button type="button" role="menuitemradio" aria-checked="false" data-ab="0">
-                <b>Open questions</b><span>Questions that you answer in your own words.</span></button>
+                <b>Open questions</b></button>
             </div>
           </div>
           <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
@@ -1800,15 +1762,6 @@ function wirePriceHover(box){
 
 // A small picture per case, shown until a tool run replaces it with real numbers.
 const CASE_PICTURES = {
-  tutorial: {
-    title: '4 flips: H H H H → ?',
-    svg: () => {
-      const coin = (x, t, next) => `<circle cx="${x}" cy="35" r="20" style="fill:var(${next ? '--panel' : '--signal-soft'});stroke:var(${next ? '--caution' : '--signal'})" stroke-width="2.5"${next ? ' stroke-dasharray="5 4"' : ''}/>
-        <text x="${x}" y="41" text-anchor="middle" font-size="17" font-weight="600" style="fill:var(${next ? '--caution' : '--signal'})">${t}</text>`;
-      return `<svg viewBox="0 0 240 70" role="img" aria-label="4 coins showing heads, then a question mark">
-        ${['H', 'H', 'H', 'H'].map((t, i) => coin(24 + i * 48, t)).join('')}${coin(216, '?', true)}</svg>`;
-    },
-  },
   pattern_or_luck: {
     title: 'NVDA · last 10 days',
     svg: mini => priceChartSVG(mini),
@@ -1931,7 +1884,7 @@ async function loadProgress(){
       else progress[cid] = {sid, round: d.round, total: d.total_rounds};
     } catch(e){ setSaved(cid, null); }  // gone (e.g. deleted): forget it
   }));
-  document.querySelectorAll('.case-row:not(.tut)').forEach(row => {
+  document.querySelectorAll('.case-row').forEach(row => {
     const pr = progress[row.dataset.id];
     row.querySelector('.resume')?.remove();
     if(pr) row.querySelector('.num').insertAdjacentHTML('afterend',
@@ -2909,8 +2862,6 @@ function caseNo(c){
 }
 
 function renderCases(){
-  $('startRow').querySelector('.case-row.tut')?.remove();
-  $('startRow').insertAdjacentHTML('afterbegin', tutorialRow());
   $('cases').innerHTML = concepts.map(c => [c, caseNo(c)]).map(([c, i]) => `
     <button class="case-row" data-id="${esc(c.id)}">
       <span class="thumb" aria-hidden="true">${CASE_PICTURES[c.id] ? CASE_PICTURES[c.id].svg(true) : c.generated ? pictureSVG(c.picture, i) : ''}</span>
@@ -2925,7 +2876,7 @@ function renderCases(){
 }
 
 async function loadConcepts(){
-  [quantCases, tut.data] = await Promise.all([api('/api/concepts'), api('/api/tutorial')]);
+  quantCases = await api('/api/concepts');
   renderTopics();
 }
 
@@ -2937,10 +2888,6 @@ $('abOnly').addEventListener('click', e => {
 $('cases').addEventListener('click', e => {
   const row = e.target.closest('.case-row');
   if(row) openReading(row.dataset.id, 'home');
-});
-$('startRow').addEventListener('click', e => {
-  const row = e.target.closest('.case-row.tut');  // the skill check card has its own click
-  if(row) openReading('tutorial', 'home');
 });
 
 // ---------- overall status ----------
@@ -2969,14 +2916,12 @@ function overallHTML(d){
         <span class="meta">${plural(c.rounds, 'round')}</span>
         <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></summary>
       <div class="ov-case-more">
-        <div class="ov-tiles">
-          <div><span>Status</span><b>${c.finished ? 'Finished' : 'Not finished'}</b><small>played ${c.sessions === 1 ? 'once' : c.sessions === 2 ? 'twice' : `${c.sessions} times`}</small></div>
-          <div><span>Standards met</span><b>${(Math.round(avg * 10) / 10)} of 9</b><small>on average</small></div>
-          ${c.rounds && (met[weakest] || 0) >= c.rounds ? '<div><span>Work on</span><b>Nothing</b><small>you met all 9</small></div>'
-            : `<div><span>Work on</span><b>${esc(cap(weakest))}</b><small>your weakest standard</small></div>`}
+        <div class="ov-pills">
+          <span>${c.finished ? 'Finished' : 'Not finished'}</span>
+          <span>${(Math.round(avg * 10) / 10)} of 9 standards</span>
+          ${c.rounds && (met[weakest] || 0) >= c.rounds ? '' : `<span>Work on ${esc(weakest)}</span>`}
         </div>
-        ${c.comment ? `<div class="ov-coach"><span class="mono-label">Coach</span><p>${esc(c.comment)}</p></div>`
-                    : '<p class="ov-nocoach">No coach comment yet. It comes after 2 answers.</p>'}
+        ${c.comment ? `<p class="ov-coach"><b>Coach</b> ${esc(c.comment)}</p>` : ''}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
       </div></details>`;
   }).join('');
@@ -3104,7 +3049,6 @@ function renderKnowledge(){
   if(!c){ body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
   body.innerHTML = `<div class="report know">
     <h2>How the knowledge fits</h2>
-    <p class="lead">Knowledge from books, rules of thumb and data, for one case.</p>
     <div class="know-pick"><span class="mono-label">Case</span><div class="ov-filter" id="knowCase">
       <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(knowName(c))}</span>
         <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -3129,7 +3073,7 @@ async function renderKnowPane(c){
       : v.move === 'inductive' ? (lit ? 'Inductive reasoning goes from many cases to a general idea. The bright arrows show where.'
                                       : 'Inductive reasoning goes from many cases to a general idea, but this map has none yet.')
       : v.move === 'abductive' ? 'Abductive reasoning goes backwards, from what was seen to its best explanation, so the arrows turn round.'
-      : 'Each box is one idea, and arrows show how ideas link. Tap a box for its source.';
+      : '';
     const opts = [{label: 'All ideas', view: null}, ...types.map(t => ({label: capFirst(t), view: {focus: t}, dot: MAP_COLORS[t] || 'var(--ink-faint)'})),
                   ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
     const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
@@ -3139,7 +3083,7 @@ async function renderKnowPane(c){
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="ov-menu" role="menu">${item(opts[0], 0)}<div class="ov-menu-h">Knowledge type</div>${opts.slice(1, types.length + 1).map((o, i) => item(o, i + 1)).join('')}
           <div class="ov-menu-h">Reasoning</div>${opts.slice(types.length + 1).map((o, i) => item(o, i + types.length + 1)).join('')}</div></div></div>
-      <p class="know-intro${v.focus || v.move ? ' know-says' : ''}">${esc(says)}</p>
+      ${says ? `<p class="know-intro know-says">${esc(says)}</p>` : ''}
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
     wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
     return;
@@ -3278,15 +3222,14 @@ function sourceHTML(src){
 }
 
 function openReading(id, mode){
-  const isTut = id === 'tutorial';  // the tutorial opens the same pop-up as a case
-  const c = isTut ? tut.data : concepts.find(x => x.id === id);
-  const idx = isTut || !c ? 0 : caseNo(c);
+  const c = concepts.find(x => x.id === id);
+  const idx = c ? caseNo(c) : 0;
   if(!c || !c.reading) return;
   const r = c.reading;
   Object.assign(reading, {id, mode, openedAt: Date.now(), opener: document.activeElement});
   $('rmTag').className = `tag t${idx % 3}`;
   $('rmTag').textContent = c.tag || '';
-  $('rmNum').textContent = isTut ? 'EXAMPLE' : `CASE 0${idx + 1}`;
+  $('rmNum').textContent = `CASE 0${idx + 1}`;
   $('rmTitle').textContent = c.title;
   const pic = CASE_PICTURES[id];
   $('rmBody').innerHTML = `
@@ -3294,7 +3237,7 @@ function openReading(id, mode){
       <ul class="rm-idea">${r.idea.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section>
     <section><h3 class="mono-label">Example</h3>
       <p class="rm-example">${esc(r.example)}</p>
-      ${pic ? `<div class="rm-chart${isTut ? ' small' : ''}">${pic.svg(false)}</div>` : ''}</section>
+      ${pic ? `<div class="rm-chart">${pic.svg(false)}</div>` : ''}</section>
     <div class="rm-pair">
       <section><h3 class="mono-label">Key words</h3>
         <dl class="rm-words">${r.key_words.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl></section>
@@ -3309,7 +3252,7 @@ function openReading(id, mode){
   const pr = !fromSession && progress[id];
   $('rmOver').classList.toggle('hidden', !pr);
   $('rmStart').innerHTML = pr ? `Continue (${pr.total ? `${pr.round}/${pr.total}` : `round ${pr.round}`}) <svg><use href="#i-play"/></svg>`
-                              : `Start ${isTut ? 'tutorial' : 'this case'} <svg><use href="#i-play"/></svg>`;
+                              : `Start this case <svg><use href="#i-play"/></svg>`;
   $('readModal').classList.remove('hidden');
   (fromSession ? $('readModal').querySelector('.rm-x') : $('rmStart')).focus();
 }
@@ -3326,12 +3269,11 @@ $('readModal').addEventListener('click', e => { if(e.target.closest('[data-close
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && readingOpen()) closeReading(); });
 const readSeconds = () => Math.round((Date.now() - reading.openedAt) / 1000);
 $('rmStart').addEventListener('click', () => {
-  if(reading.id === 'tutorial'){ $('readModal').classList.add('hidden'); startTutorial(); }
-  else if(progress[reading.id]) resumeSession(reading.id);
+  if(progress[reading.id]) resumeSession(reading.id);
   else startSession(reading.id, readSeconds());
 });
 $('rmOver').addEventListener('click', () => startSession(reading.id, readSeconds()));
-$('readAgain').addEventListener('click', () => openReading(tut.active ? 'tutorial' : state.concept.id, 'session'));
+$('readAgain').addEventListener('click', () => openReading(state.concept.id, 'session'));
 
 function setHomeBusy(busy){
   document.querySelectorAll('.case-row, #rmStart, #rmOver').forEach(b => b.disabled = busy);
@@ -3387,7 +3329,7 @@ async function startSession(conceptId, readingSeconds = 0){
   if(!tourSeen('session')) startTour('session');
 }
 
-// Before the first question (cases and the tutorial): open the case panel (a
+// Before the first question: open the case panel (a
 // drawer on phones) and dim everything except the story until the learner
 // presses "I have read it". Not shown when a saved case is continued.
 async function readCaseFirst(rounds){
@@ -3541,7 +3483,7 @@ function updateHud(){
   const done = unlimited ? state.answered : totalRounds;
   $('hudStatus').innerHTML = ended ? `COMPLETE ${sep} ${done} ROUND${done === 1 ? '' : 'S'}`
                                    : unlimited ? `ROUND ${round}` : `ROUND ${round}/${totalRounds}`;
-  $('endBtn').classList.toggle('hidden', !unlimited || ended || tut.active);
+  $('endBtn').classList.toggle('hidden', !unlimited || ended);
   // the level sits on the right, beside Profile
   $('hudLevel').innerHTML = ended ? '' : `<span class="lv-label">LEVEL:</span> <span class="lv">${esc(level.toUpperCase())}</span>`;
   const ticks = $('ticks');
@@ -3568,7 +3510,6 @@ function setChoices(options){
 $('choices').addEventListener('click', e => {
   const b = e.target.closest('.choice');
   if(!b || state.busy) return;
-  if(tut.onPick) return tut.onPick(Number(b.dataset.i));  // tutorial: a pick is the whole answer
   const i = Number(b.dataset.i);
   state.picked = state.picked === i ? null : i;
   $('choices').querySelectorAll('.choice').forEach(c => c.setAttribute('aria-pressed', String(Number(c.dataset.i) === state.picked)));
@@ -3600,11 +3541,6 @@ function setBusy(busy){
 }
 
 async function sendAnswer(text){
-  if(tut.active){
-    if(tut.onSend) return tut.onSend();  // Socrates's typed answer: the learner sends it
-    if(tut.typing) return;
-    return tutSubmit();
-  }
   const box = $('answerBox');
   const fromBox = text == null;
   const typed = box.value;  // kept so it can be put back if sending fails
@@ -3770,7 +3706,7 @@ function skillGridHTML(r, title, sub){
 const SKILL_PLAIN = {inductive: 'Spot a pattern from examples', deductive: 'Apply a rule to a case', abductive: 'Find the best explanation',
   factual: 'Facts and numbers', conceptual: 'What ideas mean', procedural: 'Steps and methods', causal: 'Why things happen',
   relational: 'How things link', strategic: 'Plans and choices', metacognitive: 'Thinking about your thinking', epistemic: 'How we know'};
-const skillName = w => `${w[0].toUpperCase() + w.slice(1)}<small>${esc(SKILL_PLAIN[w] || '')}</small>`;
+const skillName = w => w[0].toUpperCase() + w.slice(1);
 
 // What to try next for each skill, in one short sentence
 const SKILL_TIP = {inductive: 'Look at several examples and say what they share.', deductive: 'Start from a rule, then say what it means here.',
@@ -3911,8 +3847,8 @@ function showCheck(d){
   if(d.ended){
     $('ckNum').textContent = 'DONE';
     $('ckTitle').textContent = 'Your results';
-    $('ckSub').textContent = 'Based on the questions you just answered.';
-    $('ckBody').innerHTML = `<div id="ckMastery">${DOTS}</div><p class="note">See the full data on Overall status.</p>`;
+    $('ckSub').textContent = '';
+    $('ckBody').innerHTML = `<div id="ckMastery" class="sk-flat">${DOTS}</div>`;
     $('ckSend').innerHTML = 'Done';
     $('ckSend').focus();
     // mastery uses every check from this browser, not only this one
@@ -4001,7 +3937,7 @@ document.addEventListener('keydown', e => {
 });
 
 // Goal 1 dashboard: reasoning type (columns) by knowledge type (rows). Each
-// number counts the answers that showed both. Empty for the tutorial and for
+// number counts the answers that showed both. Empty for
 // answers saved before the Reasoning agent existed.
 function reasoningGridHTML(r){
   if(!r || !r.answers) return '';
@@ -4064,7 +4000,7 @@ function reportHTML(data, final){
     <div class="note">Based on Paul &amp; Elder's 9 standards.${matchMedia('(hover: hover)').matches ? ' Hover a name for details.' : ''}</div>`;
 }
 
-function fetchStats(){ return tut.active ? Promise.resolve(tutStats()) : api(`/api/session/${state.sessionId}/stats`); }
+function fetchStats(){ return api(`/api/session/${state.sessionId}/stats`); }
 
 // End of session: the full profile appears in the chat.
 async function showFinalReport(){
@@ -4123,338 +4059,8 @@ $('answerBox').addEventListener('keydown', e => {
   if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendAnswer(); }
 });
 
-// ---------- tutorial: "Learn with Socrates" ----------
-// Uses the normal case screen (sidebar, round, level, Status). Round 1:
-// Socrates answers. Round 2: the learner picks A or B, Socrates adds the why.
-// Round 3: the learner answers and the real Assessor checks it (plain code if
-// it fails). Text types out slowly; a click on the chat finishes it at once.
-// Nothing is saved except the best score, in this browser only.
-const tut = {data: null, active: false, pick: null, history: [], final: null, mark: null,
-             onPick: null, typing: false, skip: false};
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const wait = ms => new Promise(r => setTimeout(r, reduceMotion || tut.skip ? 0 : ms));
-const pause = ms => new Promise(r => setTimeout(r, ms));  // a real pause, even after skipping the typing
-const levelName = key => tut.data.levels.find(l => l.key === key).name;
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-
-function tutBest(){ try { const v = localStorage.getItem('tutorial-best'); return v == null ? null : Number(v); } catch(e){ return null; } }
-function setTutBest(total){
-  const best = tutBest();
-  if(best == null || total > best) try { localStorage.setItem('tutorial-best', String(total)); } catch(e){}
-}
-
-function tutorialRow(){
-  const t = tut.data, best = tutBest();
-  return `
-    <button class="case-row tut" data-id="tutorial">
-      <span class="thumb" aria-hidden="true">${CASE_PICTURES.tutorial.svg(true)}</span>
-      <span class="info">
-        <span class="tag t0">${esc(t.tag)}</span><span class="num">EXAMPLE</span>
-        ${best != null ? `<span class="resume">Best ${best}/${t.max}</span>` : ''}
-        <span class="t">${esc(t.title)}</span>
-        <span class="m">${esc(t.mission)}</span>
-      </span>
-      <span class="go" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
-    </button>`;
-}
-
-// Standards met by Socrates's example in round i (round 2 adds the pick).
-function exampleAssessment(i, pick){
-  const r = tut.data.rounds[i];
-  const met = new Set(r.answer.flatMap(([, ks]) => ks));
-  if(pick != null && pick === r.best) (r.pick_standards || []).forEach(k => met.add(k));
-  return {standards: Object.fromEntries(Object.keys(tut.data.standards).map(k => [k, met.has(k) ? 1 : 0])),
-          reasoning_move: r.level};
-}
-
-// Status during the tutorial: same shape as /api/session/{id}/stats.
-function tutStats(){
-  if(tut.final) return tut.final.stats;
-  const met = Object.fromEntries(Object.keys(tut.data.standards).map(k => [k, 0]));
-  const moves = Object.fromEntries(tut.data.levels.map(l => [l.key, 0]));
-  tut.history.forEach(a => {
-    for(const k in a.standards) met[k] += a.standards[k];
-    if(a.reasoning_move in moves) moves[a.reasoning_move]++;
-  });
-  return {levels: tut.data.levels, standards: tut.data.standards, comment: null,
-          summary: {rounds_completed: tut.history.length, highest_level_reached: state.level,
-                    standards_met_count: met, reasoning_move_count: moves}};
-}
-
-function addRound(assessment){
-  tut.history.push(assessment);
-  if(profileOpen()) refreshProfile();
-}
-
-// Type text into a node letter by letter, so a turn does not land all at once.
-async function typeText(node, text, ms){
-  if(reduceMotion || tut.skip){ node.textContent = text; return; }
-  for(let i = 1; i <= text.length; i++){
-    if(tut.skip){ node.textContent = text; break; }
-    node.textContent = text.slice(0, i);
-    if(i % 24 === 0) $('chatScroll').scrollTop = $('chatScroll').scrollHeight;
-    await new Promise(r => setTimeout(r, ms));
-  }
-  scrollToEnd();
-}
-$('log').addEventListener('click', () => { if(tut.typing) tut.skip = true; });
-
-// A normal tutor turn, with the feedback line and question typed out.
-async function tutorTurn(parts, format, closing){
-  const n = addTutor(parts, format, [], closing);
-  const fb = n.querySelector('.fb'), q = n.querySelector('.q'), hint = n.querySelector('.hint-btn');
-  const fbText = fb ? fb.textContent : '', qText = q ? q.textContent : '';
-  if(fb) fb.textContent = '';
-  if(q) q.textContent = '';
-  if(hint) hint.style.visibility = 'hidden';
-  Object.assign(tut, {typing: true, skip: false});
-  if(fb) await typeText(fb, fbText, 16);
-  if(q){ await wait(200); await typeText(q, qText, 18); }
-  tut.typing = false;
-  if(hint) hint.style.visibility = '';
-  return n;
-}
-
-// Socrates's example answer: each sentence types out, then the standards it meets.
-// Socrates's example answer: one plain paragraph that types out.
-async function addExample(label, sentences){
-  const n = el('div', 'entry learner', `<div class="bubble example"><span class="mono-label">${esc(label)}</span><p></p></div>`);
-  $('log').appendChild(n);
-  Object.assign(tut, {typing: true, skip: false});
-  await typeText(n.querySelector('p'), sentences.map(([text]) => text).join(' '), 20);
-  tut.typing = false;
-  return n;
-}
-
-// The level blocks and the standards graph in Status fill in (CSS animation).
-function growStats(){
-  $('profileBody').classList.add('grow');
-}
-
-// After rounds 1 and 2: open Status and spotlight it, since filling the
-// level and all 9 standards is the goal of the app. "Done" goes on.
-async function showRoundStats(){
-  const a = tut.history[tut.history.length - 1];
-  const keys = Object.keys(a.standards), met = keys.filter(k => a.standards[k]);
-  const missed = keys.filter(k => !a.standards[k]).map(cap).join(', ');
-  openProfile();
-  await refreshProfile();
-  growStats();
-  await new Promise(r => setTimeout(r, 300));  // only long enough for the panel to slide in
-  // 2 parts: the Socratic level (blocks), then the 9 standards (graph)
-  const lvl = tut.data.levels.findIndex(l => l.name === state.level) + 1;
-  TOURS.tutStats = [
-    {title: `You reached ${state.level}`, side: 'left', target: '#profileBody .report-grid > div:first-child',
-     text: `Level ${lvl} of 6. Two good answers in a row, or one strong one, move you up.`},
-    {title: 'Our main goal', button: 'Done', side: 'left',
-     target: '#profileBody .report-grid > div:last-child',
-     text: met.length === keys.length
-       ? 'Meeting all 9 standards is how a critical thinker answers.'
-       : `Meeting all 9 standards is how a critical thinker answers, and this one missed ${missed}.`},
-  ];
-  // round 2: only the level; the 9 standards were already explained in round 1
-  if(tut.history.length > 1) TOURS.tutStats = [{...TOURS.tutStats[0], button: 'Done'}];
-  await new Promise(r => { startTour('tutStats'); tour.onEnd = r; });
-  closeProfile();
-}
-
-// Which bottom controls show. 'demo' = the answer box, locked, for Socrates to type in;
-// 'type' = the answer box for the learner; 'pick' = the A/B choices only.
-function tutControls(mode){
-  const box = mode === 'demo' || mode === 'type';
-  document.querySelector('.composer-box').classList.toggle('hidden', !box);
-  $('choices').classList.toggle('hidden', !(mode === 'pick' || (mode === 'demo' && state.options.length)));
-  $('answerBox').readOnly = mode === 'demo';
-  requestAnimationFrame(scrollToEnd);
-}
-
-// Mark one A/B choice as picked and lock both.
-function showPick(i){
-  $('choices').querySelectorAll('.choice').forEach(c => {
-    c.setAttribute('aria-pressed', String(Number(c.dataset.i) === i));
-    c.disabled = true;
-  });
-}
-
-function pickClick(options){
-  setChoices(options);
-  tutControls('pick');
-  return new Promise(r => { tut.onPick = i => { tut.onPick = null; showPick(i); r(i); }; });
-}
-
-// Socrates types the answer into the locked answer box, like a learner would.
-// The learner then presses Enter (or Send) to send it.
-async function demoAnswer(text){
-  const box = $('answerBox');
-  tutControls('demo');
-  box.placeholder = '';
-  Object.assign(tut, {typing: true, skip: false});
-  for(let i = 1; i <= text.length; i++){
-    if(reduceMotion || tut.skip){ box.value = text; break; }
-    box.value = text.slice(0, i);
-    if(i % 12 === 0) autosize();
-    await new Promise(r => setTimeout(r, 20));
-  }
-  box.value = text;
-  autosize();
-  tut.typing = false;
-  $('sendBtn').classList.add('ready');
-  box.focus();
-  await new Promise(r => { tut.onSend = r; });
-  tut.onSend = null;
-  $('sendBtn').classList.remove('ready');
-  box.value = '';
-  autosize();
-  tutControls('none');
-}
-$('answerBox').addEventListener('click', () => { if(tut.typing) tut.skip = true; });
-
-// Socrates's sent answer, in the chat on the learner side.
-function addSent(label, text){
-  const n = el('div', 'entry learner', `<div class="bubble example"><span class="mono-label">${esc(label)}</span><p>${esc(text)}</p></div>`);
-  $('log').appendChild(n);
-  scrollToEnd();
-  return n;
-}
-
-const joinAnswer = sentences => sentences.map(([text]) => text).join(' ');
-
-function setRound(n, levelKey){
-  state.round = n;
-  state.level = levelName(levelKey);
-  updateHud();
-}
-
-async function startTutorial(){
-  const [r1, r2] = tut.data.rounds;
-  Object.assign(tut, {active: true, pick: null, history: [], final: null});
-  Object.assign(state, {sessionId: null, totalRounds: tut.data.rounds.length, ended: false});
-  $('homeView').classList.add('hidden');
-  $('sessionView').classList.remove('hidden');
-  navPush({page: 'case'});
-  $('sessionView').classList.add('tut-mode');
-  $('cfNum').textContent = 'Example';  // where cases say CASE 01
-  $('cfTitle').textContent = tut.data.title;
-  $('cfScenario').textContent = tut.data.scenario;
-  showCasePicture('tutorial');
-  tutControls('none');
-  setRound(1, r1.level);
-
-  await readCaseFirst(tut.data.rounds.length);
-
-  // Round 1: Socrates answers
-  await tutorTurn({feedback: r1.feedback, question: r1.question, key_idea: r1.key_idea}, r1.format);
-  tutControls('demo');  // show the answer box before the tour, so it can point at it
-  if(!tourSeen('session')) await new Promise(r => { startTour('session'); tour.onEnd = r; });
-  await demoAnswer(joinAnswer(r1.answer));
-  addSent("Socrates's answer", joinAnswer(r1.answer));
-  addRound(exampleAssessment(0));
-  await pause(1000);  // time to read the sent answer before Status opens
-  await showRoundStats();
-
-  // Round 2: the learner picks, Socrates adds the why
-  setRound(2, r2.level);
-  await tutorTurn({feedback: `That answer met all 9 standards, so we move up a level. ${r2.feedback}`, question: r2.question,
-                   key_idea: r2.key_idea, options: r2.options}, r2.format);
-  tut.pick = await pickClick(r2.options);
-  const right = tut.pick === r2.best;
-  await wait(300);
-  await tutorTurn({feedback: right ? r2.right : r2.wrong}, null);
-  if(!right) showPick(r2.best);  // the why is for the stronger choice
-  const why = joinAnswer(r2.answer);
-  await demoAnswer(why);
-  addSent("Socrates's answer", `${'AB'[r2.best]}: ${r2.options[r2.best].replace(/\.$/, '')}. Why: ${why}`);
-  setChoices([]);
-  addRound(exampleAssessment(1, tut.pick));
-  await pause(1000);  // time to read the sent answer before Status opens
-  await showRoundStats();
-
-  // Round 3: the learner tries
-  tut.mark = $('log').lastElementChild;  // "Try round 3 again" removes everything after this
-  tutAskRound3();
-}
-
-async function tutAskRound3(){
-  const r3 = tut.data.rounds[2];
-  const r2met = Object.values(tut.history[1].standards).reduce((a, b) => a + b, 0);
-  setRound(3, r3.level);
-  await tutorTurn({feedback: `That answer met ${r2met} of 9 standards, so we move up a level. ${r3.feedback}`, question: r3.question,
-                   key_idea: r3.key_idea}, r3.format);
-  tutControls('type');
-  $('answerBox').placeholder = 'Your answer...';
-  $('answerBox').focus();
-}
-
-async function tutSubmit(){
-  const box = $('answerBox'), answer = box.value.trim();
-  if(!answer || state.busy || state.ended) return;
-  const entry = addLearner(answer);
-  box.value = '';
-  autosize();
-  setBusy(true);
-  const pending = el('div', 'thinking', '<span class="dots"><i></i><i></i><i></i></span>Checking...');
-  $('log').appendChild(pending);
-  scrollToEnd();
-  let res;
-  try { res = await postJSON('/api/tutorial/score', {answer, r2_pick: tut.pick}); }
-  catch(e){
-    pending.remove();
-    entry.remove();
-    box.value = answer;
-    autosize();
-    note('error', e.message + ' Please press Send again.');
-    setBusy(false);
-    return;
-  }
-  pending.remove();
-  setBusy(false);
-  tutControls('none');
-  const met = Object.keys(tut.data.standards).filter(k => res.assessment.standards[k]);
-  await wait(300);
-
-  tut.final = res;
-  Object.assign(state, {ended: true, level: res.level});
-  updateHud();
-  closeProfile();
-  $('composer').classList.add('hidden');
-  $('statsToggle').classList.add('hidden');
-  setTutBest(res.total);
-  await tutorTurn({feedback: res.copied
-    ? 'You copied the hint, please answer in your own words. Here is my answer, so you can compare.'
-    : `Your answer met ${met.length} of 9 standards. Here is mine, so you can compare.`}, null, true);
-  await wait(400);
-  await addExample("Socrates's answer", tut.data.rounds[2].answer);
-  await wait(400);
-  showTutorialEnd(res);
-}
-
-// End: the score, then the same profile a real case shows.
-function showTutorialEnd(res){
-  const stars = [1, 2, 3].map(i => `<span class="${i <= res.stars ? 'on' : ''}">★</span>`).join('');
-  const panel = $('report');
-  panel.className = 'report';
-  panel.innerHTML = `
-    <div class="mono-label">Tutorial complete</div>
-    <div class="tut-score"><b>${res.total}/${res.max}</b><span>standards met</span>
-      <span class="stars" role="img" aria-label="${res.stars} of 3 stars">${stars}</span></div>
-    ${reportHTML(res.stats, true)}`;
-  $('againBtn').textContent = 'Start a real case';
-  $('againBtn').addEventListener('click', goHome);
-  $('reviewBtn').textContent = 'Try round 3 again';
-  $('reviewBtn').addEventListener('click', tutRetry);
-  panel.scrollIntoView({behavior: 'smooth', block: 'start'});
-}
-
-function tutRetry(){
-  while(tut.mark.nextElementSibling) tut.mark.nextElementSibling.remove();
-  $('report').className = 'hidden';
-  $('report').innerHTML = '';
-  Object.assign(tut, {final: null, history: tut.history.slice(0, 2)});
-  state.ended = false;
-  $('composer').classList.remove('hidden');
-  $('statsToggle').classList.remove('hidden');
-  tutAskRound3();
-}
 
 // ---------- first-time tour ----------
 // Small pop-ups that point at one part of the screen at a time. Shown once per
@@ -4478,23 +4084,15 @@ const TOURS = {
     {title: 'Mode', text: 'Pick open questions, or A or B choices.', target: '#askModeBtn'},
     {title: 'Overall status', text: 'See your skills across all chats.', target: '#overallBtn'},
   ],
-  home: [
-    {title: 'Welcome', text: 'New here? Start with Socrates for a quick 3-round tour that takes about 2 minutes.', target: '.case-row.tut'},
-    {title: 'Cases', text: 'After that, pick a case to start learning.', target: '#cases .case-row'},
-    {title: 'Rounds', text: 'Choose how many rounds you want to play, or pick ∞ to keep going until you press End session.', target: '.rounds .seg'},
-    {title: 'Mode', text: 'Choose mixed question types, or only A or B questions.', target: '#abOnly'},
-    {title: 'Overall status', text: 'See your highest level and your standards across every case you play.', target: '#overallBtn'},
-  ],
   session: [
     {title: 'Progress', text: 'This shows which round you are on.', target: '#hudProgress'},
     {title: 'Level', text: 'This is your thinking level, and it goes up when you reason well.', target: '#hudLevel'},
     {title: 'The question', text: 'Read the question, then answer it in your own words.', target: () => lastOf('.entry.tutor .card')},  // the whole question box
     {title: 'Hint', text: 'Open this if you need a little help.', target: () => lastOf('.hint-btn')},
-    {title: 'Answer here', text: "Type your answer and press Enter to send it. If you feel lost, press \"I'm not sure\".",
-     tutText: 'Type your answer and press Enter to send it.', target: '.composer-box'},  // no "I'm not sure" button in the tutorial
+    {title: 'Answer here', text: "Type your answer and press Enter to send it. If you feel lost, press \"I'm not sure\".", target: '.composer-box'},
     {title: 'Status', text: 'See how your thinking is going, updated after every answer.', target: '#statsToggle'},
   ],
-  // every new case and the tutorial, before round 1 (text filled in by readCaseFirst)
+  // every new case, before round 1 (text filled in by readCaseFirst)
   readCase: [
     {title: 'Read the case first', text: '', button: 'I have read it', target: '#cfScenario'},
   ],
@@ -4519,7 +4117,7 @@ function tourTarget(step){
 function startTour(name){
   endTour(false);
   if(name !== 'readCase') $('sessionView').classList.remove('drawer-open');  // readCase points into the open drawer
-  if(profileOpen() && name !== 'tutStats') closeProfile();
+  if(profileOpen()) closeProfile();
   tour.name = name;
   tour.steps = TOURS[name].filter(st => tourTarget(st) !== undefined);
   tour.i = 0;
@@ -4537,7 +4135,7 @@ function renderTour(){
   pop.innerHTML = `<span class="arrow"></span>
     ${n > 1 ? `<div class="tp-step">${tour.i + 1} / ${n}</div>` : ''}
     <h4 id="tourTitle">${esc(step.title)}</h4>
-    <p>${esc(tut.active && step.tutText ? step.tutText : (sideHidden() && step.narrowText ? step.narrowText : step.text))}</p>
+    <p>${esc(sideHidden() && step.narrowText ? step.narrowText : step.text)}</p>
     <div class="tp-actions">
       <button class="ghost tp-skip">${last ? '' : 'Skip'}</button>
       <span class="spacer"></span>
@@ -4812,7 +4410,7 @@ history.replaceState({page: firstPage}, '', '/');
 showPage(firstPage);
 addEventListener('popstate', e => {
   const s = e.state || {page: 'ask'};
-  // a case or the tutorial has its own screen, so going back from it reloads Home
+  // a case has its own screen, so going back from it reloads the start page
   if(!$('sessionView').classList.contains('hidden') || s.page === 'case') return location.replace('/');
   navRestoring = true;
   try {

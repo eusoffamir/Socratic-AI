@@ -293,7 +293,7 @@ def clean_assessment(data):
 
 def _add_graph_reading(out, session, steps):
     """Goal 3, step 5. The agent's graph steps read by plain code (traverse.py),
-    kept next to the agent's own reasoning labels. Cases only, not the tutorial."""
+    kept next to the agent's own reasoning labels."""
     if out.get("reasoning") is not None and session.get("concept_id"):
         out["reasoning"]["graph"] = traverse.read(case_of(session), steps)
 

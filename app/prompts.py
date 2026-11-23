@@ -200,7 +200,7 @@ def _graph_for_agent(case):
 
 def assessor_user(session, answer, with_reasoning=False, with_plan=False):
     payload = {"question_asked": session["last_tutor"], "learner_answer": answer}
-    if session.get("concept_id"):  # the case facts, so accuracy can really be judged (the tutorial has none)
+    if session.get("concept_id"):  # the case facts, so accuracy can really be judged
         c = case_of(session)
         extra = {"NOTE_TYPES": reasoning.note_types(c), "GRAPH": _graph_for_agent(c)} if with_reasoning else {}
         payload = {"case_story": c["scenario"], "NOTES": c["notes"], **extra, **payload}

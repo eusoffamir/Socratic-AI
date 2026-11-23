@@ -18,9 +18,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from . import (auth, builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
-               skillcheck, stats, storage, tutorial)
+               skillcheck, stats, storage)
 from .llm_client import LLMError
-from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, TUTORIAL, case_of
+from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
 
 app = FastAPI(title="Socratic AI")
 
@@ -84,11 +84,6 @@ class AnswerRequest(BaseModel):
 
 class OverviewRequest(BaseModel):
     session_ids: list[str] = []  # the sessions this browser has started (no logins, so no per-user history)
-
-
-class TutorialScoreRequest(BaseModel):
-    answer: str = ""
-    r2_pick: int | None = None  # 0 = A, 1 = B
 
 
 def _run_turn_safely(session, answer):
@@ -348,19 +343,6 @@ def make_topic(req: TopicRequest):
         raise HTTPException(503, str(e))
 
 
-# The tutorial is a fixed script. Only round 3 calls a model (the Assessor,
-# once). Nothing is saved to disk: it is practice, not thesis data.
-@app.get("/api/tutorial")
-def get_tutorial():
-    return {**TUTORIAL, "max": tutorial.MAX_SCORE,
-            "levels": [{"key": k, "name": name} for k, name, _ in LEVELS], "standards": STANDARDS}
-
-
-@app.post("/api/tutorial/score")
-def score_tutorial(req: TutorialScoreRequest):
-    return tutorial.final_result(req.r2_pick, req.answer[:MAX_ANSWER_CHARS])
-
-
 @app.post("/api/session")
 def start_session(req: StartRequest):
     case = None
@@ -549,8 +531,7 @@ def overview(req: OverviewRequest):
     """The learner's overall status across every case they played in this
     browser: highest level, the 9 standards over all answers, and the best
     level per case. Same summary shape as /stats, so the page reuses its
-    drawings. Unknown or broken ids are skipped. The tutorial is practice and
-    is not saved, so it never counts here."""
+    drawings. Unknown or broken ids are skipped."""
     history, best_idx, played, finished, per_case, checks = [], 0, 0, 0, {}, []
     sids = list(dict.fromkeys(filter(None, map(_clean_id, req.session_ids[:300]))))
     # one storage call for every session not in memory yet
@@ -703,5 +684,5 @@ def get_stats(sid: str, coach: bool = False):
         "comment": comment,
         "coach_due": coach_due,
         "history": session["history"],
-        "topic": (session.get("case") or {}).get("topic"),  # a built topic (Goal 2), None for quant and the tutorial
+        "topic": (session.get("case") or {}).get("topic"),  # a built topic (Goal 2), None for quant
     }

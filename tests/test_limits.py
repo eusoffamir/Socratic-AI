@@ -1,7 +1,7 @@
 """The daily budget of AI calls that protects the free Gemini quota."""
 from fastapi.testclient import TestClient
 
-from app import limits, llm_client, main, tutorial
+from app import limits, llm_client, main
 
 
 def fresh(monkeypatch, budget):
@@ -60,11 +60,3 @@ def test_zero_means_no_limit(monkeypatch):
     for _ in range(1000):
         limits.count_call()
     assert limits.budget_left()
-
-
-def test_tutorial_uses_the_word_check_when_the_budget_is_used(monkeypatch):
-    fresh(monkeypatch, 1)
-    limits.count_call()
-    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
-    monkeypatch.setattr(llm_client, "call_assessor", lambda *a: (_ for _ in ()).throw(AssertionError("no AI call")))
-    assert tutorial.assess_answer("I would test the rule on new days because luck fades")["source"] == "code"
