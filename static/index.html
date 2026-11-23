@@ -679,8 +679,7 @@
   .report .ov-cases + h2{margin-top:56px;}
   /* skill check pop-up (Goal 1) */
   .ck-card{width:min(680px, 94vw);}
-  .ck-situation{font-size:16px; line-height:1.55; margin:0 0 14px;}
-  .ck-question{font-weight:600; font-size:16.5px; line-height:1.5; margin:0 0 16px;}
+  .ck-question{font-size:16.5px; line-height:1.5; margin:0 0 16px;}
   .ck-body .composer-box{margin-bottom:18px;}
   .ck-tools{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
   .ck-status{padding:0 28px; min-height:4px;}
@@ -2786,8 +2785,7 @@ function showCheck(d){
   const q = d.question;
   $('ckNum').textContent = `QUESTION ${q.number} OF ${q.total}`;
   $('ckTitle').textContent = 'Skill check';
-  $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-situation">${esc(q.situation)}</p>
-    <p class="ck-question">${esc(q.question)}</p>
+  $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-question">${esc([q.situation, q.question].filter(Boolean).join(' '))}</p>
     <div class="composer-box ck-box"><textarea id="ckAnswer" rows="3" placeholder="Your answer"></textarea>
       <div class="ck-tools"><span class="ck-count" id="ckCount">${countText(0)}</span>
         <button type="button" class="send" id="ckGo" title="Send (Enter)" aria-label="Send"><svg><use href="#i-up"/></svg></button></div></div></div>`;
