@@ -24,6 +24,6 @@ services:
       - key: AUTH_SECRET           # signs the sign-in cookie; the value is in .env (npx.cmd dotenvx get AUTH_SECRET)
         sync: false
       - key: AI_GUARD             # 1 = AI-style answer check on and paste off in the skill check; 0 = both off
-        value: "0"                 # off for testing (21 October 2026). MUST be "1" for the pilot and the study.
+        value: "1"                 # on for the pilot (23 November 2026). Set "0" only for testing.
       - key: AGENT_CHECKER_MODEL   # 0 = keep the Checker's free code checks but skip its model call, so answers are faster
         value: "0"

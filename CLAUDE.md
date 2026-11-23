@@ -90,7 +90,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## Open items
 
-- **BEFORE THE PILOT: `AI_GUARD=1`** in `.env` and on Render (it turns the AI-style answer check on and paste off). Eusoff sets it to 0 for testing. Remind Eusoff whenever the pilot, the study or study mode comes up.
+- **Pilot ready (23 November 2026): `AI_GUARD=1`** in `.env` and on Render (`render.yaml`), so the AI-style answer check is on and paste is off. If Eusoff sets it to 0 for testing, remind him to set it back to 1 before any pilot or study session.
 
 - Remind Dr Ho about the Claude and Render subscription requests.
 - Full list of questions for Dr Ho and things to verify: history file, "Open items".
