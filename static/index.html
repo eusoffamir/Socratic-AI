@@ -1491,6 +1491,16 @@ function wrap2(label, max = 17){
   }
   return lines.map(l => l.length > max + 3 ? l.slice(0, max + 1) + '...' : l);
 }
+// Like wrap2 but never cuts the text: as many lines as it needs.
+function wrapAll(label, max){
+  const lines = [''];
+  for(const w of label.split(' ')){
+    const line = lines[lines.length - 1];
+    if((line + ' ' + w).trim().length > max && line) lines.push(w);
+    else lines[lines.length - 1] = (line + ' ' + w).trim();
+  }
+  return lines;
+}
 // opts.labels writes each arrow's meaning on it (Knowledge page). opts.focus (a knowledge type) or
 // opts.move (a reasoning type) lights the arrows that belong to it and dims the rest.
 function askMapHTML(c, opts = {}){
@@ -2368,7 +2378,9 @@ function knowTreeHTML(t, answers){
 // The Bayesian network: causes on top, what they cause below, then the chances it learned.
 function knowNetHTML(v){
   const tops = v.nodes.filter(n => !n.parents.length), lows = v.nodes.filter(n => n.parents.length);
-  const W = 184, H = 44, GAP = 28, ROW = 96, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
+  const labels = Object.fromEntries(v.nodes.map(n => [n.id, wrapAll(n.text.replace(/\.$/, ''), 27)]));  // full text, as many lines as it needs
+  const most = Math.max(1, ...Object.values(labels).map(l => l.length));
+  const W = 184, H = Math.max(44, 18 + most * 14), GAP = 28, ROW = H + 52, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
   [tops, lows].forEach((row, r) => row.forEach((n, i) => {
     pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * ROW};
   }));
@@ -2378,9 +2390,9 @@ function knowNetHTML(v){
       <text class="rel" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${(y1 + y2) / 2 + 4}" text-anchor="${x2 > x1 ? 'start' : 'end'}">${esc(rel)}</text>`;
   }).join('');
   const boxes = v.nodes.map(n => {
-    const {x, y} = pos[n.id], label = wrap2(n.text.replace(/\.$/, ''), 27);
+    const {x, y} = pos[n.id], label = labels[n.id], top = y + (H - label.length * 14) / 2 + 11;
     return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
-      `<text x="${x + W / 2}" y="${y + (label.length === 1 ? 26 : 19 + k * 14)}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
+      `<text x="${x + W / 2}" y="${top + k * 14}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
   }).join('');
   const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
     <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
