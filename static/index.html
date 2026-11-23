@@ -210,6 +210,7 @@
   .sk-col li::before{content:"\2192"; position:absolute; left:2px; top:0; color:var(--caution, #b5762c); font-weight:700;}
   .sk-col.ok li::before{content:"\2713"; color:var(--signal);}
   .sk-col.ok li.almost::before{content:"\25CB"; font-weight:400;}
+  .sk-col.seen li::before{content:"\2022"; color:var(--ink-faint);}
   .sk-col li small{display:block; font-size:13px; color:var(--ink-soft); margin-top:1px;}
   .sk-flat .sk-card{border:0; background:none; padding:0;}  /* inside the pop-up, no second box */
   .sk-flat .sk-card > .mono-label{display:none;}
@@ -2381,7 +2382,7 @@ function ovSkillsHTML(d){
   return `<div class="know-tabs ov-tabs" role="tablist">
       <button type="button" role="tab" data-ovtab="simple" aria-selected="true">Summary</button>
       <button type="button" role="tab" data-ovtab="full" aria-selected="false">Full data</button></div>
-    <div id="ovSimple">${skillsSimpleHTML(d.mastery)}</div>
+    <div id="ovSimple">${skillsSimpleHTML(d.mastery, true, r)}</div>
     <div id="ovFull" class="hidden"><div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
       ${r && r.answers ? reasoningGridHTML(r) : ''}</div>`;
 }
@@ -2827,10 +2828,24 @@ const skillName = w => w[0].toUpperCase() + w.slice(1);
 
 // The learner's view of the skill checks: what they are strong at and what to practise next, in plain words.
 // The bars and grids stay on the Full data tab for the study.
-function skillsSimpleHTML(m, withButton = true){
+// The 8 skills of the skill checks, in their usual order
+const CORE_SKILLS = ['inductive', 'deductive', 'abductive', 'factual', 'conceptual', 'procedural', 'causal', 'relational'];
+// How often each skill showed up in chat answers. Credit only, because a chat
+// question is not aimed at one skill, so it never changes mastery.
+function seenInChatsHTML(chat){
+  if(!chat || !chat.answers) return '';
+  const count = s => (chat.types && chat.types[s]) ?? (chat.knowledge && chat.knowledge[s]) ?? 0;
+  const seen = CORE_SKILLS.map(s => [s, count(s)]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
+  if(!seen.length) return '';
+  return `<div class="sk-col seen"><h4>Seen in your chats</h4><ul>${seen.map(([s, n]) =>
+    `<li><b>${esc(SKILL_PLAIN[s])}</b><small>in ${n} answer${n === 1 ? '' : 's'}</small></li>`).join('')}</ul></div>`;
+}
+function skillsSimpleHTML(m, withButton = true, chat = null){
   const button = withButton ? '<button type="button" class="sk-go" data-take-check>Take a skill check</button>' : '';
+  const seen = seenInChatsHTML(chat);
   if(!m || !m.answers) return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
-    <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>${button}</div>`;
+    <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>
+    ${seen ? `<div class="sk-cols">${seen}</div>` : ''}${button}</div>`;
   const plain = r => SKILL_PLAIN[r.skill] || r.skill;
   const strong = m.skills.filter(r => r.status === 'mastered');
   const almost = m.skills.filter(r => r.status === 'not sure yet');
@@ -2838,8 +2853,8 @@ function skillsSimpleHTML(m, withButton = true){
   // the Coach paragraph (fillSkillCoach) says what to work on and how, so no Practise next list
   return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
     <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.</p>
-    ${strong.length || almost.length ? `<div class="sk-cols"><div class="sk-col ok"><h4>Going well</h4>
-      <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div></div>` : ''}
+    ${strong.length || almost.length || seen ? `<div class="sk-cols">${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
+      <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div>` : ''}${seen}</div>` : ''}
     <div class="coach-comment sk-coach" data-skill-coach><div class="mono-label">Coach</div><p class="thinking">${DOTS}</p></div>
     ${button}${withButton ? '<button type="button" class="ov-open ov-remove sk-clear" data-clear-checks>Clear my skill checks</button>' : ''}</div>`;
 }
