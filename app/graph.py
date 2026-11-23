@@ -130,7 +130,10 @@ def _check_node(state: TurnState) -> TurnState:
     if not rewritten:
         state["first_code_ok"] = not code_problems
     problems = code_problems
-    if not problems:  # only spend a model call when the free checks pass
+    if not problems and agent_on("AGENT_CHECKER_MODEL"):  # only spend a model call when the free checks pass
+        # AGENT_CHECKER_MODEL=0 keeps the free checks but skips this call, so each
+        # answer waits for one call less. In 121 Gemini turns (23 November 2026)
+        # the call found a problem the free checks missed only 3 times.
         # The Checker also judges repeats in new words (seen 15 October 2026:
         # "pattern or luck, and why?" asked 3 rounds in a row). Plain code only
         # catches exact repeats, since every question shares the story's words.

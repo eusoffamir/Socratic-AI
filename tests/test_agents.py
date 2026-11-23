@@ -471,3 +471,20 @@ def test_missing_shared_plan_falls_back_to_the_planner(monkeypatch):
     s = graph.run_turn(orc.new_session("pattern_or_luck", total_rounds=6), None)["session"]
     graph.run_turn(s, "it could be luck because many stocks rise")
     assert called == [1]
+
+
+def test_checker_model_switch_keeps_free_checks(monkeypatch):
+    # 23 Nov 2026: AGENT_CHECKER_MODEL=0 skips the Checker's model call for speed,
+    # but the free code checks still run and can still ask for a rewrite.
+    from app import checker
+    monkeypatch.setenv("AGENT_CHECKER_MODEL", "0")
+    called = []
+    monkeypatch.setattr(llm_client, "call_checker", lambda *a, **k: called.append(1) or ["bad"])
+    s = orc.new_session("pattern_or_luck", total_rounds=6)
+    s["last_tutor"] = "Pattern or luck, and why?"
+    out = graph.run_turn(s, "luck, because many stocks rise five days in a row by chance")
+    assert not called
+    assert out["session"]["turns"][-1]["check"]["ran"]
+    monkeypatch.setattr(checker, "code_check", lambda *a: ["question is missing."])
+    out = graph.run_turn(out["session"], "it could be a pattern, because the rises came after news")
+    assert out["session"]["turns"][-1]["rewrites"] == 1 and not called

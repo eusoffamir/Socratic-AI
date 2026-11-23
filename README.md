@@ -87,6 +87,7 @@ Then open http://127.0.0.1:8000.
 | `GEMINI_MODEL` | Default `gemini-3.5-flash-lite`, which is fast and has 500 free calls a day. |
 | `PROVIDER` | Force `gemini` or `mock`. Blank means it is picked from the keys. |
 | `AGENT_PLANNER`, `AGENT_TOOLS`, `AGENT_CHECKER` | `0` switches that agent off, for "with vs without" tests or to save calls. |
+| `AGENT_CHECKER_MODEL` | `0` keeps the Checker's free code checks but skips its model call, so each answer is faster. |
 | `DAILY_CALL_BUDGET` | New sessions stop after this many AI calls a day (default 400, `0` = no limit). |
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | Save to a free Supabase database instead of local files. Needed online. |
 
