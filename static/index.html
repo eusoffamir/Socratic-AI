@@ -689,17 +689,19 @@
   /* skill check pop-up (Goal 1) */
   .ck-card{width:min(680px, 94vw);}
   /* one short row for the skill check header: title, then the question count */
-  .ck-card .rm-head{display:flex; align-items:baseline; gap:12px; padding:14px 56px 12px 28px;}
+  .ck-card .rm-head{display:flex; align-items:baseline; gap:12px; padding:20px 64px 16px 36px;}
+  .ck-card .rm-body{padding:30px 36px 14px;}
+  @media (max-width:600px){ .ck-card .rm-head{padding:16px 52px 12px 20px;} .ck-card .rm-body{padding:22px 20px 10px;} .ck-status{padding:0 20px;} }
   .ck-card .rm-head h2{order:-1; font-size:20px; margin:0;}
   .ck-card .rm-head .num{margin-left:0;}
   .ck-card .rm-head .rm-x{top:8px; right:12px;}
-  .ck-question{font-size:16.5px; line-height:1.5; margin:0 0 26px;}
+  .ck-question{font-size:16.5px; line-height:1.65; margin:0 0 34px;}
   .ck-body .composer-box{margin-bottom:18px;}
   .ck-tools{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
   .ck-acts{display:flex; align-items:center; gap:6px;}
-  .ck-status{padding:0 28px; min-height:4px;}
+  .ck-status{padding:0 36px; min-height:4px;}
   .ck-status:not(:empty){padding-bottom:14px;}
-  .ck-body textarea{min-height:90px;}
+  .ck-body textarea{min-height:52px;}
   .ck-count{font-size:12px; color:var(--ink-faint);}
   .ck-count.over{color:var(--caution); font-weight:600;}
   .rk td.unasked{color:var(--ink-faint); background:var(--panel-2);}
@@ -2900,7 +2902,7 @@ function showCheck(d){
   $('ckNum').textContent = `QUESTION ${q.number} OF ${q.total}`;
   $('ckTitle').textContent = 'Skill check';
   $('ckBody').innerHTML = `<div class="ck-body"><p class="ck-question">${esc([q.situation, q.question].filter(Boolean).join(' '))}</p>
-    <div class="composer-box ck-box"><textarea id="ckAnswer" rows="3" placeholder="Your answer"></textarea>
+    <div class="composer-box ck-box"><textarea id="ckAnswer" rows="2" placeholder="Your answer"></textarea>
       <div class="ck-tools"><span class="ck-count" id="ckCount">${countText(0)}</span>
         <span class="ck-acts">${MIC_BUTTON('ckMic')}<button type="button" class="send" id="ckGo" title="Send (Enter)" aria-label="Send"><svg><use href="#i-up"/></svg></button></span></div></div></div>`;
   $('ckFoot').classList.add('hidden');
