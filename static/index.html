@@ -1629,6 +1629,14 @@ function askMapHTML(c, opts = {}){
   const lit = (a, b) => focus ? typeOf[a] === focus || typeOf[b] === focus
     : move === 'inductive' ? inductive(a, b) : move === 'deductive' ? !inductive(a, b) : move === 'abductive' ? true : null;
   let loops = false, litCount = 0;
+  // Arrow words go on top of every line, and a word that would sit on another is moved down a line.
+  const words = [], placed = [];  // named so they do not clash with the layout helpers
+  const placeWord = (lx, ly, anchor, text) => {
+    const w = text.length * 6, x0 = anchor === 'middle' ? lx - w / 2 : anchor === 'end' ? lx - w : lx;
+    for(let k = 0; k < 6 && placed.some(p => Math.abs(p.y - ly) < 12 && x0 < p.x1 && x0 + w > p.x0); k++) ly += 13;
+    placed.push({x0, x1: x0 + w, y: ly});
+    return ly;
+  };
   const lines = edges.map(([a, rel, b]) => {
     const p = pos[a], q = pos[b], e = fwd.find(f => f.a === a && f.b === b);
     let d, lx, ly, anchor = 'middle';
@@ -1655,8 +1663,11 @@ function askMapHTML(c, opts = {}){
     const r0 = rel.split(', ')[0], on = lit(a, b), cls = on === null ? '' : on ? ' lit' : ' dim';
     if(on) litCount++;
     const end = move === 'abductive' ? `marker-start="url(#mapArrow-${r0})"` : `marker-end="url(#mapArrow-${r0})"`;  // abductive turns the arrows round
-    const words = opts.labels ? `<text class="rl${cls}" data-t="${typeOf[a]} ${typeOf[b]}" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(rel.replace(/_/g, ' '))}</text>` : '';
-    return `<path class="ed${cls}" data-t="${typeOf[a]} ${typeOf[b]}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>${words}`;
+    if(opts.labels){
+      const text = rel.replace(/_/g, ' ');
+      words.push(`<text class="rl${cls}" data-t="${typeOf[a]} ${typeOf[b]}" x="${lx}" y="${placeWord(lx, ly, anchor, text)}" text-anchor="${anchor}">${esc(text)}</text>`);
+    }
+    return `<path class="ed${cls}" data-t="${typeOf[a]} ${typeOf[b]}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>`;
   }).join('');
   if(loops) width += opts.labels ? 70 : 30;  // room for a loop round the right side, and its word
   const boxes = nodes.map((n, i) => {
@@ -1672,7 +1683,7 @@ function askMapHTML(c, opts = {}){
   return `<div class="am-map" data-lit="${litCount}" data-texts="${esc(JSON.stringify(nodes.map(n => `${n.type}. ${n.text}`)))}">
     <span class="mono-label">Map of the ideas</span>
     <div class="map-scroll"><svg viewBox="0 0 ${width} ${height}" style="max-width:${width}px; --mw:${width}px" aria-label="A map of how the ideas in this case link">
-      <defs>${markers}</defs>${lines}${boxes}</svg></div>
+      <defs>${markers}</defs>${lines}${words.join('')}${boxes}</svg></div>
     <p class="cap"><span class="swipe-hint">Swipe sideways to see the whole map.</span></p>
     <div class="legend"><b>Box colours</b>${types.map(t => `<button type="button" class="lg-t" data-kfocus="${t}" aria-pressed="${t === focus}"><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(capFirst(t))}</button>`).join('')}</div>
     ${opts.labels ? '' : `<div class="legend rels"><b>Arrows</b>${rels.map(r => `<span><i class="ln" style="background:${REL_COLORS[r] || 'var(--ink-faint)'}"></i>${esc(r.replace(/_/g, ' '))}, ${esc(REL_MEANING[r] || '')}</span>`).join('')}</div>`}</div>`;
