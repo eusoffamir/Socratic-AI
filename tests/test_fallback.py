@@ -75,3 +75,26 @@ def test_main_model_is_asked_once_more_when_all_are_busy(monkeypatch):
     monkeypatch.setattr(llm_client, "_gemini_call", call)
     assert llm_client._generate_gemini("s", "u", 50, False) == "late reply"
     assert calls == ["main", "second", "main"]
+
+
+def test_groq_answers_when_gemini_fails(monkeypatch):
+    def gemini_down(*a, **k):
+        raise llm_client.LLMError("The free Gemini models are used up or busy right now.")
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    monkeypatch.setattr(llm_client, "_generate_gemini", gemini_down)
+    monkeypatch.setattr(llm_client, "_generate_groq", lambda *a, **k: (llm_client._note_model("groq:x"), "groq reply")[1])
+    monkeypatch.setenv("GROQ_API_KEY", "test")
+    used = llm_client.track_models()
+    assert llm_client._generate("s", "u", 50) == "groq reply"
+    assert used == ["groq:x"]
+
+
+def test_without_a_groq_key_the_gemini_error_shows(monkeypatch):
+    def gemini_down(*a, **k):
+        raise llm_client.LLMError("Gemini busy")
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    monkeypatch.setattr(llm_client, "_generate_gemini", gemini_down)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    import pytest
+    with pytest.raises(llm_client.LLMError, match="Gemini busy"):
+        llm_client._generate("s", "u", 50)

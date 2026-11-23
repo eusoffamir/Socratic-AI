@@ -224,8 +224,11 @@ def health():
     if llm_client.PROVIDER == "mock":
         ai_ok, ai = not os.getenv("RENDER"), "Using mock replies, so no real AI. Set GOOGLE_API_KEY to use Gemini."
     else:
-        model = llm_client.GEMINI_MODEL if llm_client.PROVIDER == "gemini" else llm_client.ANTHROPIC_MODEL
-        ai_ok, ai = True, f"Using {llm_client.PROVIDER} ({model}). This page does not call it, to save quota."
+        model = {"gemini": llm_client.GEMINI_MODEL, "groq": llm_client.GROQ_MODEL}.get(llm_client.PROVIDER,
+                                                                                       llm_client.ANTHROPIC_MODEL)
+        backup = (f" Groq ({llm_client.GROQ_MODEL}) is the backup." if llm_client.PROVIDER == "gemini"
+                  and os.getenv("GROQ_API_KEY") else "")
+        ai_ok, ai = True, f"Using {llm_client.PROVIDER} ({model}).{backup} This page does not call it, to save quota."
     ok = saving_ok and ai_ok
     budget = limits.DAILY_CALL_BUDGET or "no limit"
     return JSONResponse({"ok": ok, "saving": {"ok": saving_ok, "message": saving}, "ai": {"ok": ai_ok, "message": ai},
@@ -596,13 +599,15 @@ def answer_check(sid: str, req: CheckAnswerRequest):
     working = copy.deepcopy(check)  # a failed model call leaves the saved check as it was
     try:
         seconds = None if req.seconds is None else max(0, min(req.seconds, 86400))
+        used = llm_client.track_models()
         turn = skillcheck.answer(working, req.answer[:MAX_ANSWER_CHARS], seconds)
     except LLMError as e:
         raise HTTPException(503, str(e)) from e
     SESSIONS[sid] = working
     _persist(sid, working)
     storage.append_transcript(sid, {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                                    "session_id": sid, "mode": "skill_check", "provider": llm_client.PROVIDER, **turn})
+                                    "session_id": sid, "mode": "skill_check", "provider": llm_client.PROVIDER,
+                                    "models": used, **turn})
     return {"check_id": sid, **_check_view(working)}
 
 

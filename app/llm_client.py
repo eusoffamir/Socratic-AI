@@ -5,9 +5,13 @@
                      no credit card needed for the free-tier models)
   PROVIDER=anthropic  needs a paid Anthropic API key
 
+With PROVIDER=gemini and a GROQ_API_KEY set, Groq's free API takes over any call
+that no Gemini model could answer (get a key at https://console.groq.com/keys).
+
 If PROVIDER is not set, it's picked automatically: GOOGLE_API_KEY present -> gemini,
 else ANTHROPIC_API_KEY present -> anthropic, else mock.
 """
+import contextvars
 import json
 import logging
 import os
@@ -81,6 +85,29 @@ REQUEST_TIMEOUT_SECONDS = 45
 _anthropic_client = None
 _gemini_client = None
 _gemini_resting = {}  # model -> time.time() until which it is skipped
+
+# Groq is the free backup when no Gemini model answers (24 November 2026). Its answers can
+# be weaker than Gemini's, so every saved turn records which models answered it.
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+# gpt-oss thinks before answering and that counts against the token cap, like Gemini
+GROQ_THINKING_HEADROOM = 1024
+
+# The models that answered the current turn, so the transcript can say which ones did.
+_models_used = contextvars.ContextVar("models_used", default=None)
+
+
+def track_models():
+    """Start a list of the models used from here on in this request, and return it."""
+    used = []
+    _models_used.set(used)
+    return used
+
+
+def _note_model(name):
+    used = _models_used.get()
+    if used is not None and name not in used:
+        used.append(name)
 
 
 class LLMError(RuntimeError):
@@ -159,6 +186,7 @@ def _gemini_last_try(user, config, problems):
         problems[GEMINI_MODEL] = e
         return None
     logging.getLogger(__name__).warning("Gemini: %s answered on the last try", GEMINI_MODEL)
+    _note_model(GEMINI_MODEL)
     return resp
 
 
@@ -179,6 +207,7 @@ def _generate_gemini(system, user, max_tokens, json_mode, seed=None, thinking="l
     for model in awake:
         try:
             resp = _gemini_call(model, user, config, last=model == awake[-1])
+            _note_model(model)
             if model != GEMINI_MODEL:
                 logging.getLogger(__name__).warning("Gemini fallback: %s answered for %s", model, GEMINI_MODEL)
             break
@@ -217,14 +246,60 @@ def _generate_anthropic(system, user, max_tokens):
     return resp.content[0].text.strip()
 
 
+def _generate_groq(system, user, max_tokens, json_mode, seed=None):
+    """One call to Groq's OpenAI-style API, with plain httpx (no extra package)."""
+    import httpx
+    body = {"model": GROQ_MODEL, "max_completion_tokens": max_tokens + GROQ_THINKING_HEADROOM,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
+    if seed is not None:
+        body["seed"] = seed
+    if "gpt-oss" in GROQ_MODEL:
+        body.update(reasoning_effort="low", include_reasoning=False)  # short replies need little thinking
+    try:
+        res = httpx.post(GROQ_URL, json=body, timeout=REQUEST_TIMEOUT_SECONDS,
+                         headers={"Authorization": f"Bearer {os.getenv('GROQ_API_KEY', '')}"})
+    except httpx.TimeoutException as e:
+        raise LLMError(f"Groq took longer than {REQUEST_TIMEOUT_SECONDS}s to reply. Try again.") from e
+    except httpx.TransportError as e:
+        raise LLMError("Couldn't reach the Groq API. Check your internet connection.") from e
+    if res.status_code == 429:
+        raise LLMError("The free Groq limit is used up right now. Wait a few minutes and try again.")
+    if res.status_code != 200:
+        raise LLMError(f"Groq error {res.status_code}: {res.text[:200]}")
+    try:
+        text = res.json()["choices"][0]["message"]["content"] or ""
+    except (ValueError, KeyError, IndexError, TypeError) as e:
+        raise LLMError("Groq sent a reply that could not be read. Try again.") from e
+    if not text.strip():
+        raise LLMError("Groq returned an empty reply. Try again.")
+    _note_model(f"groq:{GROQ_MODEL}")
+    return text.strip()
+
+
 def _generate(system, user, max_tokens, json_mode=False, seed=None, thinking="low"):
     """Dispatch one call to whichever provider is active. Returns raw text.
     A fixed seed asks the model to give the same reply to the same input.
     thinking: Gemini's thinking level ("minimal" for tiny jobs)."""
     limits.count_call()
     if PROVIDER == "gemini":
-        return _generate_gemini(system, user, max_tokens, json_mode, seed, thinking)
+        try:
+            return _generate_gemini(system, user, max_tokens, json_mode, seed, thinking)
+        except LLMError as e:
+            if not os.getenv("GROQ_API_KEY"):
+                raise
+            try:
+                text = _generate_groq(system, user, max_tokens, json_mode, seed)
+            except LLMError as groq_error:
+                logging.getLogger(__name__).warning("Groq backup failed too: %s", groq_error)
+                raise e from groq_error  # the learner sees the Gemini message
+            logging.getLogger(__name__).warning("Groq (%s) answered because Gemini failed: %s", GROQ_MODEL, e)
+            return text
+    if PROVIDER == "groq":
+        return _generate_groq(system, user, max_tokens, json_mode, seed)
     if PROVIDER == "anthropic":
+        _note_model(ANTHROPIC_MODEL)
         return _generate_anthropic(system, user, max_tokens)
     raise RuntimeError(f"Unknown PROVIDER: {PROVIDER!r}")  # mock is handled by the callers
 

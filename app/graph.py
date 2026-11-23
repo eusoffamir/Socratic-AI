@@ -215,6 +215,7 @@ def run_turn(session: dict, answer: Optional[str], progress=None) -> dict:
     """Run one turn. `answer` is None to open a brand new session. progress,
     when given, is called with each real step as it starts, for the page."""
     inputs = {"session": session, "answer": answer}
+    used = llm_client.track_models()
     if progress is None:
         result = _graph.invoke(inputs)
     else:
@@ -227,6 +228,7 @@ def run_turn(session: dict, answer: Optional[str], progress=None) -> dict:
                 for node in chunk:
                     if node in STEP_AFTER:
                         progress(STEP_AFTER[node])
+    result["session"]["turns"][-1]["models"] = used  # which models answered, Gemini or the Groq backup
     return {
         "reply": result["reply"],
         "parts": result["parts"],
