@@ -679,6 +679,8 @@
   .ov-open{margin-top:14px; font:inherit; font-size:13.5px; font-weight:600; padding:7px 16px; border-radius:999px;
            border:1px solid var(--signal); background:none; color:var(--signal); cursor:pointer;}
   .ov-open:hover{background:var(--signal-soft);}
+  .ov-remove{margin-left:8px; border-color:var(--rule); color:var(--ink-soft);}
+  .ov-remove:hover{border-color:var(--caution); color:var(--caution); background:none;}
   .ov-case .meta{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
   .ov-case .lvl{font-size:12.5px; font-weight:600; color:var(--signal); background:var(--signal-soft); padding:2px 10px; border-radius:999px;}
   .ov-by{display:block; margin-top:28px;}
@@ -2320,6 +2322,7 @@ function overallHTML(d){
         </div>
         ${c.comment ? `<p class="ov-coach"><b>Coach</b> ${esc(c.comment)}</p>` : ''}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
+        <button type="button" class="ov-open ov-remove" data-remove-case="${esc(JSON.stringify(c.session_ids || []))}" data-title="${esc(c.title)}">Remove</button>
       </div></details>`;
   }).join('');
   return `<div class="report" data-ex-general>
@@ -2582,6 +2585,14 @@ $('knowBody').addEventListener('keydown', e => {
 $('overallBody').addEventListener('click', e => {
   const b = e.target.closest('[data-open-chat]');
   if(b) askOpen(b.dataset.openChat);
+  // Remove a case from the overall status. Its chat stays in Recents, where × removes it.
+  const r = e.target.closest('[data-remove-case]');
+  if(r && confirm(`Remove ${r.dataset.title} from your overall status?`)){
+    const gone = new Set(JSON.parse(r.dataset.removeCase));
+    try { localStorage.setItem('my-sessions', JSON.stringify(mySessions().filter(id => !gone.has(id)))); } catch(err){}
+    profileDirty();
+    openOverall();
+  }
 });
 
 // ---------- answering ----------
