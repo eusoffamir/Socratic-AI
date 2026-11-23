@@ -437,7 +437,17 @@
   .ask-tools .spacer{flex:1;}
   .privacy-note{margin:18px auto 0; max-width:520px; text-align:center; font-size:12px; line-height:1.5; color:var(--ink-faint);}
   .privacy-note.left{margin:22px 0 0; max-width:none; text-align:left;}
-  .ask-main:not(.empty) .privacy-note{display:none;}
+  .ask-main:not(.empty) .privacy-note, .ask-main:not(.empty) .ask-start{display:none;}
+  /* the tutorial and the skill check as two cards under the chat box, so there is one place to start */
+  .ask-start{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:22px auto 0; width:100%;}
+  .ask-card{display:flex; align-items:center; gap:12px; text-align:left; padding:12px 14px; border-radius:14px;
+            background:var(--panel); border:1px solid var(--rule); color:var(--ink); font:inherit; cursor:pointer; transition:border-color .15s;}
+  .ask-card:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .ask-card .ic{flex:none; width:36px; height:36px; display:grid; place-items:center; border-radius:10px; background:var(--signal-soft); color:var(--signal);}
+  .ask-card .ic svg{width:18px; height:18px;}
+  .ask-card b{display:block; font-size:14px; font-weight:600;}
+  .ask-card small{display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; line-height:1.4;}
+  @media (max-width:560px){ .ask-start{grid-template-columns:1fr;} }
   .ask-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px;}
   .ask-chips button{font-size:12px; padding:4px 11px; border-radius:999px; background:var(--signal-soft);
                     border:1px solid color-mix(in srgb, var(--signal) 20%, transparent); color:var(--signal);}
@@ -1314,14 +1324,14 @@
       <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
     </div>
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
-    <button class="sn-item" id="homeBtn" title="Home" aria-current="page"><svg><use href="#i-home"/></svg><span>Home</span></button>
+    <button class="sn-item hidden" id="homeBtn" title="Home"><svg><use href="#i-home"/></svg><span>Home</span></button>
     <button class="sn-item" id="overallBtn" title="My overall status"><svg><use href="#i-stats"/></svg><span>Overall status</span></button>
     <button class="sn-item" id="knowBtn" title="How the knowledge fits"><svg><use href="#i-graph"/></svg><span>Knowledge</span></button>
     <div class="sn-label">Recents</div>
     <div class="sn-recents" id="recents"></div>
     <div class="sn-account" id="account"></div>  <!-- Sign in with Google, only when the server has a client id -->
     <div class="sn-foot">
-      <button class="icon-btn help-btn" data-tour="home" title="How to use"><svg><use href="#i-help"/></svg></button>
+      <button class="icon-btn help-btn" data-tour="ask" title="How to use"><svg><use href="#i-help"/></svg></button>
       <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
     </div>
   </nav>
@@ -1452,6 +1462,12 @@
       </form>
       <p class="tb-privacy hidden" id="askPrivacy">The file is read by the AI and not saved. Please do not upload private or confidential files.</p>
       <div class="ask-chips" id="askChips"></div>
+      <div class="ask-start">
+        <button type="button" class="ask-card" id="askTut"><span class="ic"><svg><use href="#i-play"/></svg></span>
+          <span><b>New here? Take the tutorial</b><small>Learn how to answer critically, in about 2 minutes</small></span></button>
+        <button type="button" class="ask-card" id="askCheck"><span class="ic"><svg><use href="#i-stats"/></svg></span>
+          <span><b>What kind of thinker are you?</b><small>6 questions to see your reasoning skills</small></span></button>
+      </div>
       <p class="privacy-note">Your answers are saved without your name, to improve the tutor and for our final year project study. Please do not type private details.</p>
       <div id="askStatus" aria-live="polite"></div>
     </div>
@@ -1496,7 +1512,7 @@
       <div class="spacer"></div>
       <span class="status" id="hudLevel"></span>
       <button class="ghost end-btn hidden" id="endBtn" title="Finish now and see your profile">End<span class="end-word"> session</span></button>
-      <button class="top-home" id="topHome" title="Back to Home"><svg><use href="#i-back"/></svg>Home</button>
+      <button class="top-home" id="topHome" title="Back to New chat"><svg><use href="#i-back"/></svg>Back</button>
     </header>
 
     <div class="chat-scroll" id="chatScroll">
@@ -2043,7 +2059,7 @@ function navPush(state){
 const navSetChat = id => history.replaceState({page: 'ask', chat: id}, '');
 function showPage(name){
   navPush({page: name});
-  if(tour.name && name !== 'home') endTour(false);  // the Home tour points at Home, so it is not left over another page
+  if(tour.name && name !== 'ask') endTour(false);  // the start tour points at New chat, so it is not left over another page
   for(const [k, sel] of Object.entries(PAGES)) document.querySelector(sel).classList.toggle('hidden', k !== name);
   // aria-current="page" marks the open page (the highlight style matches that value)
   const mark = (id, on) => on ? $(id).setAttribute('aria-current', 'page') : $(id).removeAttribute('aria-current');
@@ -2057,7 +2073,7 @@ function showPage(name){
 }
 // The Home tour points at Home, so it starts the first time Home is shown.
 function homeTourOnce(){
-  if(!tourSeen('home') && !document.querySelector(PAGES.home).classList.contains('hidden')) setTimeout(() => startTour('home'), 300);
+  if(!tourSeen('ask') && !$('askMain').classList.contains('hidden') && $('askMain').classList.contains('empty')) setTimeout(() => startTour('ask'), 300);
 }
 $('homeBtn').addEventListener('click', () => { showPage('home'); homeTourOnce(); });
 $('askBtn').addEventListener('click', () => { askReset(); showPage('ask'); });
@@ -3397,7 +3413,7 @@ $('openSide').addEventListener('click', () => {
 $('backdrop').addEventListener('click', () => $('sessionView').classList.remove('drawer-open'));
 // Progress is saved after every answer, so going Home needs no warning.
 // Back to Home: a fresh load (the simplest clean state), opened on Home, not the chat
-const goHome = () => location.assign('/?page=home');
+const goHome = () => location.assign('/');
 $('topHome').addEventListener('click', goHome);
 
 // ---------- conversation ----------
@@ -3887,6 +3903,8 @@ function closeCheck(){
 }
 
 $('checkBtn').addEventListener('click', openCheck);
+$('askCheck').addEventListener('click', openCheck);
+$('askTut').addEventListener('click', () => { endTour(true); openReading('tutorial', 'home'); });
 // The skill check measures the learner's own reasoning, so pasting (for
 // example from an AI chatbot) is turned off. It does not stop retyping, which
 // is why the server also checks for chatbot-style answers.
@@ -4374,6 +4392,13 @@ function tutRetry(){
 
 const lastOf = sel => [...document.querySelectorAll(sel)].pop();
 const TOURS = {
+  ask: [
+    {title: 'Welcome', text: 'New here? Take the tutorial first. It is a quick 3-round tour that takes about 2 minutes.', target: '#askTut'},
+    {title: 'Pick a topic', text: 'Then type any topic or question here, or tap one of the ideas below the box.', target: '.ask-box'},
+    {title: 'Rounds', text: 'Choose how many rounds you want, or No limit to keep going.', target: '#askRoundsBtn'},
+    {title: 'Mode', text: 'Choose open questions, or A or B questions that give you 2 choices.', target: '#askModeBtn'},
+    {title: 'Overall status', text: 'See your thinking skills across every chat.', target: '#overallBtn'},
+  ],
   home: [
     {title: 'Welcome', text: 'New here? Start with Socrates for a quick 3-round tour that takes about 2 minutes.', target: '.case-row.tut'},
     {title: 'Cases', text: 'After that, pick a case to start learning.', target: '#cases .case-row'},
@@ -4703,18 +4728,17 @@ async function initStudy(){
 }
 
 // The chat is the first page (the student's choice, 21 October 2026); a case's Home button comes back with ?page=home.
-const firstPage = new URLSearchParams(location.search).get('page') === 'home' ? 'home' : 'ask';
+const firstPage = 'ask';  // Home was folded into New chat (23 November 2026), so ?page=home lands here too
 history.replaceState({page: firstPage}, '', '/');
 showPage(firstPage);
 addEventListener('popstate', e => {
   const s = e.state || {page: 'ask'};
   // a case or the tutorial has its own screen, so going back from it reloads Home
-  if(!$('sessionView').classList.contains('hidden') || s.page === 'case') return location.replace('/?page=home');
+  if(!$('sessionView').classList.contains('hidden') || s.page === 'case') return location.replace('/');
   navRestoring = true;
   try {
     if(s.page === 'status') openOverall();
     else if(s.page === 'knowledge') openKnowledge();
-    else if(s.page === 'home') showPage('home');
     else if(s.chat && askChats().some(x => x.id === s.chat)) askOpen(s.chat);
     else { askReset(); showPage('ask'); }
   } finally { navRestoring = false; }
