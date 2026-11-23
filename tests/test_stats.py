@@ -57,7 +57,7 @@ def test_dina_recovers_known_skills_on_a_small_case():
 
 def test_q_matrix_tags_two_skills_per_question():
     q = dina.q_matrix()
-    assert len(q) == 30 and all(bin(m).count("1") == 2 for m in q.values())
+    assert len(q) == 60 and all(bin(m).count("1") == 2 for m in q.values())
 
 
 def test_export_checks_rows():

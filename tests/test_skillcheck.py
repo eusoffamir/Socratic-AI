@@ -21,11 +21,13 @@ def test_bank_has_two_questions_per_pair():
     for r in REASONING_TYPES:
         for k in CORE_KNOWLEDGE:
             assert len([i for i in skillcheck.ITEMS.values() if i["reasoning"] == r and i["knowledge"] == k]) == 2
-    assert all(i["case"] in CONCEPTS for i in skillcheck.ITEMS.values())
+    assert all(i["case"] is None for i in skillcheck.ITEMS.values())  # everyday questions need no case
+    assert all(i["case"] in CONCEPTS for i in skillcheck.QUANT_ITEMS.values())
 
 
 def test_bank_text_follows_the_writing_rules():
-    for i in skillcheck.ITEMS.values():
+    for i in skillcheck.ALL_ITEMS.values():
+        assert i["id"] in skillcheck.QUANT_ITEMS or len(i["situation"].split()) <= 35 and len(i["question"].split()) <= 25, i["id"]
         text = i["situation"] + " " + i["question"]
         assert "--" not in text and "—" not in text and "!" not in text and ":" not in text, i["id"]
         assert i["question"].endswith("?"), i["id"]

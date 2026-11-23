@@ -307,9 +307,9 @@ Knowledge types, and what using them looks like:
 """ + "\n".join(f"- {k}: the learner {KNOWLEDGE_SIGNS[k]}" for k in CORE_KNOWLEDGE) + """
 
 Examples from another topic:
-- inductive, factual. situation "Over 4 weeks you count how many of 500 stocks went up 5 days in a row, and you get 14, 17, 15 and 16." question "What general idea do these counts suggest about 5 day streaks?"
-- deductive, causal. situation "Hot weather makes people buy more ice cream and also makes more people swim." question "If a town has a heatwave next week, what should happen to both, and why?"
-- abductive, relational. situation "Two bank stocks have moved together almost every day for 5 years." question "What is the most likely explanation for this link?"
+- inductive, causal. situation "Your plant drooped in the week you forgot to water it, in the week it sat in the dark, and in the week it got too hot." question "What do these 3 weeks suggest makes a plant droop?"
+- deductive, factual. situation "Your phone loses about 10% battery every hour while you watch videos, and it has 40% left." question "How long can you keep watching before it dies, and why?"
+- abductive, relational. situation "Your football team has won every match this season when it wore its blue kit." question "What could best explain this link?"
 
 Rules:
 - situation: at most 35 words, concrete, giving the facts the learner needs. Inductive gives at least 3 separate cases or observations (3 places, 3 years, 3 people or 3 results) and asks what general idea they suggest, so 1 example alone is never inductive. Deductive gives a rule and a new case. Abductive gives a surprising observation with information missing.

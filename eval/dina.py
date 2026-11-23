@@ -31,7 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app.skillcheck import ITEMS  # noqa: E402
+from app.skillcheck import ALL_ITEMS as ITEMS  # noqa: E402  (the everyday and the old quant questions)
 from app.stats import SKILLS  # noqa: E402
 
 ATTRS = [name for _, name in SKILLS]
@@ -124,7 +124,7 @@ def real_responses():
             continue
         key = s.get("participant_code") or sid
         for t in s.get("turns", []):
-            if t["item"] in ITEMS:  # the fixed quant bank only; generated topics (Goal 2) have one-off questions
+            if t["item"] in ITEMS:  # the fixed banks only; generated topics (Goal 2) have one-off questions
                 by.setdefault(key, {})[t["item"]] = t["attained"]
     return by
 
