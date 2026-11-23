@@ -1973,9 +1973,11 @@ async function askNext(){
   await askStart(t.cases[0], null, ctx);
 }
 
-// Every 2 answers, the Status panel opens by itself to show the Coach's new comment.
+// Every time the Coach has a new comment, the Status panel opens by itself to show it
+// (or loads again, if it is already open).
 function askProgress(){
   if($('askStats').classList.contains('hidden')) $('askStrip').click();
+  else askStatsLoad();
 }
 
 // A new topic: the Builder writes 1 case, then the chat starts on it.
@@ -2077,7 +2079,8 @@ async function askAnswer(typed){
     askShowTurn(data);
     ask.answers++;
     ask.caseAnswers++;  // the Coach counts per case, not per chat
-    if(ask.caseAnswers % 2 === 0) askProgress();  // a new Coach comment (COACH_EVERY in main.py)
+    if(data.coach_new) askProgress();  // a new Coach comment (COACH_EVERY in main.py)
+    else if(!$('askStats').classList.contains('hidden')) askStatsLoad();  // open, so it stays up to date
     if(data.ended) ask.done = true;
   } catch(err){
     if(!askLive(gen)) return;

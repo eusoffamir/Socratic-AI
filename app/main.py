@@ -186,6 +186,8 @@ def _turn_response(session, result):
         # tool results for the case file chart, newest last
         "tools": _tools_view(result["tool_runs"]),
         "level_idx": session["level_idx"],  # the Ask chat's level dots
+        # a new Coach comment is due, so the Ask chat opens its Status panel to show it
+        "coach_new": bool(session["history"]) and len(session["history"]) % COACH_EVERY == 0,
         "thought": _thought(session["turns"][-1]),  # the Ask chat's folded "Thought process"
         # a short view of what the agents did this turn (for the researcher, not shown as scores)
         "trace": {"plan_reason": (trace["plan"] or {}).get("reason"),
