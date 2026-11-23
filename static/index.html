@@ -215,6 +215,8 @@
   .know-views button{border:1px solid var(--rule); background:var(--panel); border-radius:999px; padding:4px 12px; font-size:13px; color:var(--ink-soft);}
   .know-views button:hover{color:var(--ink);}
   .know-views button[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:#fff;}
+  .know-views .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:0;}
+  .know .am-map .legend:not(.rels){display:none;}  /* the type buttons above carry the colours, so no second key */
   .know-says{color:var(--ink); background:var(--signal-soft); border-radius:10px; padding:10px 14px;}
   @media (max-width:560px){ .know-views{grid-template-columns:1fr;} }
   .know-quote, .know-lesson{font-size:14.5px; line-height:1.6; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:12px 14px;}
@@ -2265,6 +2267,11 @@ function askMapHTML(c, opts = {}){
   const depth = Object.fromEntries(nodes.map(n => [n.id, 0]));
   for(let k = 0; k < nodes.length; k++)  // longest path from a start; a loop stops after nodes.length rounds
     for(const [a, , b] of edges) if(depth[b] < depth[a] + 1) depth[b] = Math.min(depth[a] + 1, 4);
+  for(let k = 0; k < nodes.length; k++)  // then move each box as far right as its arrows allow, so it sits next to what it points to
+    for(const n of nodes){
+      const outs = edges.filter(([a, , b]) => a === n.id && depth[b] > depth[n.id]).map(([, , b]) => depth[b]);
+      if(outs.length) depth[n.id] = Math.max(depth[n.id], Math.min(...outs) - 1);
+    }
   const cols = [];
   nodes.forEach(n => (cols[depth[n.id]] = cols[depth[n.id]] || []).push(n));
   const W = 136, H = 42, CX = opts.labels ? 236 : 172, RY = 60, PAD = 14, used = cols.filter(Boolean);  // wider gaps leave room for the arrow words
@@ -3063,15 +3070,15 @@ async function renderKnowPane(c){
     if(!map){ pane.innerHTML = '<p class="know-none">This case has no knowledge map.</p>'; return; }
     const nodes = c.knowledge.nodes, types = KNOWLEDGE_NAMES.filter(t => nodes.some(n => n.type === t));
     const lit = Number((map.match(/data-lit="(\d+)"/) || [])[1] || 0);
-    const pick = (attr, val, label, on) => `<button type="button" ${attr}="${val}" aria-pressed="${on}">${label}</button>`;
+    const pick = (attr, val, label, on, dot) => `<button type="button" ${attr}="${val}" aria-pressed="${on}">${dot ? `<i class="kdot" style="background:${dot}"></i>` : ''}${label}</button>`;
     const says = v.focus ? `${capFirst(v.focus)} knowledge answers the question "${KNOW_QUESTION[v.focus]}", and ${(k => `${k} of the ${nodes.length} pieces here ${k === 1 ? 'is' : 'are'}`)(nodes.filter(n => n.type === v.focus).length)} ${v.focus}. The bright arrows show how they link to the rest.`
       : v.move === 'deductive' ? 'Deductive reasoning walks forward along the arrows, from facts and rules to a conclusion. The bright arrows are the forward steps it can take.'
       : v.move === 'inductive' ? (lit ? 'Inductive reasoning counts many cases to reach a general idea. The bright arrows start from a counted result, or join several pieces into one idea.'
                                       : 'Inductive reasoning counts many cases to reach a general idea, but this map has no counted result or joined pieces yet.')
       : v.move === 'abductive' ? 'Abductive reasoning walks the arrows backwards, from what was seen to what best explains it, so every arrow is turned round. This is also how a system can trace a fault back to its cause.'
-      : 'Each box is one piece of knowledge, and each arrow says how two pieces link. Tap a box to see where it comes from, or pick a type or a reasoning move to see it on its own.';
+      : 'Each box is one idea, and each arrow shows how two ideas link. Tap a box to see where it comes from.';
     pane.innerHTML = `<div class="know-views">
-        <span class="mono-label">Knowledge type</span><div class="row">${pick('data-kfocus', '', 'All', !v.focus && !v.move)}${types.map(t => pick('data-kfocus', t, capFirst(t), v.focus === t)).join('')}</div>
+        <span class="mono-label">Knowledge type</span><div class="row">${pick('data-kfocus', '', 'All', !v.focus && !v.move)}${types.map(t => pick('data-kfocus', t, capFirst(t), v.focus === t, MAP_COLORS[t] || 'var(--ink-faint)')).join('')}</div>
         <span class="mono-label">Reasoning move</span><div class="row">${['deductive', 'inductive', 'abductive'].map(m => pick('data-kmove', m, capFirst(m), v.move === m)).join('')}</div></div>
       <p class="know-intro${v.focus || v.move ? ' know-says' : ''}">${esc(says)}</p>
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
