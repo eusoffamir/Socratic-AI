@@ -679,7 +679,12 @@
   .report .ov-cases + h2{margin-top:56px;}
   /* skill check pop-up (Goal 1) */
   .ck-card{width:min(680px, 94vw);}
-  .ck-question{font-size:16.5px; line-height:1.5; margin:0 0 16px;}
+  /* one short row for the skill check header: title, then the question count */
+  .ck-card .rm-head{display:flex; align-items:baseline; gap:12px; padding:14px 56px 12px 28px;}
+  .ck-card .rm-head h2{order:-1; font-size:20px; margin:0;}
+  .ck-card .rm-head .num{margin-left:0;}
+  .ck-card .rm-head .rm-x{top:8px; right:12px;}
+  .ck-question{font-size:16.5px; line-height:1.5; margin:0 0 26px;}
   .ck-body .composer-box{margin-bottom:18px;}
   .ck-tools{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
   .ck-acts{display:flex; align-items:center; gap:6px;}
