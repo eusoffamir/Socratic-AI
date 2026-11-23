@@ -704,6 +704,13 @@
   .ov-open:hover{background:var(--signal-soft);}
   .ov-remove{margin-left:8px; border-color:var(--rule); color:var(--ink-soft);}
   .ov-remove:hover{border-color:var(--caution); color:var(--caution); background:none;}
+  .sk-card .sk-clear{margin-top:18px;}
+  .ov-clear{margin-top:48px; padding-top:18px; border-top:1px solid var(--rule);}
+  .ov-clear .ov-remove{margin-left:0;}
+  /* × on each case row, to remove it without opening it */
+  .ov-x{flex:none; margin-left:4px; width:28px; height:28px; padding:0; border:0; border-radius:8px; background:none;
+    color:var(--ink-faint); font-size:18px; line-height:1; display:grid; place-items:center;}
+  .ov-x:hover{color:var(--caution); background:var(--panel-2); opacity:1;}
   .ov-case .meta{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
   .ov-case .lvl{font-size:12.5px; font-weight:600; color:var(--signal); background:var(--signal-soft); padding:2px 10px; border-radius:999px;}
   .ov-by{display:block; margin-top:28px;}
@@ -2338,7 +2345,8 @@ function overallHTML(d){
     return `<details class="ov-case-d"><summary class="ov-case">
         <span class="t">${esc(c.title)}<small>${esc(c.topic || '')}</small></span>
         <span class="meta">${plural(c.rounds, 'round')}</span>
-        <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></summary>
+        <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span>
+        <button type="button" class="ov-x" title="Remove from your overall status" aria-label="Remove ${esc(c.title)}" data-remove-case="${esc(JSON.stringify(c.session_ids || []))}" data-title="${esc(c.title)}">&times;</button></summary>
       <div class="ov-case-more">
         <div class="ov-pills">
           <span>${c.finished ? 'Finished' : 'Not finished'}</span>
@@ -2347,7 +2355,6 @@ function overallHTML(d){
         </div>
         ${c.comment ? `<p class="ov-coach"><b>Coach</b> ${esc(c.comment)}</p>` : ''}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
-        <button type="button" class="ov-open ov-remove" data-remove-case="${esc(JSON.stringify(c.session_ids || []))}" data-title="${esc(c.title)}">Remove</button>
       </div></details>`;
   }).join('');
   return `<div class="report" data-ex-general>
@@ -2430,6 +2437,8 @@ async function openOverall(){
   try {
     const d = await postJSON('/api/overview', {session_ids: ids});
     body.innerHTML = overallHTML(d);
+    if(d.sessions_played || d.mastery)
+      body.insertAdjacentHTML('beforeend', '<div class="ov-clear"><button type="button" class="ov-open ov-remove" data-clear-all>Clear all my data</button></div>');
     // the Coach on every case, after the page shows, because it may be an AI call
     if($('ovCoach')) postJSON('/api/overview/coach', {session_ids: ids})
       .then(c => { const box = $('ovCoach'); if(box) box.innerHTML = c.comment
@@ -2450,6 +2459,22 @@ async function openOverall(){
 }
 
 $('overallBtn').addEventListener('click', openOverall);
+
+// Clear data. This only forgets the ids in this browser and the signed-in profile;
+// the saved answers stay in the database for the research, with no name on them.
+document.addEventListener('click', e => {
+  if(e.target.closest('[data-clear-checks]')
+     && confirm('Clear all your skill checks? Your mastery starts again from 0, and your chats stay.')){
+    try { localStorage.setItem('my-checks', '[]'); } catch(err){}
+    profileDirty();
+    openOverall();
+  }
+  if(e.target.closest('[data-clear-all]')
+     && confirm('Clear all your data? Your chats, topics, cases and skill checks will all be gone from this app.')){
+    SYNC_KEYS.forEach(k => { try { localStorage.setItem(k, '[]'); } catch(err){} });
+    Promise.resolve(profilePush()).finally(() => location.reload());
+  }
+});
 
 // ---------- Knowledge page (Goal 3): one case's knowledge from books, rules of thumb and data ----------
 const know = {id: null, tab: 'books', views: {}, answers: {}, view: null};  // view is {focus: type} or {move: reasoning type}
@@ -2612,6 +2637,7 @@ $('overallBody').addEventListener('click', e => {
   if(b) askOpen(b.dataset.openChat);
   // Remove a case from the overall status. Its chat stays in Recents, where × removes it.
   const r = e.target.closest('[data-remove-case]');
+  if(r) e.preventDefault();  // the × sits in the row, so it must not also open the case
   if(r && confirm(`Remove ${r.dataset.title} from your overall status?`)){
     const gone = new Set(JSON.parse(r.dataset.removeCase));
     try { localStorage.setItem('my-sessions', JSON.stringify(mySessions().filter(id => !gone.has(id)))); } catch(err){}
@@ -2816,7 +2842,7 @@ function skillsSimpleHTML(m, withButton = true){
       <div class="sk-col"><h4>Practise next</h4>${next.length
         ? `<ul>${next.map(r => li(r)).join('')}</ul>`
         : '<p class="sk-none">You have mastered every skill.</p>'}</div>
-    </div>${button}</div>`;
+    </div>${button}${withButton ? '<button type="button" class="ov-open ov-remove sk-clear" data-clear-checks>Clear my skill checks</button>' : ''}</div>`;
 }
 
 // Mastery so far, from every skill check in this browser. The bar is the 90%
