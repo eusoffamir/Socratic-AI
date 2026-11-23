@@ -348,8 +348,8 @@
   .am-case .t .tag{background:var(--signal); color:var(--paper);}
   .am-fb{color:var(--ink-soft);}
   .am-q{font-weight:600;}
-  .am-ai .am-opts{display:flex; flex-wrap:wrap; justify-content:center; gap:12px 64px; margin:4px 0 10px; font-family:var(--sans);}  /* side by side, centred, wide gap */
-  .am-ai .am-opts .choice{flex:0 1 auto; min-width:0; font-size:14px; font-weight:400; padding:12px 28px 12px 18px; gap:16px;}
+  .am-ai .am-opts{display:flex; flex-wrap:wrap; justify-content:center; gap:12px clamp(20px, 5vw, 56px); margin:4px 0 10px; font-family:var(--sans);}  /* side by side, centred, wide gap */
+  .am-ai .am-opts .choice{flex:0 1 auto; min-width:min(240px, 100%); font-size:14px; font-weight:400; padding:12px 40px 12px 22px; gap:16px;}
   .am-ai .am-opts .choice .l{width:28px; height:28px; font-size:13px;}
   .am-qrow{display:flex; align-items:center; gap:16px; margin:4px 0 14px;}
   /* the last thing in a Socratic message adds no space of its own, so the learner's answer sits closer */
@@ -602,7 +602,7 @@
   .choice{justify-content:center; text-align:center;}
   /* narrower buttons, centred as a pair */
   /* each button fits its words, and the pair sits in the middle with a wide gap */
-  .choices{justify-content:center; column-gap:64px;}
+  .choices{justify-content:center; column-gap:clamp(20px, 5vw, 56px);}
   .choices .choice{flex:0 1 auto; min-width:0; padding-left:20px; padding-right:28px;}
   /* A and B both use the theme green; the letter badge tells them apart */
   .choice{--c:var(--signal); --c-soft:var(--signal-soft);}
