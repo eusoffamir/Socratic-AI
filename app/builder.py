@@ -313,6 +313,7 @@ Examples from another topic:
 
 Rules:
 - situation: at most 35 words, concrete, giving the facts the learner needs. Inductive gives at least 3 separate cases or observations (3 places, 3 years, 3 people or 3 results) and asks what general idea they suggest, so 1 example alone is never inductive. Deductive gives a rule and a new case. Abductive gives a surprising observation with information missing.
+- Make each situation fun and easy to picture, so a learner wants to answer it. Use a named person, a friend, a social media post, a game, a film or everyday student life. The fun never changes the facts, the reasoning type or the knowledge type the question needs.
 - question: at most 20 words, exactly one question, ending with "?".
 - Use only well known facts about the topic. Easy English, short smooth sentences, no colons joining parts, no dashes, no emoji. Chances and shares as percentages, never fractions or words like "half" or "one in three".
 - case: the number (1, 2 or 3) of the case it fits best.
