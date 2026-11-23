@@ -872,9 +872,16 @@
   details.ov-case-d > summary:hover{outline:1px solid var(--signal); outline-offset:-1px;}
   details.ov-case-d[open] > summary{border-radius:10px 10px 0 0;}
   .ov-case-more{padding:4px 14px 16px; background:var(--panel-2); border-radius:0 0 10px 10px; border-top:1px solid var(--rule);}
-  .ov-case-more > p.meta{font-family:var(--mono); font-size:12px; color:var(--ink-faint); margin:10px 0 0;}
-  .ov-case-more .coach-comment{margin-top:12px; padding-top:0; border-top:0;}
-  .ov-case-more .coach-comment p{font-size:14.5px;}
+  .ov-tiles{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin:14px 0 0;}
+  .ov-tiles > div{background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:10px 14px;}
+  .ov-tiles span{display:block; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint);}
+  .ov-tiles b{display:block; font-size:17px; font-weight:600; margin-top:3px;}
+  .ov-tiles small{display:block; font-size:12.5px; color:var(--ink-soft);}
+  .ov-coach{margin-top:12px; padding:12px 16px; border-left:3px solid var(--signal); background:var(--panel); border-radius:4px 10px 10px 4px;}
+  .ov-coach .mono-label{display:block; margin-bottom:6px;}
+  .ov-coach p{margin:0; font-size:14.5px; line-height:1.6; max-width:760px;}
+  .ov-nocoach{margin:12px 0 0; font-size:13.5px; color:var(--ink-faint);}
+  @media (max-width:560px){ .ov-tiles{gap:6px;} .ov-tiles > div{padding:8px 10px;} .ov-tiles span{font-size:10px;} .ov-tiles b{font-size:14px;} .ov-tiles small{font-size:11.5px;} }
   .ov-open{margin-top:14px; font:inherit; font-size:13.5px; font-weight:600; padding:7px 16px; border-radius:999px;
            border:1px solid var(--signal); background:none; color:var(--signal); cursor:pointer;}
   .ov-open:hover{background:var(--signal-soft);}
@@ -2962,15 +2969,20 @@ function overallHTML(d){
         <span class="meta">${plural(c.rounds, 'round')}</span>
         <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></summary>
       <div class="ov-case-more">
-        <p class="meta">${c.finished ? 'Finished' : 'Not finished yet'} · played ${c.sessions === 1 ? 'once' : `${c.sessions} times`} · ${(Math.round(avg * 10) / 10)} of 9 standards on average · weakest is ${esc(weakest)}</p>
-        ${c.comment ? `<div class="coach-comment"><div class="mono-label">Coach</div><p>${esc(c.comment)}</p></div>`
-                    : '<p class="meta">The coach comments after 2 answers.</p>'}
+        <div class="ov-tiles">
+          <div><span>Status</span><b>${c.finished ? 'Finished' : 'Not finished'}</b><small>played ${c.sessions === 1 ? 'once' : c.sessions === 2 ? 'twice' : `${c.sessions} times`}</small></div>
+          <div><span>Standards met</span><b>${(Math.round(avg * 10) / 10)} of 9</b><small>on average</small></div>
+          ${c.rounds && (met[weakest] || 0) >= c.rounds ? '<div><span>Work on</span><b>Nothing</b><small>you met all 9</small></div>'
+            : `<div><span>Work on</span><b>${esc(cap(weakest))}</b><small>your weakest standard</small></div>`}
+        </div>
+        ${c.comment ? `<div class="ov-coach"><span class="mono-label">Coach</span><p>${esc(c.comment)}</p></div>`
+                    : '<p class="ov-nocoach">No coach comment yet. It comes after 2 answers.</p>'}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
       </div></details>`;
   }).join('');
   return `<div class="report" data-ex-general>
     <span class="mono-label ov-by">Your cases</span><div class="ov-cases">${cases}</div>
-    <h2>Your highest level is <em>${esc(s.highest_level_reached)}</em></h2>
+    <h2>Your overall highest level is <em>${esc(s.highest_level_reached)}</em></h2>
     <div class="report-grid ov-three">
       <div><div class="ov-std-head"><span class="mono-label">6 Socratic Questions</span>${caseFilterHTML(d.cases, 'ovLevelFilter')}</div>
         <div id="ovLadder">${ladderHTML(d.levels, reachedIdx, 'Highest level')}</div></div>
