@@ -2630,10 +2630,6 @@ const SKILL_PLAIN = {inductive: 'Spot a pattern from examples', deductive: 'Appl
 const skillName = w => w[0].toUpperCase() + w.slice(1);
 
 // What to try next for each skill, in one short sentence
-const SKILL_TIP = {inductive: 'Look at several examples and say what they share.', deductive: 'Start from a rule, then say what it means here.',
-  abductive: 'Ask what best explains what you see, and why.', factual: 'Back your point with a fact or a number.',
-  conceptual: 'Say what a key word means in your own words.', procedural: 'Say the steps you would take to check it.',
-  causal: 'Explain why it happens, not only what happens.', relational: 'Say how one thing changes when another does.'};
 
 // The learner's view of the skill checks: what they are strong at and what to practise next, in plain words.
 // The bars and grids stay on the Full data tab for the study.
@@ -2654,7 +2650,7 @@ function skillsSimpleHTML(m, withButton = true){
       ${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
         <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div>` : ''}
       <div class="sk-col"><h4>Practise next</h4>${next.length
-        ? `<ul>${next.map(r => li(r, `<small>${esc(SKILL_TIP[r.skill] || '')}</small>`)).join('')}</ul>`
+        ? `<ul>${next.map(r => li(r)).join('')}</ul>`
         : '<p class="sk-none">You have mastered every skill.</p>'}</div>
     </div>${button}</div>`;
 }
