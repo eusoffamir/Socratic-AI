@@ -1514,8 +1514,10 @@ $('askForm').addEventListener('drop', e => {
   if(e.dataTransfer.files[0]) setAskFile(e.dataTransfer.files[0]);
 });
 $('askInput').addEventListener('paste', e => {
+  // Word and browsers often put a picture of the copied text on the clipboard too, so plain text wins
+  if(e.clipboardData?.getData('text/plain')) return;
   const f = [...(e.clipboardData?.files || [])][0];
-  if(f){ e.preventDefault(); setAskFile(f); }
+  if(f && FILE_TYPES.test(f.name)){ e.preventDefault(); setAskFile(f); }
 });
 $('askInput').addEventListener('input', () => {  // the box grows with the text
   const t = $('askInput');
