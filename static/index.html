@@ -351,6 +351,11 @@
   .am-ai .am-opts{display:flex; flex-wrap:wrap; justify-content:center; gap:12px clamp(20px, 5vw, 56px); margin:4px 0 10px; font-family:var(--sans);}  /* side by side, centred, wide gap */
   .am-ai .am-opts .choice{flex:0 1 auto; min-width:min(240px, 100%); font-size:14px; font-weight:400; padding:12px 40px 12px 22px; gap:16px;}
   .am-ai .am-opts .choice .l{width:28px; height:28px; font-size:13px;}
+  /* the letter stays on the left edge and the words sit in the middle of the button
+     (the right margin matches the letter and its gap, so the words are truly centred) */
+  .am-ai .am-opts .choice{justify-content:flex-start;}
+  .am-ai .am-opts .choice{padding-left:22px; padding-right:22px;}
+  .am-ai .am-opts .choice .t{flex:1; text-align:center; margin-right:44px;}
   .am-qrow{display:flex; align-items:center; gap:16px; margin:4px 0 14px;}
   /* the last thing in a Socratic message adds no space of its own, so the learner's answer sits closer */
   .am-ai > :last-child, .am-ai > :has(+ .am-key.hidden:last-child){margin-bottom:0;}
@@ -1763,7 +1768,7 @@ function askCaseHTML(c){
 // One tutor turn inside a Socratic message: feedback, question, A/B choices, hint.
 function askTurnHTML(p){
   const opts = !p.options || p.options.length !== 2 ? '' : `<div class="am-opts choices">${p.options.map((o, i) =>
-    `<button class="choice" type="button" aria-pressed="false" data-i="${i}"><span class="l">${'AB'[i]}</span>${esc(o)}</button>`).join('')}</div>`;
+    `<button class="choice" type="button" aria-pressed="false" data-i="${i}"><span class="l">${'AB'[i]}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>`;
   return `${p.feedback ? `<p class="am-fb">${inline(p.feedback)}</p>` : ''}
     ${p.question ? `<div class="am-qrow"><p class="am-q">${inline(p.question)}</p>${p.key_idea
       ? `<button type="button" class="hint-btn" aria-expanded="false" aria-label="Show hint" title="Hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}</div>` : ''}
