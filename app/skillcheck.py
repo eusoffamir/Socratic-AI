@@ -350,6 +350,51 @@ REASONING_TIPS = {
 }
 
 
+# The same plain names as the page (SKILL_PLAIN in index.html)
+PLAIN = {"inductive": "Spot a pattern from examples", "deductive": "Apply a rule to a case",
+         "abductive": "Find the best explanation", "factual": "facts and numbers", "conceptual": "what ideas mean",
+         "procedural": "steps and methods", "causal": "why things happen", "relational": "how things link"}
+
+
+def coach_answers(checks):
+    """Every answer of these checks, oldest first, in the shape the skill Coach reads."""
+    out = []
+    for check in checks:
+        bank = check.get("bank") or ALL_ITEMS
+        for t in check["turns"]:
+            item = bank.get(t["item"], {})
+            out.append({"question": f'{item.get("situation", "")} {item.get("question", "")}'.strip(),
+                        "answer": t.get("answer", ""),
+                        "skill": f'{PLAIN[t["reasoning"]]}, with {PLAIN[t["knowledge"]]}',
+                        "showed_it": bool(t["attained"]), "ai_like": bool(t.get("ai_like"))})
+    return out
+
+
+def coach_fallback(turns):
+    """A plain paragraph when the model is not used: the skill shown most,
+    the one missed most, and how to show it."""
+    if not turns:
+        return None
+    rate = {}
+    for t in turns:
+        a, n = rate.get(t["reasoning"], (0, 0))
+        rate[t["reasoning"]] = (a + t["attained"], n + 1)
+    share = lambda r: rate[r][0] / rate[r][1]  # noqa: E731
+    best, worst = max(rate, key=share), min(rate, key=share)
+    out = []
+    if any(t.get("ai_like") for t in turns):
+        out.append("Some answers read like an AI chatbot wrote them, so they scored 0, and next time use your own words.")
+    doing = {"inductive": "spotting a pattern from examples", "deductive": "applying a rule to a case",
+             "abductive": "finding the best explanation"}
+    if rate[best][0] and best != worst:
+        out.append(f"So far you are best at {doing[best]}.")
+    if share(worst) < 1:
+        out.append(f"Work on {doing[worst]} next, so {REASONING_TIPS[worst][0].lower()}{REASONING_TIPS[worst][1:]}")
+    else:
+        out.append("You showed the right kind of thinking every time, so keep giving a clear reason in each answer.")
+    return " ".join(out)
+
+
 def review(check):
     """Each answered question with whether the target skill was shown, and a
     short tip for a miss, so the learner knows what to do differently."""

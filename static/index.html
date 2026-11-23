@@ -597,7 +597,8 @@
   #log .card .q{font-size:15px;}
   #log{gap:24px;}
 
-  .choices{display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .choices{display:flex; gap:20px; margin-bottom:12px; flex-wrap:wrap;}
+  .choice{justify-content:center; text-align:center;}
   /* A and B both use the theme green; the letter badge tells them apart */
   .choice{--c:var(--signal); --c-soft:var(--signal-soft);}
   .choice{
@@ -705,6 +706,8 @@
   .ov-remove{margin-left:8px; border-color:var(--rule); color:var(--ink-soft);}
   .ov-remove:hover{border-color:var(--caution); color:var(--caution); background:none;}
   .sk-card .sk-clear{margin-top:18px;}
+  .sk-card .sk-coach{margin-top:4px; padding-top:14px;}
+  .sk-cols + .sk-coach{margin-top:18px;}
   .ov-clear{margin-top:48px; padding-top:18px; border-top:1px solid var(--rule);}
   .ov-clear .ov-remove{margin-left:0;}
   /* × on each case row, to remove it without opening it */
@@ -2439,6 +2442,7 @@ async function openOverall(){
     body.innerHTML = overallHTML(d);
     if(d.sessions_played || d.mastery)
       body.insertAdjacentHTML('beforeend', '<div class="ov-clear"><button type="button" class="ov-open ov-remove" data-clear-all>Clear all my data</button></div>');
+    fillSkillCoach();
     // the Coach on every case, after the page shows, because it may be an AI call
     if($('ovCoach')) postJSON('/api/overview/coach', {session_ids: ids})
       .then(c => { const box = $('ovCoach'); if(box) box.innerHTML = c.comment
@@ -2830,19 +2834,22 @@ function skillsSimpleHTML(m, withButton = true){
   const plain = r => SKILL_PLAIN[r.skill] || r.skill;
   const strong = m.skills.filter(r => r.status === 'mastered');
   const almost = m.skills.filter(r => r.status === 'not sure yet');
-  const rank = {'not mastered yet': 0, 'not sure yet': 1, 'not enough answers': 2};
-  const next = m.skills.filter(r => r.status !== 'mastered' && r.status !== 'not sure yet').sort((a, b) => rank[a.status] - rank[b.status] || a.mean - b.mean).slice(0, 3);
-  const few = m.skills.every(r => r.status === 'not enough answers');
   const li = (r, extra = '', cls = '') => `<li${cls ? ` class="${cls}"` : ''}><b>${esc(plain(r))}</b>${extra}</li>`;
+  // the Coach paragraph (fillSkillCoach) says what to work on and how, so no Practise next list
   return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
-    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : strong.length ? '' : ' A skill counts once you show it in a few answers across checks, so it grows as you practise.'}</p>
-    <div class="sk-cols">
-      ${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
-        <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div>` : ''}
-      <div class="sk-col"><h4>Practise next</h4>${next.length
-        ? `<ul>${next.map(r => li(r)).join('')}</ul>`
-        : '<p class="sk-none">You have mastered every skill.</p>'}</div>
-    </div>${button}${withButton ? '<button type="button" class="ov-open ov-remove sk-clear" data-clear-checks>Clear my skill checks</button>' : ''}</div>`;
+    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.</p>
+    ${strong.length || almost.length ? `<div class="sk-cols"><div class="sk-col ok"><h4>Going well</h4>
+      <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div></div>` : ''}
+    <div class="coach-comment sk-coach" data-skill-coach><div class="mono-label">Coach</div><p class="thinking">${DOTS}</p></div>
+    ${button}${withButton ? '<button type="button" class="ov-open ov-remove sk-clear" data-clear-checks>Clear my skill checks</button>' : ''}</div>`;
+}
+// Fills every Coach box on the skill checks card, after the card shows (it may be an AI call)
+function fillSkillCoach(){
+  const boxes = document.querySelectorAll('[data-skill-coach]');
+  if(!boxes.length) return;
+  postJSON('/api/overview/skill-coach', {session_ids: myChecks()})
+    .then(c => boxes.forEach(b => c.comment ? b.innerHTML = `<div class="mono-label">Coach</div><p>${esc(c.comment)}</p>` : b.remove()))
+    .catch(() => boxes.forEach(b => b.remove()));
 }
 
 // Mastery so far, from every skill check in this browser. The bar is the 90%
@@ -2965,7 +2972,7 @@ function showCheck(d){
     $('ckSend').focus();
     // mastery uses every check from this browser, not only this one
     postJSON('/api/overview', {session_ids: myChecks()})
-      .then(o => { const box = $('ckMastery'); if(box) box.innerHTML = skillsSimpleHTML(o.mastery, false); })
+      .then(o => { const box = $('ckMastery'); if(box){ box.innerHTML = skillsSimpleHTML(o.mastery, false); fillSkillCoach(); } })
       .catch(() => {});
     return;
   }

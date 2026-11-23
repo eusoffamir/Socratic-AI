@@ -81,6 +81,9 @@ def test_api_runs_a_whole_check(monkeypatch, tmp_path):
     # each question comes back with a tick, or a tip on how to answer it next time
     assert len(r["review"]) == q["total"]
     assert all(v["question"] and bool(v["tip"]) != bool(v["attained"]) for v in r["review"])
+    # the skill Coach (mock mode) falls back to a plain paragraph
+    assert c.post("/api/overview/skill-coach", json={"session_ids": [cid]}).json()["comment"]
+    assert c.post("/api/overview/skill-coach", json={"session_ids": []}).json()["comment"] is None
     ov = c.post("/api/overview", json={"session_ids": [cid]}).json()
     assert ov["skill_check"]["answers"] == q["total"] and ov["sessions_played"] == 0
     # the next check avoids the questions already answered

@@ -641,6 +641,32 @@ def overview(req: OverviewRequest):
 _overall_comments = {}
 
 
+@app.post("/api/overview/skill-coach")
+def overview_skill_coach(req: OverviewRequest):
+    """One Coach paragraph on the skill checks in this browser: which skill to
+    work on and how. Kept per set of answers, so it costs one call per new check."""
+    sids = list(dict.fromkeys(filter(None, map(_clean_id, req.session_ids[:300]))))
+    SESSIONS.update(storage.load_sessions([sid for sid in sids if sid not in SESSIONS]))
+    checks = [(sid, s) for sid, s in ((sid, SESSIONS.get(sid)) for sid in sids)
+              if s and s.get("mode") == "skill_check" and s["turns"]]
+    if not checks:
+        return {"comment": None}
+    key = ("skill",) + tuple(sorted((sid, len(s["turns"])) for sid, s in checks))
+    if key in _overall_comments:
+        return {"comment": _overall_comments[key]}
+    checks = [s for _, s in checks]
+    try:
+        text = llm_client.call_skill_coach(skillcheck.coach_answers(checks))
+    except Exception:  # any model problem: fall back, never block the page
+        text = None
+    if not text:
+        return {"comment": skillcheck.coach_fallback([t for c in checks for t in c["turns"]])}
+    if len(_overall_comments) > 500:
+        _overall_comments.clear()
+    _overall_comments[key] = text
+    return {"comment": text}
+
+
 @app.post("/api/overview/coach")
 def overview_coach(req: OverviewRequest):
     """One Coach paragraph on how the learner answers across every case played
