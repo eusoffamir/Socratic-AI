@@ -3,6 +3,8 @@ runs on a generated case with no quant content."""
 import copy
 
 import pytest
+import json
+
 from fastapi.testclient import TestClient
 
 from app import builder, limits, llm_client, main, orchestrator, prompts, reasoning
@@ -219,3 +221,29 @@ def test_broken_rules_or_model_are_dropped_not_the_case():
     assert [n.get("why") for n in case["heuristics"]["nodes"]] == ["n1", None, "rate"]
     assert case["model"]["findings"][3]["percent"] > 30
     assert case["model"]["findings"][3]["label"] == "it is true, after seeing that a sign shows and another sign shows"
+
+
+def test_build_streams_its_real_steps(monkeypatch):
+    # 23 Nov 2026: the page shows each step of the build as it happens.
+    steps = []
+    monkeypatch.setattr(llm_client, "PROVIDER", "gemini")
+    monkeypatch.setattr(builder.sources, "find", lambda r, a=None: None)
+    monkeypatch.setattr(llm_client, "_generate", lambda *a, **k: json.dumps(builder._mock("Rivers", 1)))
+    builder._CACHE.clear()
+    builder.build("Rivers", count=1, progress=steps.append)
+    assert steps == ["Searching Wikipedia for Rivers", "No Wikipedia article found, so writing from general knowledge",
+                     "Writing the case", "Checking the facts and quotes"]
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    r = TestClient(main.app).post("/api/topic", json={"text": "Volcanoes", "count": 1, "stream": True})
+    lines = [json.loads(x) for x in r.text.splitlines()]
+    assert len(lines[-1]["topic"]["cases"]) == 1
+    bad = TestClient(main.app).post("/api/topic", json={"text": "x", "stream": True})
+    assert json.loads(bad.text.splitlines()[-1])["status"] == 400
+
+
+def test_short_topics_get_angles():
+    assert builder.short_topic("thanos") and not builder.short_topic("Was Thanos right?")
+    assert not builder.short_topic("why do quants look for patterns in prices")
+    c = TestClient(main.app)
+    assert len(c.post("/api/topic/angles", json={"text": "thanos"}).json()["angles"]) == 3
+    assert c.post("/api/topic/angles", json={"text": "Was Thanos right?"}).json()["angles"] == []

@@ -296,6 +296,13 @@
            border-radius:16px; padding:10px 16px; font-size:15px; white-space:pre-wrap; overflow-wrap:anywhere;}
   .am-user + .am-ai{margin-top:16px;}  /* more room after an answer, before the next Thought process */
   .am-status{color:var(--ink-faint); font-size:14.5px; display:flex; align-items:center; gap:8px;}
+  /* the real steps of writing a case, ticked off as the server reports them */
+  .build-steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px;}
+  .build-steps li{display:flex; align-items:center; gap:8px;}
+  .build-steps li.done{color:var(--ink-soft);}
+  .build-steps li.done::before{content:"\2713"; color:var(--signal); font-weight:700; width:22px; text-align:center;}
+  .build-steps li.now{color:var(--ink);}
+  .build-steps li.now .dots{width:22px;}
   .am-ai{font-family:var(--sans); font-size:15px; line-height:1.6; color:var(--ink);}  /* sans like the rest of the chat (the student found 3 fonts too many) */
   .am-ai p{margin:0 0 12px;}
   details.am-case summary{list-style:none; cursor:pointer; position:relative;}
@@ -1466,6 +1473,44 @@ function askAdd(className, html){
   return n;
 }
 function askStatus(text){ return askAdd('am-status', `${DOTS}${esc(text)}`); }
+
+// Writes a case and shows each real step the server reports (searching
+// Wikipedia, reading the article, writing, checking), ticking off the ones done.
+async function buildTopic(body, wait){
+  let res;
+  try {
+    res = await fetch('/api/topic', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                     body: JSON.stringify({...body, stream: true})});
+  } catch(e){ throw new Error('No connection. Is the server running?'); }
+  lastReply = Date.now();
+  if(!res.ok || !res.body){
+    let data = null;
+    try { data = await res.json(); } catch(e){}
+    const detail = data && data.detail;
+    throw new Error(typeof detail === 'string' ? detail : `Server error (${res.status}).`);
+  }
+  const steps = [];
+  const draw = () => wait.innerHTML = `<ul class="build-steps">${steps.map((t, i) => i < steps.length - 1
+    ? `<li class="done">${esc(t)}</li>` : `<li class="now">${DOTS}${esc(t)}</li>`).join('')}</ul>`;
+  const reader = res.body.getReader(), dec = new TextDecoder();
+  let buf = '';
+  for(;;){
+    const {value, done} = await reader.read();
+    if(value) buf += dec.decode(value, {stream: true});
+    let nl;
+    while((nl = buf.indexOf('\n')) >= 0){
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if(!line) continue;
+      const m = JSON.parse(line);
+      if(m.step){ steps.push(m.step); draw(); }
+      else if(m.topic) return m.topic;
+      else throw new Error(m.error || 'The topic could not be built, so please try again.');
+    }
+    if(done) break;
+  }
+  throw new Error('The connection was lost, so please try again.');
+}
 function askLock(on){
   ask.busy = on;
   $('askSend').disabled = $('askInput').disabled = $('askAdd').disabled = $('askMic').disabled = on;
@@ -1967,10 +2012,10 @@ async function askNext(){
   askPending.set(ctx.chatId, {name: (askChats().find(x => x.id === ctx.chatId) || {}).name || ask.cases[0].title});
   renderRecents();
   askLock(true);
-  const wait = askStatus('Writing a new case. This takes 20 to 40 seconds.');
+  const wait = askStatus('Starting a new case...');
   let t;
   try {
-    t = await postJSON('/api/topic', {text: ask.request, article: ask.article || '', count: 1, avoid: ask.cases.map(c => c.title)});
+    t = await buildTopic({text: ask.request, article: ask.article || '', count: 1, avoid: ask.cases.map(c => c.title)}, wait);
   } catch(err){
     if(!askLive(gen)) return askPendingDone(ctx.chatId, null, err.message);
     askPending.delete(ctx.chatId);
@@ -1999,9 +2044,9 @@ function askProgress(){
 // A new topic: the Builder writes 1 case, then the chat starts on it.
 // "Which one do you mean?" with one button per Wikipedia title and Something else.
 // Resolves to the picked title, or null for Something else.
-function askChoose(titles){
+function askChoose(titles, heading = 'Which one do you mean?'){
   return new Promise(done => {
-    const card = askAdd('am-card', `Which one do you mean?<div class="row">${titles.map(t =>
+    const card = askAdd('am-card', `${esc(heading)}<div class="row">${titles.map(t =>
       `<button type="button" data-mean="${esc(t)}">${esc(t)}</button>`).join('')}<button type="button" class="ghost" data-mean-other>Something else</button></div>`);
     card.addEventListener('click', e => {
       const b = e.target.closest('[data-mean], [data-mean-other]');
@@ -2013,17 +2058,24 @@ function askChoose(titles){
     });
   });
 }
+// A bare topic ("thanos") first asks what about it to think about, with 3 angles.
+// Something else keeps the topic, so the learner's next words are added to it.
+let askAbout = null;  // {name, article} while the learner types their own angle
+const askShort = text => text.trim().split(/\s+/).length <= 3 && !text.includes('?') && text.length <= 40;
 async function askTopic(text){
+  const about = askAbout, shown = text;
+  askAbout = null;
+  if(about && text && !askFile) text = `${about.name}, ${text}`;  // the learner's own angle on the topic
   const ctx = askCtx(), gen = ctx.gen;
   ctx.key = `new-${++askPendingNo}`;
   askPending.set(ctx.key, {name: String(text || askFile.name).slice(0, 80), first: text || askFile.name});
   ask.pendKey = ctx.key;
   renderRecents();
   askChatting(true);
-  askAdd('am-user', esc(text || askFile.name));
+  askAdd('am-user', esc(shown || askFile.name));
   askLock(true);
-  let article = '';
-  if(!askFile){  // an unclear topic ("mercury") asks which one first, so the case is on the right thing
+  let article = about ? about.article : '';
+  if(!askFile && !about){  // an unclear topic ("mercury") asks which one first, so the case is on the right thing
     const look = askStatus('Checking your topic...');
     let means = [];
     try { means = (await postJSON('/api/topic/meanings', {text})).meanings || []; } catch(err){}  // no check, so just go on
@@ -2041,14 +2093,35 @@ async function askTopic(text){
       article = pick;
     }
   }
-  const wait = askStatus(askFile ? `Reading ${askFile.name} and writing a case...`
-                                  : 'Writing a case. This takes 20 to 40 seconds.');
+  let request = text;
+  if(!askFile && !about && askShort(text) && askLive(gen)){
+    const look = askStatus('Finding angles on your topic...');
+    let angles = [];
+    try { angles = (await postJSON('/api/topic/angles', {text: article || text})).angles || []; } catch(err){}  // none, so just go on
+    look.remove();
+    if(angles.length && askLive(gen)){
+      const name = article || text;
+      const pick = await askChoose(angles, `What about ${name} would you like to think about?`);
+      if(pick == null){  // their own angle, added to the topic when they send it
+        askPending.delete(ctx.key);
+        renderRecents();
+        askLock(false);
+        askAbout = {name, article: article || text};
+        $('askInput').placeholder = `What about ${name} would you like to think about?`;
+        $('askInput').focus();
+        return;
+      }
+      request = pick;
+      if(!article) article = text;  // the Wikipedia article is still the one on the topic itself
+    }
+  }
+  const wait = askStatus('Starting...');
   let t;
   const askFileUsed = !!askFile;
   try {
-    const body = {text, article, count: 1};
+    const body = {text: request, article, count: 1};
     if(askFile) body.file = {name: askFile.name, data: await fileBase64(askFile)};
-    t = await postJSON('/api/topic', body);
+    t = await buildTopic(body, wait);
   } catch(err){
     if(!askLive(gen)) return askPendingDone(ctx.key, null, err.message);
     askPending.delete(ctx.key);
@@ -2061,7 +2134,7 @@ async function askTopic(text){
   }
   wait.remove();
   saveTopics([...myTopics().filter(x => x.id !== t.id), t]);
-  ctx.request = askFileUsed ? null : text;  // a file is not kept, so it cannot make another case
+  ctx.request = askFileUsed ? null : request;  // a file is not kept, so it cannot make another case
   ctx.article = article;
   if(askLive(gen)){
     setAskFile(null);
@@ -2124,6 +2197,7 @@ $('askForm').addEventListener('submit', e => {
 });
 
 function askReset(){
+  askAbout = null;
   Object.assign(ask, {sid: null, options: [], shelved: [], picked: null, cases: [], hintOpened: false,
                      chatId: null, pendKey: null, sids: [], request: null, article: '', answers: 0, offered: [], total: 0, done: false, gen: ask.gen + 1});
   askLock(false);

@@ -1,5 +1,8 @@
 import base64
 import binascii
+import json
+import logging
+import queue
 import copy
 import os
 import threading
@@ -13,7 +16,7 @@ load_env()  # must run before `from . import graph` below, since llm_client
                 # picks its provider (mock/gemini/anthropic) at import time
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -22,6 +25,7 @@ from . import (auth, builder, copycheck, files, explainer, graph, heuristics, kn
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
 
+log = logging.getLogger(__name__)
 app = FastAPI(title="Socratic AI")
 
 # Live sessions are kept in memory and also saved after every turn (see
@@ -67,6 +71,7 @@ class TopicRequest(BaseModel):
     count: int = 3  # how many cases; the Ask chat asks for 1 at a time
     avoid: list[str] = []  # titles of the cases already done on this topic (the Ask chat's next case)
     article: str = ""  # the Wikipedia title picked in "Which one do you mean?"
+    stream: bool = False  # send each step of the build as it happens (one JSON object per line)
 
 
 class CodeRequest(BaseModel):
@@ -345,12 +350,52 @@ def make_topic(req: TopicRequest):
         except (binascii.Error, ValueError) as e:  # FileError is a ValueError
             msg = str(e) if isinstance(e, files.FileError) else "This file could not be read, so please try again."
             raise HTTPException(400, msg)
+    if req.stream:
+        return _build_stream(req, file)
     try:
         return builder.build(req.text, file, req.count, req.avoid, req.article)
     except builder.TopicError as e:
         raise HTTPException(400, str(e))
     except LLMError as e:
         raise HTTPException(503, str(e))
+
+
+def _build_stream(req, file):
+    """The build in a thread, with each real step sent to the page as one JSON
+    line, then {"topic": ...} or {"error": ..., "status": ...} at the end."""
+    lines = queue.Queue()
+
+    def work():
+        try:
+            topic = builder.build(req.text, file, req.count, req.avoid, req.article,
+                                  progress=lambda text: lines.put({"step": text}))
+            lines.put({"topic": topic})
+        except builder.TopicError as e:
+            lines.put({"error": str(e), "status": 400})
+        except LLMError as e:
+            lines.put({"error": str(e), "status": 503})
+        except Exception:  # noqa: BLE001  the page must always get an end line
+            log.exception("Topic build failed")
+            lines.put({"error": "The topic could not be built, so please try again.", "status": 500})
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def send():
+        while True:
+            item = lines.get()
+            yield json.dumps(item, ensure_ascii=False) + "\n"
+            if "step" not in item:
+                return
+
+    return StreamingResponse(send(), media_type="application/x-ndjson",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.post("/api/topic/angles")
+def topic_angles(req: TopicRequest):
+    """Up to 3 debatable questions for a short topic ("thanos"), so the learner
+    picks what to think about before a case is written. [] when not needed."""
+    return {"angles": builder.angles(req.text)}
 
 
 @app.post("/api/session")

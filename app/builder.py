@@ -424,7 +424,7 @@ def _mock(request, count=CASES_PER_TOPIC):
     return {"topic": name, "cases": [case(i) for i in range(1, count + 1)]}
 
 
-def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
+def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article="", progress=None):
     """3 cases for any topic, written from 1 or 2 Wikipedia articles when they
     can be found (sources.py), from the learner's own reading, or from their
     own file. file: {"name", "text"} from files.read(); then request is
@@ -432,8 +432,10 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
     Ask chat asks for 1, so the wait is about a third). avoid: titles of the
     cases already done on this topic, so a new case tests a new idea; the new
     case ids then carry on after them. article: the Wikipedia title the
-    learner picked when the topic was unclear. Raises TopicError (or LLMError if the
-    model fails)."""
+    learner picked when the topic was unclear. progress: called with a short
+    line each time a real step starts, so the page can show what is happening.
+    Raises TopicError (or LLMError if the model fails)."""
+    step = progress or (lambda text: None)
     count = max(1, min(int(count), CASES_PER_TOPIC))
     avoid = [str(a)[:80] for a in avoid if isinstance(a, str) and a.strip()][:MAX_AVOID]
     request = (request or "").strip()[:MAX_REQUEST_CHARS]
@@ -464,7 +466,17 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
     else:
         if not limits.budget_left():
             raise TopicError(limits.FULL_MESSAGE)
-        found = {"text": picked} if file else None if source else sources.find(request, article)
+        if file:
+            step(f"Reading {file['name']}")
+            found = {"text": picked}
+        elif source:
+            step("Reading your text")
+            found = None
+        else:
+            step(f"Searching Wikipedia for {article or request}")
+            found = sources.find(request, article)
+            step(f"Reading the Wikipedia article on {' and '.join(a['title'] for a in found['articles'])}" if found
+                 else "No Wikipedia article found, so writing from general knowledge")
         payload = {"REQUEST": request, "COUNT": count, **({"AVOID": avoid} if avoid else {}),
                    **({"SOURCE": found["text"]} if found else {})}
         source = source or found
@@ -473,9 +485,11 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
         # JSON, so a reply with no usable case is asked for once more. A
         # refusal is final.
         for attempt in range(2):
+            step("Writing the case" if not attempt else "The first draft had a problem, so writing it again")
             reply = llm_client._generate(SYSTEM, json.dumps(payload, ensure_ascii=False),
                                          max_tokens=3200 * count, json_mode=True)  # quotes, rules and model need about 1000 more
             data = llm_client._parse_json(reply)
+            step("Checking the facts and quotes")
             if isinstance(data, dict) and data.get("refuse"):
                 break
             try:
@@ -491,4 +505,49 @@ def build(request, file=None, count=CASES_PER_TOPIC, avoid=(), article=""):
     return topic
 
 
-__all__ = ["build", "clean_case", "clean_topic", "clean_items", "recheck", "skill_items", "TopicError", "LLMError"]
+# ---------- angles: what a short topic could be about ----------
+
+ANGLES_SYSTEM = """You help a learner choose what to think about. TOPIC is a short topic they typed, like a name or a thing. Write 3 different questions about it that are worth debating, so a learner could argue either side and give reasons.
+
+Rules:
+- Each question is at most 10 words, ends with "?" and names the topic exactly once.
+- The 3 questions look at different sides of the topic, for example right or wrong, cause, and what would happen if.
+- Easy English for university beginners. No colons, no dashes, no emoji.
+- If the topic is harmful or makes no sense, reply {"angles": []}.
+
+Reply with ONLY this JSON:
+{"angles": ["", "", ""]}"""
+
+MAX_ANGLE_WORDS = 3  # a longer request already says what the learner means
+
+
+def short_topic(text):
+    """A bare topic ("thanos"), not a question or a reading, so it is worth asking which angle."""
+    text = (text or "").strip()
+    return 0 < len(text.split()) <= MAX_ANGLE_WORDS and "?" not in text and len(text) <= 40
+
+
+def angles(text):
+    """Up to 3 debatable questions about a short topic, or [] when it is not
+    short or the model fails (then the case is simply written as before)."""
+    if not short_topic(text):
+        return []
+    text = text.strip()
+    if llm_client.PROVIDER == "mock":
+        return [f"Is {text} good or bad?", f"Why does {text} matter?", f"What if there was no {text}?"]
+    if not limits.budget_left():
+        return []
+    try:
+        data = llm_client._parse_json(llm_client._generate(ANGLES_SYSTEM, json.dumps({"TOPIC": text}, ensure_ascii=False),
+                                                           max_tokens=200, json_mode=True, thinking="minimal"))
+    except LLMError:
+        return []
+    out = []
+    for a in (data or {}).get("angles") or [] if isinstance(data, dict) else []:
+        a = " ".join(str(a).split())
+        if a.endswith("?") and len(a.split()) <= 14 and ":" not in a and a not in out:
+            out.append(a)
+    return out[:3]
+
+
+__all__ = ["build", "angles", "short_topic", "clean_case", "clean_topic", "clean_items", "recheck", "skill_items", "TopicError", "LLMError"]
