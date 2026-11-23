@@ -1386,20 +1386,12 @@ $('recents').addEventListener('click', e => {
 renderRecents();
 
 function renderAskChips(){
-  $('askChips').innerHTML = `<button type="button" class="checked" data-quant title="The checked example topic">${esc(QUANT_TOPIC.topic)}</button>`
-    + pickTopics(3).map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
+  $('askChips').innerHTML = pickTopics(3).map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
 }
 renderAskChips();
 $('askChips').addEventListener('click', e => {
   const b = e.target.closest('button');
   if(!b || $('askSend').disabled) return;
-  if(b.hasAttribute('data-quant')){  // the checked topic needs no build
-    if(!quantCases[0]) return;
-    askChatting(true);
-    askAdd('am-user', esc(QUANT_TOPIC.topic));
-    askStart(quantCases[0], QUANT_TOPIC.topic);
-    return;
-  }
   $('askInput').value = b.dataset.fill;  // fills only, so no AI call until they press Enter
   $('askInput').focus();
 });
