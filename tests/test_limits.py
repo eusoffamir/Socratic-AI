@@ -46,6 +46,22 @@ def test_hint_opened_is_saved_with_the_answer(monkeypatch):
     assert [t.get("hint_opened") for t in turns] == [None, True, False]
 
 
+def test_a_streamed_answer_sends_its_real_steps_then_the_reply(monkeypatch):
+    import json
+    fresh(monkeypatch, 0)
+    monkeypatch.setattr(llm_client, "PROVIDER", "mock")
+    client = TestClient(main.app)
+    sid = client.post("/api/session", json={}).json()["session_id"]
+    r = client.post(f"/api/session/{sid}/answer", json={"answer": "luck, since many stocks do it", "stream": True})
+    lines = [json.loads(x) for x in r.text.splitlines() if x.strip()]
+    steps = [x["step"] for x in lines if "step" in x]
+    assert steps[:4] == ["Reading your answer", "Planning the next question",
+                         "Writing the next question", "Checking the question"]
+    assert len(main.SESSIONS[sid]["history"]) == 1  # saved like a normal answer
+    normal = client.post(f"/api/session/{sid}/answer", json={"answer": "test it on new days"}).json()
+    assert set(lines[-1]["result"]) == set(normal)  # the same reply as without streaming
+
+
 def test_the_count_starts_again_on_a_new_day(monkeypatch):
     fresh(monkeypatch, 2)
     limits.count_call()

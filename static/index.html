@@ -1538,11 +1538,16 @@ function askStatus(text){ return askAdd('am-status', `${DOTS}${esc(text)}`); }
 
 // Writes a case and shows each real step the server reports (searching
 // Wikipedia, reading the article, writing, checking), ticking off the ones done.
-async function buildTopic(body, wait){
+function buildTopic(body, wait){
+  return postSteps('/api/topic', body, wait, 'topic', 'The topic could not be built, so please try again.');
+}
+// POST with stream on, show each real step the server sends in `wait` (done
+// ones ticked), and return the `key` field of the last line.
+async function postSteps(url, body, wait, key, failText){
   let res;
   try {
-    res = await fetch('/api/topic', {method: 'POST', headers: {'Content-Type': 'application/json'},
-                                     body: JSON.stringify({...body, stream: true})});
+    res = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({...body, stream: true})});
   } catch(e){ throw new Error('No connection. Is the server running?'); }
   lastReply = Date.now();
   if(!res.ok || !res.body){
@@ -1566,8 +1571,8 @@ async function buildTopic(body, wait){
       if(!line) continue;
       const m = JSON.parse(line);
       if(m.step){ steps.push(m.step); draw(); }
-      else if(m.topic) return m.topic;
-      else throw new Error(m.error || 'The topic could not be built, so please try again.');
+      else if(m[key]) return m[key];
+      else throw new Error(m.error || failText);
     }
     if(done) break;
   }
@@ -2231,10 +2236,12 @@ async function askAnswer(typed){
   $('askInput').style.height = '';
   const gen = ask.gen;
   askLock(true);
-  const wait = askStatus('Thinking...');
-  const slow = whenSlow(() => wait.innerHTML = DOTS + esc(slowText()));
+  const wait = askStatus('Sending your answer');
+  // a sleeping server sends no steps at first, so the wake-up note still shows then
+  const slow = whenSlow(() => { if(!wait.querySelector('.build-steps')) wait.innerHTML = DOTS + esc(slowText()); });
   try {
-    const data = await postJSON(`/api/session/${ask.sid}/answer`, {answer, hint_opened: !!ask.hintOpened});
+    const data = await postSteps(`/api/session/${ask.sid}/answer`, {answer, hint_opened: !!ask.hintOpened}, wait,
+                                 'result', 'Something went wrong, so please send your answer again.');
     if(!askLive(gen)) return;  // saved on the server, so it shows when that chat is opened again
     ask.hintOpened = false;
     wait.remove();

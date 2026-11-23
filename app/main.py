@@ -86,19 +86,20 @@ MAX_ANSWER_CHARS = 2000
 class AnswerRequest(BaseModel):
     answer: str
     hint_opened: bool = False  # the learner opened the hint of this question before answering
+    stream: bool = False  # send each real step as one JSON line, then the reply (like /api/topic)
 
 
 class OverviewRequest(BaseModel):
     session_ids: list[str] = []  # the sessions this browser has started (no logins, so no per-user history)
 
 
-def _run_turn_safely(session, answer):
+def _run_turn_safely(session, answer, progress=None):
     """Run one turn on a copy of the session, so that if a model call fails
     halfway through, the stored session is left exactly as it was and the
     learner can simply resend. Returns (updated_session, result)."""
     working = copy.deepcopy(session)
     try:
-        result = graph.run_turn(working, answer=answer)
+        result = graph.run_turn(working, answer=answer, progress=progress)
     except LLMError as e:
         raise HTTPException(503, str(e)) from e
     return working, result
@@ -459,7 +460,13 @@ def submit_answer(sid: str, req: AnswerRequest):
         raise HTTPException(400, "This session has already ended.")
     if not req.answer.strip():  # the page blocks this too; a blank answer would waste a round and AI calls
         raise HTTPException(400, "Please type an answer first.")
-    session, result = _run_turn_safely(session, req.answer[:MAX_ANSWER_CHARS])
+    if req.stream:
+        return _answer_stream(sid, session, req)
+    return _answer(sid, session, req)
+
+
+def _answer(sid, session, req, progress=None):
+    session, result = _run_turn_safely(session, req.answer[:MAX_ANSWER_CHARS], progress)
     # saved with the answer, for a "with vs without hint" comparison in the thesis
     result["trace"]["hint_opened"] = session["turns"][-1]["hint_opened"] = req.hint_opened
     SESSIONS[sid] = session
@@ -467,6 +474,33 @@ def submit_answer(sid: str, req: AnswerRequest):
     _save_turn(sid, session, result)
     # last_assessment is for the stats screen; never shown to the learner mid-question
     return {**_turn_response(session, result), "last_assessment": result["assessment"]}
+
+
+def _answer_stream(sid, session, req):
+    """The turn in a thread, with each real step sent as {"step": ...}, then
+    {"result": ...} or {"error": ..., "status": ...} at the end."""
+    lines = queue.Queue()
+
+    def work():
+        try:
+            lines.put({"result": _answer(sid, session, req, progress=lambda text: lines.put({"step": text}))})
+        except HTTPException as e:
+            lines.put({"error": e.detail, "status": e.status_code})
+        except Exception:  # noqa: BLE001  the page must always get an end line
+            log.exception("Answer failed")
+            lines.put({"error": "Something went wrong, so please send your answer again.", "status": 500})
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def send():
+        while True:
+            item = lines.get()
+            yield json.dumps(item, ensure_ascii=False) + "\n"
+            if "step" not in item:
+                return
+
+    return StreamingResponse(send(), media_type="application/x-ndjson",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/api/session/{sid}/end")

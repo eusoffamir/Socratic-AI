@@ -204,9 +204,29 @@ def build_graph():
 _graph = build_graph()
 
 
-def run_turn(session: dict, answer: Optional[str]) -> dict:
-    """Run one turn. `answer` is None to open a brand new session."""
-    result = _graph.invoke({"session": session, "answer": answer})
+# What the page shows while a turn runs: the step that starts after each node ends.
+# The Checker may send the question back once, so "Rewriting" only shows when it does.
+STEP_AFTER = {"assess": "Planning the next question", "guard": "Writing the next question",
+              "tutor": "Checking the question", "rewrite": "Rewriting the question"}
+FIRST_STEP = "Reading your answer"
+
+
+def run_turn(session: dict, answer: Optional[str], progress=None) -> dict:
+    """Run one turn. `answer` is None to open a brand new session. progress,
+    when given, is called with each real step as it starts, for the page."""
+    inputs = {"session": session, "answer": answer}
+    if progress is None:
+        result = _graph.invoke(inputs)
+    else:
+        progress(FIRST_STEP)
+        result = None
+        for mode, chunk in _graph.stream(inputs, stream_mode=["updates", "values"]):
+            if mode == "values":
+                result = chunk
+            else:
+                for node in chunk:
+                    if node in STEP_AFTER:
+                        progress(STEP_AFTER[node])
     return {
         "reply": result["reply"],
         "parts": result["parts"],
