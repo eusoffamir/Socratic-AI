@@ -305,6 +305,7 @@
   details.am-case[open] .am-case-more svg{transform:rotate(180deg);}
   .am-more-body{display:flex; flex-direction:column; gap:16px; margin:16px 0 0; padding:16px 0 0; border-top:1px solid var(--rule); color:var(--ink); cursor:auto;}
   .am-more-body .am-map, .am-more-body .rm-source{margin:0;}
+  .am-more-body .rm-source{justify-content:center; margin-top:10px;}
   .am-more-body .am-map{background:none; border:0; padding:0;}
   .am-more-body .am-map .mono-label{color:var(--signal);}
   .am-more-body .am-lead{margin:0; font-size:14px; line-height:1.6; color:var(--ink);}
@@ -313,7 +314,8 @@
   .am-think{font-size:14px; line-height:1.55; color:var(--ink);}
   .am-think b{display:block; font-size:12px; font-weight:600; color:var(--signal); margin-bottom:2px;}
   .am-glossary{display:grid; gap:6px;}
-  .am-glossary div{font-size:14px; line-height:1.5;}
+  .am-glossary div{font-size:14px; line-height:1.5; position:relative; padding-left:16px;}
+  .am-glossary div::before{content:""; position:absolute; left:2px; top:.62em; width:5px; height:5px; border-radius:50%; background:var(--signal);}
   .am-glossary b{font-weight:600; color:var(--signal); margin-right:6px;}
   .am-glossary span{color:var(--ink-soft);}
   .am-more-body a{color:var(--signal);}
@@ -406,6 +408,7 @@
   .am-map .legend.rels{margin-top:4px;}
   .am-map .legend i.ln{width:14px; height:3px; border-radius:2px; opacity:1; vertical-align:3px;}
   .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
+  @media (min-width:701px){ .am-map .cap:not(.on){min-height:0; margin:0;} }
   .am-map .cap.on{margin:10px 0 0; padding:10px 14px; line-height:1.5; color:var(--ink); background:var(--signal-soft); border-radius:10px;
                   border:1px solid color-mix(in srgb, var(--signal) 25%, transparent);}  /* the picked box's text, a shade greener than the map */
   .am-map .cap.on{position:relative; padding-right:40px;}
@@ -489,6 +492,8 @@
   }
   .tb-add:hover:not(:disabled){background:var(--panel-2); color:var(--ink); opacity:1;}
   .tb-add svg{width:20px; height:20px;}
+  .mic.rec{color:#fff; background:#c0533f; animation:micPulse 1.4s ease-in-out infinite;}
+  @keyframes micPulse{50%{opacity:.7;}}
   .tb-files{display:flex; padding:2px 2px 8px;}
   .tb-file{
     display:inline-flex; align-items:center; gap:8px; max-width:100%; padding:6px 6px 6px 10px;
@@ -1029,6 +1034,8 @@
                 <b>Open questions</b></button>
             </div>
           </div>
+          <button type="button" class="tb-add mic hidden" id="askMic" title="Speak your answer" aria-label="Speak your answer" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
           <button type="submit" class="send" id="askSend" title="Start (Enter)" aria-label="Start"><svg><use href="#i-up"/></svg></button>
         </div>
         <input type="file" id="askFile" accept=".pdf,.docx,.txt,.md" hidden>
@@ -1443,7 +1450,8 @@ function askAdd(className, html){
 function askStatus(text){ return askAdd('am-status', `${DOTS}${esc(text)}`); }
 function askLock(on){
   ask.busy = on;
-  $('askSend').disabled = $('askInput').disabled = $('askAdd').disabled = on;
+  $('askSend').disabled = $('askInput').disabled = $('askAdd').disabled = $('askMic').disabled = on;
+  if(on && typeof micStop === 'function') micStop();
   syncWhy();
 }
 function askChatting(on){
@@ -1593,7 +1601,7 @@ function askMapHTML(c, opts = {}){
     <span class="mono-label">Map of the ideas</span>
     <div class="map-scroll"><svg viewBox="0 0 ${width} ${height}" style="max-width:${width}px; --mw:${width}px" aria-label="A map of how the ideas in this case link">
       <defs>${markers}</defs>${lines}${boxes}</svg></div>
-    <p class="cap">Tap a box to read it.<span class="swipe-hint"> Swipe sideways to see the whole map.</span></p>
+    <p class="cap"><span class="swipe-hint">Swipe sideways to see the whole map.</span></p>
     <div class="legend"><b>Box colours</b>${types.map(t => `<span><i style="background:${MAP_COLORS[t] || 'var(--ink-faint)'}"></i>${esc(capFirst(t))}</span>`).join('')}</div>
     ${opts.labels ? '' : `<div class="legend rels"><b>Arrows</b>${rels.map(r => `<span><i class="ln" style="background:${REL_COLORS[r] || 'var(--ink-faint)'}"></i>${esc(r.replace(/_/g, ' '))}, ${esc(REL_MEANING[r] || '')}</span>`).join('')}</div>`}</div>`;
 }
@@ -1752,6 +1760,13 @@ $('askModeMenu').addEventListener('click', async e => {
   $('askModeBtn').focus();
   if(on === was) return;
   setAskMode(on);
+  if(!on && ask.options.length && !ask.busy){  // Open questions at once: the A and B buttons go, the question stays
+    $('askThread').querySelectorAll('.am-opts').forEach(o => o.remove());
+    ask.options = [];
+    ask.picked = null;
+    $('askInput').placeholder = 'Your answer...';
+    syncWhy();
+  }
   if(!ask.sid) return;
   try { await postJSON(`/api/session/${encodeURIComponent(ask.sid)}/mode`, {ab_only: on}); }
   catch(err){ setAskMode(was); }  // not saved, so show it as it really is
@@ -2427,6 +2442,33 @@ function askWhy(box){
 // A pick with no why cannot be sent, so its send button is greyed out.
 function syncWhy(){
   $('askSend').classList.toggle('nowhy', ask.picked != null && !$('askInput').value.trim());
+}
+
+// Voice typing with the browser's own speech to text (free, Chrome, Edge and Safari).
+// The words go into the box, so the learner can fix them before sending.
+const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+var micRec = null;  // var, because askLock may run before this line
+function micStop(){ if(micRec){ micRec.stop(); } }
+if(Speech){
+  $('askMic').classList.remove('hidden');
+  $('askMic').addEventListener('click', () => {
+    if(micRec){ micStop(); return; }
+    const box = $('askInput'), before = box.value.replace(/\s*$/, '');
+    const rec = new Speech();
+    Object.assign(rec, {continuous: true, interimResults: true, lang: navigator.language || 'en-US'});
+    rec.onresult = e => {
+      const said = [...e.results].map(r => r[0].transcript).join(' ').replace(/\s+/g, ' ').trim();
+      box.value = (before ? before + ' ' : '') + said;
+      box.dispatchEvent(new Event('input'));
+    };
+    rec.onend = () => { micRec = null; $('askMic').classList.remove('rec'); $('askMic').setAttribute('aria-pressed', 'false'); };
+    rec.onerror = e => { if(e.error === 'not-allowed') askAdd('am-status', 'Please allow the microphone to speak your answer.'); };
+    micRec = rec;
+    $('askMic').classList.add('rec');
+    $('askMic').setAttribute('aria-pressed', 'true');
+    rec.start();
+  });
+  $('askForm').addEventListener('submit', micStop, true);
 }
 
 // ---------- thinking profile ----------
