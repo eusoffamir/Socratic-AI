@@ -2799,7 +2799,7 @@ const skillName = w => w[0].toUpperCase() + w.slice(1);
 // The bars and grids stay on the Full data tab for the study.
 function skillsSimpleHTML(m, withButton = true){
   const button = withButton ? '<button type="button" class="sk-go" data-take-check>Take a skill check</button>' : '';
-  if(!m || !m.answers) return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
+  if(!m || !m.answers) return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
     <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>${button}</div>`;
   const plain = r => SKILL_PLAIN[r.skill] || r.skill;
   const strong = m.skills.filter(r => r.status === 'mastered');
@@ -2808,7 +2808,7 @@ function skillsSimpleHTML(m, withButton = true){
   const next = m.skills.filter(r => r.status !== 'mastered' && r.status !== 'not sure yet').sort((a, b) => rank[a.status] - rank[b.status] || a.mean - b.mean).slice(0, 3);
   const few = m.skills.every(r => r.status === 'not enough answers');
   const li = (r, extra = '', cls = '') => `<li${cls ? ` class="${cls}"` : ''}><b>${esc(plain(r))}</b>${extra}</li>`;
-  return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
+  return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
     <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : strong.length ? '' : ' A skill counts once you show it in a few answers across checks, so it grows as you practise.'}</p>
     <div class="sk-cols">
       ${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
