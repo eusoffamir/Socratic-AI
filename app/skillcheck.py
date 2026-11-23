@@ -342,6 +342,33 @@ def summarize(turns):
             "knowledge_types": {k: KNOWLEDGE_TYPES[k] for k in CORE_KNOWLEDGE}}
 
 
+# How to show each kind of thinking, said once per missed question on the results screen
+REASONING_TIPS = {
+    "inductive": "Look at all the examples together, then say the one general idea they share.",
+    "deductive": "Take the rule you were given, apply it to this case, and say what must follow.",
+    "abductive": "Give the most likely explanation, say why it beats the others, and say what you would check.",
+}
+
+
+def review(check):
+    """Each answered question with whether the target skill was shown, and a
+    short tip for a miss, so the learner knows what to do differently."""
+    from .explainer import _STEP
+    bank = check.get("bank") or ALL_ITEMS
+    out = []
+    for t in check["turns"]:
+        item = bank.get(t["item"], {})
+        if t["attained"]:
+            tip = ""
+        elif t.get("ai_like"):
+            tip = "This answer looked like it came from an AI chatbot, so answer in your own words."
+        else:
+            tip = f'{REASONING_TIPS[t["reasoning"]]} {_STEP.get(t["knowledge"], "")}'.strip()
+        out.append({"question": item.get("question", ""), "reasoning": t["reasoning"],
+                    "knowledge": t["knowledge"], "attained": t["attained"], "tip": tip})
+    return out
+
+
 def _messages(by_type, grid):
     asked = [(r, v) for r, v in by_type.items() if v["asked"]]
     if not asked:

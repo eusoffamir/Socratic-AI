@@ -508,7 +508,8 @@ class CheckRequest(BaseModel):
 
 def _check_view(check):
     return {"question": skillcheck.current(check), "ended": check["ended"], "topic": check.get("topic"),
-            "results": skillcheck.summarize(check["turns"]) if check["ended"] else None}
+            "results": skillcheck.summarize(check["turns"]) if check["ended"] else None,
+            "review": skillcheck.review(check) if check["ended"] else None}
 
 
 def _get_check(sid):

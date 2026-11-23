@@ -78,6 +78,9 @@ def test_api_runs_a_whole_check(monkeypatch, tmp_path):
         r = c.post(f"/api/check/{cid}/answer", json={"answer": "Many stocks do this, so it is probably luck"}).json()
     assert r["ended"] and r["question"] is None and r["results"]["answers"] == q["total"]
     assert c.post(f"/api/check/{cid}/answer", json={"answer": "more"}).status_code == 400
+    # each question comes back with a tick, or a tip on how to answer it next time
+    assert len(r["review"]) == q["total"]
+    assert all(v["question"] and bool(v["tip"]) != bool(v["attained"]) for v in r["review"])
     ov = c.post("/api/overview", json={"session_ids": [cid]}).json()
     assert ov["skill_check"]["answers"] == q["total"] and ov["sessions_played"] == 0
     # the next check avoids the questions already answered

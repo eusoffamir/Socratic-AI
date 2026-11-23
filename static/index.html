@@ -218,6 +218,18 @@
   .sk-none{margin:0; font-size:14px; color:var(--ink-faint);}
   .sk-go{margin-top:18px; border-radius:999px; padding:8px 16px; background:var(--signal); border-color:var(--signal); color:var(--paper); font-weight:600;}
   @media (max-width:700px){ .sk-cols{grid-template-columns:1fr;} }
+  /* each answer as a box like the Socratic levels, so a good answer glows green */
+  .ck-review{list-style:none; margin:0 0 30px; padding:0; display:grid; gap:8px;}
+  .ck-review li{position:relative; padding:11px 16px 11px 42px; border-radius:10px; font-size:14.5px; line-height:1.5;
+    background:var(--panel-2); border:1px solid transparent;}
+  .ck-review li.ok{background:var(--signal-soft); border-color:var(--signal);
+    box-shadow:0 0 14px color-mix(in srgb, var(--signal) 22%, transparent);}
+  .ck-review li::before{content:"\2713"; position:absolute; left:16px; top:11px; color:var(--signal); font-weight:700;}
+  .ck-review li.miss::before{content:"\2715"; color:var(--caution, #b5762c);}
+  .ck-review b{font-weight:600;}
+  .ck-review small{display:block; font-size:12.5px; color:var(--ink-faint); margin-top:2px;}
+  .ck-review .tip{display:block; margin-top:6px; color:var(--ink-soft);}
+  .ck-sub{font-size:15px; margin:0 0 10px;}
   .ov-menu-h{font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint); padding:10px 12px 4px;}
   .know-says{color:var(--ink); background:var(--signal-soft); border-radius:10px; padding:10px 14px;}
   .know-quote, .know-lesson{font-size:14.5px; line-height:1.6; background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:12px 14px;}
@@ -2786,7 +2798,7 @@ function skillsSimpleHTML(m, withButton = true){
   const few = m.skills.every(r => r.status === 'not enough answers');
   const li = (r, extra = '', cls = '') => `<li${cls ? ` class="${cls}"` : ''}><b>${esc(plain(r))}</b>${extra}</li>`;
   return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
-    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : ''}</p>
+    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : strong.length ? '' : ' A skill counts once you show it in a few answers across checks, so it grows as you practise.'}</p>
     <div class="sk-cols">
       ${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
         <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div>` : ''}
@@ -2904,7 +2916,14 @@ function showCheck(d){
   if(d.ended){
     $('ckNum').textContent = '';
     $('ckTitle').textContent = 'Your results';
-    $('ckBody').innerHTML = `<div id="ckMastery" class="sk-flat">${DOTS}</div>`;
+    // this check first, each question with a tick or a tip, then the skills over all checks
+    const rv = d.review || [], got = rv.filter(r => r.attained).length;
+    const skillOf = r => `${SKILL_PLAIN[r.reasoning] || r.reasoning}, ${(SKILL_PLAIN[r.knowledge] || r.knowledge).toLowerCase()}`;
+    $('ckBody').innerHTML = (rv.length ? `<p class="sk-lead">In this check you used the right kind of thinking in <b>${got} of ${rv.length}</b> answers.</p>
+      <ul class="ck-review">${rv.map(r => `<li class="${r.attained ? 'ok' : 'miss'}"><b>${esc(r.question)}</b>
+        <small>${esc(skillOf(r))}</small>${r.tip ? `<span class="tip">${esc(r.tip)}</span>` : ''}</li>`).join('')}</ul>
+      <h3 class="ck-sub">Your skills so far</h3>` : '')
+      + `<div id="ckMastery" class="sk-flat">${DOTS}</div><button type="button" class="sk-go" id="ckAgain">Take another check</button>`;
     $('ckFoot').classList.remove('hidden');
     $('ckSend').focus();
     // mastery uses every check from this browser, not only this one
@@ -2971,6 +2990,7 @@ function closeCheck(){
 }
 
 $('askCheck').addEventListener('click', openCheck);
+$('ckBody').addEventListener('click', e => { if(e.target.closest('#ckAgain')) openCheck(); });
 // The skill check measures the learner's own reasoning, so pasting (for
 // example from an AI chatbot) is turned off. It does not stop retyping, which
 // is why the server also checks for chatbot-style answers.
