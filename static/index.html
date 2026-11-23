@@ -154,7 +154,7 @@
   .sn-item svg{width:18px; height:18px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
-  .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:24px; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
+  .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:56px; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   /* a thin, see-through scrollbar that only shows on hover, so the green sidebar stays clean */
   .sn-recents{scrollbar-width:thin; scrollbar-color:transparent transparent;}
@@ -215,6 +215,22 @@
   .know-views button:hover{color:var(--ink);}
   .know-views button[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:#fff;}
   .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:0;}
+  .ov-tabs{margin:40px 0 18px;}
+  .sk-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:18px 20px;
+           background:color-mix(in srgb, var(--signal-soft) 35%, var(--panel));}
+  .sk-card .mono-label{display:block; margin-bottom:8px;}
+  .sk-lead{margin:0 0 16px; font-size:15px;}
+  .sk-cols{display:grid; grid-template-columns:1fr 1fr; gap:16px 28px;}
+  .sk-col h4{margin:0 0 8px; font-size:13px; font-weight:600; color:var(--ink-soft);}
+  .sk-col ul{list-style:none; margin:0; padding:0; display:grid; gap:10px;}
+  .sk-col li{position:relative; padding-left:26px; font-size:14.5px; line-height:1.45;}
+  .sk-col li::before{content:"\2192"; position:absolute; left:2px; top:0; color:var(--caution, #b5762c); font-weight:700;}
+  .sk-col.ok li::before{content:"\2713"; color:var(--signal);}
+  .sk-col.ok li.almost::before{content:"\25CB"; font-weight:400;}
+  .sk-col li small{display:block; font-size:13px; color:var(--ink-soft); margin-top:1px;}
+  .sk-none{margin:0; font-size:14px; color:var(--ink-faint);}
+  .sk-go{margin-top:18px; border-radius:999px; padding:8px 16px; background:var(--signal); border-color:var(--signal); color:var(--paper); font-weight:600;}
+  @media (max-width:700px){ .sk-cols{grid-template-columns:1fr;} }
   .ov-menu-h{font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint); padding:10px 12px 4px;}
   .know-says{color:var(--ink); background:var(--signal-soft); border-radius:10px; padding:10px 14px;}
   @media (max-width:560px){ .know-views{grid-template-columns:1fr;} }
@@ -1458,7 +1474,7 @@
       </form>
       <p class="tb-privacy hidden" id="askPrivacy">The AI reads the file but does not save it. Please do not upload private files.</p>
       <div class="ask-chips" id="askChips"></div>
-      <p class="ask-start">New here? <button type="button" id="askTut">Take the tutorial</button> or <button type="button" id="askCheck">find your thinking style</button></p>
+      <p class="ask-start">Not sure where to start? <button type="button" id="askCheck">Find your thinking style</button></p>
       <p class="privacy-note">Answers are saved without your name for our study. Please do not type private details.</p>
       <div id="askStatus" aria-live="polite"></div>
     </div>
@@ -2644,6 +2660,7 @@ async function askStart(c, name, ctx = askCtx()){
     $('askBtn').removeAttribute('aria-current');
     wait.remove();
     askShowTurn(data, askCaseHTML(c));
+    if(!tourSeen('chat')) setTimeout(() => { if(askLive(ctx.gen)) startTour('chat'); }, 500);  // the first chat teaches how to answer
   } catch(err){
     error = err.message;
     if(!live()) return;
@@ -2923,7 +2940,7 @@ function overallHTML(d){
   const s = d.summary, n = s.rounds_completed;
   if(!n) return d.mastery
     ? `<div class="report" data-ex-general><h2>Your skill checks</h2>
-      <p class="lead">Play a case too, and your Socratic levels will show here.</p><div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div></div>`
+      <p class="lead">Start a chat too, and your Socratic levels will show here.</p>${ovSkillsHTML(d)}</div>`
     : `<div class="report"><h2>Nothing yet</h2>
       <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
@@ -2939,11 +2956,9 @@ function overallHTML(d){
     return `<details class="ov-case-d"><summary class="ov-case">
         <span class="t">${esc(c.title)}<small>${esc(c.topic || '')}</small></span>
         <span class="meta">${plural(c.rounds, 'round')}</span>
-        <span class="meta" title="The average number of the 9 standards your answers met">${(Math.round(avg * 10) / 10)} of 9 standards</span>
-        <span class="meta" title="The standard your answers met least often in this case">Weakest: ${esc(cap(weakest))}</span>
         <span class="lvl" title="The highest Socratic level you reached in this case">${levelNo(c.level) ? `Level ${levelNo(c.level)} of ${d.levels.length}, ` : ''}${esc(c.level)}</span></summary>
       <div class="ov-case-more">
-        <p class="meta">${c.finished ? 'Finished' : 'Not finished yet'} · played ${c.sessions === 1 ? 'once' : `${c.sessions} times`}</p>
+        <p class="meta">${c.finished ? 'Finished' : 'Not finished yet'} · played ${c.sessions === 1 ? 'once' : `${c.sessions} times`} · ${(Math.round(avg * 10) / 10)} of 9 standards on average · weakest is ${esc(weakest)}</p>
         ${c.comment ? `<div class="coach-comment"><div class="mono-label">Coach</div><p>${esc(c.comment)}</p></div>`
                     : '<p class="meta">The coach comments after 2 answers.</p>'}
         ${chat ? `<button type="button" class="ov-open" data-open-chat="${esc(chat.id)}">Open the chat</button>` : ''}
@@ -2960,11 +2975,31 @@ function overallHTML(d){
       <div class="coach-comment" id="ovCoach"><div class="mono-label">Coach</div>
         <div class="thinking">${DOTS}Reading all your answers...</div></div>
     </div>
-    <div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
-    ${s.reasoning && s.reasoning.answers ? reasoningGridHTML(s.reasoning) : ''}
+    ${ovSkillsHTML(d)}
     <div class="note">Only chats in this browser count, not the tutorial.</div>
   </div>`;
 }
+
+// Below the levels: a plain Summary for the learner, and the Full data (bars and grids) for the study
+function ovSkillsHTML(d){
+  const r = d.summary && d.summary.reasoning;
+  return `<div class="know-tabs ov-tabs" role="tablist">
+      <button type="button" role="tab" data-ovtab="simple" aria-selected="true">Summary</button>
+      <button type="button" role="tab" data-ovtab="full" aria-selected="false">Full data</button></div>
+    <div id="ovSimple">${skillsSimpleHTML(d.mastery)}</div>
+    <div id="ovFull" class="hidden"><div class="ov-two">${masteryHTML(d.mastery)}${skillGridHTML(d.skill_check, SKILL_GRID_TITLE, SKILL_GRID_SUB)}</div>
+      ${r && r.answers ? reasoningGridHTML(r) : ''}</div>`;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-ovtab]');
+  if(t){
+    t.parentElement.querySelectorAll('[data-ovtab]').forEach(b => b.setAttribute('aria-selected', b === t));
+    $('ovSimple').classList.toggle('hidden', t.dataset.ovtab !== 'simple');
+    $('ovFull').classList.toggle('hidden', t.dataset.ovtab !== 'full');
+    return;
+  }
+  if(e.target.closest('[data-take-check]')) openCheck();
+});
 
 // "All cases" or one case: the small teal pill filter in the overall status panel
 function caseFilterHTML(cases, id){
@@ -3723,6 +3758,37 @@ const SKILL_PLAIN = {inductive: 'Spot a pattern from examples', deductive: 'Appl
   relational: 'How things link', strategic: 'Plans and choices', metacognitive: 'Thinking about your thinking', epistemic: 'How we know'};
 const skillName = w => `${w[0].toUpperCase() + w.slice(1)}<small>${esc(SKILL_PLAIN[w] || '')}</small>`;
 
+// What to try next for each skill, in one short sentence
+const SKILL_TIP = {inductive: 'Look at several examples and say what they share.', deductive: 'Start from a rule, then say what it means here.',
+  abductive: 'Ask what best explains what you see, and why.', factual: 'Back your point with a fact or a number.',
+  conceptual: 'Say what a key word means in your own words.', procedural: 'Say the steps you would take to check it.',
+  causal: 'Explain why it happens, not only what happens.', relational: 'Say how one thing changes when another does.'};
+
+// The learner's view of the skill checks: what they are strong at and what to practise next, in plain words.
+// The bars and grids stay on the Full data tab for the study.
+function skillsSimpleHTML(m, withButton = true){
+  const button = withButton ? '<button type="button" class="sk-go" data-take-check>Take a skill check</button>' : '';
+  if(!m || !m.answers) return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
+    <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>${button}</div>`;
+  const plain = r => SKILL_PLAIN[r.skill] || r.skill;
+  const strong = m.skills.filter(r => r.status === 'mastered');
+  const almost = m.skills.filter(r => r.status === 'not sure yet');
+  const rank = {'not mastered yet': 0, 'not sure yet': 1, 'not enough answers': 2};
+  const next = m.skills.filter(r => r.status !== 'mastered' && r.status !== 'not sure yet').sort((a, b) => rank[a.status] - rank[b.status] || a.mean - b.mean).slice(0, 3);
+  const few = m.skills.every(r => r.status === 'not enough answers');
+  const li = (r, extra = '', cls = '') => `<li${cls ? ` class="${cls}"` : ''}><b>${esc(plain(r))}</b>${extra}</li>`;
+  return `<div class="sk-card"><span class="mono-label">Your thinking skills</span>
+    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.${few ? ' Do another check so we can tell more.' : ''}</p>
+    <div class="sk-cols">
+      <div class="sk-col ok"><h4>Strong at</h4>${strong.length || almost.length
+        ? `<ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul>`
+        : '<p class="sk-none">Nothing yet, so keep going.</p>'}</div>
+      <div class="sk-col"><h4>Practise next</h4>${next.length
+        ? `<ul>${next.map(r => li(r, `<small>${esc(SKILL_TIP[r.skill] || '')}</small>`)).join('')}</ul>`
+        : '<p class="sk-none">You have mastered every skill.</p>'}</div>
+    </div>${button}</div>`;
+}
+
 // Mastery so far, from every skill check in this browser. The bar is the 90%
 // range of the true share, the dot is the most likely share, and the dashed line
 // is the mastery level. Hover a row for the numbers.
@@ -3833,12 +3899,12 @@ function showCheck(d){
     $('ckNum').textContent = 'DONE';
     $('ckTitle').textContent = 'Your results';
     $('ckSub').textContent = 'Based on the questions you just answered.';
-    $('ckBody').innerHTML = `<div data-ex-topic="${esc(d.topic || '')}">${skillGridHTML(d.results, 'This check')}</div><div id="ckMastery"></div>`;
+    $('ckBody').innerHTML = `<div id="ckMastery">${DOTS}</div><p class="note">See the full data on Overall status.</p>`;
     $('ckSend').innerHTML = 'Done';
     $('ckSend').focus();
     // mastery uses every check from this browser, not only this one
     postJSON('/api/overview', {session_ids: myChecks()})
-      .then(o => { const box = $('ckMastery'); if(box) box.innerHTML = masteryHTML(o.mastery); })
+      .then(o => { const box = $('ckMastery'); if(box) box.innerHTML = skillsSimpleHTML(o.mastery, false); })
       .catch(() => {});
     return;
   }
@@ -3899,7 +3965,6 @@ function closeCheck(){
 
 $('checkBtn').addEventListener('click', openCheck);
 $('askCheck').addEventListener('click', openCheck);
-$('askTut').addEventListener('click', () => { endTour(true); openReading('tutorial', 'home'); });
 // The skill check measures the learner's own reasoning, so pasting (for
 // example from an AI chatbot) is turned off. It does not stop retyping, which
 // is why the server also checks for chatbot-style answers.
@@ -4387,9 +4452,17 @@ function tutRetry(){
 
 const lastOf = sel => [...document.querySelectorAll(sel)].pop();
 const TOURS = {
+  chat: [
+    {title: 'Read the case', text: 'Start by reading this short case. Tap Read more for the full story.', target: () => lastOf('.am-case')},
+    {title: 'Answer the question', text: 'There is no single right answer, so the reason you give is what counts.', target: () => lastOf('.am-qrow')},
+    {title: 'Hint', text: 'Stuck? Tap the bulb for a key idea.', target: () => lastOf('.am-qrow .hint-btn')},
+    {title: 'Pick, then explain', text: 'Pick A or B, then say why.', target: () => lastOf('.am-opts')},
+    {title: 'Give a reason', text: 'A good answer gives a reason, an example or another view. Press Enter to send.', target: '#askForm'},
+    {title: 'Your level', text: 'Your level goes up as you reason well. Tap here to see how you are doing.', target: '#askStrip'},
+  ],
   ask: [
-    {title: 'Welcome', text: 'New here? Start with this 2-minute tutorial.', target: '#askTut'},
-    {title: 'Pick a topic', text: 'Then type any topic or question, or tap an idea below.', target: '.ask-box'},
+    {title: 'Welcome', text: 'Type any topic or question, or tap an idea below.', target: '.ask-box'},
+    {title: 'Thinking style', text: 'Take a 6-question check to see your thinking skills.', target: '#askCheck'},
     {title: 'Rounds', text: 'Pick how many rounds, or No limit.', target: '#askRoundsBtn'},
     {title: 'Mode', text: 'Pick open questions, or A or B choices.', target: '#askModeBtn'},
     {title: 'Overall status', text: 'See your skills across all chats.', target: '#overallBtn'},
