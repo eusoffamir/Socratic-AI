@@ -88,7 +88,10 @@ _gemini_resting = {}  # model -> time.time() until which it is skipped
 
 # Groq is the free backup when no Gemini model answers (24 November 2026). Its answers can
 # be weaker than Gemini's, so every saved turn records which models answered it.
-GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+# tried in order; each has its own free limit. 120b is the strongest, qwen3.8-27b next.
+GROQ_MODELS = [m.strip() for m in os.getenv(
+    "GROQ_MODELS", "openai/gpt-oss-120b,qwen/qwen3.8-27b,openai/gpt-oss-20b").split(",") if m.strip()]
+GROQ_MODEL = GROQ_MODELS[0] if GROQ_MODELS else ""
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 # gpt-oss thinks before answering and that counts against the token cap, like Gemini
 GROQ_THINKING_HEADROOM = 1024
@@ -246,17 +249,28 @@ def _generate_anthropic(system, user, max_tokens):
     return resp.content[0].text.strip()
 
 
-def _generate_groq(system, user, max_tokens, json_mode, seed=None):
-    """One call to Groq's OpenAI-style API, with plain httpx (no extra package)."""
+def _groq_settings(model, max_tokens):
+    """Each Groq model needs its own thinking setting. gpt-oss thinks a little, and that
+    counts against the token cap; Qwen thinks only when asked, and its free output limit
+    is 1000 tokens a minute, so it gets no thinking and no extra room."""
+    if "gpt-oss" in model:
+        return {"max_completion_tokens": max_tokens + GROQ_THINKING_HEADROOM,
+                "reasoning_effort": "low", "include_reasoning": False}
+    if "qwen" in model:
+        return {"max_completion_tokens": min(max_tokens, 1000), "reasoning_effort": "none"}
+    return {"max_completion_tokens": max_tokens}
+
+
+def _groq_call(model, system, user, max_tokens, json_mode, seed):
+    """One Groq model. Returns the text, or raises _GroqBusy when its
+    free limit is used up, so the next model is tried."""
     import httpx
-    body = {"model": GROQ_MODEL, "max_completion_tokens": max_tokens + GROQ_THINKING_HEADROOM,
+    body = {"model": model, **_groq_settings(model, max_tokens),
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
     if json_mode:
         body["response_format"] = {"type": "json_object"}
     if seed is not None:
         body["seed"] = seed
-    if "gpt-oss" in GROQ_MODEL:
-        body.update(reasoning_effort="low", include_reasoning=False)  # short replies need little thinking
     try:
         res = httpx.post(GROQ_URL, json=body, timeout=REQUEST_TIMEOUT_SECONDS,
                          headers={"Authorization": f"Bearer {os.getenv('GROQ_API_KEY', '')}"})
@@ -264,8 +278,10 @@ def _generate_groq(system, user, max_tokens, json_mode, seed=None):
         raise LLMError(f"Groq took longer than {REQUEST_TIMEOUT_SECONDS}s to reply. Try again.") from e
     except httpx.TransportError as e:
         raise LLMError("Couldn't reach the Groq API. Check your internet connection.") from e
-    if res.status_code == 429:
-        raise LLMError("The free Groq limit is used up right now. Wait a few minutes and try again.")
+    # 429 is the free limit, 413 a call too big for this model's limit, 404 a model Groq dropped,
+    # 5xx Groq being busy: all of these move on to the next model
+    if res.status_code in (404, 413, 429) or res.status_code >= 500:
+        raise _GroqBusy(res.status_code)
     if res.status_code != 200:
         raise LLMError(f"Groq error {res.status_code}: {res.text[:200]}")
     try:
@@ -274,8 +290,31 @@ def _generate_groq(system, user, max_tokens, json_mode, seed=None):
         raise LLMError("Groq sent a reply that could not be read. Try again.") from e
     if not text.strip():
         raise LLMError("Groq returned an empty reply. Try again.")
-    _note_model(f"groq:{GROQ_MODEL}")
-    return text.strip()
+    # these models like the no-break hyphen and space, which some screens and fonts show badly
+    return text.strip().replace("‑", "-").replace(" ", " ").replace(" ", " ")
+
+
+class _GroqBusy(Exception):
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def _generate_groq(system, user, max_tokens, json_mode, seed=None):
+    """Groq's OpenAI-style API, with plain httpx (no extra package). Each model has its
+    own free limit (8000 tokens a minute, checked 24 November 2026), so a used-up model
+    hands the call to the next one."""
+    codes = {}
+    for model in GROQ_MODELS:
+        try:
+            text = _groq_call(model, system, user, max_tokens, json_mode, seed)
+        except _GroqBusy as e:
+            codes[model] = e.code
+            continue
+        _note_model(f"groq:{model}")
+        return text
+    logging.getLogger(__name__).warning("Groq: no model answered %s", codes)
+    raise LLMError("The free Groq limit is used up right now. Wait a few minutes and try again.")
 
 
 def _generate(system, user, max_tokens, json_mode=False, seed=None, thinking="low"):
@@ -294,7 +333,7 @@ def _generate(system, user, max_tokens, json_mode=False, seed=None, thinking="lo
             except LLMError as groq_error:
                 logging.getLogger(__name__).warning("Groq backup failed too: %s", groq_error)
                 raise e from groq_error  # the learner sees the Gemini message
-            logging.getLogger(__name__).warning("Groq (%s) answered because Gemini failed: %s", GROQ_MODEL, e)
+            logging.getLogger(__name__).warning("Groq answered because Gemini failed: %s", e)
             return text
     if PROVIDER == "groq":
         return _generate_groq(system, user, max_tokens, json_mode, seed)
