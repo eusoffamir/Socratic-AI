@@ -26,9 +26,9 @@ profiles/
 # data exports hold real learner answers: never upload them
 eval/exports/
 
-# personal papers (resume, results, SSM, IC numbers) and copyrighted books: never upload
-**/Resume*.pdf
-**/Examination Results*
-**/SA0632752-K*
+# personal papers (resume, results, SSM with IC numbers): never upload
+docs/personal/
+
+# copyrighted books and the Meeting 3 transcript (career and company talk): never upload
 **/*Koller*
-**/meeting3.txt
+**/meeting3*.txt

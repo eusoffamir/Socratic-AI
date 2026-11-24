@@ -1,6 +1,6 @@
 # Meeting 2 with Dr Ho (19 October 2026)
 
-Sources: the meeting recording (`docs/supervisor/Meeting2.txt`, made by Whisper, so some words and names are misheard), Dr Ho's handwritten page (`docs/supervisor/Critical Thinking.pdf`) and his written message after the meeting. Written by Claude on 20 October 2026. Anything marked **[unclear]** could not be read or heard well, so check it with Dr Ho.
+Sources: the meeting recording (`docs/supervisor/meetings/meeting2-transcript.txt`, made by Whisper, so some words and names are misheard), Dr Ho's handwritten page (`docs/supervisor/materials/Critical Thinking.pdf`) and his written message after the meeting. Written by Claude on 20 October 2026. Anything marked **[unclear]** could not be read or heard well, so check it with Dr Ho.
 
 ## 1. The big picture: three goals
 
