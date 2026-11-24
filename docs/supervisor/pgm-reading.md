@@ -13,8 +13,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 1 | Ch 1 Introduction | 1 to 14 | The big picture and the words used | Done 25 Nov |
 | 2 | 2.1 Probability, 2.2 Graphs | 15 to 44 | Conditional probability, Bayes rule, independence, graph words | Done 25 Nov |
 | 3 | 3.1 to 3.4 Bayesian networks | 45 to 92 | What a node and an arrow mean, which questions the graph can answer (d-separation) | Done 25 Nov |
-| 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Next |
-| 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | |
+| 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Done 25 Nov |
+| 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Next |
 | 6 | 16, 17.1 to 17.2 Learning chances | 697 to 732 | Counting chances from data, which is what `app/pgm.py` does now | |
 | 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | |
 | 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | |
@@ -176,22 +176,92 @@ For our tool, the Builder already asks for chances between 5 and 95 percent and 
 
 **Pathfinder** (Box 3.D) diagnosed lymph node diseases with more than 60 diseases and about 100 findings. The full Bayesian network agreed with an expert pathologist in 50 of 53 cases, against 47 of 53 for naive Bayes. Its structure took about 35 hours to define and its numbers about 40 hours. The expert found it easier to give the chance of one finding across all diseases than all the findings for one disease. For the Ex use case, that suggests asking engineers "how often does each fault show this sign" one sign at a time, and planning for tens of hours of engineer time.
 
-## 5. What this means for our tool
+## 5. Notes on Chapter 5 (sections 5.1 to 5.4, local models)
+
+Chapter 3 gave each node a full table of chances, one row for every mix of its parents' values. Chapter 5 is about smaller ways to fill that table. We skipped 5.5 (continuous variables) for now, and only skimmed the formal parts of 5.2.2 and 5.3.2 on the extra independencies these models create.
+
+### 5.1 Why full tables break (5.1)
+
+A full table for a yes or no node with k yes or no parents has 2 to the power k rows. Five parents need 32 rows and ten parents need 1,024. No expert will answer 1,024 questions such as "what is the chance of a fever with disease A but not B, and C but not D ...". The key idea of the chapter is that **a table is just one way to write a function** that takes the parents' values and gives a chance. Any rule that gives the right chances will do.
+
+### 5.2 Fixed rules (5.2, deterministic CPDs)
+
+Some nodes follow a rule with no chance at all, for example an OR gate, or blood type from two genes. They are common in machines and circuits, where the rule is part of the design.
+
+A fixed node can also make a model simpler. The book's example is four tyres, any of which can go flat. Instead of making all four tyres parents of Steering and of Ride, add one node "a tyre is flat" that is the OR of the four, and make it the only parent of Steering and Ride.
+
+For our tool, this is how a **fault tree fits into a Bayesian network** (thesis section 2.8.1). Each AND or OR gate becomes a fixed node, and the basic events keep their chances. So fault trees that engineers already have can be reused as part of the network.
+
+### 5.3 When only some parents matter (5.3, context-specific CPDs)
+
+Often a parent matters only in some situations. In the book's example, if the student did not apply for the job, the SAT score and the letter cannot affect the offer. If the SAT is high, the recruiter does not read the letter. So the 8 rows of the table collapse to 4 different cases.
+
+- **Tree CPD.** A small yes or no tree over the parents, with a chance at each leaf (Figure 5.4). It has the same shape as the expert decision trees in `app/heuristics.py`, but here each leaf holds a chance instead of a decision. So an engineer's rule of thumb tree could become one node's table, with chances at the leaves counted from records.
+- **Rule CPD.** A set of rules, each with a situation and a chance. This is finer than a tree.
+- **Multinets and similarity networks** (Box 5.B). These use one small network per class, for example per disease group, holding only the signs that tell those classes apart. Pathfinder used similarity networks to cut its numbers from about 75,000 to under 14,000 (Box 3.D).
+- **These models create extra independencies** that the graph alone does not show. If the student did not apply, getting the job tells us nothing about intelligence. The book shows that we can remove the arrows that do not matter in that situation and then use d-separation as before.
+
+**Box 5.A (troubleshooting).** A printer network built for Windows 95 troubleshooting had a printer that could be joined to the computer by a local cable or by Ethernet. The Ethernet cable matters only when the printer is on the network. Writing this as a tree cut the numbers from 145 to 55. Ex equipment has the same kind of structure. For example, a check on the cable gland only matters for equipment fed by a cable, and the type of protection (flameproof, increased safety, intrinsic safety) decides which defects matter at all. That is a natural first split in a tree.
+
+### 5.4 Many causes acting on their own (5.4, independence of causal influence)
+
+When each cause acts on the effect through its own separate mechanism, the table can be built from one number per cause.
+
+**Noisy-OR.**
+- Each cause on its own makes the effect happen with its own chance (the noise parameter). In the book, a professor remembers a student's class questions 80 percent of the time and can read the final paper 90 percent of the time.
+- The effect fails only if every present cause fails. With both causes, the letter is weak with a chance of 20 percent times 10 percent, which is 2 percent, so it is strong 98 percent of the time. We checked this number.
+- A **leak** chance covers "it happens for no listed reason".
+- With k causes, a noisy-OR needs k + 1 numbers instead of 2 to the power k.
+- Proposition 5.3 says that when the effect is **absent**, its causes stay independent. This makes reasoning cheap in diagnosis, where most findings are absent (Box 5.C).
+
+**Our own Ex example, with made-up numbers.** Take the node "the enclosure no longer contains a spark", with three possible defects. A damaged gasket breaks protection with a chance of 30 percent, missing bolts 20 percent and a wrong cable gland 10 percent, with a leak of 1 percent.
+
+| Defects present | Chance protection is broken |
+|---|---|
+| None | 1 percent (the leak) |
+| Gasket only | 30.7 percent |
+| Bolts only | 20.8 percent |
+| Gasket and bolts | 44.6 percent |
+| All three | 50.1 percent |
+
+That is 4 numbers instead of 8, and with ten possible defects it would be 11 numbers instead of 1,024. An engineer can answer "how often does a damaged gasket alone break protection", but not 1,024 questions about every mix of defects. An explosion still needs both a broken protection and gas in the air, which is a fixed AND (section 5.2 of these notes), not a noisy-OR.
+
+**Logistic CPD (generalised linear model).** Each cause adds a weight to a total "burden", and an S-shaped curve (the sigmoid) turns the total into a chance. A small burden stays near 0 percent, a large one saturates near 100 percent, and in between it is close to a straight line. This is the same model as logistic regression, so its weights can be learned from records with standard tools. It also takes numeric parents, such as years in service or how many defects were found.
+
+**The general idea (5.4.3).** Both models pass each cause through its own noise, then join the results with a simple rule (OR for noisy-OR, adding for the logistic model). **Noisy-MAX** (Box 5.D) does the same for an effect with levels of severity, which fits inspection grades such as minor, major and dangerous.
+
+**Real size (Box 5.D).** QMR-DT, for internal medicine, has more than 500 diseases, about 4,000 findings and more than 40,000 links, all noisy-OR. CPCS has close to 500 variables. Full tables would need close to 134 million numbers, but with noisy-OR and noisy-MAX it needs 8,254, and only about 560 were asked of experts. The rest came from frequency weights already in the knowledge base. So **a large diagnosis network is possible with a few hundred expert answers**.
+
+### 5.5 Which model for which node
+
+This answers our question 2.
+
+| The node looks like | Use | Numbers needed |
+|---|---|---|
+| Few parents, causes that interact in odd ways | Full table | 2 to the power k |
+| A rule with no chance (a gate, a design rule) | Fixed (deterministic) node | None |
+| Some parents matter only in some situations | Tree CPD or rules | One per leaf |
+| Many causes, each able to cause the effect alone | Noisy-OR, with a leak | k + 1 |
+| The effect has levels of severity | Noisy-MAX | Per cause and level |
+| Causes add up, or parents are numbers, and there are records | Logistic CPD | k + 1 weights, learned from data |
+
+## 6. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
 | Nodes are random variables chosen for the questions | Nodes are true or false statements, each linked to a knowledge graph node (`app/pgm.py`) | Only yes or no values. Real inspection data will have more values, such as a condition grade. Grade in the Student example needs three values |
 | Explaining away between two causes (3.2.1.2) | Each case has one cause | A fault model needs two or more causes of the same sign |
 | Hidden nodes stop double counting (Box 3.C) | The Builder's model is naive Bayes, with one cause and two signs | Add a shared hidden cause when signs are linked |
+| Smaller tables (noisy-OR, trees, fixed nodes, Ch 5) | Every node has a full table | Fine for 1 or 2 parents. A fault with many causes needs noisy-OR, and fault trees need fixed AND and OR nodes |
+| Tree CPDs (5.3) | Expert decision trees in `app/heuristics.py` end in decisions, not chances | The same tree shape could hold chances at its leaves and become one node's table |
 | Numbers learned from data | Chances counted from simulated data with a fixed seed | The data is made up to show the method |
 | Inference by smart algorithms (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20 |
 | Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet |
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. They should be marked as guesses or replaced by counted ones |
 
-## 6. Questions to carry into the next chapters
+## 7. Questions to carry into the next chapters
 
-Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold).
-
+Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node).
 
 1. How do we pick the values of a variable when the inspection data uses grades or free text?
 2. When does a node with many causes need noisy-OR (5.4) instead of a full table?
@@ -201,6 +271,7 @@ Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is
 6. Is marginal MAP over the fault (2.1.5.3) cheap enough to answer for a network of 20 or more nodes (Chapter 9 and 13)?
 7. Can d-separation pick the next inspection check to ask for, by skipping checks that cannot change the diagnosis?
 8. Should the Ex model use one variable per fault (several faults at once) or a single fault variable, given the cost of reasoning?
+9. Do the partner's inspection records grade defects by severity (for noisy-MAX), and do they say the type of protection, so that it can be the first split of a tree?
 
 ## References
 
