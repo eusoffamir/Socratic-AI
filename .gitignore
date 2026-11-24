@@ -25,3 +25,10 @@ profiles/
 
 # data exports hold real learner answers: never upload them
 eval/exports/
+
+# personal papers (resume, results, SSM, IC numbers) and copyrighted books: never upload
+**/Resume*.pdf
+**/Examination Results*
+**/SA0632752-K*
+**/*Koller*
+**/meeting3.txt
