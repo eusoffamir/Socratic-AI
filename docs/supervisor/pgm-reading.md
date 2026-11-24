@@ -21,7 +21,7 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 9 | 22.1, 22.3, 23.1, 23.2, 23.7 Decisions | 1059 to 1126 | Influence diagrams, which add actions and costs to a network, and the value of information. This could rank which equipment to inspect first | Done 25 Nov |
 | Skim | 4.1 to 4.2 Markov networks | 103 to 115 | Only to know when an undirected graph fits better | |
 
-All 9 steps were read on 25 November 2026. Next is task 8, a small network on an open dataset, as a proof of concept.
+All 9 steps were read on 25 November 2026. Task 8, a small network on an open dataset, was done the same day (`docs/supervisor/pgm-ai4i.md`, `eval/pgm_ai4i.py`).
 
 ## 2. Notes on Chapter 1 (Introduction)
 
