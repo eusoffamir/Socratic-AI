@@ -14,8 +14,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 2 | 2.1 Probability, 2.2 Graphs | 15 to 44 | Conditional probability, Bayes rule, independence, graph words | Done 25 Nov |
 | 3 | 3.1 to 3.4 Bayesian networks | 45 to 92 | What a node and an arrow mean, which questions the graph can answer (d-separation) | Done 25 Nov |
 | 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Done 25 Nov |
-| 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Next |
-| 6 | 16, 17.1 to 17.2 Learning chances | 697 to 732 | Counting chances from data, which is what `app/pgm.py` does now | |
+| 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Done 25 Nov |
+| 6 | 16, 17.1 to 17.2 Learning chances | 697 to 732 | Counting chances from data, which is what `app/pgm.py` does now | Next |
 | 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | |
 | 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | |
 | 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | |
@@ -245,7 +245,60 @@ This answers our question 2.
 | The effect has levels of severity | Noisy-MAX | Per cause and level |
 | Causes add up, or parents are numbers, and there are records | Logistic CPD | k + 1 weights, learned from data |
 
-## 6. What this means for our tool
+## 6. Notes on Chapter 9 (sections 9.1 to 9.4, variable elimination)
+
+We read 9.1 to 9.4 and Box 9.B, and skipped Box 9.A (the network polynomial) and the formal proofs in 9.1.
+
+### 6.1 The bad news first (9.1)
+
+Answering a question exactly from a Bayesian network is NP-hard in the worst case (Theorem 9.1). Even a rough answer is just as hard once there is evidence (Theorem 9.4). So no method is fast for every network. The good news is that real networks are rarely the worst case, and how hard a network is depends on its shape, which we can see and control.
+
+### 6.2 The idea, push the sums inside (9.2)
+
+To answer a question, `pgm.py` lists every full case, multiplies the small tables for each, and adds the ones that fit. In a chain A to B to C to D, most of those products repeat the same pieces. Variable elimination works from the inside out instead.
+
+1. Multiply the chance of A by the chance of B given A, and add over A. This gives the chance of B, once.
+2. Use that to get the chance of C, then the chance of D.
+
+For a chain of n nodes with k values each, adding up every case costs about k to the power n steps, but this costs about n times k squared. So a chain of 20 yes or no nodes needs about 20 million multiplications by listing every case, and about 80 this way. The two ideas are that each piece of the sum depends on only a few variables, and that each piece is worked out once and kept (dynamic programming).
+
+### 6.3 The method (9.3)
+
+A **factor** is any small table over a few variables, for example one node's CPD. The method needs only two operations, multiplying factors and **summing out** a variable from a factor.
+
+1. Start with one factor per node (its CPD).
+2. Put the evidence in by keeping only the rows that agree with what was seen.
+3. Pick an **elimination order** for the variables that are neither asked about nor seen.
+4. For each variable in that order, multiply every factor that mentions it, sum it out, and put the new smaller factor back.
+5. Multiply what is left and scale it to add up to 100 percent. The scale used is the chance of the evidence.
+
+Two practical points from the worked example (9.3.1.2) follow.
+- A variable below the question with no evidence on it adds nothing. It gives a factor that is always 1, so it can be dropped before starting.
+- Evidence can make the work smaller. Seeing Intelligence meant that Grade and SAT never had to be joined in one factor, because they are independent once Intelligence is known.
+
+**Our check.** We wrote a small plain Python version (about 50 lines, in the scratchpad, not in the app) and ran it on the Student network.
+- It gave the same answers as adding up every case for the four questions we tried, for example 50.2 percent for a strong letter and 57.8 percent for smart given a C and a high SAT.
+- It used 62 to 80 multiplications against 192 for listing all 48 cases.
+- With a poor order (Grade first), the largest factor grew from 3 to 4 variables and the work rose from 80 to 118 multiplications.
+
+The network is small, so the saving is small, but it grows quickly with size, as in the chain example.
+
+### 6.4 What makes a network hard (9.4)
+
+- The cost is set by the **largest factor made along the way**. A factor over m variables with v values each has v to the power m rows.
+- Eliminating a variable joins all of its neighbours, which can add new links (**fill edges**). The graph with all of these links is the **induced graph**, and each factor made is a clique in it.
+- The **width** of an order is the size of the largest clique minus 1. The smallest width over all orders is the **tree-width** of the network. **The work grows exponentially in the tree-width, not in the number of nodes.**
+- Finding the best order is itself NP-hard (Theorem 9.7). Simple greedy rules work well in practice, such as eliminating next the variable that adds the fewest fill edges (min-fill).
+- **Polytrees** (Box 9.B), networks with at most one trail between any two nodes, are always easy, and the cost grows only with the size of their tables. But there is no sharp line between easy and hard. The difficulty rises smoothly with the tree-width.
+
+### 6.5 What this means for the Ex use case
+
+- **Size is not the problem, shape is.** A network with hundreds of nodes is fine if it is close to a tree. A two-layer fault network (faults on top, findings below, as in Box 5.C) can have a large tree-width when many faults share many findings. The noisy-OR trick from section 5.4 of these notes (an absent finding can be removed) is what keeps such networks fast.
+- **Keep the graph close to a tree.** This matches Box 3.C's advice to leave out weak links. Every extra link can raise the tree-width.
+- **Question 6 is partly answered.** If the model has a single fault variable, "the most likely fault" is just one probability query (the chance of each fault given the evidence) followed by picking the largest. Variable elimination answers it, and the cost depends on the tree-width. With one variable per fault, finding the most likely set of faults is a marginal MAP question (Chapter 13), which is harder.
+- **For `pgm.py`.** Adding up every case is fine for its 3 or 4 nodes. When the Ex network passes about 20 yes or no nodes (about 1 million cases), the app needs variable elimination. Our scratch version shows it fits in plain Python with no new libraries, in the same spirit as `pgm.py`. A library such as pgmpy could check its answers.
+
+## 7. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
@@ -255,13 +308,13 @@ This answers our question 2.
 | Smaller tables (noisy-OR, trees, fixed nodes, Ch 5) | Every node has a full table | Fine for 1 or 2 parents. A fault with many causes needs noisy-OR, and fault trees need fixed AND and OR nodes |
 | Tree CPDs (5.3) | Expert decision trees in `app/heuristics.py` end in decisions, not chances | The same tree shape could hold chances at its leaves and become one node's table |
 | Numbers learned from data | Chances counted from simulated data with a fixed seed | The data is made up to show the method |
-| Inference by smart algorithms (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20 |
+| Variable elimination (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20. Variable elimination works in plain Python (checked in a scratch version), and its cost depends on the tree-width, not the number of nodes |
 | Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet |
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. They should be marked as guesses or replaced by counted ones |
 
-## 7. Questions to carry into the next chapters
+## 8. Questions to carry into the next chapters
 
-Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node).
+Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width).
 
 1. How do we pick the values of a variable when the inspection data uses grades or free text?
 2. When does a node with many causes need noisy-OR (5.4) instead of a full table?
