@@ -18,10 +18,10 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 6 | 16, 17.1 to 17.4 Learning chances | 697 to 750 | Counting chances from data, which is what `app/pgm.py` does now, and adding prior knowledge | Done 25 Nov |
 | 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | Done 25 Nov |
 | 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | Done 25 Nov |
-| 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | Next |
+| 9 | 22.1, 22.3, 23.1, 23.2, 23.7 Decisions | 1059 to 1126 | Influence diagrams, which add actions and costs to a network, and the value of information. This could rank which equipment to inspect first | Done 25 Nov |
 | Skim | 4.1 to 4.2 Markov networks | 103 to 115 | Only to know when an undirected graph fits better | |
 
-Then task 8, a small network on an open dataset, as a proof of concept.
+All 9 steps were read on 25 November 2026. Next is task 8, a small network on an open dataset, as a proof of concept.
 
 ## 2. Notes on Chapter 1 (Introduction)
 
@@ -473,7 +473,74 @@ In troubleshooting, a repair is an intervention. It sets a part to "not broken".
   The fix is to put these factors in the model as nodes (site, age, type of protection), so the network can account for them.
 - **For our tool.** The deductive move in `pgm.py` asks for the chance of an effect given its cause by seeing, not doing. For a cause with no parents, such as "the day is hot", seeing and doing give the same answer, so the current cases are fine. The difference appears once a cause has its own causes.
 
-## 10. What this means for our tool
+## 10. Notes on Chapters 22 and 23 (sections 22.1, 22.3, 23.1, 23.2 and 23.7, decisions)
+
+We read 22.1.1, 22.3.1 and Box 22.B in Chapter 22, and 23.1, 23.2, 23.7 and Box 23.C in Chapter 23. We added 23.7 (value of information) and Box 23.C (troubleshooting) to the plan, because they answer our question 7 and match the Ex use case closely. We skipped the proofs, utility curves and attitudes to risk (22.2), complex outcomes (22.4), and the algorithms for solving influence diagrams (23.3 to 23.6).
+
+### 10.1 Expected utility (22.1)
+
+A chance alone does not say what to do. We also need how much each outcome matters, its **utility**. The rule is to **pick the action with the highest expected utility**, which is each outcome's utility times its chance, added up over the outcomes.
+
+- In the book's example, a graduate deciding whether to start a company faces no demand (50 percent, utility minus 7), low demand (30 percent, utility 5) or high demand (20 percent, utility 20). Starting the company has an expected utility of 2, and not starting has 0, so he should start it.
+- Utility is not the same as money. Most people take a sure 3 million over an 80 percent chance of 4 million, even though the second is worth 3.2 million on average. Fear of loss is part of the utility.
+
+### 10.2 Where utilities come from (22.3, Box 22.B)
+
+Utilities are harder to get than chances. Chances can be counted from data, but utilities are a person's or an organisation's own preferences, they are never seen directly, and different ways of asking give different answers. The classic way is the **standard gamble**, which asks at what chance of the best outcome (against the worst) a person is indifferent to a sure middle outcome.
+
+**Pathfinder again (Box 22.B).**
+- Its evaluation weighed each wrong diagnosis by how much harm it does. Mistaking a viral infection for a bacterial one costs a few days of antibiotics, but mistaking Hodgkin's disease for a viral infection can be deadly.
+- It put all harms on one scale, the **micromort**, a one-in-a-million chance of death.
+- Splitting the harm into parts (the disease itself, a delayed treatment, a needless treatment) cut the questions by 80 percent, to about 60 hours of work.
+- The full Bayesian network lost on average 16 micromorts per case, against 340 for naive Bayes.
+- The book adds a useful point. A **bad decision** is not the best choice given what was known, but a **bad outcome** can happen to a good decision by bad luck. So a system should be judged on its decisions, not on single outcomes.
+
+### 10.3 Decision trees and influence diagrams (23.1 and 23.2)
+
+- **Decision tree.** This has the agent's choices and nature's chances as branches and utilities at the leaves. It is solved from the leaves up (**backward induction**). At a chance point, take the chance-weighted average. At a choice point, take the best branch. It is clear but grows very fast and repeats the same numbers in many branches.
+  - This is a different object from the expert decision trees in `app/heuristics.py`, which are yes or no rules with no chances or utilities.
+- **Influence diagram** (decision network). This is a Bayesian network with two more kinds of node:
+  - **chance nodes** (ovals), with their usual tables
+  - **decision nodes** (rectangles), whose incoming arrows show what is known when the choice is made (**information edges**)
+  - **utility nodes** (diamonds), each a fixed number for each mix of its parents, with no children. The total utility is the sum of the utility nodes.
+
+  A decision is an action, so an influence diagram is causal by nature. Choosing a value for a decision node is a "do" (section 9 of these notes).
+
+### 10.4 Value of information (23.7)
+
+The **value of perfect information** of a check is how much the best expected utility rises if we see the check's result before deciding. It is never negative. It is **zero if no possible result would change the decision**.
+
+- **Our check.** In the book's example, a market survey before deciding gives an expected utility of 3.25 with the book's tables, against 2 without it, so the survey is worth about 1.25. The book gives 3.22 and a value of 1.22. The small gap is probably rounding, or a survey cost set in Example 23.6, which we did not read.
+- **Many checks.** Choosing the best plan of checks, where each next check depends on earlier results, is very hard. The usual shortcut is **myopic**: pick the single best next check, see its result, and repeat. It can miss a check that is worth little alone but shows which other check to do.
+
+This answers question 7. d-separation can rule out checks that cannot change any chance that matters (their value is zero). Value of information goes further. It ranks the remaining checks by how much they can change the decision, and the cost of each check can be subtracted.
+
+### 10.5 Troubleshooting (Box 23.C)
+
+The Windows 95 troubleshooters were hundreds of Bayesian networks, each a few dozen to a few hundred variables, one per common fault such as printing.
+- Actions were either **checks** (observe a part) or **repairs** (replace a part), each with a cost.
+- Repairs were handled as counterfactuals (Box 21.C), because the evidence from before the repair still holds after it.
+- With a single fault and noisy-OR tables, the expected cost of repair could be computed exactly, and the next check chosen by its value of information.
+- On the printer network, this saved about 20 percent of repair time over the best fixed plan. It did as well or better even when there were several faults, which broke the model's own assumption.
+- Users found the questions sensible and could skip one. Designers found it easier to update a few tables than to redraw a flowchart.
+
+### 10.6 What this means for the Ex use case
+
+This is the part of the book closest to Dr Ho's "prioritise by safety impact".
+
+- **Rank by expected loss, not by chance alone.** A simple version is the chance that an item's protection is broken times the harm if it ignites.
+  - In our own example with made-up numbers, a pump motor in a Zone 1 area with a 30 percent chance of broken protection and a harm of 100 gives an expected loss of 30. A light fitting in Zone 1 at 10 percent gives 10. A junction box in Zone 2 at 45 percent, with a harm of only 20 because gas is present less often there, gives 9.
+  - So the junction box is the most likely to be broken but the least urgent.
+  - The real harm should come from the partner's own risk ratings, not from us. Hazardous area zones are a real classification, but our numbers are not.
+- **The influence diagram is the natural model of the product.**
+  - Chance nodes: the hidden state of each item's protection, its defects, the gas present and the findings.
+  - Decision nodes: which item to inspect next, and whether to repair or isolate it.
+  - Utility nodes: the harm of an ignition and the cost of inspection, repair and downtime.
+- **Value of information picks the next inspection.** Choose the check with the largest value minus its cost, see the result, update and repeat (myopic). This is the same loop as the Windows troubleshooters, which is evidence that it works in practice.
+- **Judge the system on decisions, not outcomes** (Box 22.B). For the paper, compare its ranking with an expert's ranking on the same findings, not with whether a fault happened later.
+- **Utilities belong to the partner.** The cost of an ignition against the cost of downtime is the partner's and the regulator's choice. Our job is to make that choice explicit and use it consistently.
+
+## 11. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
@@ -488,10 +555,11 @@ In troubleshooting, a repair is an intervention. It sets a part to "not broken".
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. Chapter 17 gives the fix, use each guess as a weak prior (a few imaginary records) that real records then correct (section 7.6) |
 | Holdout test or cross-validation (Box 16.A) | Not used, because the data is simulated | Needed as soon as real inspection records arrive |
 | Seeing against doing (Ch 21) | Only seeing. The deductive move conditions on the cause | Same answer for causes with no parents, as in the current cases. Advice about repairs needs "do" (cut the arrows into the repaired part) and arrows that follow real causes |
+| Influence diagrams and value of information (Ch 23) | No decisions or utilities. The tool reports chances only | The Ex product needs decision and utility nodes, a ranking by expected loss, and value of information to choose the next check |
 
-## 11. Questions to carry into the next chapters
+## 12. Questions still open
 
-Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width). Question 3 is answered in section 7.6 (it depends on the records per parent mix, and a weak prior covers the gap).
+Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width). Question 3 is answered in section 7.6 (it depends on the records per parent mix, and a weak prior covers the gap). Questions 4 and 7 are answered in sections 10.4 and 10.6 (yes, an influence diagram ranks by expected loss, and value of information chooses the next check).
 
 1. How do we pick the values of a variable when the inspection data uses grades or free text?
 2. When does a node with many causes need noisy-OR (5.4) instead of a full table?
@@ -505,6 +573,7 @@ Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is
 10. How many imaginary records should a guessed chance be worth, for a language model guess and for an engineer's estimate? Cross-validation on the first real records could choose it.
 11. Will the partner have enough clean inspection records (a few hundred or more, with the same fields filled in) to suggest links, or only enough to correct the numbers of an engineer-built graph?
 12. Do the inspection records say why each item was inspected (routine or flagged), and give site, age and type of protection, so that selection bias and hidden common causes can be modelled?
+13. What harm or risk rating does the partner already use for each item and zone, so that the utilities come from them and not from us?
 
 ## References
 
