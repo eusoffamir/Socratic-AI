@@ -12,8 +12,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 |---|---|---|---|---|
 | 1 | Ch 1 Introduction | 1 to 14 | The big picture and the words used | Done 25 Nov |
 | 2 | 2.1 Probability, 2.2 Graphs | 15 to 44 | Conditional probability, Bayes rule, independence, graph words | Done 25 Nov |
-| 3 | 3.1 to 3.4 Bayesian networks | 45 to 92 | What a node and an arrow mean, which questions the graph can answer (d-separation) | Next |
-| 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | |
+| 3 | 3.1 to 3.4 Bayesian networks | 45 to 92 | What a node and an arrow mean, which questions the graph can answer (d-separation) | Done 25 Nov |
+| 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Next |
 | 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | |
 | 6 | 16, 17.1 to 17.2 Learning chances | 697 to 732 | Counting chances from data, which is what `app/pgm.py` does now | |
 | 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | |
@@ -101,17 +101,97 @@ For our tool, the small cause and signs model that the Builder drafts assumes th
 
 For our tool, the knowledge graph allows "causes" arrows in any direction, and nothing stops them forming a cycle (A causes B, B causes A). That is fine for teaching, but **if we ever turn the causal part of the knowledge graph into a Bayesian network, we must first check that it is acyclic**. `app/heuristics.py` already walks its decision trees from the root to catch loops, so the same idea can be reused.
 
-## 4. What this means for our tool
+## 4. Notes on Chapter 3 (sections 3.1 to 3.4, Bayesian networks)
+
+We read 3.1 to 3.4 and the four boxes, and only skimmed 3.4.3 (finding perfect maps, marked as advanced), which is the basis of the PC method in thesis section 2.8.5.
+
+### 4.1 From one big table to small tables (3.1)
+
+- **Write the chances in the order things happen.** Instead of one table for Intelligence and SAT together, give the chance of Intelligence, then the chance of each SAT score given Intelligence. The small table for one node given its parents is called a **CPD** (conditional probability distribution).
+- **Naive Bayes** (3.1.3, Box 3.A) is one hidden class with many signs that are independent given the class. With n yes or no signs it needs only 2n + 1 numbers. Its known weakness is **double counting**. High blood pressure and obesity both point to heart disease, but they are linked to each other, so naive Bayes counts the same evidence twice, and diagnosis got worse as more signs were added. This is the weakness of our Builder's cause and signs model (section 3.4 of these notes).
+- **Modularity.** Adding a new variable only needs one new small table. The old tables stay the same. This suits a graph that grows as engineers add knowledge.
+
+### 4.2 What a Bayesian network is (3.2)
+
+A Bayesian network is a DAG plus one CPD per node. The chance of a full case is the product of each node's chance given its parents (the **chain rule for Bayesian networks**). In the Student example (Difficulty, Intelligence, Grade, SAT, Letter) this needs 15 numbers instead of 47. With n yes or no nodes and at most k parents each, it needs fewer than n times 2 to the power k, so the size grows with the number of parents, not the number of nodes.
+
+**What the graph promises (local independencies).** Each node is independent of everything that is not its descendant, once its parents are known. Parents shield a node from its causes further back, but its descendants (its effects) can still change our belief about it.
+
+**The two views are the same thing.** If the graph's independencies hold, the chances can be split into the small tables, and if the chances are split that way, the independencies hold (Theorems 3.1 and 3.2).
+
+### 4.3 Four reasoning patterns (3.2.1.2)
+
+These match the reasoning types in our tool.
+
+| Book's name | Direction | Student example | Our tool |
+|---|---|---|---|
+| Causal reasoning (prediction) | From cause to effect | Not so smart, so a strong letter is less likely (50 percent down to 39 percent) | The deductive-style forward move in `pgm.py` |
+| Evidential reasoning (explanation) | From effect to cause | A grade of C, so a smart student is less likely (30 percent down to 8 percent) | The abductive move |
+| Intercausal reasoning, explaining away | Between two causes of one effect | A grade of C, then learning the class is hard, so a smart student is a bit more likely again (8 percent up to 11 percent) | Not used yet |
+| Combined | Mixed | A grade of C but a high SAT, so smart rises to 58 percent and a hard class rises to 76 percent | Not used yet |
+
+**Explaining away** matters most for diagnosis. When two faults can cause the same sign, finding one fault lowers the chance of the other. In Ex inspection, finding a damaged gasket explains the water inside an enclosure, so a cracked housing becomes less likely.
+
+We rebuilt the Student network in plain Python and got all 12 numbers the book gives in this section (for example 50.2 percent for a strong letter, 7.9 percent for smart given a C, 57.8 percent given a C and a high SAT). So adding up every case, the method `pgm.py` uses, matches the book. One thing `pgm.py` cannot do yet is a node with three values like Grade, because its nodes are only true or false.
+
+### 4.4 Reading independence from the graph (3.3, d-separation)
+
+For three nodes on a trail X, Z, Y, influence flows from X to Y in these cases.
+
+| Shape | Name | Flows when |
+|---|---|---|
+| X to Z to Y | Causal chain | Z is not observed |
+| X from Z from Y | Evidential chain | Z is not observed |
+| X from Z to Y | Common cause | Z is not observed |
+| X to Z from Y | Common effect (v-structure) | Z, **or one of its descendants**, is observed |
+
+The common effect is the odd one. Two causes are independent until we see their shared effect, and then they become linked (this is explaining away). A longer trail is **active** if every three-node step on it lets influence through. X and Y are **d-separated** given what we have seen if no trail between them is active, and then they are truly independent in every network with that graph (sound, Theorem 3.3). The book also gives a fast algorithm that finds every node reachable by an active trail (3.3.3).
+
+For our tool, d-separation tells the Ex system **which inspection results are worth asking for**. If a check is d-separated from the fault given what is already known, it cannot change the diagnosis, so it can be skipped.
+
+### 4.5 Different graphs, same meaning (3.3.4)
+
+Two graphs say the same thing (**I-equivalent**) exactly when they have the same skeleton (the edges with the arrows removed) and the same **immoralities** (v-structures X to Z from Y where X and Y are not joined). So data alone cannot tell "A causes B" from "B causes A". The direction must come from knowledge of the world (Chapter 21). This is why, in thesis section 2.8.5, learned arrows are "not always true causes".
+
+### 4.6 From a distribution to a graph (3.4)
+
+- **Minimal I-map.** Add the variables in some order, and give each one the smallest set of earlier variables that makes it independent of the rest. The result depends on the order. The causal order gives the clean Student graph, but a backwards order (Letter first) gives a graph that is almost fully joined and hides most independencies.
+- **Perfect map.** A graph whose independencies are exactly those of the data. Not every distribution has one. Two examples are four students in a study circle, which needs an undirected graph (Chapter 4), and independencies that hold only for some values of a variable (Chapter 5).
+
+### 4.7 Building a network by hand (Box 3.C) and a real case (Box 3.D)
+
+Box 3.C is the most useful part of the chapter for the Ex use case.
+
+- **Picking variables.** Each variable must pass the **clarity test**, which asks whether someone who saw everything could say its value. "Fever" is not clear until we say measured how, where and when. "Risk of heart attack" fails, because nobody can observe a risk, only whether the attack happened. For inspection, "seal damaged" must say what counts as damaged, and "spark risk" should not be a node.
+- **Hidden variables help.** When many signs are linked by one unseen thing, add a hidden node for it. This answers our question 5. If rust and a loose cover both come from a wet location, add a "wet location" node as a parent of both, so they are independent given it, and naive Bayes no longer counts them twice.
+- **Value ranges.** If the values are too coarse, the independencies can be false. For example, two cholesterol tests both fail more often when the level is borderline, so a "borderline" value is needed.
+- **Picking structure.** Draw arrows from cause to effect, because causal graphs need fewer edges. Build backwards from the variable of interest. If the expert says its chance "depends on" something, add that as a parent (**extending the conversation**). Leave out weak links, because every extra edge makes the network harder to understand, to fill with numbers and to reason over. For fault diagnosis, the correct model has one variable per fault (several faults at once), but a **single fault** variable is a common simplification.
+- **Picking chances.**
+  - Experts dislike exact numbers, and the way a question is asked changes the answer.
+  - A change from 70 to 75 percent rarely matters.
+  - Three errors do matter. A **zero chance** for something that is only rare can never be undone by evidence (an early version of Pathfinder got 10 percent of its cases wrong this way). The order of size matters for rare events (1 in 10,000 against 1 in 100,000). The order between rows matters (a sign must be more likely under the right cause).
+  - **Sensitivity analysis** shows which numbers change the answer, so the effort goes there.
+
+For our tool, the Builder already asks for chances between 5 and 95 percent and the code keeps every chance between 1 and 99 percent (`builder._percent`), so it never gives a zero, and it checks the order between rows (`if_cause` higher than `if_not`). These are two of the three rules above.
+
+**Pathfinder** (Box 3.D) diagnosed lymph node diseases with more than 60 diseases and about 100 findings. The full Bayesian network agreed with an expert pathologist in 50 of 53 cases, against 47 of 53 for naive Bayes. Its structure took about 35 hours to define and its numbers about 40 hours. The expert found it easier to give the chance of one finding across all diseases than all the findings for one disease. For the Ex use case, that suggests asking engineers "how often does each fault show this sign" one sign at a time, and planning for tens of hours of engineer time.
+
+## 5. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
-| Nodes are random variables chosen for the questions | Nodes are true or false statements, each linked to a knowledge graph node (`app/pgm.py`) | Only yes or no values. Real inspection data will have more values, such as a condition grade |
+| Nodes are random variables chosen for the questions | Nodes are true or false statements, each linked to a knowledge graph node (`app/pgm.py`) | Only yes or no values. Real inspection data will have more values, such as a condition grade. Grade in the Student example needs three values |
+| Explaining away between two causes (3.2.1.2) | Each case has one cause | A fault model needs two or more causes of the same sign |
+| Hidden nodes stop double counting (Box 3.C) | The Builder's model is naive Bayes, with one cause and two signs | Add a shared hidden cause when signs are linked |
 | Numbers learned from data | Chances counted from simulated data with a fixed seed | The data is made up to show the method |
 | Inference by smart algorithms (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20 |
 | Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet |
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. They should be marked as guesses or replaced by counted ones |
 
-## 5. Questions to carry into the next chapters
+## 6. Questions to carry into the next chapters
+
+Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold).
+
 
 1. How do we pick the values of a variable when the inspection data uses grades or free text?
 2. When does a node with many causes need noisy-OR (5.4) instead of a full table?
@@ -119,6 +199,8 @@ For our tool, the knowledge graph allows "causes" arrows in any direction, and n
 4. Can an influence diagram (23.2) turn "chance of a spark" plus "cost of an explosion" into an inspection order?
 5. When two signs share another cause (rust and a loose cover from a wet location), how does a Bayesian network show it without the table growing too big (Chapter 3)?
 6. Is marginal MAP over the fault (2.1.5.3) cheap enough to answer for a network of 20 or more nodes (Chapter 9 and 13)?
+7. Can d-separation pick the next inspection check to ask for, by skipping checks that cannot change the diagnosis?
+8. Should the Ex model use one variable per fault (several faults at once) or a single fault variable, given the cost of reasoning?
 
 ## References
 
