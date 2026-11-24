@@ -367,7 +367,7 @@ This is the fix for the problem we found in Chapter 1. **The AI-guessed chances 
 
 ## 8. Notes on Chapter 18 (sections 18.1 to 18.4, learning the arrows)
 
-We read 18.1 to 18.4, skipping the formulas in 18.2.2 and 18.3.3 to 18.3.4, and the advanced parts (18.3.7 and 18.4.4). Section 18.4.4 is where the GES method cited in thesis section 2.8.5 is explained, so it is worth a later look for the thesis.
+We read 18.1 to 18.4, skipping the formulas in 18.2.2 and 18.3.3 to 18.3.4, and the advanced parts (18.3.7 and 18.4.4). Section 18.4.4 explains the GES method cited in thesis section 2.8.5. We read it on 25 November 2026. GES searches over groups of equivalent graphs, adds arrows while the score improves, then removes them, and with enough clean data it finds the true group.
 
 ### 8.1 The problem (18.1)
 
@@ -581,4 +581,4 @@ Koller, D., & Friedman, N. (2009). Probabilistic graphical models: Principles an
 
 Lauritzen, S. L., & Spiegelhalter, D. J. (1988). Local computations with probabilities on graphical structures and their application to expert systems. Journal of the Royal Statistical Society, Series B, 50(2), 157-194. https://doi.org/10.1111/j.2517-6161.1988.tb01721.x
 
-Pearl, J. (1988). Probabilistic reasoning in intelligent systems: Networks of plausible inference. Morgan Kaufmann. (Cited in Koller and Friedman; not yet checked.)
+Pearl, J. (1988). Probabilistic reasoning in intelligent systems: Networks of plausible inference. Morgan Kaufmann. https://doi.org/10.1016/C2009-0-27609-4
