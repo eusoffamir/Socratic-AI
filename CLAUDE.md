@@ -4,7 +4,7 @@ Short version. Full history, details, audits and dated findings are in `docs/pro
 
 ## Student and writing style
 
-- **Muhammad Eusoff Amir bin Hazri**, ID **22010491**, goes by Eusoff. Course **EFB4042** (FYP I), UTP. Programme Bachelor of Computer Engineering with Honours (Faculty of Engineering, Department of Electrical and Electronic Engineering, intake May 2023). Project "Agentic AI for Fostering Critical Thinking Education", code **26S005**, supervisor Dr Ho Tatt Wei.
+- **Muhammad Eusoff Amir bin Hazri**, ID **22010491**, goes by Eusoff. Course **EFB4042** (FYP I), UTP. Programme Bachelor of Computer Engineering with Honours (Faculty of Engineering, Department of Electrical and Electronic Engineering, intake May 2023). Project "Agentic AI for Fostering Critical Thinking Education", code **26S005**, supervisor Dr Ho Tatt Wei. Final semester (FYP II) is January 2027 (lectures 11 January to 2 April, exams 6 to 20 April 2027); convocation is usually late October or early November 2027.
 - **Student-facing and thesis text: easy English, short sentences. Never use "--" or em dashes.**
 - **No colons (":") in slides, scripts or other text Eusoff presents**, not even "Label: text" or "Title: subtitle". Use plain spoken English instead ("Next, ...", "so ..."). Reference lists keep their colons.
 - No money for APIs. Default to free options (Gemini free tier, mock mode, local tools).
