@@ -16,8 +16,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Done 25 Nov |
 | 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Done 25 Nov |
 | 6 | 16, 17.1 to 17.4 Learning chances | 697 to 750 | Counting chances from data, which is what `app/pgm.py` does now, and adding prior knowledge | Done 25 Nov |
-| 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | Next |
-| 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | |
+| 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | Done 25 Nov |
+| 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | Next |
 | 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | |
 | Skim | 4.1 to 4.2 Markov networks | 103 to 115 | Only to know when an undirected graph fits better | |
 
@@ -365,7 +365,64 @@ Counting alone cannot tell 3 heads in 10 tosses from 300,000 in 1,000,000, and c
 
 This is the fix for the problem we found in Chapter 1. **The AI-guessed chances should not be thrown away or trusted blindly. They should be a prior with a small weight, which real records then correct.** The weight says how much we trust the guess (an engineer's estimate might get more weight than a language model's). This also answers question 3. There is no fixed number of records. The answer for each table entry depends on how many records match its parent mix, and the prior covers the gap until there are enough.
 
-## 8. What this means for our tool
+## 8. Notes on Chapter 18 (sections 18.1 to 18.4, learning the arrows)
+
+We read 18.1 to 18.4, skipping the formulas in 18.2.2 and 18.3.3 to 18.3.4, and the advanced parts (18.3.7 and 18.4.4). Section 18.4.4 is where the GES method cited in thesis section 2.8.5 is explained, so it is worth a later look for the thesis.
+
+### 8.1 The problem (18.1)
+
+The data is noisy, so the shares in it never show an exact independence. 100 tosses of two fair coins almost never give exactly 25 of each pair. So every method must decide **how sure it must be before it adds an arrow**. Adding more arrows gives false links, and adding fewer misses real ones. Which mistake is worse depends on the use.
+
+- **For knowledge discovery**, the best possible answer is the true graph's equivalence class (section 4.5 of these notes), never more. Data cannot fix the direction of every arrow.
+- **For good answers on new cases**, fewer arrows are often better, even if some of them are real. Each extra parent splits the records into smaller groups, so the numbers get noisier (data fragmentation, section 7.5 of these notes). In the book's example, a chance estimated from 9 records instead of 20 has a spread of about 17 points instead of 11.
+
+### 8.2 Three families of methods (18.1.2)
+
+| Family | Idea | Strength | Weakness |
+|---|---|---|---|
+| Constraint-based (18.2), such as PC | Test which pairs are independent given small sets of others, then build the graph that fits the tests | Clear and close to the meaning of a Bayesian network. Uses few, small tests | One wrong test can lead to several wrong arrows |
+| Score-based (18.3, 18.4), such as hill climbing and GES | Give each whole graph a score for fit and simplicity, then search for a high score | Looks at the whole graph at once, so it can weigh weak links better | The search space is huge, and finding the best graph is NP-hard |
+| Model averaging | Keep many likely graphs and average their answers | Shows how sure we are about each arrow | Costly. Not in our reading plan |
+
+### 8.3 Testing independence (18.2)
+
+The usual test for yes or no and category data is the **chi-squared test** (or mutual information). It asks how far the counts are from what independence would predict, and how likely so large a gap is by chance (the **p-value**). An arrow is kept when that chance is below 5 percent. With many tests, about 1 in 20 rejections will be wrong (the **multiple testing** problem). Stricter levels cut false arrows but miss more real ones. The book says this works well with few variables, many records and strong links, and struggles when the links are weak.
+
+### 8.4 Scoring a graph (18.3)
+
+- **Fit alone always prefers more arrows.** Adding an arrow can never lower the plain likelihood score, so learning by fit alone ends with an almost fully joined graph. That is overfitting.
+- **The Bayesian score**, and its simple form the **BIC score**, add a cost for each number in the model. BIC is the fit minus half the log of the number of records times the number of free numbers. The fit grows with the number of records, but the cost only grows with its log. So with little data, simpler graphs win, and with more data the true graph wins. The book shows this on ICU-Alarm data, where simpler graphs (359 and 214 numbers) beat the true one (509 numbers) until there are enough records (Figure 18.4).
+- **Consistency (Theorem 18.2).** With enough data, BIC picks the true graph or an equivalent one.
+- **Priors on the graph** matter little once there is data, unless they rule a graph out. A small cost per arrow is a common choice. This is also where expert knowledge can enter, for example by fixing arrows the engineers are sure of, or forbidding arrows that point back in time.
+
+### 8.5 Searching (18.4)
+
+- **Trees are easy (18.4.1).** If each node may have at most one parent, the best tree can be found exactly and quickly. Each pair of nodes gets a weight (how much one tells about the other), and the best tree is the maximum spanning tree (the Chow and Liu idea). A tree is a good first model, because it is sparse and cannot overfit much.
+- **A known order is easier (18.4.2).** If we know which variables come first, for example by time, there can be no cycles, and each node's parents can be chosen on its own. A wrong order gives an overly complex graph, as in section 4.6 of these notes. For inspection data, a natural order exists: design and environment, then defects, then the state of the protection, then the findings.
+- **General graphs are hard (18.4.3).** Finding the best graph with up to 2 parents per node is already NP-hard (Theorem 18.5). The usual method is **greedy hill climbing**. Start from an empty graph, a tree or an expert's graph. Try every single change (add, remove or reverse one arrow) that keeps the graph acyclic, apply the best one, and repeat until nothing helps. It can get stuck at a local best or on a flat stretch where equivalent graphs score the same. Fixes include tabu search (do not undo recent moves), random restarts, and slightly reweighting the data.
+- **In practice (18.4.3.4)**, learning both the arrows and the numbers of ICU-Alarm was only a little worse than learning the numbers with the true arrows given. A network of about 100 variables took a few minutes. The learned graphs were usually simpler than the true one, but answered almost as well.
+
+### 8.6 Our check
+
+We sampled records from the book's Student network (5 nodes, 4 arrows, Figure 3.4) and learned the arrows back with the BIC score and greedy hill climbing (plain Python, in the scratchpad, about 60 lines).
+
+| Records | Samples (out of 10) where the learned links were exactly right |
+|---|---|
+| 50 | 2 |
+| 100 | 4 |
+| 200 | 7 |
+| 500 | 8 |
+
+With one sample of 50 records, it missed the weak link from Difficulty to Grade and added two false links (from Letter and from SAT to Difficulty). From 200 records upward it usually found all four links with no extras. The arrows into Grade (from Difficulty and Intelligence) can be told apart from the data, because they form a v-structure, but the direction of the Intelligence and SAT link cannot (section 4.5 of these notes). So **even a 5-node network needs a few hundred clean records to learn its links reliably, and some arrow directions always need knowledge from outside the data.**
+
+### 8.7 What this means for the Ex use case and the thesis
+
+- **Start from the engineers' graph, not from nothing.** Use the expert or Builder graph as the starting point and as a prior, fix the arrows the engineers are sure of, forbid arrows against the time order, and let the data suggest additions and removals. This is the mix proposed at the end of thesis section 2.8.
+- **Do not claim causes from learned arrows alone.** Directions inside an equivalence class come from knowledge, not data. This backs the warning in thesis section 2.8.5.
+- **Expect to need hundreds of records** even for a small network, more for weak links. Until then, structure learning is best used to flag possible missing links for an engineer to check, not to build the graph.
+- **A tree is a safe first step.** With few records, the best tree is quick to learn and hard to overfit.
+
+## 9. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
@@ -376,11 +433,11 @@ This is the fix for the problem we found in Chapter 1. **The AI-guessed chances 
 | Tree CPDs (5.3) | Expert decision trees in `app/heuristics.py` end in decisions, not chances | The same tree shape could hold chances at its leaves and become one node's table |
 | Numbers learned from data, with a prior (Ch 17) | Chances counted from simulated data with a fixed seed, plus 1 imaginary true and 1 false (Laplace's correction, `pgm.learn()`) | The data is made up to show the method. The prior is the same weak one everywhere, and is not yet taken from an expert or the Builder's guess |
 | Variable elimination (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20. Variable elimination works in plain Python (checked in a scratch version), and its cost depends on the tree-width, not the number of nodes |
-| Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet |
+| Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet. BIC with hill climbing works in plain Python (checked in a scratch version), but needs a few hundred records even for 5 nodes. Best used to start from the expert graph and suggest changes |
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. Chapter 17 gives the fix, use each guess as a weak prior (a few imaginary records) that real records then correct (section 7.6) |
 | Holdout test or cross-validation (Box 16.A) | Not used, because the data is simulated | Needed as soon as real inspection records arrive |
 
-## 9. Questions to carry into the next chapters
+## 10. Questions to carry into the next chapters
 
 Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width). Question 3 is answered in section 7.6 (it depends on the records per parent mix, and a weak prior covers the gap).
 
@@ -394,6 +451,7 @@ Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is
 8. Should the Ex model use one variable per fault (several faults at once) or a single fault variable, given the cost of reasoning?
 9. Do the partner's inspection records grade defects by severity (for noisy-MAX), and do they say the type of protection, so that it can be the first split of a tree?
 10. How many imaginary records should a guessed chance be worth, for a language model guess and for an engineer's estimate? Cross-validation on the first real records could choose it.
+11. Will the partner have enough clean inspection records (a few hundred or more, with the same fields filled in) to suggest links, or only enough to correct the numbers of an engineer-built graph?
 
 ## References
 
