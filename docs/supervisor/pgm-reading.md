@@ -17,8 +17,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Done 25 Nov |
 | 6 | 16, 17.1 to 17.4 Learning chances | 697 to 750 | Counting chances from data, which is what `app/pgm.py` does now, and adding prior knowledge | Done 25 Nov |
 | 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | Done 25 Nov |
-| 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | Next |
-| 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | |
+| 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | Done 25 Nov |
+| 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | Next |
 | Skim | 4.1 to 4.2 Markov networks | 103 to 115 | Only to know when an undirected graph fits better | |
 
 Then task 8, a small network on an open dataset, as a proof of concept.
@@ -422,7 +422,58 @@ With one sample of 50 records, it missed the weak link from Difficulty to Grade 
 - **Expect to need hundreds of records** even for a small network, more for weak links. Until then, structure learning is best used to flag possible missing links for an engineer to check, not to build the graph.
 - **A tree is a safe first step.** With few records, the best tree is quick to learn and hard to overfit.
 
-## 9. What this means for our tool
+## 9. Notes on Chapter 21 (sections 21.1 and 21.2, causality)
+
+We read 21.1 and 21.2, the summary (21.8), and Box 21.C, which is about repair. We skipped the advanced parts (21.3 to 21.7: when a causal answer can be found from data, counterfactuals and learning causal models). Section 21.7 is worth a later look if the paper ever claims causes from data.
+
+### 9.1 Seeing is not doing (21.1.1)
+
+Up to now, the direction of the arrows did not matter for answers, as long as the network gave the right chances. Arrows that follow cause and effect just give sparser, more natural graphs. Direction starts to matter when we **act on the world** instead of only looking at it.
+
+- **Seeing.** "Given that the grade is A, what is the chance the student is smart?" This is an ordinary conditional chance.
+- **Doing (an intervention).** "If we **set** the grade to A, what is the chance the student is smart?" It is written with "do", as in the chance of smart given do(grade = A). An ideal intervention sets one variable and changes nothing else directly.
+- **Counterfactual.** "Given what actually happened, what would have happened if we had changed one thing?" For example, a car does not start but its lights work, so would replacing the battery have fixed it? The evidence (the lights work) must be kept, and it already says the battery is probably fine.
+
+**Our check, on the Student network.** Seeing an A raises the chance that the student is smart from 30 percent to 61 percent. Faking the A (the book's student hacks the grade database) leaves it at 30 percent, because a set grade says nothing about where it came from. The chance of a strong letter is 90 percent either way, because the letter depends only on the grade.
+
+### 9.2 Why links in data are not causes (21.1.2)
+
+A link between X and Y in data can come from X causing Y, from Y causing X, or from both sharing a cause. The book's examples are useful as warnings for real inspection data.
+
+- **Hidden common cause (confounding).** People who take an antacid get more ulcers, but the discomfort before an ulcer causes both. We can never list every hidden cause.
+- **Selection bias.** A survey answered mostly by good students and by athletes shows a false negative link between sport and grades.
+- **Mixed groups.** Across all children, height and verbal ability look negatively linked, only because boys and girls differ in both.
+- **Shared trends over time.** Average height rose while polar ice shrank over the last century, so they look linked, but time is the hidden common cause.
+
+### 9.3 A causal model (21.2)
+
+A **causal model** is a Bayesian network in which each arrow is read as a direct cause, and each node's table is the **mechanism** that makes its value from its parents. To answer "what if we set Z to z", cut every arrow into Z and fix Z to z (the **mutilated network**), then ask the question as usual.
+
+So X to Y and Y to X are the same for seeing but different for doing. This is why the direction of arrows, which data alone cannot always fix (section 8.6 of these notes), matters as soon as the system recommends actions.
+
+**Simpson's paradox (Example 21.9).** We checked the book's numbers.
+- **Seeing.** Overall, 57.5 percent of patients who took a drug were cured, against 50 percent of those who did not, so the drug looks good.
+- **By group.** Among men it was 70 percent against 80 percent, and among women 20 percent against 40 percent, so it was worse in both groups. Men took the drug far more often (75 percent against 25 percent) and men recover more often anyway.
+- **Doing.** Cutting the arrow from gender to drug gives 45 percent cured if everyone takes the drug and 60 percent if no one does. So the drug harms.
+
+The causal graph tells us which numbers to trust, which the data alone cannot.
+
+### 9.4 Repair is an action (Box 21.C)
+
+In troubleshooting, a repair is an intervention. It sets a part to "not broken". But the question after a repair is a counterfactual one: given the faults we saw before, is the system fixed now? If the evidence already said the replaced part was probably fine, the system is probably still broken. With noisy-OR tables and a single fault, this is cheap to compute (the book points to Breese and Heckerman, 1996, which we have not checked).
+
+### 9.5 What this means for the Ex use case
+
+- **Diagnosis is seeing, but advice is doing.** "Which fault is most likely, given these findings?" is an ordinary question, so a non-causal network is fine. "Will replacing the gasket restore protection?" or "Which repair lowers the chance of ignition most?" are questions about doing, so the arrows must follow real cause and effect. They must come from engineers and physics, not from data alone.
+- **Watch for these traps in inspection records.**
+  - Selection bias. Equipment flagged before may be inspected more closely, so it shows more defects.
+  - Hidden common causes. Older sites, or sites near the sea, may have both more corrosion and more of other defects.
+  - Mixed groups. Each type of protection may behave differently, so pooling them can hide or reverse a link, as in Simpson's paradox.
+
+  The fix is to put these factors in the model as nodes (site, age, type of protection), so the network can account for them.
+- **For our tool.** The deductive move in `pgm.py` asks for the chance of an effect given its cause by seeing, not doing. For a cause with no parents, such as "the day is hot", seeing and doing give the same answer, so the current cases are fine. The difference appears once a cause has its own causes.
+
+## 10. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
@@ -436,8 +487,9 @@ With one sample of 50 records, it missed the weak link from Difficulty to Grade 
 | Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet. BIC with hill climbing works in plain Python (checked in a scratch version), but needs a few hundred records even for 5 nodes. Best used to start from the expert graph and suggest changes |
 | Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. Chapter 17 gives the fix, use each guess as a weak prior (a few imaginary records) that real records then correct (section 7.6) |
 | Holdout test or cross-validation (Box 16.A) | Not used, because the data is simulated | Needed as soon as real inspection records arrive |
+| Seeing against doing (Ch 21) | Only seeing. The deductive move conditions on the cause | Same answer for causes with no parents, as in the current cases. Advice about repairs needs "do" (cut the arrows into the repaired part) and arrows that follow real causes |
 
-## 10. Questions to carry into the next chapters
+## 11. Questions to carry into the next chapters
 
 Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width). Question 3 is answered in section 7.6 (it depends on the records per parent mix, and a weak prior covers the gap).
 
@@ -452,6 +504,7 @@ Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is
 9. Do the partner's inspection records grade defects by severity (for noisy-MAX), and do they say the type of protection, so that it can be the first split of a tree?
 10. How many imaginary records should a guessed chance be worth, for a language model guess and for an engineer's estimate? Cross-validation on the first real records could choose it.
 11. Will the partner have enough clean inspection records (a few hundred or more, with the same fields filled in) to suggest links, or only enough to correct the numbers of an engineer-built graph?
+12. Do the inspection records say why each item was inspected (routine or flagged), and give site, age and type of protection, so that selection bias and hidden common causes can be modelled?
 
 ## References
 
