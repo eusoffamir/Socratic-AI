@@ -15,8 +15,8 @@ The plan follows the authors' own reader's guide (Figure 1.2, "Core" first), the
 | 3 | 3.1 to 3.4 Bayesian networks | 45 to 92 | What a node and an arrow mean, which questions the graph can answer (d-separation) | Done 25 Nov |
 | 4 | 5.1 to 5.4 Local models | 157 to 185 | How to give chances to a node with many causes. Noisy-OR (5.4) fits "many things can cause a spark" | Done 25 Nov |
 | 5 | 9.1 to 9.4 Variable elimination | 288 to 310 | Exact answers without adding up every case, so the network can grow past a few nodes | Done 25 Nov |
-| 6 | 16, 17.1 to 17.2 Learning chances | 697 to 732 | Counting chances from data, which is what `app/pgm.py` does now | Next |
-| 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | |
+| 6 | 16, 17.1 to 17.4 Learning chances | 697 to 750 | Counting chances from data, which is what `app/pgm.py` does now, and adding prior knowledge | Done 25 Nov |
+| 7 | 18.1 to 18.4 Structure learning | 783 to 820 | Learning the arrows from data. Links to section 2.8.5 of the thesis | Next |
 | 8 | 21.1 to 21.2 Causality | 1009 to 1017 | The difference between seeing X and changing X | |
 | 9 | 22.1, 23.1 to 23.2 Decisions | 1059 to 1095 | Influence diagrams, which add actions and costs to a network. This could rank which equipment to inspect first | |
 | Skim | 4.1 to 4.2 Markov networks | 103 to 115 | Only to know when an undirected graph fits better | |
@@ -298,7 +298,74 @@ The network is small, so the saving is small, but it grows quickly with size, as
 - **Question 6 is partly answered.** If the model has a single fault variable, "the most likely fault" is just one probability query (the chance of each fault given the evidence) followed by picking the largest. Variable elimination answers it, and the cost depends on the tree-width. With one variable per fault, finding the most likely set of faults is a marginal MAP question (Chapter 13), which is harder.
 - **For `pgm.py`.** Adding up every case is fine for its 3 or 4 nodes. When the Ex network passes about 20 yes or no nodes (about 1 million cases), the app needs variable elimination. Our scratch version shows it fits in plain Python with no new libraries, in the same spirit as `pgm.py`. A library such as pgmpy could check its answers.
 
-## 7. What this means for our tool
+## 7. Notes on Chapter 16 and sections 17.1 to 17.4 (learning chances from data)
+
+We read Chapter 16 (skipping the formal parts of 16.2 and Box 16.B) and sections 17.1 to 17.4 (skipping 17.2.4 and 17.2.5, which are marked as advanced, and the proofs). We read 17.3 and 17.4 as well as the planned 17.1 and 17.2, because they answer our question 3.
+
+### 7.1 Why learn from data at all (16.1)
+
+Building a network by hand needs a skilled person and experts for hours, and for large networks weeks or months. Sometimes the experts' time is too costly, sometimes no expert understands the whole domain, and sometimes the domain changes from site to site or over time. Records are often easier to get than expert time. The usual mix is still prior knowledge from a person plus numbers from data.
+
+### 7.2 Three goals, three ways to judge (16.2)
+
+1. **A good overall model** of the whole distribution, judged by how likely it finds new records.
+2. **A good answer to one task**, such as classifying a fault, judged by how often that answer is right.
+3. **Knowledge discovery**, finding which links are real, judged by whether the learned graph is the true one. This is the hardest to get. Equivalent graphs cannot be told apart (section 4.5 of these notes), weak links get lost in noise, and with many variables and few records some links appear strong by pure chance.
+
+For the Ex use case, goal 2 (rank the faults) is what the product needs, and goal 3 (which defects really lead to which failures) is what the paper might claim. Goal 3 needs much more care about how sure we are.
+
+### 7.3 Overfitting (16.3)
+
+The chances that fit the training records best are just the shares seen in those records. With 1,000 records over 100 yes or no variables, almost every possible case gets a chance of zero. More generally, the amount of data needed grows with the number of numbers to learn, so it grows exponentially with the number of parents.
+
+This is the **bias and variance trade-off**.
+- A simple model may be wrong even with endless data (bias).
+- A rich model fits the few records we have, including their noise, and changes a lot from one sample to another (variance).
+- With little data, a model that is known to be too simple can give better answers than the true one.
+
+There are two fixes, used together. One is to limit the kind of model (for example, few parents or noisy-OR). The other is to add a preference for simple models (**regularisation**).
+
+**How to check (Box 16.A).** Test on records that were not used for learning (a **holdout test set**). With few records, use **k-fold cross-validation**, which splits the data into k parts and tests on each part in turn. A large gap between training and test results means overfitting.
+
+### 7.4 What kind of learning (16.4)
+
+Learning problems differ along three lines.
+- **What is given.** The graph may be given with only the numbers to learn (the easy case), only the variables may be given, or even the variables may not all be known.
+- **What is seen.** The data may be complete, have gaps, or have **hidden variables** that are never seen.
+- **Bayesian or Markov network.**
+
+For Bayesian networks with complete data and a known graph, the answer has a simple closed form. Gaps and hidden variables make it much harder. The methods guess the missing values, re-estimate, and repeat, which needs inference at every step (Chapter 19).
+
+Hidden variables can still be worth it. In Figure 16.1, one hidden node with 17 numbers stands for a model that would need 59 numbers without it, which is the "wet location" idea from section 4.7 of these notes. For Ex inspection, the real state of the protection is never seen directly, only through inspection findings, so it is a hidden variable by nature.
+
+### 7.5 Counting (17.1 and 17.2, maximum likelihood)
+
+- **One variable.** For a thumbtack that lands heads 35 times in 100, the best fitting chance is 35 percent. This is the **maximum likelihood estimate (MLE)**, the chance that makes the seen data most likely.
+- **A whole network.** The likelihood splits into one part per node, and each node's table can be learned on its own (17.2.2). For a full table, each entry is the count of that value with that parent mix, divided by the count of that parent mix (17.2.3). This is exactly what `pgm.learn()` does, apart from the extra counts described in 7.6 below.
+- **Data fragmentation.** Each entry uses only the records that match its parent mix. With more parents there are many more mixes, so each gets fewer records. That gives noisy estimates and many zeros. The book calls this one of the main limits of learning Bayesian networks from data.
+- **Naive Bayes as a classifier (Box 17.A).** It is easy to learn because each sign needs only its own small table. Its chances are often badly off, but it often still ranks the classes in the right order. So it is a good first baseline for "which fault is most likely".
+
+### 7.6 Adding prior knowledge (17.3 and 17.4, Bayesian estimation)
+
+Counting alone cannot tell 3 heads in 10 tosses from 300,000 in 1,000,000, and cannot tell a thumbtack (we know little) from a coin (we are sure it is about 50 percent). Bayesian estimation fixes both.
+
+- **Laplace's correction.** With no prior knowledge, add 1 imaginary heads and 1 imaginary tails, so the estimate is (heads + 1) divided by (tosses + 2). **This is exactly what `pgm.learn()` does now**, so a parent mix with no records gives 50 percent and never zero.
+- **A prior as imaginary records (the Beta prior).** A prior belief of p with strength a is like having already seen a times p true cases and a times (1 minus p) false cases. Real records are then added on top. In the book's example, 3 heads in 10 gives 33 percent with a weak prior (1 and 1) and 43 percent with a strong prior (10 and 10). After 300 heads in 1,000, both give about 30 percent. So the prior matters when data is scarce and fades as data grows.
+- **For a whole network (17.4.3).** The usual way is to imagine a prior data set of a chosen size, described by a rough network, and to use its counts as the imaginary records for every table (the **BDe prior**).
+- **The evidence (Box 17.C).** The ICU-Alarm network has 37 nodes and 504 numbers. Learning its numbers back from simulated records, plain counting (MLE) did worst, because it follows each sample too closely. A **weak prior** (an imaginary sample of about 5) did best. Strong priors added bias at first, but their effect faded as records grew.
+
+**Our own example, with made-up numbers.** Suppose the Builder or an engineer guesses that a damaged gasket breaks protection 30 percent of the time, and we give that guess the weight of 10 imaginary inspections (3 broken, 7 not).
+
+| Real records | Broken | Counting alone | Guess plus records |
+|---|---|---|---|
+| 0 | 0 | No answer | 30 percent (the guess) |
+| 5 | 2 | 40 percent | 33 percent |
+| 50 | 10 | 20 percent | 22 percent |
+| 1,000 | 200 | 20 percent | 20.1 percent |
+
+This is the fix for the problem we found in Chapter 1. **The AI-guessed chances should not be thrown away or trusted blindly. They should be a prior with a small weight, which real records then correct.** The weight says how much we trust the guess (an engineer's estimate might get more weight than a language model's). This also answers question 3. There is no fixed number of records. The answer for each table entry depends on how many records match its parent mix, and the prior covers the gap until there are enough.
+
+## 8. What this means for our tool
 
 | In the book | In our tool now | Gap |
 |---|---|---|
@@ -307,14 +374,15 @@ The network is small, so the saving is small, but it grows quickly with size, as
 | Hidden nodes stop double counting (Box 3.C) | The Builder's model is naive Bayes, with one cause and two signs | Add a shared hidden cause when signs are linked |
 | Smaller tables (noisy-OR, trees, fixed nodes, Ch 5) | Every node has a full table | Fine for 1 or 2 parents. A fault with many causes needs noisy-OR, and fault trees need fixed AND and OR nodes |
 | Tree CPDs (5.3) | Expert decision trees in `app/heuristics.py` end in decisions, not chances | The same tree shape could hold chances at its leaves and become one node's table |
-| Numbers learned from data | Chances counted from simulated data with a fixed seed | The data is made up to show the method |
+| Numbers learned from data, with a prior (Ch 17) | Chances counted from simulated data with a fixed seed, plus 1 imaginary true and 1 false (Laplace's correction, `pgm.learn()`) | The data is made up to show the method. The prior is the same weak one everywhere, and is not yet taken from an expert or the Builder's guess |
 | Variable elimination (Ch 9) | Exact answer by adding up every case | Fine for 3 or 4 nodes, too slow past about 20. Variable elimination works in plain Python (checked in a scratch version), and its cost depends on the tree-width, not the number of nodes |
 | Structure from experts or data (Ch 18) | Arrows written by hand, or drafted by the Builder | No structure learning yet |
-| Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. They should be marked as guesses or replaced by counted ones |
+| Confidence numbers without meaning are a known failure (Mycin) | The Builder's chances for a new topic are AI guesses in round numbers | Our guessed chances have the same weakness. Chapter 17 gives the fix, use each guess as a weak prior (a few imaginary records) that real records then correct (section 7.6) |
+| Holdout test or cross-validation (Box 16.A) | Not used, because the data is simulated | Needed as soon as real inspection records arrive |
 
-## 8. Questions to carry into the next chapters
+## 9. Questions to carry into the next chapters
 
-Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width).
+Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is partly answered there too (the clarity test, and values fine enough for the independencies to hold). Question 2 is answered in section 5.5 (the table of which model to use for which node). Question 6 is partly answered in section 6.5 (with one fault variable it is a single probability query, and the cost depends on the tree-width). Question 3 is answered in section 7.6 (it depends on the records per parent mix, and a weak prior covers the gap).
 
 1. How do we pick the values of a variable when the inspection data uses grades or free text?
 2. When does a node with many causes need noisy-OR (5.4) instead of a full table?
@@ -325,6 +393,7 @@ Question 5 is answered in section 4.7 (add a hidden shared cause). Question 1 is
 7. Can d-separation pick the next inspection check to ask for, by skipping checks that cannot change the diagnosis?
 8. Should the Ex model use one variable per fault (several faults at once) or a single fault variable, given the cost of reasoning?
 9. Do the partner's inspection records grade defects by severity (for noisy-MAX), and do they say the type of protection, so that it can be the first split of a tree?
+10. How many imaginary records should a guessed chance be worth, for a language model guess and for an engineer's estimate? Cross-validation on the first real records could choose it.
 
 ## References
 
