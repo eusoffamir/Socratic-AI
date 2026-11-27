@@ -98,4 +98,4 @@ Design requirements R1 to R9 and honest status: see history file.
 
 - **Personal papers** (resume, results, SSM, SIP and SIT reports, SakeCha term sheet) live in `docs/personal/` (git-ignored, the repo stays public) with a copy in the Google Drive folder "Eusoff Personal Documents". The resume source is `docs/personal/resume.html` (old Calibri layout, 2 A4 pages, page 1 education and work); print it with Chrome headless `--print-to-pdf` to `Muhammad Eusoff Amir - Resume.pdf`. Facts there are checked against the documents (UTP CGPA 3.66, diploma UniKL MFI taught at MJII, SIDP grade A-, SakeCha term sheet RM30K for 20% plus up to RM20K matched, title Partner and CEO, resigned July 2026).
 - Remind Dr Ho about the Claude and Render subscription requests.
-- Full list of questions for Dr Ho and things to verify: history file, "Open items".
+- Full list of questions for Dr Ho: `docs/supervisor/questions-for-dr-ho.md` (27 November 2026, gathered from every file). Older things to verify: history file, "Open items".

@@ -117,6 +117,8 @@ Say "For the backup paper, we planned a pretest and posttest study with matched 
 
 ## Questions to ask Dr Ho
 
+The full list, including older questions, is in `questions-for-dr-ho.md`.
+
 1. Is the Diagnosis page the right shape for the inspection use case? What should change before we show it to the partner or the startup contacts?
 2. Are the eleven relation classes right, and is anything missing that inspection engineers use?
 3. Which cohort and topic for the teaching study, and how does ethics approval work at UTP?
