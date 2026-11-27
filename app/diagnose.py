@@ -100,6 +100,40 @@ def reading(r, check):
     return {"check": check, "name": CHECK_NAMES[check], "value": f"{value} {unit}", "band": r[check]}
 
 
+SHIFT = 0.1  # a check "points to" or "makes unlikely" a fault when it moves its chance by 10 points or more
+
+
+def found(r, done):
+    """Each check in order, with what it found about the faults it can cause
+    (its "causes" edges, learned from data). A big rise points to that fault
+    (abductive), a big fall makes it unlikely, otherwise it tells little."""
+    parents = model()["parents"]
+    out, evidence = [], {"type": r["type"], "failed": 1}
+    before = _chances(evidence)
+    for c in done:
+        evidence[c] = r[c]
+        after = _chances(evidence)
+        mine = [m for m in net.MODES if c in parents[m]]
+        up = max(mine, key=lambda x: after[x] - before[x], default=None)
+        down = min(mine, key=lambda x: after[x] - before[x], default=None)
+        if up and after[up] - before[up] >= SHIFT:
+            effect = {"kind": "up", "fault": FAULTS[up], "text": f"Points to {FAULTS[up]}"}
+        elif down and before[down] - after[down] >= SHIFT:
+            effect = {"kind": "down", "fault": FAULTS[down], "text": f"Makes {FAULTS[down]} unlikely"}
+        else:
+            effect = {"kind": "none", "fault": None, "text": "Tells little"}
+        out.append({**reading(r, c), **effect})
+        before = after
+    return out
+
+
+def _tells(gain, best):
+    """How much a check would tell, compared with the best one now."""
+    if best <= 0.01 or gain < best / 4:
+        return "tells little"
+    return "tells a lot" if gain >= best * 2 / 3 else "tells some"
+
+
 def graph():
     """The demo's knowledge graph in the standard relation classes."""
     p = model()["parents"]
@@ -135,10 +169,11 @@ def step(udi, done):
     finished = now >= CONFIDENT or not left
     out = {
         "machine": {"udi": r["udi"], "pid": r["pid"], "type": r["type"]},
-        "done": [reading(r, c) for c in done],
+        "done": found(r, done),
         "faults": [{"id": x, "name": FAULTS[x], "percent": _pct(chances[x])} for x in ranked],
         "sure": _pct(now),
-        "checks": [{"check": c, "name": CHECK_NAMES[c], "gain": round(100 * max(values.get(c, 0), 0))} for c in left],
+        "checks": [{"check": c, "name": CHECK_NAMES[c], "gain": round(100 * max(values.get(c, 0), 0)),
+                    "tells": _tells(values.get(c, 0), max(values.values(), default=0))} for c in left],
         "best": max(left, key=lambda c: values.get(c, 0)) if left else None,
         "finished": finished,
     }

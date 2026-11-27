@@ -19,27 +19,45 @@ Say "We start with the tutor. It never gives the answer. It asks questions up Pa
 
 ### 2. Knowledge page (3 minutes)
 
-Open Knowledge in the sidebar and go through the three tabs.
+The idea to get across is that the same topic is stored three ways, and each way matches one kind of reasoning.
 
-Say "This is how the knowledge fits. From books is the knowledge graph with a quote behind each idea. Rules of thumb is an expert's decision tree, which is deductive. From data is a small Bayesian network learned from data, which is inductive, and asking it for a cause is abductive."
+Open Knowledge in the sidebar. It shows the topic of your prepared chat.
+
+**From books.** Tap one box.
+
+Say "Each box is one idea, and each arrow says how two ideas link, like causes or supports. When I tap a box, it shows the Wikipedia quote it came from, so nothing is made up."
+
+Open Show and pick Deductive reasoning.
+
+Say "This lights up the path a student walks when they reason this way, so we can see their thinking as a walk on the graph."
+
+**Rules of thumb.** Answer the questions with the buttons until it reaches a decision.
+
+Say "This is how an expert decides. They ask a few questions in order and each answer leads to the next one, until there is a decision. Following fixed rules like this is deductive reasoning."
+
+**From data.** Point to the diagram on top, then the chance bars below.
+
+Say "This is a small Bayesian network. The top boxes are causes and the arrows show what they change. The chances underneath were counted from data, which is inductive. Asking it which cause is most likely, given what we saw, is abductive. This is the same engine the Diagnosis page uses."
 
 ### 3. Diagnosis page, the main new part (5 minutes)
 
-Open Diagnosis in the sidebar and use machine L47230.
+Open Diagnosis in the sidebar. Machine L47230 is picked already.
 
-Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. A milling machine has failed. The system ranks every possible fault, and it suggests the check that tells us the most."
+Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. This machine has stopped. The bars show how likely each fault is before we check anything, and the buttons below are the checks we can do. The green one is the check that would tell us the most."
 
-Click the suggested check, then the next one.
+Click Strain on the tool.
 
-Say "After two checks it is sure it is a power failure. It walks the causes backward to find the best explanation, which is abductive. Then it applies the published rule and gives the fix, which is deductive. And all the chances were learned from seven thousand past runs, which is inductive. The agent only writes the explanation at the end. The numbers come from the network, because an algorithm can do that part."
+Say "Strain is low, so overstrain failure becomes unlikely. That is the first row under What we checked."
 
-Then pick machine L49739 to show an honest hard case.
+Click Power.
 
-Say "Here no reading explains the failure, so after all six checks the best answer left is a random failure. The system does not pretend to know more than the data shows."
+Say "Power is low, and low power is a known cause of power failure, so it points straight there. Now one fault is at 99 percent, so it stops. It walked from the failure back to its cause, which is abductive. Then it applied the published rule and gave the fix, which is deductive. And all the chances were learned from seven thousand past runs, which is inductive. The agent only writes this explanation at the end. The numbers come from the network, because an algorithm can do that part."
 
-Point to the result line.
+Then pick machine L49739 from the menu and keep clicking the green check.
 
-Say "On the 114 failed machines in the test set, the network named the right fault every time when it had all the readings."
+Say "Here every check rules one fault out, one by one. In the end no reading explains the failure, so the best answer left is a random failure, and that is right. The system does not pretend to know more than the data shows."
+
+If asked how good it is, say "On the 114 failed machines in the test set, the network named the right fault every time when it had all the readings."
 
 ### 4. Relation classes (2 minutes)
 
