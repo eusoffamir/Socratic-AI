@@ -278,6 +278,29 @@
     .know-bar{grid-template-columns:auto minmax(0, 1fr) 44px;}
     .know-bar .lab{grid-column:1 / -1;}
   }
+  /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
+  .diag .mono-label{display:block; margin:24px 0 8px;}
+  .diag .know-head + #diagPane > .mono-label:first-child{margin-top:0;}
+  .diag-bar{grid-template-columns:minmax(0, 1fr) 200px 48px;}
+  .diag-bar.on b{color:var(--signal);}
+  .know-tree.diag-done{margin:4px 0 0; width:auto;}
+  .know-tree.diag-done li{padding-bottom:12px;}
+  .diag-checks{display:flex; flex-wrap:wrap; gap:10px;}
+  .diag-checks button{display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:10px 16px; border-radius:12px;
+    background:var(--panel); border:1px solid var(--rule); color:var(--ink); font-weight:600; font-size:13.5px;}
+  .diag-checks button small{font-weight:500; color:var(--ink-faint); font-size:12px;}
+  .diag-checks button.best{background:var(--signal-soft); color:var(--signal); border-color:var(--signal);}
+  .diag-checks button.best small{color:var(--signal);}
+  .diag-checks button:hover:not(:disabled){border-color:var(--signal);}
+  .diag-end{border:1px solid var(--signal); background:var(--signal-soft); border-radius:12px; padding:14px 18px; margin:24px 0 18px;}
+  .diag-end .mono-label{margin:0 0 4px;}
+  .diag-end p{margin:6px 0 0; line-height:1.6; font-size:13.5px;}
+  .diag-truth{font-weight:600; color:var(--signal);}
+  .diag-truth.no{color:var(--caution);}
+  .diag .know-restart{margin-top:18px;}
+  @media (max-width:700px){
+    .diag-bar{grid-template-columns:minmax(0, 1fr) 44px;}
+  }
   /* Overall status: levels, standards and the Coach side by side, like the chat's Status panel */
   .report-grid.ov-three{grid-template-columns:minmax(0, .95fr) minmax(0, 1fr) minmax(0, 1fr);}
   .ov-three > div:nth-child(2){padding-left:28px;}  /* the standards sit a little to the right */
@@ -807,7 +830,7 @@
   .rk .mono-label{display:block; margin-bottom:12px;}
   .rk .mono-label + .rk-sub{margin:-6px 0 12px;}
   .rk-sub{font-size:13px; color:var(--ink-soft); margin:0 0 10px;}
-  details.rk-more .rk-msg, :is(#overallBody, #knowBody, .ask-stats) details.rk-more .rk-msg{background:var(--signal-soft);}  /* a little greener than the tinted box around it, so it stands out */
+  details.rk-more .rk-msg, :is(#overallBody, #knowBody, #diagBody, .ask-stats) details.rk-more .rk-msg{background:var(--signal-soft);}  /* a little greener than the tinted box around it, so it stands out */
   .rk-msg{margin:0 0 14px; padding:10px 14px; border-radius:10px; line-height:1.55; font-size:13.5px;  /* the same box as a Your cases row, on every page */
           background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
   .rk-msg p{margin:0; line-height:1.45; position:relative; padding-left:16px;} .rk-msg p + p{margin-top:6px;}
@@ -995,21 +1018,21 @@
   }
   /* Overall status and the chat's status panel: one font (sans), three sizes (15 text, 13 small, 12 tiny),
      soft green boxes instead of beige, so they match the chat */
-  :is(#overallBody, #knowBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
-  :is(#overallBody, #knowBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) :is(.mono-label, .meta, .rn, .here, .rk td, .ms-axis, .sradar .sc){font-family:var(--sans);}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
   /* two sizes only, the same as the sidebar: 13.5 for everything you read (like New chat), 12 for tiny labels (like Recents) */
-  :is(#overallBody, #knowBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .ov-case .t small, .report .lead, .rk-msg, .meta,
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) :is(.rung, .coach-comment p, .ov-case .t, .ov-case .t small, .report .lead, .rk-msg, .meta,
      .ms-row .nm, .ms-row .st, .rk table, .rk th.row, .rk-sub, .note, .ov-open, details.rk-more > summary, .ov-menu button){font-size:13.5px;}
-  :is(#overallBody, #knowBody, .ask-stats) :is(.lvl, .ov-filter > button, .ms-row .nm small, .ms-axis, .rk thead th, .rk tfoot td,
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) :is(.lvl, .ov-filter > button, .ms-row .nm small, .ms-axis, .rk thead th, .rk tfoot td,
      .rung .rn, .rung .here, details.rk-more > summary small){font-size:12px;}
-  :is(#overallBody, #knowBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
-  :is(#overallBody, #knowBody, .ask-stats) .ov-case{background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
-  :is(#overallBody, #knowBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
-  :is(#overallBody, #knowBody, .ask-stats) .rk-msg{background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
-  :is(#overallBody, #knowBody, .ask-stats) .ov-case-more{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-top:0;}
-  :is(#overallBody, #knowBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
-  :is(#overallBody, #knowBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
-  :is(#overallBody, #knowBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) :is(.ov-case, .ov-case-more, .rk-msg){background:color-mix(in srgb, var(--signal-soft) 55%, var(--panel));}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .ov-case{background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}  /* white with a green edge, so each case stands out from the page */
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) details.ov-case-d[open] > .ov-case{border-bottom-color:transparent;}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .rk-msg{background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel)); border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .ov-case-more{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-top:0;}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .ov-case-more{border-top-color:color-mix(in srgb, var(--signal) 15%, transparent);}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) .rung:not(.on):not(.top){background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
+  :is(#overallBody, #knowBody, #diagBody, .ask-stats) details.rk-more{border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
   /* Knowledge page: the same two sizes and green boxes */
   #knowBody :is(.know-tabs button, .know-intro, .know-none, .know-quote, .know-lesson, .know-tree li p,
      .know-tree .why, .know-restart, .know-bar, .am-map .cap){font-size:13.5px;}
@@ -1017,8 +1040,8 @@
   #knowBody :is(.know-bar .mv, .am-map .mono-label){font-family:var(--sans);}
   #knowBody .am-map .mono-label{font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--signal);}
   #knowBody :is(.am-map, .know-quote){border-color:color-mix(in srgb, var(--signal) 22%, transparent);}
-  #knowBody .know-restart{color:var(--signal); background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
-  #knowBody .know-bar .track{background:var(--signal-soft);}
+  :is(#knowBody, #diagBody) .know-restart{color:var(--signal); background:var(--signal-soft); border-color:color-mix(in srgb, var(--signal) 20%, transparent);}
+  :is(#knowBody, #diagBody) .know-bar .track{background:var(--signal-soft);}
 </style>
 </head>
 <body>
@@ -1035,6 +1058,7 @@
   <symbol id="i-side" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4v16" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 5.5 4.5 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-stats" viewBox="0 0 24 24"><path d="M12 2.5 20.5 7.3v9.4L12 21.5 3.5 16.7V7.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5 16.5 10l-1.6 6.2-4.9-.9L7.8 10.3z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-diag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20.5 20.5M6.6 10.8h1.9l1.2-2.4 1.6 4.6 1.2-2.2h1.6"/></g></symbol>
   <symbol id="i-graph" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="8" r="2.6"/><circle cx="9" cy="18" r="2.6"/><path d="M8.5 6.6 15.4 7.6M7 8.5l1.3 7M16.4 10.2l-5.6 6"/></g></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="currentColor"/></symbol>
 </svg>
@@ -1055,6 +1079,7 @@
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
     <button class="sn-item" id="overallBtn" title="My overall status"><svg><use href="#i-stats"/></svg><span>Overall status</span></button>
     <button class="sn-item" id="knowBtn" title="How the knowledge fits"><svg><use href="#i-graph"/></svg><span>Knowledge</span></button>
+    <button class="sn-item" id="diagBtn" title="Find the fault in a machine"><svg><use href="#i-diag"/></svg><span>Diagnosis</span></button>
     <div class="sn-label">Recents</div>
     <div class="sn-recents" id="recents"></div>
     <div class="sn-account" id="account"></div>  <!-- Sign in with Google, only when the server has a client id -->
@@ -1070,6 +1095,10 @@
 
   <div class="status-main hidden" id="knowMain">
     <div class="status-scroll"><div class="status-inner" id="knowBody"></div></div>
+  </div>
+
+  <div class="status-main hidden" id="diagMain">
+    <div class="status-scroll"><div class="status-inner" id="diagBody"></div></div>
   </div>
 
   <div class="ask-main empty" id="askMain">
@@ -1366,7 +1395,7 @@ const askViewing = () => ask.chatId || ask.pendKey;
 function askCtx(){ return {gen: ask.gen, chatId: ask.chatId, rounds: ask.rounds, ab: !!ask.ab, request: ask.request, article: ask.article}; }
 
 // The pages beside the sidebar: the chat, Overall status and Knowledge.
-const PAGES = {ask: '#askMain', status: '#statusMain', knowledge: '#knowMain'};
+const PAGES = {ask: '#askMain', status: '#statusMain', knowledge: '#knowMain', diagnosis: '#diagMain'};
 // Browser back and forward: each page (and each chat) is one history step.
 // navRestoring is on while a back or forward press redraws a page, so it adds no new step.
 let navRestoring = false;
@@ -1385,6 +1414,7 @@ function showPage(name){
   const mark = (id, on) => on ? $(id).setAttribute('aria-current', 'page') : $(id).removeAttribute('aria-current');
   mark('overallBtn', name === 'status');
   mark('knowBtn', name === 'knowledge');
+  mark('diagBtn', name === 'diagnosis');
   mark('askBtn', name === 'ask' && !ask.sid);
   renderRecents();
   $('homeView').classList.remove('nav-open');  // phones: close the drawer
@@ -2649,6 +2679,69 @@ function knowSourceHTML(c, n){
     : (c.source || {}).kind === 'file' ? `Your file, ${esc(c.source.name)}` : 'Your own reading';
   return `<div class="know-quote"><span class="mono-label">From a book</span>${where}<blockquote>"${esc(s.quote)}"</blockquote></div>`;
 }
+// ---------- Diagnosis page: why did this machine fail (the industrial use case, on open data) ----------
+// The chances and the best next check come from a Bayesian network (app/diagnose.py);
+// the Diagnosis agent only explains the answer at the end.
+const diag = {list: null, udi: null, done: [], view: null, busy: false};
+const diagName = m => `Machine ${m.pid}, type ${m.type}`;
+async function openDiagnosis(){
+  showPage('diagnosis');
+  if(diag.list){ renderDiagnosis(); return; }
+  const body = $('diagBody');
+  body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
+  try { diag.list = await api('/api/diagnose'); }
+  catch(e){ body.innerHTML = ''; note('error', e.message, body); return; }
+  diag.udi = diag.list.machines[0].udi;
+  diagLoad();
+}
+async function diagLoad(){
+  const udi = diag.udi, done = diag.done.slice();
+  diag.busy = true;
+  renderDiagnosis();
+  try {
+    const v = await api('/api/diagnose/step', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({machine: udi, done})});
+    if(diag.udi === udi && diag.done.join() === done.join()) diag.view = v;
+  } catch(e){
+    diag.busy = false; renderDiagnosis(); note('error', e.message, $('diagPane')); return;
+  }
+  diag.busy = false;
+  renderDiagnosis();
+}
+function renderDiagnosis(){
+  const L = diag.list, m = L.machines.find(x => x.udi === diag.udi);
+  const v = diag.view && diag.view.machine.udi === diag.udi ? diag.view : null;
+  $('diagBody').innerHTML = `<div class="report know diag">
+    <div class="know-head"><h2>Find the fault</h2><div class="ov-filter" id="diagPick">
+      <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(diagName(m))}</span>
+        <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="ov-menu" role="menu">${L.machines.map((x, i) =>
+        `<button type="button" role="menuitemradio" aria-checked="${x.udi === m.udi}" data-i="${i}">${esc(diagName(x))}</button>`).join('')}</div></div></div>
+    <div id="diagPane">${v ? diagPaneHTML(v, diag.busy) : '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'}</div></div>`;
+  wireCaseFilter($('diagPick'), L.machines, x => { diag.udi = x.udi; diag.done = []; diag.view = null; diagLoad(); });
+}
+function diagPaneHTML(v, busy){
+  const faults = v.faults.map(f => `<div class="know-bar diag-bar${v.finished && f.id === v.named ? ' on' : ''}">
+    <span class="lab">${esc(capFirst(f.name))}</span><span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
+  const done = v.done.map(d => `<li class="done"><p>${esc(d.name)}</p><span class="know-ans">${esc(d.value)}, ${esc(d.band)}</span></li>`).join('');
+  const next = v.finished ? '' : `<span class="mono-label">Check next</span><div class="diag-checks">${v.checks.map(c =>
+    `<button type="button" data-check="${esc(c.check)}" class="${c.check === v.best ? 'best' : ''}"${busy ? ' disabled' : ''}>
+      <span>${esc(c.name)}</span><small>+${c.gain}%</small></button>`).join('')}</div>`;
+  const end = v.finished ? `<div class="diag-end"><span class="mono-label">Most likely</span>
+    <p><b>${esc(capFirst(v.named_name))}</b>, ${v.faults[0].percent}%</p>
+    <p>${esc(v.explanation.text)}</p>
+    <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
+  return `<span class="mono-label">Chance of each fault</span>${faults}
+    ${done ? `<span class="mono-label">Checks done</span><ol class="know-tree diag-done">${done}</ol>` : ''}
+    ${next}${end}
+    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${busy ? ' disabled' : ''}>Start again</button>` : ''}`;
+}
+$('diagBtn').addEventListener('click', openDiagnosis);
+$('diagBody').addEventListener('click', e => {
+  const b = e.target.closest('[data-check]');
+  if(b && !diag.busy){ diag.done.push(b.dataset.check); diagLoad(); return; }
+  if(e.target.closest('[data-diag-restart]') && !diag.busy){ diag.done = []; diag.view = null; diagLoad(); }
+});
 $('knowBtn').addEventListener('click', openKnowledge);
 $('knowBody').addEventListener('click', e => {
   const c = knowCases().find(x => x.id === know.id);
@@ -3431,6 +3524,7 @@ addEventListener('popstate', e => {
   try {
     if(s.page === 'status') openOverall();
     else if(s.page === 'knowledge') openKnowledge();
+    else if(s.page === 'diagnosis') openDiagnosis();
     else if(s.chat && askChats().some(x => x.id === s.chat)) askOpen(s.chat);
     else { askReset(); showPage('ask'); }
   } finally { navRestoring = false; }

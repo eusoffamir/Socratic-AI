@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Streamin
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import (auth, builder, copycheck, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
+from . import (auth, builder, copycheck, diagnose, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
                skillcheck, sources, stats, storage)
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
@@ -332,6 +332,27 @@ def knowledge_view(case_id: str):
     if case_id not in CONCEPTS:
         raise HTTPException(404, "Only the built-in quant cases have rules of thumb and a data model so far.")
     return {"tree": heuristics.view(case_id), "network": pgm.view(case_id)}
+
+
+class DiagnoseRequest(BaseModel):
+    machine: int
+    done: list[str] = []
+
+
+@app.get("/api/diagnose")
+def diagnose_machines():
+    """The diagnosis demo (Meeting 3 use case, on the AI4I open data): the
+    failed machines to try, the method's test score and its knowledge graph."""
+    return diagnose.machine_list()
+
+
+@app.post("/api/diagnose/step")
+def diagnose_step(req: DiagnoseRequest):
+    """Where one machine's diagnosis stands after the checks done so far."""
+    try:
+        return diagnose.step(req.machine, req.done[:len(diagnose.CHECKS)])
+    except KeyError:
+        raise HTTPException(404, "This machine is not in the demo.")
 
 
 @app.post("/api/topic/meanings")

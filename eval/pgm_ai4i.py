@@ -72,6 +72,10 @@ def load(path=DATA):
                 "strain": _band(wear * torque, [11000, 13000], ["low", "mid", "high"]),
             }
             row.update({m: int(r[m]) for m in MODES})
+            # the real numbers, for showing a reading on the diagnosis page (app/diagnose.py)
+            row["udi"], row["pid"] = int(r["UDI"]), r["Product ID"]
+            row["raw"] = {"gap": proc - air, "speed": speed, "torque": torque, "wear": wear,
+                          "power": power, "strain": wear * torque}
             rows.append(row)
     return rows
 
