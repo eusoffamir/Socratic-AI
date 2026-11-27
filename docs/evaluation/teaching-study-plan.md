@@ -47,7 +47,7 @@ So a class of 40 can only show a large effect. The main study needs about 100 st
 ## What we measure
 
 1. **Main measure, the reasoning test (pre and post).** It must not favour the tool group, so both groups take it the same way, outside the tutor. Two options.
-   - Use our skill check question bank (A or B choice with a reason, each question tagged inductive, deductive or abductive). It is ours, so it is free, but it needs a check that the questions are sound. The everyday skill check in the app is only 3 questions (one per reasoning type, since 27 November 2026), so the study test would be a longer form from the same bank, for example 12 questions.
+   - Use our skill check question bank (A or B choice with a reason, each question tagged inductive, deductive or abductive). It is ours, so it is free, but it needs a check that the questions are sound. The everyday skill check in the app is only 3 questions (one per reasoning type, since 27 November 2026), so the study test uses two longer forms from the same bank, 15 questions each (`docs/evaluation/study-test-forms.md`, made by `eval/study_forms.py`).
    - Use a published critical thinking test. Most known ones are paid or licensed, so check the cost and the licence first.
    Two parallel forms (A and B) are needed, and half the students get A first, half get B first.
 2. **During the session, tool group only.** The Assessor's marks on the 9 standards and the reasoning types, the highest level reached, and the time spent. These describe how students used the tool but are not compared between groups.
@@ -62,7 +62,7 @@ So a class of 40 can only show a large effect. The main study needs about 100 st
 ## Ethics and data
 
 - **Ethics approval is needed before any student is tested.** We do not know UTP's process yet, so ask Dr Ho now, because it takes time. Dr Ho's proposal named UPSI for the grant's ethics approval, so check whether that covers us.
-- **Consent.** Study mode is already built. It shows a consent screen and only accepts participant codes the lecturer hands out, so no names are stored (`STUDY_CODES`, history file "Study mode"). The consent text is marked DRAFT until the ethics wording is given.
+- **Consent.** A draft information sheet and consent form are in `docs/evaluation/study-consent-draft.md`. Study mode is already built. It shows a consent screen and only accepts participant codes the lecturer hands out, so no names are stored (`STUDY_CODES`, history file "Study mode"). The consent text is marked DRAFT until the ethics wording is given.
 - **Model access.** The free Gemini tier cannot serve a whole class at once. The Azure tokens from UTP would solve this, and a paid service also avoids the data being used for training, which matters for ethics.
 - **AI_GUARD must be 1** during the study, so students cannot paste AI answers.
 
