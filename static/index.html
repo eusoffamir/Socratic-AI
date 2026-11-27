@@ -567,6 +567,17 @@
   .am-map .rl.lit{fill:var(--ink); font-weight:600;}
   .am-map :is(.ed, .rl).dim{opacity:.12;}
   .am-map .nd.dim{opacity:.3;}
+  /* Walk through it: everything fades, then each link and its two boxes light up in turn */
+  .am-map svg.walking .ed, .am-map svg.walking .rl{opacity:.1;}
+  .am-map svg.walking .nd{opacity:.3;}
+  .am-map svg.walking .ed.wk{opacity:1; stroke-width:2.3;}
+  .am-map svg.walking .rl.wk{opacity:1; fill:var(--ink); font-weight:600;}
+  .am-map svg.walking .nd.wk{opacity:1;}
+  .am-map svg.walking .nd.wk rect{stroke:var(--c); stroke-width:2; fill:color-mix(in srgb, var(--c) 22%, var(--panel));}
+  .am-map .ed.draw{stroke-dasharray:1; stroke-dashoffset:1; animation:dgDraw .8s ease forwards;}
+  @media (prefers-reduced-motion: reduce){ .am-map .ed.draw{animation:none; stroke-dashoffset:0;} }
+  .know-walk{margin:0 0 0 auto;}
+  .know-walk-step{min-height:1.5em; margin:10px 0 0; font-size:14px; color:var(--ink-soft); text-align:center;}
   .am-map .legend.rels{margin-top:4px;}
   .am-map .legend i.ln{width:14px; height:3px; border-radius:2px; opacity:1; vertical-align:3px;}
   .am-map .cap{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 0; min-height:1.5em;}
@@ -1876,14 +1887,14 @@ function askMapHTML(c, opts = {}){
     const end = move === 'abductive' ? `marker-start="url(#mapArrow-${r0})"` : `marker-end="url(#mapArrow-${r0})"`;  // abductive turns the arrows round
     if(opts.labels){
       const text = rel.replace(/_/g, ' ');
-      words.push(`<text class="rl${cls}" data-t="${typeOf[a]} ${typeOf[b]}" x="${lx}" y="${placeWord(lx, ly, anchor, text)}" text-anchor="${anchor}">${esc(text)}</text>`);
+      words.push(`<text class="rl${cls}" data-t="${typeOf[a]} ${typeOf[b]}" data-a="${esc(a)}" data-b="${esc(b)}" x="${lx}" y="${placeWord(lx, ly, anchor, text)}" text-anchor="${anchor}">${esc(text)}</text>`);
     }
-    return `<path class="ed${cls}" data-t="${typeOf[a]} ${typeOf[b]}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>`;
+    return `<path class="ed${cls}" data-t="${typeOf[a]} ${typeOf[b]}" data-a="${esc(a)}" data-b="${esc(b)}" data-o="${p.c * 10 + q.c}" data-rel="${esc(rel.replace(/_/g, ' '))}" d="${d}" style="stroke:${REL_COLORS[r0] || 'var(--ink-faint)'}" ${end}><title>${esc(rel.replace(/_/g, ' '))}, ${esc(REL_MEANING[r0] || '')}</title></path>`;
   }).join('');
   if(loops) width += opts.labels ? 70 : 30;  // room for a loop round the right side, and its word
   const boxes = nodes.map((n, i) => {
     const {x, y} = pos[n.id], color = MAP_COLORS[n.type] || 'var(--ink-faint)', label = wrap2(mapLabel(n, n.text));
-    return `<g class="nd${focus && n.type !== focus ? ' dim' : ''}" data-t="${n.type}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
+    return `<g class="nd${focus && n.type !== focus ? ' dim' : ''}" data-t="${n.type}" data-i="${i}" data-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${esc(mapLabel(n, n.text))}" style="--c:${color}">
       <rect x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>
       ${label.map((l, k) => `<text x="${x + W / 2}" text-anchor="middle" y="${y + (label.length === 1 ? 25 : 18 + k * 14)}">${esc(l)}</text>`).join('')}</g>`;
   }).join('');
@@ -2709,6 +2720,7 @@ function renderKnowledge(){
   renderKnowPane(c);
 }
 async function renderKnowPane(c){
+  knowWalkStop();
   const pane = $('knowPane');
   if(know.tab === 'books'){
     const v = know.view || {}, map = askMapHTML(c, {labels: true, ...v});
@@ -2722,8 +2734,9 @@ async function renderKnowPane(c){
       <div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
         <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div></div>
-      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<div id="knowSrc"></div>`;
+        <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div>
+        <button type="button" class="dg-play know-walk" data-walk>${know.walking ? 'Stop' : 'Walk through it'}</button></div>
+      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<p class="know-walk-step" id="knowWalkStep"></p><div id="knowSrc"></div>`;
     wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
     return;
   }
@@ -2966,6 +2979,57 @@ $('diagBody').addEventListener('click', e => {
   if(b && !diag.busy){ diag.auto = false; diag.done.push(b.dataset.check); diagLoad(); return; }
   if(e.target.closest('[data-diag-restart]') && (!diag.busy || diag.auto)){ diag.auto = false; diag.done = []; diag.view = null; diagLoad(); }
 });
+// Walk through it: light the map one link at a time, in the order the reasoning goes
+// (forward for deductive and inductive, backward for abductive), like the Diagnosis graph.
+function knowWalkStop(){
+  clearTimeout(know.walkTimer);
+  know.walking = false;
+  const b = document.querySelector('[data-walk]');
+  if(b) b.textContent = 'Walk through it';
+}
+function knowWalk(){
+  const svg = document.querySelector('#knowPane .am-map svg');
+  if(!svg) return;
+  const move = (know.view || {}).move;
+  let links = [...svg.querySelectorAll('path.ed')];
+  if(svg.querySelector('path.ed.lit')) links = links.filter(e => e.classList.contains('lit'));
+  links.sort((e, f) => Number(e.dataset.o) - Number(f.dataset.o));
+  if(move === 'abductive') links.reverse();
+  if(!links.length) return;
+  svg.querySelectorAll('.wk, .draw').forEach(el => el.classList.remove('wk', 'draw'));
+  svg.classList.add('walking');
+  know.walking = true;
+  const btn = document.querySelector('[data-walk]');
+  if(btn) btn.textContent = 'Stop';
+  const name = id => (svg.querySelector(`.nd[data-id="${CSS.escape(id)}"]`) || {}).getAttribute?.('aria-label') || id;
+  let i = 0;
+  const step = () => {
+    if(!know.walking) return;
+    if(i >= links.length){
+      knowWalkStop();
+      $('knowWalkStep').textContent = `${links.length} links walked. Tap Walk through it to see it again.`;
+      return;
+    }
+    const e = links[i], a = e.dataset.a, b = e.dataset.b;
+    e.setAttribute('pathLength', '1');
+    e.classList.add('wk', 'draw');
+    svg.querySelectorAll(`.rl[data-a="${CSS.escape(a)}"][data-b="${CSS.escape(b)}"]`).forEach(t => t.classList.add('wk'));
+    [a, b].forEach(id => { const n = svg.querySelector(`.nd[data-id="${CSS.escape(id)}"]`); if(n) n.classList.add('wk'); });
+    const rel = (e.dataset.rel || '').split(', ')[0];
+    $('knowWalkStep').textContent = move === 'abductive'
+      ? `Step ${i + 1} of ${links.length}. To explain "${name(b)}", look back to "${name(a)}", which ${rel} it.`
+      : `Step ${i + 1} of ${links.length}. "${name(a)}" ${rel} "${name(b)}".`;
+    i++;
+    know.walkTimer = setTimeout(step, 1500);
+  };
+  step();
+}
+$('knowBody').addEventListener('click', e => {
+  if(!e.target.closest('[data-walk]')) return;
+  e.stopPropagation();
+  if(know.walking){ knowWalkStop(); return; }
+  knowWalk();
+}, true);
 $('knowBtn').addEventListener('click', openKnowledge);
 $('knowBody').addEventListener('click', e => {
   const c = knowCases().find(x => x.id === know.id);
@@ -3491,6 +3555,7 @@ const TOURS = {
     {title: 'Three ways to see it', text: '', target: '.know-tabs'},
     {title: 'Tap a box to see its source', text: '', target: '#knowPane .am-map'},
     {title: 'Light up one kind of reasoning', text: '', target: '#knowView'},
+    {title: 'Watch it walk the links', text: '', target: '[data-walk]'},
     {title: 'Answer like an expert', text: '', target: '.know-rules'},
     {title: 'One of these is the decision', text: '', target: '.know-decs'},
     {title: 'Causes point to signs', text: '', target: '.know-net-fig'},

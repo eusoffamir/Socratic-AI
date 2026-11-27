@@ -55,7 +55,9 @@ Say "Each box is one idea, and each arrow says how two ideas link, like causes o
 
 Open Show and pick Deductive reasoning.
 
-Say "This lights up the path a student walks when they reason this way, so we can read their thinking as a walk on the graph."
+Then press Walk through it.
+
+Say "This lights up the path a student walks when they reason this way, one link at a time, so we can read their thinking as a walk on the graph. Abductive walks it backward, from what we see to what explains it."
 
 **Rules of thumb.** Point to the list of possible decisions first, then answer the questions with the buttons.
 
