@@ -224,6 +224,12 @@
   .sk-pill b{min-width:22px; height:22px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
     background:var(--panel); color:var(--signal); font-size:12px; font-weight:700;}
   .sk-card .sk-go{margin-top:18px;}
+  /* mastered so far on the left, Seen in your chats on the right */
+  .sk-top{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px 28px;}
+  .sk-top .sk-lead{margin:0;}
+  .sk-top .sk-col.seen h4{text-align:right;}
+  .sk-top .sk-pills{justify-content:flex-end;}
+  @media (max-width:700px){ .sk-top .sk-col.seen h4{text-align:left;} .sk-top .sk-pills{justify-content:flex-start;} }
   .ov-empty{display:flex; flex-wrap:wrap; gap:10px;}
   /* no skill check yet: centred, so the card does not look empty on the right */
   .sk-card.sk-empty{text-align:center; padding:26px 20px;}
@@ -3088,8 +3094,10 @@ function skillsSimpleHTML(m, withButton = true, chat = null){
   const li = (r, extra = '', cls = '') => `<li${cls ? ` class="${cls}"` : ''}><b>${esc(plain(r))}</b>${extra}</li>`;
   // the Coach paragraph (fillSkillCoach) says what to work on and how, so no Practise next list
   return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
-    <p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.</p>
-    ${strong.length || almost.length || seen ? `<div class="sk-cols">${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
+    ${!(strong.length || almost.length) && seen
+      ? `<div class="sk-top"><p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.</p>${seen}</div>`
+      : `<p class="sk-lead">You have mastered <b>${strong.length} of ${m.skills.length}</b> skills.</p>`}
+    ${strong.length || almost.length ? `<div class="sk-cols">${strong.length || almost.length ? `<div class="sk-col ok"><h4>Going well</h4>
       <ul>${strong.map(r => li(r)).join('')}${almost.map(r => li(r, '<small>Almost there</small>', 'almost')).join('')}</ul></div>` : ''}${seen}</div>` : ''}
     <div class="coach-comment sk-coach" data-skill-coach><div class="mono-label">Coach</div><p class="thinking">${DOTS}</p></div>
     ${button}${withButton ? '<button type="button" class="ov-open ov-remove sk-clear" data-clear-checks>Clear my skill checks</button>' : ''}</div>`;
