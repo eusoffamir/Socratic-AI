@@ -2905,7 +2905,8 @@ $('diagBody').addEventListener('click', e => {
 // The same milling machine the Diagnosis page works on, in three kinds of knowledge: what the
 // published source says (books), an engineer's checklist (rules of thumb) and the network
 // learned from 7,000 past runs (data). Students see their own case maps in the chat instead.
-const know = {tab: 'books', data: null, pick: null, answers: [], ev: {}, chances: null};
+// src is 'machine' or a case id from the learner's chats (for Dr Ho, to see what the AI built for each topic)
+const know = {src: 'machine', tab: 'books', data: null, pick: null, flow: [], ev: {}, chances: null, id: null, views: {}, answers: {}, view: null};
 const KNOW_TABS = [['books', 'From books'], ['rules', 'Rules of thumb'], ['data', 'From data']];
 const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
 const KN_READINGS = DG_READINGS;  // the same order as the Diagnosis graph
@@ -2918,19 +2919,33 @@ async function openKnowledge(){
     catch(e){ body.innerHTML = ''; note('error', e.message, body); return; }
   }
   renderKnowledge();
+  // the cases from recent chats fill the menu once they load
+  knowLoadRecents().then(() => { if(!$('knowMain').classList.contains('hidden')) renderKnowledge(); });
 }
 function renderKnowledge(){
+  const cases = knowCases();
+  if(know.src !== 'machine' && !cases.some(c => c.id === know.src)) know.src = 'machine';
+  const items = [{label: 'Milling machine', src: 'machine'}, ...cases.map(c => ({label: knowName(c), src: c.id}))];
+  const on = items.find(x => x.src === know.src);
   $('knowBody').innerHTML = `<div class="report know">
-    <div class="know-head"><h2>Machine knowledge</h2>
-      <p class="kn-purpose">What RootAI knows about a milling machine, from a book, an engineer and data.</p></div>
+    <div class="know-head"><h2>Knowledge</h2><div class="ov-filter" id="knowCase">
+      <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(on.label)}</span>
+        <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="ov-menu" role="menu">${items.map((x, i) =>
+        `<button type="button" role="menuitemradio" aria-checked="${x.src === know.src}" data-i="${i}"${i === 1 ? ' class="dg-own-item"' : ''}>${esc(x.label)}</button>`).join('')}</div></div>
+      <p class="kn-purpose">${know.src === 'machine' ? 'What RootAI knows about a milling machine, from a book, an engineer and data.'
+        : 'What the AI built for this case, from books, an expert and data.'}</p></div>
     <div class="know-tabs" role="tablist">${KNOW_TABS.map(([k, name]) =>
       `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === know.tab}">${name}</button>`).join('')}</div>
     <div id="knowPane" role="tabpanel"></div></div>`;
+  wireCaseFilter($('knowCase'), items, x => { know.src = x.src; know.id = x.src === 'machine' ? null : x.src; renderKnowledge(); });
   renderKnowPane();
 }
 function renderKnowPane(){
+  knowWalkStop();
   const pane = $('knowPane');
   if(!pane) return;
+  if(know.src !== 'machine'){ const c = knowCases().find(x => x.id === know.src); if(c) renderCasePane(c); return; }
   if(know.tab === 'books') pane.innerHTML = knowBookHTML();
   else if(know.tab === 'rules') pane.innerHTML = knowRulesHTML();
   else {
@@ -2996,7 +3011,7 @@ function knowBookHTML(){
 function knowRulesHTML(){
   const t = know.data.tree, nodes = Object.fromEntries(t.nodes.map(n => [n.id, n]));
   const path = [t.root], taken = [];
-  for(const ans of know.answers){
+  for(const ans of know.flow){
     const e = t.edges.find(([a, x]) => a === path[path.length - 1] && x === ans);
     if(!e) break;
     taken.push(e); path.push(e[2]);
@@ -3040,7 +3055,7 @@ function knowRulesHTML(){
         <button type="button" class="dg-step" data-krestart>Start again</button></div>`
     : `<div class="kn-ask"><p>${esc(at.text)}</p><div class="kn-yn-row">
         <button type="button" class="dg-run" data-kans="yes">Yes</button><button type="button" class="dg-run" data-kans="no">No</button>
-        ${know.answers.length ? '<button type="button" class="dg-step" data-krestart>Start again</button>' : ''}</div></div>`;
+        ${know.flow.length ? '<button type="button" class="dg-step" data-krestart>Start again</button>' : ''}</div></div>`;
   return `<p class="know-story"><b>How an engineer checks a stopped machine.</b> Answer each question, and the path leads to the fault and its fix.</p>
     ${ask}
     <div class="dg-card"><div class="dg-svgwrap"><svg class="dgg kn-flow" viewBox="0 0 ${DX + DW + 8} ${H + 8}" role="img" aria-label="The engineer's checklist as a flowchart">
@@ -3057,7 +3072,7 @@ async function knowWhatIf(){
     if(JSON.stringify(ev) !== JSON.stringify(know.ev)) return;
     know.chances = got.faults;
   } catch(e){ const pane = $('knowPane'); if(pane){ pane.innerHTML = ''; note('error', e.message, pane); } return; }
-  if(know.tab === 'data' && !$('knowMain').classList.contains('hidden')) renderKnowPane();
+  if(know.src === 'machine' && know.tab === 'data' && !$('knowMain').classList.contains('hidden')) renderKnowPane();
 }
 function knowDataHTML(){
   const d = know.data, ev = know.ev, faults = know.chances;
@@ -3085,6 +3100,187 @@ function knowDataHTML(){
         <span><i class="lg-on"></i>What you set</span></div></div>
     ${d.agree ? `<div class="know-lesson"><span class="mono-label">What this shows</span>The data found the same causes as the book, without being told them.</div>` : ''}`;
 }
+// the cases on the learner's own topics, the open chat first, then every recent chat
+// (loaded once by knowLoadRecents), so the page is not empty after New chat
+function knowCases(){
+  const mine = [...ask.cases, ...(know.recent || [])].filter(c => c.generated);
+  return mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i);
+}
+const KNOW_RECENT_CHATS = 10;
+async function knowLoadRecents(){
+  const sids = askChats().slice(0, KNOW_RECENT_CHATS).flatMap(r => r.sids);
+  const key = sids.join();
+  if(know.recentKey === key) return;
+  const got = await Promise.all(sids.map(sid => api(`/api/session/${encodeURIComponent(sid)}`).catch(() => null)));
+  know.recent = got.map(d => d && d.case).filter(Boolean);
+  know.recentKey = key;
+}
+const knowName = x => x.title;
+async function renderCasePane(c){
+  knowWalkStop();
+  const pane = $('knowPane');
+  if(know.tab === 'books'){
+    const v = know.view || {}, map = askMapHTML(c, {labels: true, ...v});
+    if(!map){ pane.innerHTML = '<p class="know-none">This case has no knowledge map.</p>'; return; }
+    const nodes = c.knowledge.nodes, types = KNOWLEDGE_NAMES.filter(t => nodes.some(n => n.type === t));
+    const lit = Number((map.match(/data-lit="(\d+)"/) || [])[1] || 0);
+    const opts = [{label: 'All ideas', view: null}, ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
+    const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
+    const item = (o, i) => `<button type="button" role="menuitemradio" aria-checked="${on(o)}" data-i="${i}">${o.dot ? `<i class="kdot" style="background:${o.dot}"></i>` : ''}${esc(o.label)}</button>`;
+    pane.innerHTML = `<p class="know-story"><b>The ideas behind this case.</b> Each box is one idea, and each arrow says how two ideas link. Tap a box to see where it came from.</p>
+      <div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
+        <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
+          <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div>
+        <button type="button" class="know-walk" data-walk>${know.walking ? 'Stop' : 'Walk through it'}</button></div>
+      ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<p class="know-walk-step" id="knowWalkStep"></p><div id="knowSrc"></div>`;
+    wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderCasePane(c); });
+    return;
+  }
+  if(c.generated){  // drafted by the Topic Builder with the case, so nothing to fetch
+    const what = know.tab === 'rules' ? c.heuristics : c.model;
+    if(!what){
+      pane.innerHTML = `<p class="know-none">This case has no ${know.tab === 'rules' ? 'rules of thumb' : 'model'} yet. A new case on your topic will have one.</p>`;
+      return;
+    }
+    const texts = Object.fromEntries((c.knowledge.nodes || []).map(n => [n.id, n.text || (c.notes || [])[n.note] || '']));
+    pane.innerHTML = know.tab === 'rules'
+      ? knowTreeHTML({...what, nodes: what.nodes.map(n => ({...n, why_text: texts[n.why] || ''}))}, know.answers[c.id] || {})
+      : knowNetHTML(what);
+    return;
+  }
+  if(!know.views[c.id]){
+    pane.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
+    try { know.views[c.id] = await api(`/api/knowledge/${encodeURIComponent(c.id)}`); }
+    catch(e){ pane.innerHTML = ''; note('error', e.message, pane); return; }
+    if(know.id === c.id && $('knowPane')) renderCasePane(c);
+    return;
+  }
+  const v = know.views[c.id];
+  pane.innerHTML = know.tab === 'rules' ? knowTreeHTML(v.tree, know.answers[c.id] || {}) : knowNetHTML(v.network);
+}
+// The decision tree, walked one answer at a time. Reaching a decision is deductive reasoning.
+function knowTreeHTML(t, answers){
+  const nodes = Object.fromEntries(t.nodes.map(n => [n.id, n])), done = [];
+  let at = t.root;
+  while(nodes[at].kind === 'question' && answers[at]){
+    const next = t.edges.find(([a, ans]) => a === at && ans === answers[at]);
+    if(!next) break;
+    done.push(`<li class="done"><p>${esc(nodes[at].text)}</p><span class="know-ans">${esc(capFirst(answers[at]))}</span></li>`);
+    at = next[2];
+  }
+  const n = nodes[at], ended = n.kind !== 'question';
+  const now = !ended
+    ? `<li class="now"><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
+        `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
+    : `<li class="end"><div class="card"><span class="mono-label">The expert decides</span><p><b>${esc(n.text)}</b></p>
+        <p class="why">Your answers led here by fixed rules, so the decision follows from them. That is deductive reasoning.</p>
+        ${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
+  const decisions = t.nodes.filter(x => x.kind !== 'question');
+  return `<p class="know-story"><b>How would an expert decide?</b> Answer each question, and the rules lead to one of the decisions below.</p>
+    <span class="mono-label">Questions</span>
+    <ol class="know-tree know-rules">${done.join('')}${now}</ol>
+    <span class="mono-label">Possible decisions</span>
+    <ul class="know-decs">${decisions.map(d => `<li class="${ended && d.id === at ? 'on' : ''}">${esc(d.text)}</li>`).join('')}</ul>
+    ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
+}
+// The Bayesian network: causes on top, what they cause below, then the chances it learned.
+function knowNetHTML(v){
+  const tops = v.nodes.filter(n => !n.parents.length), lows = v.nodes.filter(n => n.parents.length);
+  const labels = Object.fromEntries(v.nodes.map(n => [n.id, wrapAll(n.text.replace(/\.$/, ''), 27)]));  // full text, as many lines as it needs
+  const most = Math.max(1, ...Object.values(labels).map(l => l.length));
+  const W = 184, H = Math.max(44, 18 + most * 14), GAP = 28, ROW = H + 52, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
+  [tops, lows].forEach((row, r) => row.forEach((n, i) => {
+    pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * ROW};
+  }));
+  const lines = v.edges.map(([a, rel, b]) => {
+    const p = pos[a], q = pos[b], x1 = p.x + W / 2, y1 = p.y + H, x2 = q.x + W / 2, y2 = q.y - 2;
+    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 28} ${x2} ${y2 - 28} ${x2} ${y2}" marker-end="url(#netArrow)"/>
+      <text class="rel" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${(y1 + y2) / 2 + 4}" text-anchor="${x2 > x1 ? 'start' : 'end'}">${esc(rel)}</text>`;
+  }).join('');
+  const boxes = v.nodes.map(n => {
+    const {x, y} = pos[n.id], label = labels[n.id], top = y + (H - label.length * 14) / 2 + 11;
+    return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
+      `<text x="${x + W / 2}" y="${top + k * 14}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
+  }).join('');
+  const bar = f => `<div class="know-bar diag-bar"><span class="lab">${esc(capFirst(f.label))}</span>
+    <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`;
+  const forward = v.findings.filter(f => f.move !== 'abductive'), back = v.findings.filter(f => f.move === 'abductive');
+  const bars = (forward.length ? `<span class="mono-label">From cause to sign, deductive</span>${forward.map(bar).join('')}` : '')
+    + (back.length ? `<span class="mono-label">From signs back to the cause, abductive</span>${back.map(bar).join('')}` : '');
+  return `<div class="know-net"><p class="know-story"><b>What the data says.</b> Each arrow shows what causes what. ${v.guessed
+      ? 'The chances below are rough guesses by the AI, since this topic has no data to count.'
+      : 'Every chance below was counted from simulated data, which is inductive reasoning.'}</p>
+    <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
+      <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
+    ${bars}
+    <div class="know-lesson"><span class="mono-label">What this shows</span>${esc(v.lesson)}</div></div>`;
+}
+// Where one box of the map comes from: a book quote, a simulation, a rule of thumb or the case story.
+function knowSourceHTML(c, n){
+  const s = n.source || (n.quote ? {kind: 'book', title: n.from || '', quote: n.quote} : null);
+  const line = (label, text) => `<div class="know-quote"><span class="mono-label">${label}</span>${esc(text)}</div>`;
+  if(!s) return line('No source', 'No exact quote was found for this one, so check it yourself.');
+  if(s.kind === 'data') return line('From data', 'This number was counted by a simulation of this case.');
+  if(s.kind === 'heuristic') return line('From a rule of thumb', 'This is one of the decisions in the Rules of thumb tab.');
+  if(s.kind === 'case') return line('From the case', 'This comes from the case story itself.');
+  const art = ((c.source || {}).articles || []).find(a => a.title === s.title), url = s.url || (art && art.url);
+  const where = s.title ? (url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Wikipedia, ${esc(s.title)}</a>` : `Wikipedia, ${esc(s.title)}`)
+    : (c.source || {}).kind === 'file' ? `Your file, ${esc(c.source.name)}` : 'Your own reading';
+  return `<div class="know-quote"><span class="mono-label">From a book</span>${where}<blockquote>"${esc(s.quote)}"</blockquote></div>`;
+}
+// Walk through it: light the map one link at a time, in the order the reasoning goes
+// (forward for deductive and inductive, backward for abductive), like the Diagnosis graph.
+function knowWalkStop(){
+  clearTimeout(know.walkTimer);
+  know.walking = false;
+  const b = document.querySelector('[data-walk]');
+  if(b) b.textContent = 'Walk through it';
+}
+function knowWalk(){
+  const svg = document.querySelector('#knowPane .am-map svg');
+  if(!svg) return;
+  const move = (know.view || {}).move;
+  let links = [...svg.querySelectorAll('path.ed')];
+  if(svg.querySelector('path.ed.lit')) links = links.filter(e => e.classList.contains('lit'));
+  links.sort((e, f) => Number(e.dataset.o) - Number(f.dataset.o));
+  if(move === 'abductive') links.reverse();
+  if(!links.length) return;
+  svg.querySelectorAll('.wk, .draw').forEach(el => el.classList.remove('wk', 'draw'));
+  svg.classList.add('walking');
+  know.walking = true;
+  const btn = document.querySelector('[data-walk]');
+  if(btn) btn.textContent = 'Stop';
+  const name = id => (svg.querySelector(`.nd[data-id="${CSS.escape(id)}"]`) || {}).getAttribute?.('aria-label') || id;
+  let i = 0;
+  const step = () => {
+    if(!know.walking) return;
+    if(i >= links.length){
+      knowWalkStop();
+      $('knowWalkStep').textContent = `${links.length} links walked. Tap Walk through it to see it again.`;
+      return;
+    }
+    const e = links[i], a = e.dataset.a, b = e.dataset.b;
+    e.setAttribute('pathLength', '1');
+    e.classList.add('wk', 'draw');
+    svg.querySelectorAll(`.rl[data-a="${CSS.escape(a)}"][data-b="${CSS.escape(b)}"]`).forEach(t => t.classList.add('wk'));
+    [a, b].forEach(id => { const n = svg.querySelector(`.nd[data-id="${CSS.escape(id)}"]`); if(n) n.classList.add('wk'); });
+    const rel = (e.dataset.rel || '').split(', ')[0];
+    $('knowWalkStep').textContent = move === 'abductive'
+      ? `Step ${i + 1} of ${links.length}. To explain "${name(b)}", look back to "${name(a)}", which ${rel} it.`
+      : `Step ${i + 1} of ${links.length}. "${name(a)}" ${rel} "${name(b)}".`;
+    i++;
+    know.walkTimer = setTimeout(step, 1500);
+  };
+  step();
+}
+$('knowBody').addEventListener('click', e => {
+  if(!e.target.closest('[data-walk]')) return;
+  e.stopPropagation();
+  if(know.walking){ knowWalkStop(); return; }
+  knowWalk();
+}, true);
 $('knowBtn').addEventListener('click', openKnowledge);
 $('knowBody').addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]');
@@ -3092,8 +3288,8 @@ $('knowBody').addEventListener('click', e => {
   const f = e.target.closest('[data-kfault]');
   if(f){ know.pick = know.pick === f.dataset.kfault ? null : f.dataset.kfault; renderKnowPane(); return; }
   const a = e.target.closest('[data-kans]');
-  if(a){ know.answers.push(a.dataset.kans); renderKnowPane(); return; }
-  if(e.target.closest('[data-krestart]')){ know.answers = []; renderKnowPane(); return; }
+  if(a){ know.flow.push(a.dataset.kans); renderKnowPane(); return; }
+  if(e.target.closest('[data-krestart]')){ know.flow = []; renderKnowPane(); return; }
   const s = e.target.closest('[data-kev]');
   if(s){
     const ev = {...know.ev};
@@ -3105,6 +3301,27 @@ $('knowBody').addEventListener('click', e => {
 $('knowBody').addEventListener('keydown', e => {
   const f = e.target.closest('[data-kfault]');
   if(f && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); f.dispatchEvent(new MouseEvent('click', {bubbles: true})); }
+});
+$('knowBody').addEventListener('click', e => {
+  if(know.src === 'machine') return;  // the case views only
+  const c = knowCases().find(x => x.id === know.id);
+  const kf = e.target.closest('[data-kfocus]'), km = e.target.closest('[data-kmove]');
+  if((kf || km) && c){
+    know.view = kf ? (kf.dataset.kfocus && (know.view || {}).focus !== kf.dataset.kfocus ? {focus: kf.dataset.kfocus} : null)
+      : (know.view || {}).move === km.dataset.kmove ? null : {move: km.dataset.kmove};  // a second tap on a move turns it off
+    renderCasePane(c); return;
+  }
+  const nd = e.target.closest('.am-map .nd');
+  if(nd && c){ $('knowSrc').innerHTML = mapPick(nd) ? knowSourceHTML(c, c.knowledge.nodes[Number(nd.dataset.i)] || {}) : ''; return; }
+  const x = e.target.closest('.am-map .cap-x');
+  if(x){ mapUnpick(x.closest('.am-map')); $('knowSrc').innerHTML = ''; return; }
+  const ans = e.target.closest('[data-ans]');
+  if(ans && c){ know.answers[c.id] = {...(know.answers[c.id] || {}), [ans.dataset.q]: ans.dataset.ans}; renderCasePane(c); return; }
+  if(e.target.closest('[data-restart]') && c){ know.answers[c.id] = {}; renderCasePane(c); }
+});
+$('knowBody').addEventListener('keydown', e => {
+  const nd = e.target.closest('.am-map .nd');
+  if(nd && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); nd.dispatchEvent(new MouseEvent('click', {bubbles: true})); }
 });
 $('overallBody').addEventListener('click', e => {
   const b = e.target.closest('[data-open-chat]');
@@ -3607,11 +3824,16 @@ const TOURS = {
     {title: 'Tap a case to open it', text: '', target: '.ov-cases'},
   ],
   'help-knowledge': [
+    {title: 'The machine, or a case from your chats', text: '', target: '#knowCase'},
     {title: 'Three kinds of knowledge', text: '', target: '.know-tabs'},
     {title: 'Tap a fault to read its rule', text: '', target: '.kn-book'},
     {title: 'Answer like an engineer', text: '', target: '.kn-ask'},
     {title: 'Set what you know', text: '', target: '.kn-set'},
     {title: 'Watch the chances change', text: '', target: () => document.querySelector('.kn-set') && lastOf('#knowPane .dgg')},
+    {title: 'Tap a box to see its source', text: '', target: '#knowPane .am-map'},
+    {title: 'Watch it walk the links', text: '', target: '[data-walk]'},
+    {title: 'Answer like an expert', text: '', target: '.know-rules'},
+    {title: 'Read the chances', text: '', target: () => lastOf('#knowPane .diag-bar')},
   ],
   'help-diagnosis': [
     {title: 'Pick a machine, or type in your own', text: '', target: '#diagPick'},

@@ -90,8 +90,17 @@ Then set Product type to L.
 
 Say "Overstrain goes up again, because type L has the lowest strain limit. And the box at the bottom says the data found the same causes as the book, without being told them."
 
+**A case from a chat.** Open the menu next to the title and pick the case from your prepared chat.
+
+Say "The same page also shows what the AI built for every topic a student chats about. Here is the map from books, with the source of each box, the expert rules and the network. So for any topic, not only the machine, we can check the knowledge the tutor reasons with."
+
+Press Walk through it.
+
+Say "This lights the map one link at a time, the way a student walks it when they reason."
+
 **Why it looks like this.**
-- It shows one machine, the same one Diagnosis works on, so the two pages are a pair. Knowledge is what RootAI knows, and Diagnosis is RootAI using it.
+- It opens on the machine, the same one Diagnosis works on, so the two pages are a pair. Knowledge is what RootAI knows, and Diagnosis is RootAI using it.
+- The menu next to the title also lists the case from every recent chat, so we can check what the AI built for any topic. The machine comes first because the page is for engineers, and the cases are there for us and for you to review.
 - Three tabs for the three kinds of knowledge from Goal 3, books, rules of thumb and data, and each one matches one kind of reasoning. Keeping them apart lets an engineer check each source on its own.
 - Every tab is something to try, not text to read, because an engineer trusts what they can test. Tapping a fault shows its source, so every claim can be traced.
 - Rules of thumb is a flowchart and not one question at a time, so the engineer sees the whole checklist at once and can say where it is wrong.
