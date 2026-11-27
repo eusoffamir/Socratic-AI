@@ -312,8 +312,6 @@
   /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
   .diag{max-width:1080px; margin:0 auto;}
   .diag .diag-story{font-size:16px; margin:-4px 0 24px;}
-  .dg-grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:18px; align-items:start; margin-top:18px;}
-  .dg-grid > :only-child{grid-column:1 / -1;}
   .dg-svgwrap{overflow-x:auto; margin:0 -6px; padding:0 6px;}
   .dgg{display:block; width:100%; min-width:720px; height:auto;}
   .dgg .hd{font-size:11px; font-weight:600; letter-spacing:.06em; fill:var(--ink-faint);}
@@ -345,33 +343,33 @@
   @keyframes dgDraw{to{stroke-dashoffset:0;}}
   @keyframes dgPop{0%{stroke-width:6;} 100%{stroke-width:2;}}
   @media (prefers-reduced-motion: reduce){ .dgg .ed.new{animation:none; stroke-dashoffset:0;} .dgg .nd.new rect:first-child{animation:none;} }
+  .dg-controls{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:0 0 18px;}
+  .dg-run{padding:12px 30px; border-radius:999px; border:0; background:var(--signal); color:var(--paper); font-weight:700; font-size:15px;}
+  .dg-step{padding:10px 18px; border-radius:999px; background:transparent; border:1px solid color-mix(in srgb, var(--signal) 40%, transparent);
+    color:var(--signal); font-weight:600; font-size:13.5px;}
+  .dg-step:hover:not(:disabled){background:var(--signal-soft);}
+  .dg-step:disabled{opacity:.4;}
+  .dg-result{display:grid; grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr); gap:10px 28px; align-items:start;}
+  .diag-end .dg-res-name{font-family:var(--serif); font-size:26px; font-weight:700; margin:2px 0 6px; color:var(--ink);}
+  .diag-end .dg-res-fix{font-size:15px; margin:0;}
+  .dg-res-facts p{margin:0 0 6px; font-size:14px;}
+  .dg-res-facts .no{color:var(--caution);}
+  .dg-why{grid-column:1 / -1; border-top:1px solid color-mix(in srgb, var(--signal) 25%, transparent); padding-top:10px;}
+  .dg-why summary{cursor:pointer; font-weight:600; color:var(--signal); font-size:13.5px;}
+  .dg-steps{margin:8px 0 0; padding-left:20px; font-size:13.5px; line-height:1.6;}
+  .dg-fleet{text-align:center; font-size:13px; color:var(--ink-faint); margin:14px 0 0;}
+  .dgg .rd.next rect:first-child{stroke:var(--signal); stroke-width:1.8; stroke-dasharray:5 4;}
+  .dgg .rd.next .s{fill:var(--signal);}
+  @media (max-width:700px){ .dg-result{grid-template-columns:1fr;} }
   .dg-legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:12.5px; color:var(--ink-soft);}
   .dg-legend span{display:inline-flex; align-items:center; gap:7px;}
   .dg-legend i{display:inline-block; width:22px; height:0; border-top:1.5px solid var(--ink-faint);}
   .dg-legend i.lg-bar{width:16px; height:5px; border:0; border-radius:3px; background:var(--signal);}
   .dg-legend i.lg-on{border-top:3px solid var(--signal);}
   .dg-legend i.lg-rule{width:14px; height:12px; border:0; border-radius:4px; background:var(--signal);}
-  .dg-play{display:block; margin:12px auto 0; background:transparent; border:1px solid color-mix(in srgb, var(--signal) 40%, transparent);
-    color:var(--signal); border-radius:999px; padding:7px 18px; font-weight:600; font-size:13.5px;}
-  .dg-play:hover{background:var(--signal-soft);}
-  .dg-side{display:grid; gap:18px;}
   .dg-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));
     border-radius:14px; padding:18px 20px;}
   .dg-card > .mono-label{display:block; margin:0 0 10px;}
-  .dg-best{width:100%; display:flex; flex-direction:column; align-items:center; gap:2px; padding:14px; border-radius:12px; border:0;
-    background:var(--signal); color:var(--paper); font-weight:700; font-size:15px;}
-  .dg-best small{font-weight:500; font-size:12px; opacity:.85;}
-  .dg-more{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;}
-  .dg-more button{display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:9px 12px; border-radius:10px; text-align:left;
-    background:var(--panel); border:1px solid var(--rule); color:var(--ink); font-weight:600; font-size:13.5px;}
-  .dg-more button small{font-weight:500; font-size:12px; color:var(--ink-faint);}
-  .dg-more button:hover:not(:disabled){border-color:var(--signal); opacity:1;}
-  .dg-done{list-style:none; margin:0; padding:0; display:grid; gap:12px;}
-  .dg-done li{display:grid; grid-template-columns:24px minmax(0, 1fr); gap:10px; align-items:start;}
-  .dg-done .n{width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
-    background:var(--signal-soft); color:var(--signal);}
-  .dg-done p{margin:2px 0 6px; font-size:14px; line-height:1.45;}
-  .dg-done p span{color:var(--ink-soft);}
   .diag-fx{display:inline-block;}
   .diag-bar{grid-template-columns:minmax(0, 1fr) 200px 48px;}
   .diag-bar.on b{color:var(--signal);}
@@ -410,7 +408,6 @@
   .diag-rule.no{color:var(--caution);}
   .diag-truth.no{color:var(--caution);}
   .diag .know-restart{margin-top:18px;}
-  @media (max-width:800px){ .dg-grid{grid-template-columns:1fr;} }
   .diag .diag-end{margin-bottom:18px;}
   @media (max-width:700px){
     .diag-bar{grid-template-columns:minmax(0, 1fr) 44px;}
@@ -581,7 +578,9 @@
   .am-map svg.walking .nd.wk rect{stroke:var(--c); stroke-width:2; fill:color-mix(in srgb, var(--c) 22%, var(--panel));}
   .am-map .ed.draw{stroke-dasharray:1; stroke-dashoffset:1; animation:dgDraw .8s ease forwards;}
   @media (prefers-reduced-motion: reduce){ .am-map .ed.draw{animation:none; stroke-dashoffset:0;} }
-  .know-walk{margin:0 0 0 auto;}
+  .know-walk{margin:0 0 0 auto; background:transparent; border:1px solid color-mix(in srgb, var(--signal) 40%, transparent);
+    color:var(--signal); border-radius:999px; padding:7px 18px; font-weight:600; font-size:13.5px;}
+  .know-walk:hover{background:var(--signal-soft);}
   .know-walk-step{min-height:1.5em; margin:10px 0 0; font-size:14px; color:var(--ink-soft); text-align:center;}
   .am-map .legend.rels{margin-top:4px;}
   .am-map .legend i.ln{width:14px; height:3px; border-radius:2px; opacity:1; vertical-align:3px;}
@@ -1809,7 +1808,7 @@ function askMapHTML(c, opts = {}){
     }
   const cols = [];
   nodes.forEach(n => (cols[depth[n.id]] = cols[depth[n.id]] || []).push(n));
-  const W = 136, H = 42, CX = opts.labels ? 236 : 172, RY = 60, PAD = 14, used = cols.filter(Boolean);  // wider gaps leave room for the arrow words
+  const W = 136, H = 42, CX = opts.labels ? 236 : 172, RY = opts.labels ? 80 : 60, PAD = 14, used = cols.filter(Boolean);  // taller gaps on the Knowledge page, so a word between two stacked boxes is clear  // wider gaps leave room for the arrow words
   const rows = Math.max(...used.map(col => col.length));
   const pos = {};
   const place = () => used.forEach((col, x) => col.forEach((n, y) => {
@@ -2740,7 +2739,7 @@ async function renderKnowPane(c){
         <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div>
-        <button type="button" class="dg-play know-walk" data-walk>${know.walking ? 'Stop' : 'Walk through it'}</button></div>
+        <button type="button" class="know-walk" data-walk>${know.walking ? 'Stop' : 'Walk through it'}</button></div>
       ${map.replace('Tap a box to read it.', '').replace(/max-width:(\d+)px/, (_, w) => `max-width:${Math.round(w * 1.17)}px`)}<p class="know-walk-step" id="knowWalkStep"></p><div id="knowSrc"></div>`;
     wireCaseFilter($('knowView'), opts, o => { know.view = o.view; renderKnowPane(c); });
     return;
@@ -2881,26 +2880,27 @@ function renderDiagnosis(){
   wireCaseFilter($('diagPick'), L.machines, x => { diag.auto = false; diag.udi = x.udi; diag.done = []; diag.view = null; diagLoad(); });
 }
 function diagPaneHTML(v, busy){
-  const top = v.faults[0], m = v.machine;
-  const dis = busy ? ' disabled' : '';
+  const top = v.faults[0], m = v.machine, F = diag.list.fleet, n = diag.list.checks, running = diag.auto;
+  const last = v.done[v.done.length - 1];
   const story = v.finished ? ''
-    : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> RootAI finds the cause step by step, the way an expert engineer would. Tap the green button and it checks the most useful reading next.</p>`
-    : `<p class="diag-story">Best guess so far is <b>${esc(top.name)}</b>, at ${top.percent}%.</p>`;
-  const best = v.checks.find(c => c.check === v.best), rest = v.checks.filter(c => c.check !== v.best);
-  const checks = v.finished ? '' : `<div class="dg-card"><span class="mono-label">Check next</span>
-    ${best ? `<button type="button" class="dg-best" data-check="${esc(best.check)}"${dis}><span>Check ${esc(best.name.toLowerCase())}</span><small>Tells the most</small></button>` : ''}
-    <div class="dg-more">${rest.map(c => `<button type="button" data-check="${esc(c.check)}"${dis}><span>${esc(c.name)}</span><small>${esc(capFirst(c.tells))}</small></button>`).join('')}</div>
-    <button type="button" class="dg-play" data-diag-play>${diag.auto ? 'Stop' : 'Run it for me'}</button></div>`;
-  const done = v.done.length ? `<div class="dg-card"><span class="mono-label">What we checked</span><ol class="dg-done">${v.done.map((d, i) =>
-    `<li><span class="n">${i + 1}</span><div><p><b>${esc(d.name)}</b> <span>is ${esc(d.band)}, ${esc(d.value)}</span></p>
-      <span class="diag-fx ${d.kind}">${esc(d.text)}</span></div></li>`).join('')}</ol></div>` : '';
-  const end = v.finished ? `<div class="diag-end"><span class="mono-label">Found it</span>
-    <p><b>${esc(capFirst(v.named_name))}</b>, ${top.percent}%</p>
-    <p>${esc(v.explanation.text)}</p>
-    <p class="diag-rule${v.rule_check.holds ? '' : ' no'}"><span class="mono-label">Expert rule</span>${v.rule_check.holds ? '&#10003;' : '&#10007;'} ${esc(v.rule_check.text)}</p>
-    <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
-  return `${story}${end}${diagGraphHTML(v)}<div class="dg-grid">${checks}${done}</div>
-    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${busy && !diag.auto ? ' disabled' : ''}>Start again</button>` : ''}`;
+    : `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> ${last
+      ? `${esc(last.name)} is ${esc(last.band)}, ${esc(last.value)}, so ${esc(last.text.charAt(0).toLowerCase() + last.text.slice(1))}. Best guess so far is ${esc(top.name)}, at ${top.percent}%.`
+      : 'Press Find the cause, and RootAI checks the most useful readings until it is sure.'}</p>`;
+  const controls = v.finished
+    ? `<div class="dg-controls"><button type="button" class="dg-step" data-diag-restart>Start again</button></div>`
+    : `<div class="dg-controls"><button type="button" class="dg-run" data-diag-play>${running ? 'Stop' : v.done.length ? 'Keep going' : 'Find the cause'}</button>
+        <button type="button" class="dg-step" data-check="${esc(v.best || '')}"${busy || running || !v.best ? ' disabled' : ''}>One step</button>
+        ${v.done.length && !running ? `<button type="button" class="dg-step" data-diag-restart${busy ? ' disabled' : ''}>Start again</button>` : ''}</div>`;
+  const result = v.finished ? `<div class="diag-end dg-result">
+      <div><span class="mono-label">The cause</span><p class="dg-res-name">${esc(capFirst(v.named_name))}</p>
+        <p class="dg-res-fix">${esc(v.fix)}</p></div>
+      <div class="dg-res-facts"><p><b>${v.done.length} of ${n}</b> readings checked</p><p><b>${top.percent}%</b> sure</p>
+        <p class="${v.rule_check.holds ? '' : 'no'}">${v.rule_check.holds ? '&#10003; Expert rule holds' : '&#10007; Expert rule does not hold'}</p>
+        <p class="${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>
+      <details class="dg-why"><summary>Why</summary><p>${esc(v.explanation.text)}</p><p>${esc(v.rule_check.text)}</p>
+        <ol class="dg-steps">${v.done.map(d => `<li><b>${esc(d.name)}</b> is ${esc(d.band)}, ${esc(d.value)}. ${esc(d.text)}.</li>`).join('')}</ol></details></div>` : '';
+  const fleet = `<p class="dg-fleet">Tested on ${F.machines} failed machines, RootAI found the right cause ${F.right_pct}% of the time, checking ${F.avg_checks} of ${n} readings on average.</p>`;
+  return `${story}${controls}${result}${diagGraphHTML(v)}${fleet}`;
 }
 // The reasoning as a graph: readings, the faults they can cause (learned from data), and the fix
 // (the expert rule). Each check lights its reading and the link it followed, so the path to the
@@ -2943,7 +2943,9 @@ function diagGraphHTML(v){
   const readings = DG_READINGS.map(id => {
     const d = done[id];
     if(id === 'type') return node(id, 'nd rd given', names.type, `Type ${v.machine.type}, known`);
-    return node(id, `nd rd${d ? ' chk ' + d.kind : ''}${id === last ? ' new' : ''}`, names[id], d ? `${capFirst(d.band)}, ${d.value}` : 'Not checked');
+    const next = !d && !v.finished && id === v.best;
+    return node(id, `nd rd${d ? ' chk ' + d.kind : ''}${id === last ? ' new' : ''}${next ? ' next' : ''}`, names[id],
+      d ? `${capFirst(d.band)}, ${d.value}` : next ? 'Checking next' : 'Not checked');
   }).join('');
   const faults = DG_FAULTS.map(id => node(id, `nd ft${id === lead ? ' lead' : ''}${id === found ? ' found' : ''}`,
     capFirst(g.nodes.find(n => n.id === id).text.replace(' failure', '')), '', pct[id])).join('');
@@ -2982,7 +2984,7 @@ $('diagBody').addEventListener('click', e => {
   }
   const b = e.target.closest('[data-check]');
   if(b && !diag.busy){ diag.auto = false; diag.done.push(b.dataset.check); diagLoad(); return; }
-  if(e.target.closest('[data-diag-restart]') && (!diag.busy || diag.auto)){ diag.auto = false; diag.done = []; diag.view = null; diagLoad(); }
+  if(e.target.closest('[data-diag-restart]') && !diag.busy){ diag.auto = false; diag.done = []; diag.view = null; diagLoad(); }
 });
 // Walk through it: light the map one link at a time, in the order the reasoning goes
 // (forward for deductive and inductive, backward for abductive), like the Diagnosis graph.
@@ -3573,11 +3575,10 @@ const TOURS = {
   ],
   'help-diagnosis': [
     {title: 'Pick a machine', text: '', target: '#diagPick'},
-    {title: 'How RootAI reasons', text: '', target: '.dg-graph'},
-    {title: 'Tap the green check', text: '', target: '.dg-best'},
-    {title: 'Or let it run', text: '', target: '.dg-play'},
-    {title: 'What each check found', text: '', target: '.dg-done'},
-    {title: 'The answer and the fix', text: '', target: '.diag-end'},
+    {title: 'Press Find the cause', text: '', target: '.dg-run'},
+    {title: 'Or go one step at a time', text: '', target: '.dg-step'},
+    {title: 'Watch it reason', text: '', target: '.dg-graph'},
+    {title: 'The cause and the fix', text: '', target: '.dg-result'},
   ],
 };
 // The guide for the page that is open now
