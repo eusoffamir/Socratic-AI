@@ -1,6 +1,6 @@
 # Demo for Dr Ho (after Meeting 3)
 
-About 15 minutes of demo, then questions. Written 27 November 2026, updated the same day for RootAI and the new pages.
+About 15 minutes of demo, 5 minutes on the papers, then questions. Written 27 November 2026, updated the same day for RootAI and the new pages.
 
 The story to tell is simple. First we teach reasoning, then we measure it, then we store knowledge as a graph so the reasoning can walk it, and now the same engine finds faults in machines.
 
@@ -12,7 +12,7 @@ The story to tell is simple. First we teach reasoning, then we measure it, then 
 4. Open https://socratic-ai-qlk6.onrender.com about 5 minutes before, so the server is awake, and press Ctrl+Shift+R so the RootAI logo shows.
 5. Open /api/health and check it says ok. Open /api/config and check ai_guard is true.
 6. Open the Diagnosis page once, so the network is already learned (the first load takes a few seconds).
-7. Have these open in tabs, the relation classes doc, the teaching study plan and the AI4I results.
+7. Have these open in tabs, the knowledge graph review (thesis section 2.8 or `docs/thesis/kg-generation-review.md`), the relation classes doc, the Ex problem statement, the teaching study plan and the AI4I results.
 8. If you forget what a page does, press the question mark at the bottom of the sidebar. It walks through the page that is open, and Dr Ho can see it too.
 
 ## What to show and what to say
@@ -85,13 +85,31 @@ Say "Here every check makes one fault unlikely, one by one. In the end no readin
 
 If asked how good it is, say "On the 114 failed machines in the test set, the network named the right fault every time when it had all the readings."
 
-### 6. Relation classes (1 minute)
+### 6. Knowledge graph review (2 minutes)
+
+Open the review. This was the main task from the last meeting, so give it time.
+
+Say "We looked at twelve families of methods for building a knowledge graph. For each one we asked how it chooses the nodes, how many nodes it makes, and how it chooses the edges and their types. The main finding is that methods with a fixed list of relation types give graphs we can check and join, while open methods give many names for the same link. And from the open data test, choosing the right nodes mattered more than anything else, because the same method went from 82 percent to 100 percent just by using the variables an engineer would choose."
+
+Then ask "Which of these methods do you think fits the inspection case best?"
+
+### 7. Fusing the three graphs (1 minute)
+
+Say "Task seven was to fuse the three kinds of graph. So far each topic has all three, the map from books, the expert rules and the network from data, and the Diagnosis page already joins the graph with the network. The expert rules are not used in the diagnosis yet, and there is no single fused graph. How do you picture the fusion?"
+
+### 8. Relation classes (1 minute)
 
 Open the relation classes doc.
 
 Say "For task five, we drafted eleven standard relation classes. We kept our seven and added part of, prevents, rules out and fixed by, because each one answers a question in debugging. The Diagnosis page already uses causes, tests and fixed by. We would like your view before we change the graph prompt."
 
-### 7. Teaching study (1 minute)
+### 9. The Ex problem statement (1 minute)
+
+Open the Ex problem statement.
+
+Say "You said that for the FYP it is enough to state the problem and its impact clearly. This is our draft. The problem is not finding defects but ranking them by safety impact, so the most dangerous ones are fixed first. It joins a hazard graph with a graph of the plant, and we think it needs one more relation, located in, to link them. We also wrote down what we need from the partner."
+
+### 10. Teaching study (1 minute)
 
 Open the teaching study plan.
 
@@ -104,6 +122,10 @@ Say "For the backup paper, we planned a pretest and posttest study with matched 
 3. Which cohort and topic for the teaching study, and how does ethics approval work at UTP?
 4. Is the Azure access ready, so we can test the agents on it?
 5. Is the name RootAI fine with you? The thesis keeps its title.
+6. Which graph-building method from the review fits the inspection case, and how do you picture fusing the three graphs?
+7. Is the Ex problem statement right? Can the partner share past inspection records with outcomes, not only photos, and who can check the hazard graph?
+8. Can you share one deck of your IML training slides, so we can try loading slides and check that the tool asks deeper questions, not just summaries?
+9. When can we meet? You are away until about 6 December, and my exams start around 7 December.
 
 ## Things to say honestly if asked
 

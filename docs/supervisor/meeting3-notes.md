@@ -78,7 +78,11 @@ Eusoff's idea. Choose the graph-building algorithm adaptively from the input and
 - [x] Find and document how the tool's knowledge graph is stored and passed to the agents. (Done 25 November 2026, `kg-storage.md`.)
 - [ ] When Azure access arrives, switch the agents to Azure models and test.
 - [ ] Wait for the Ex inspection images and problem details (about 2 months), then build the use case.
-- [ ] Pick one cohort for the teaching study and plan the January 2027 experiment.
+- [ ] Pick one cohort for the teaching study and plan the January 2027 experiment. (Plan drafted 27 November 2026, `docs/evaluation/teaching-study-plan.md`. Cohort still to pick with Dr Ho.)
+- [ ] Standard relation classes (task 5). (Draft 27 November 2026, `relation-classes.md`, waiting for Dr Ho.)
+- [ ] Fuse the three graphs (task 7). (Partly. The Diagnosis page joins the graph and the network, 27 November 2026. The rules of thumb are not used in diagnosis yet.)
+- [ ] State the Ex problem and its impact for the FYP. (Draft 27 November 2026, `ex-problem-statement.md`.)
+- [ ] Ask Dr Ho for one deck of IML slides to try in the tool.
 
 ## 7. Claude's honest notes
 
