@@ -53,6 +53,8 @@ FIXES = {
     "RNF": "No reading explains this, so log it and inspect the machine by hand.",
 }
 # What each reading tests, as "tests" edges (the true causes from the dataset page).
+FIX_SHORT = {"TWF": "Replace the tool", "HDF": "Improve the cooling", "PWF": "Keep power in range",
+             "OSF": "Lower the load", "RNF": "Inspect by hand"}
 TESTS = {"wear": ["TWF"], "gap": ["HDF"], "speed": ["HDF"], "power": ["PWF"], "strain": ["OSF"], "torque": []}
 MAX_PER_FAULT = 2
 OSF_LIMIT = {"L": 11000, "M": 12000, "H": 13000}  # wear times torque, min Nm, from the dataset page
@@ -152,11 +154,11 @@ def found(r, done):
         up = max(mine, key=lambda x: after[x] - before[x], default=None)
         down = min(mine, key=lambda x: after[x] - before[x], default=None)
         if up and after[up] - before[up] >= SHIFT:
-            effect = {"kind": "up", "fault": FAULTS[up], "text": f"Points to {FAULTS[up]}"}
+            effect = {"kind": "up", "fault": FAULTS[up], "fault_id": up, "text": f"Points to {FAULTS[up]}"}
         elif down and before[down] - after[down] >= SHIFT:
-            effect = {"kind": "down", "fault": FAULTS[down], "text": f"Makes {FAULTS[down]} unlikely"}
+            effect = {"kind": "down", "fault": FAULTS[down], "fault_id": down, "text": f"Makes {FAULTS[down]} unlikely"}
         else:
-            effect = {"kind": "none", "fault": None, "text": "Tells little"}
+            effect = {"kind": "none", "fault": None, "fault_id": None, "text": "Tells little"}
         out.append({**reading(r, c), **effect})
         before = after
     return out
@@ -175,7 +177,7 @@ def graph():
     nodes = [{"id": c, "kind": "check", "text": CHECK_NAMES[c]} for c in CHECKS]
     nodes += [{"id": m, "kind": "fault", "text": FAULTS[m].capitalize()} for m in net.MODES]
     nodes += [{"id": "type", "kind": "context", "text": "Product type (L, M or H)"}]
-    nodes += [{"id": f"fix_{m}", "kind": "action", "text": FIXES[m]} for m in net.MODES]
+    nodes += [{"id": f"fix_{m}", "kind": "action", "text": FIXES[m], "short": FIX_SHORT[m]} for m in net.MODES]
     edges = [[c, "causes", m] for m in net.MODES for c in p[m]]  # learned from data
     edges += [[c, "tests", m] for c, ms in TESTS.items() for m in ms]
     edges += [[m, "fixed_by", f"fix_{m}"] for m in net.MODES]
@@ -232,9 +234,11 @@ def _join(parts):
 
 def machine_list():
     m = model()
+    # the short names the graph card shows for each reading
+    names = {**CHECK_NAMES, "type": "Product type"}
     return {"machines": [{"udi": r["udi"], "pid": r["pid"], "type": r["type"]} for r in machines().values()],
             "accuracy": m["accuracy"], "tested": m["tested"], "records": TRAIN_RECORDS,
-            "confident": round(100 * CONFIDENT), "graph": graph()}
+            "confident": round(100 * CONFIDENT), "graph": graph(), "names": names}
 
 
 # ---------- the Diagnosis agent: a plain explanation of the chain ----------

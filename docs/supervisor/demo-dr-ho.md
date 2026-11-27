@@ -69,21 +69,21 @@ Say "This is a small Bayesian network. The top box is the cause and the arrows p
 
 Open Diagnosis in the sidebar. Machine L47230 is picked already.
 
-Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. The page says the machine has stopped. What could have caused it shows the chance of each fault before we check anything. On the right, under Check next, the big green button is the reading that would tell us the most, and the smaller ones are the other readings we could take."
+Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. This machine has stopped. The card in the middle is how RootAI reasons. On the left are the readings we can check, in the middle the faults they can cause, with their chances, and on the right the fix for each. The arrows are the causes, learned from seven thousand past runs."
 
 Click the big green button, Check strain on the tool.
 
-Say "Strain is low, so under What we checked it says it makes overstrain failure unlikely. The line at the top now shows the best guess so far."
+Say "Strain is low, so the link to overstrain goes faint and that fault drops. Each check either points to a fault or rules one out."
 
 Click the big green button again, Check power.
 
-Say "Power is low, and low power is a known cause of power failure, so it points straight there. One fault is now at 99 percent, so it stops and says Found it. It walked from the failure back to its cause, which is abductive. Then it applied the published rule and gave the fix, which is deductive. And all the chances were learned from seven thousand past runs, which is inductive. The agent only writes this explanation at the end. The numbers come from the network, because an algorithm can do that part. The last line checks the answer against what really happened."
+Say "Power is low, and the link from power to power failure lights up green. One fault is now at 99 percent, so it stops, and the path goes on to the fix, checked with the expert rule. So the green path is the evidence for the answer. It walked from the failure back to its cause, which is abductive. It applied the published rule, which is deductive. And the chances were learned from data, which is inductive. The agent only writes the explanation at the top. The numbers come from the network, because an algorithm can do that part."
 
-Then pick machine L49739 from the menu and keep clicking the big green button.
+Then pick machine L49739 from the menu and press Run it for me, and just talk while it runs.
 
-Say "Here every check makes one fault unlikely, one by one. In the end no reading explains the failure, so the best answer left is a random failure, and that is right. The system does not pretend to know more than the data shows."
+Say "Here every check rules one fault out, one by one. In the end no reading explains the failure, so the best answer left is a random failure, and that is right. The system does not pretend to know more than the data shows."
 
-If asked how good it is, say "On the 114 failed machines in the test set, the network named the right fault every time when it had all the readings."
+If asked how good it is, say "On the 114 failed machines in the test set, the network named the right fault every time when it had all the readings, and the expert rule agreed every time."
 
 ### 6. Knowledge graph review (2 minutes)
 

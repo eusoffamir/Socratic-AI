@@ -307,18 +307,52 @@
   /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
   .diag{max-width:1080px; margin:0 auto;}
   .diag .diag-story{font-size:16px; margin:-4px 0 24px;}
-  .dg-grid{display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:18px; align-items:start;}
+  .dg-grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:18px; align-items:start; margin-top:18px;}
+  .dg-grid > :only-child{grid-column:1 / -1;}
+  .dg-svgwrap{overflow-x:auto; margin:0 -6px; padding:0 6px;}
+  .dgg{display:block; width:100%; min-width:720px; height:auto;}
+  .dgg .hd{font-size:11px; font-weight:600; letter-spacing:.06em; fill:var(--ink-faint);}
+  .dgg .nd rect:first-child{fill:var(--panel); stroke:var(--rule); stroke-width:1.2; transition:fill .4s, stroke .4s;}
+  .dgg .nd .t{font-size:13px; font-weight:600; fill:var(--ink);}
+  .dgg .nd .s{font-size:11.5px; fill:var(--ink-faint);}
+  .dgg .nd .p{font-size:13px; font-weight:700; fill:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .dgg .nd .tr{fill:var(--signal-soft);}
+  .dgg .nd .br{fill:color-mix(in srgb, var(--signal) 55%, transparent);}
+  .dgg .rd.given rect:first-child{stroke-dasharray:4 3;}
+  .dgg .rd.chk .s{fill:var(--ink-soft);}
+  .dgg .rd.up rect:first-child{fill:var(--signal-soft); stroke:var(--signal); stroke-width:2;}
+  .dgg .rd.down rect:first-child, .dgg .rd.none rect:first-child{stroke:var(--ink-faint);}
+  .dgg .rd.down .t, .dgg .rd.none .t{fill:var(--ink-soft);}
+  .dgg .ft.lead rect:first-child{stroke:var(--signal); stroke-width:2;}
+  .dgg .ft.lead .p, .dgg .ft.lead .t{fill:var(--signal);}
+  .dgg .ft.lead .br, .dgg .ft.found .br{fill:var(--signal);}
+  .dgg .ft.found rect:first-child{fill:var(--signal-soft);}
+  .dgg .fx.on rect:first-child{fill:var(--signal); stroke:var(--signal);}
+  .dgg .fx.on .t, .dgg .fx.on .s{fill:var(--paper);}
+  .dgg .fx .t{font-weight:500; fill:var(--ink-soft);}
+  .dgg .ed{fill:none; stroke:var(--ink-faint); stroke-width:1.3; opacity:.45;}
+  .dgg .ed.fixed{stroke-dasharray:3 4; opacity:.35;}
+  .dgg .ed.seen{opacity:.18;}
+  .dgg .ed.off{stroke-dasharray:4 4; opacity:.25;}
+  .dgg .ed.on{stroke:var(--signal); stroke-width:2.6; opacity:1; stroke-dasharray:none;}
+  .dgg .ed.new{stroke-dasharray:1; stroke-dashoffset:1; animation:dgDraw .9s ease forwards;}
+  .dgg .nd.new rect:first-child{animation:dgPop .9s ease;}
+  @keyframes dgDraw{to{stroke-dashoffset:0;}}
+  @keyframes dgPop{0%{stroke-width:6;} 100%{stroke-width:2;}}
+  @media (prefers-reduced-motion: reduce){ .dgg .ed.new{animation:none; stroke-dashoffset:0;} .dgg .nd.new rect:first-child{animation:none;} }
+  .dg-legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:12.5px; color:var(--ink-soft);}
+  .dg-legend span{display:inline-flex; align-items:center; gap:7px;}
+  .dg-legend i{display:inline-block; width:22px; height:0; border-top:1.5px solid var(--ink-faint);}
+  .dg-legend i.lg-bar{width:16px; height:5px; border:0; border-radius:3px; background:var(--signal);}
+  .dg-legend i.lg-on{border-top:3px solid var(--signal);}
+  .dg-legend i.lg-rule{width:14px; height:12px; border:0; border-radius:4px; background:var(--signal);}
+  .dg-play{display:block; margin:12px auto 0; background:transparent; border:1px solid color-mix(in srgb, var(--signal) 40%, transparent);
+    color:var(--signal); border-radius:999px; padding:7px 18px; font-weight:600; font-size:13.5px;}
+  .dg-play:hover{background:var(--signal-soft);}
   .dg-side{display:grid; gap:18px;}
   .dg-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));
     border-radius:14px; padding:18px 20px;}
   .dg-card > .mono-label{display:block; margin:0 0 10px;}
-  .dg-fault{padding:8px 0;}
-  .dg-row{display:flex; justify-content:space-between; gap:12px; font-size:14.5px; margin-bottom:6px;}
-  .dg-row b{font-variant-numeric:tabular-nums;}
-  .dg-track{display:block; height:8px; border-radius:999px; background:var(--signal-soft); overflow:hidden;}
-  .dg-track i{display:block; height:100%; border-radius:999px; background:color-mix(in srgb, var(--signal) 50%, transparent); transition:width .4s;}
-  .dg-fault.dg-top .dg-row{color:var(--signal); font-weight:700;}
-  .dg-fault.dg-top .dg-track i{background:var(--signal);}
   .dg-best{width:100%; display:flex; flex-direction:column; align-items:center; gap:2px; padding:14px; border-radius:12px; border:0;
     background:var(--signal); color:var(--paper); font-weight:700; font-size:15px;}
   .dg-best small{font-weight:500; font-size:12px; opacity:.85;}
@@ -372,6 +406,7 @@
   .diag-truth.no{color:var(--caution);}
   .diag .know-restart{margin-top:18px;}
   @media (max-width:800px){ .dg-grid{grid-template-columns:1fr;} }
+  .diag .diag-end{margin-bottom:18px;}
   @media (max-width:700px){
     .diag-bar{grid-template-columns:minmax(0, 1fr) 44px;}
     }
@@ -2788,7 +2823,7 @@ function knowSourceHTML(c, n){
 // ---------- Diagnosis page: why did this machine fail (the industrial use case, on open data) ----------
 // The chances and the best next check come from a Bayesian network (app/diagnose.py);
 // the Diagnosis agent only explains the answer at the end.
-const diag = {list: null, udi: null, done: [], view: null, busy: false};
+const diag = {list: null, udi: null, done: [], view: null, busy: false, auto: false};
 const diagName = m => `Machine ${m.pid}, type ${m.type}`;
 async function openDiagnosis(){
   showPage('diagnosis');
@@ -2813,6 +2848,7 @@ async function diagLoad(){
   }
   diag.busy = false;
   renderDiagnosis();
+  diagAutoNext();
 }
 function renderDiagnosis(){
   const L = diag.list, m = L.machines.find(x => x.udi === diag.udi);
@@ -2824,21 +2860,19 @@ function renderDiagnosis(){
       <div class="ov-menu" role="menu">${L.machines.map((x, i) =>
         `<button type="button" role="menuitemradio" aria-checked="${x.udi === m.udi}" data-i="${i}">${esc(diagName(x))}</button>`).join('')}</div></div></div>
     <div id="diagPane">${v ? diagPaneHTML(v, diag.busy) : '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'}</div></div>`;
-  wireCaseFilter($('diagPick'), L.machines, x => { diag.udi = x.udi; diag.done = []; diag.view = null; diagLoad(); });
+  wireCaseFilter($('diagPick'), L.machines, x => { diag.auto = false; diag.udi = x.udi; diag.done = []; diag.view = null; diagLoad(); });
 }
 function diagPaneHTML(v, busy){
-  const top = v.faults[0], m = v.machine, lead = v.finished || v.done.length;
+  const top = v.faults[0], m = v.machine;
   const dis = busy ? ' disabled' : '';
   const story = v.finished ? ''
     : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> RootAI finds the cause step by step, the way an expert engineer would. Tap the green button and it checks the most useful reading next.</p>`
     : `<p class="diag-story">Best guess so far is <b>${esc(top.name)}</b>, at ${top.percent}%.</p>`;
-  const faults = v.faults.map(f => `<div class="dg-fault${lead && f.id === top.id ? ' dg-top' : ''}">
-    <div class="dg-row"><span>${esc(capFirst(f.name))}</span><b>${f.percent}%</b></div>
-    <span class="dg-track" aria-hidden="true"><i style="width:${f.percent}%"></i></span></div>`).join('');
   const best = v.checks.find(c => c.check === v.best), rest = v.checks.filter(c => c.check !== v.best);
   const checks = v.finished ? '' : `<div class="dg-card"><span class="mono-label">Check next</span>
     ${best ? `<button type="button" class="dg-best" data-check="${esc(best.check)}"${dis}><span>Check ${esc(best.name.toLowerCase())}</span><small>Tells the most</small></button>` : ''}
-    <div class="dg-more">${rest.map(c => `<button type="button" data-check="${esc(c.check)}"${dis}><span>${esc(c.name)}</span><small>${esc(capFirst(c.tells))}</small></button>`).join('')}</div></div>`;
+    <div class="dg-more">${rest.map(c => `<button type="button" data-check="${esc(c.check)}"${dis}><span>${esc(c.name)}</span><small>${esc(capFirst(c.tells))}</small></button>`).join('')}</div>
+    <button type="button" class="dg-play" data-diag-play>${diag.auto ? 'Stop' : 'Run it for me'}</button></div>`;
   const done = v.done.length ? `<div class="dg-card"><span class="mono-label">What we checked</span><ol class="dg-done">${v.done.map((d, i) =>
     `<li><span class="n">${i + 1}</span><div><p><b>${esc(d.name)}</b> <span>is ${esc(d.band)}, ${esc(d.value)}</span></p>
       <span class="diag-fx ${d.kind}">${esc(d.text)}</span></div></li>`).join('')}</ol></div>` : '';
@@ -2847,16 +2881,90 @@ function diagPaneHTML(v, busy){
     <p>${esc(v.explanation.text)}</p>
     <p class="diag-rule${v.rule_check.holds ? '' : ' no'}"><span class="mono-label">Expert rule</span>${v.rule_check.holds ? '&#10003;' : '&#10007;'} ${esc(v.rule_check.text)}</p>
     <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
-  return `${story}${end}<div class="dg-grid">
-      <div class="dg-card dg-faults"><span class="mono-label">What could have caused it</span>${faults}</div>
-      <div class="dg-side">${checks}${done}</div></div>
-    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${dis}>Start again</button>` : ''}`;
+  return `${story}${end}${diagGraphHTML(v)}<div class="dg-grid">${checks}${done}</div>
+    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${busy && !diag.auto ? ' disabled' : ''}>Start again</button>` : ''}`;
+}
+// The reasoning as a graph: readings, the faults they can cause (learned from data), and the fix
+// (the expert rule). Each check lights its reading and the link it followed, so the path to the
+// cause is the evidence for the answer (Dr Ho, Meeting 3).
+const DG_READINGS = ['wear', 'gap', 'speed', 'power', 'strain', 'type', 'torque'];
+const DG_FAULTS = ['TWF', 'HDF', 'PWF', 'OSF', 'RNF'];
+function diagGraphHTML(v){
+  const g = diag.list.graph, names = diag.list.names, W = 960, NW = 214, NH = 48, ROW = 56, TOP = 30;
+  const X = [8, 373, W - NW - 8], pos = {};
+  DG_READINGS.forEach((id, i) => { pos[id] = {x: X[0], y: TOP + i * ROW}; });
+  const span = (DG_READINGS.length - 1) * ROW, step = span / (DG_FAULTS.length - 1);
+  DG_FAULTS.forEach((id, i) => { pos[id] = {x: X[1], y: TOP + i * step}; pos['fix_' + id] = {x: X[2], y: TOP + i * step}; });
+  const H = TOP + span + NH + 6;
+  const done = Object.fromEntries(v.done.map(d => [d.check, d]));
+  const last = v.done.length ? v.done[v.done.length - 1].check : null;
+  const pct = Object.fromEntries(v.faults.map(f => [f.id, f.percent]));
+  const lead = (v.finished || v.done.length) ? v.faults[0].id : null;
+  const found = v.finished ? v.named : null;
+  const curve = (a, b, cls) => {
+    const p = pos[a], q = pos[b], x1 = p.x + NW, y1 = p.y + NH / 2, x2 = q.x - 3, y2 = q.y + NH / 2, mx = (x1 + x2) / 2;
+    return `<path class="${cls}"${cls.includes('new') ? ' pathLength="1"' : ''} d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" marker-end="url(#dgArrow)"/>`;
+  };
+  const links = g.edges.filter(e => e[1] === 'causes').map(([a, , b]) => {
+    const d = done[a] || (a === 'type' ? {kind: 'given'} : null);
+    let cls = 'ed';
+    if(d && d.fault_id === b) cls += d.kind === 'up' ? ' on' : ' off';
+    else if(d && d.kind !== 'given') cls += ' seen';
+    if(a === last && d && d.fault_id === b && d.kind === 'up') cls += ' new';
+    return curve(a, b, cls);
+  }).join('') + DG_FAULTS.map(f => curve(f, 'fix_' + f, 'ed fixed' + (f === found ? ' on new' : ''))).join('');
+  const node = (id, cls, title, sub, right) => {
+    const {x, y} = pos[id];
+    return `<g class="${cls}"><rect x="${x}" y="${y}" width="${NW}" height="${NH}" rx="11"/>
+      <text x="${x + 13}" y="${y + (sub || right != null ? 20 : 29)}" class="t">${esc(title)}</text>
+      ${sub ? `<text x="${x + 13}" y="${y + 37}" class="s">${esc(sub)}</text>` : ''}
+      ${right != null ? `<text x="${x + NW - 13}" y="${y + 20}" class="p" text-anchor="end">${right}%</text>
+        <rect class="tr" x="${x + 13}" y="${y + NH - 13}" width="${NW - 26}" height="5" rx="2.5"/>
+        <rect class="br" x="${x + 13}" y="${y + NH - 13}" width="${Math.max(2, (NW - 26) * right / 100)}" height="5" rx="2.5"/>` : ''}</g>`;
+  };
+  const readings = DG_READINGS.map(id => {
+    const d = done[id];
+    if(id === 'type') return node(id, 'nd rd given', names.type, `Type ${v.machine.type}, known`);
+    return node(id, `nd rd${d ? ' chk ' + d.kind : ''}${id === last ? ' new' : ''}`, names[id], d ? `${capFirst(d.band)}, ${d.value}` : 'Not checked');
+  }).join('');
+  const faults = DG_FAULTS.map(id => node(id, `nd ft${id === lead ? ' lead' : ''}${id === found ? ' found' : ''}`,
+    capFirst(g.nodes.find(n => n.id === id).text.replace(' failure', '')), '', pct[id])).join('');
+  const fixes = DG_FAULTS.map(id => {
+    const on = id === found, n = g.nodes.find(x => x.id === 'fix_' + id);
+    return node('fix_' + id, `nd fx${on ? ' on' : ''}`, n.short, on ? (v.rule_check.holds ? 'Expert rule holds' : 'Expert rule does not hold') : '');
+  }).join('');
+  const head = (x, t) => `<text class="hd" x="${x + 2}" y="14">${t}</text>`;
+  return `<div class="dg-card dg-graph"><span class="mono-label">How RootAI reasons</span>
+    <div class="dg-svgwrap"><svg class="dgg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Readings, the faults they can cause and the fix, with the path RootAI followed">
+      <defs><marker id="dgArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0 0 10 5 0 10z" fill="context-stroke"/></marker></defs>
+      ${head(X[0], 'WHAT WE CAN CHECK')}${head(X[1], 'WHAT COULD BE WRONG')}${head(X[2], 'WHAT TO DO')}
+      ${links}${readings}${faults}${fixes}</svg></div>
+    <div class="dg-legend"><span><i class="lg-ed"></i>Causes, learned from 7,000 past runs</span>
+      <span><i class="lg-bar"></i>Chance of each fault, from the same data</span>
+      <span><i class="lg-on"></i>The path RootAI followed</span>
+      <span><i class="lg-rule"></i>Fix, checked with the expert rule</span></div></div>`;
+}
+// "Run it for me": the green check every moment, so the presenter can just talk
+function diagAutoNext(){
+  const v = diag.view;
+  if(!diag.auto || !v) return;
+  if(v.finished){ diag.auto = false; renderDiagnosis(); return; }
+  setTimeout(() => {
+    if(diag.auto && !diag.busy && diag.view === v && v.best){ diag.done.push(v.best); diagLoad(); }
+  }, diag.done.length ? 1600 : 500);
 }
 $('diagBtn').addEventListener('click', openDiagnosis);
 $('diagBody').addEventListener('click', e => {
+  if(e.target.closest('[data-diag-play]')){
+    diag.auto = !diag.auto;
+    renderDiagnosis();
+    diagAutoNext();
+    return;
+  }
   const b = e.target.closest('[data-check]');
-  if(b && !diag.busy){ diag.done.push(b.dataset.check); diagLoad(); return; }
-  if(e.target.closest('[data-diag-restart]') && !diag.busy){ diag.done = []; diag.view = null; diagLoad(); }
+  if(b && !diag.busy){ diag.auto = false; diag.done.push(b.dataset.check); diagLoad(); return; }
+  if(e.target.closest('[data-diag-restart]') && (!diag.busy || diag.auto)){ diag.auto = false; diag.done = []; diag.view = null; diagLoad(); }
 });
 $('knowBtn').addEventListener('click', openKnowledge);
 $('knowBody').addEventListener('click', e => {
@@ -3390,8 +3498,9 @@ const TOURS = {
   ],
   'help-diagnosis': [
     {title: 'Pick a machine', text: '', target: '#diagPick'},
-    {title: 'Chance of each fault', text: '', target: '.dg-faults'},
+    {title: 'How RootAI reasons', text: '', target: '.dg-graph'},
     {title: 'Tap the green check', text: '', target: '.dg-best'},
+    {title: 'Or let it run', text: '', target: '.dg-play'},
     {title: 'What each check found', text: '', target: '.dg-done'},
     {title: 'The answer and the fix', text: '', target: '.diag-end'},
   ],
