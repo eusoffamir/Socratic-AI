@@ -2828,7 +2828,7 @@ function diagPaneHTML(v, busy){
   const top = v.faults[0], m = v.machine, lead = v.finished || v.done.length;
   const dis = busy ? ' disabled' : '';
   const story = v.finished ? ''
-    : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> Check its readings to find out why.</p>`
+    : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> RootAI finds the cause step by step, the way an expert engineer would. Tap the green button and it checks the most useful reading next.</p>`
     : `<p class="diag-story">Best guess so far is <b>${esc(top.name)}</b>, at ${top.percent}%.</p>`;
   const faults = v.faults.map(f => `<div class="dg-fault${lead && f.id === top.id ? ' dg-top' : ''}">
     <div class="dg-row"><span>${esc(capFirst(f.name))}</span><b>${f.percent}%</b></div>
