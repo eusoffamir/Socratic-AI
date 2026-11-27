@@ -93,7 +93,7 @@ Design requirements R1 to R9 and honest status: see history file.
 
 ## RootAI Handbook
 
-- The founder's private book of knowledge, `docs/personal/rootai-handbook.html` (git-ignored, names partners), published at https://claude.ai/artifact/12wZW2YYYgnxQCzEbA5Txj (logo from `static/img/logo-192.png` as `logo.png`). Built like the Kar Handbook (https://claude.ai/artifact/NCApmWEvETKNVkduTNPPrb), so each page has 5 to 12 sections, each title states the point, each section opens with a picture (number band, bar chart, diagram or table) and then 2 or 3 short lines.
+- The founder's private book of knowledge, `docs/personal/rootai-handbook.html` (git-ignored, names partners), published at https://claude.ai/artifact/12wZW2YYYgnxQCzEbA5Txj (publish with `files`, logo from `static/img/logo-192.png` as `logo.png`, partner logos from `docs/personal/handbook-logos/` as `logos/utp.png`, `logos/petronas.png`, `logos/vitrox.png`). Built like the Kar Handbook (https://claude.ai/artifact/NCApmWEvETKNVkduTNPPrb), so each page has 5 to 12 sections, each title states the point, each section opens with a picture (number band, bar chart, diagram or table) and then 2 or 3 short lines.
 - Update it without being asked whenever anything about RootAI changes (results, decisions, costs, pitch, rivals, funding), and republish to the same link.
 - Costs go in its expenses database, not the page.
 - Check every fact online, list sources at the bottom of each page, mark guesses "Guess" in amber. Never invent numbers; leave the box empty and add it to "Still to find out".
