@@ -43,7 +43,7 @@ This is the same loop as the Bayesian network test on the AI4I data (`docs/super
 
 ## Worked example 1, the AI4I milling machine (open data)
 
-The dataset publishes the rule behind each failure mode, so the edges below are known to be true. They are built into the diagnosis demo (`app/diagnose.py`).
+The dataset publishes the rule behind each failure mode, so the edges below are known to be true. The diagnosis demo (`app/diagnose.py`, the Diagnosis page) already uses the causes, tests and fixed_by edges. Its causes edges are learned from the data, not written by hand.
 
 - spindle part_of machine, tool part_of machine
 - low temperature gap causes heat dissipation failure, slow speed causes heat dissipation failure
