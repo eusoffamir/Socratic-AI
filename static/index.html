@@ -218,6 +218,11 @@
     background:var(--panel); color:var(--signal); font-size:12px; font-weight:700;}
   .sk-card .sk-go{margin-top:18px;}
   .ov-empty{display:flex; flex-wrap:wrap; gap:10px;}
+  /* no skill check yet: centred, so the card does not look empty on the right */
+  .sk-card.sk-empty{text-align:center; padding:26px 20px;}
+  .sk-empty .sk-cols{display:block;}
+  .sk-empty .sk-pills{justify-content:center;}
+  .sk-empty .sk-go{display:inline-block;}
   .sk-go.ghost-go{background:transparent; color:var(--signal);}
   .sk-col li small{display:block; font-size:13px; color:var(--ink-soft); margin-top:1px;}
   .sk-flat .sk-card{border:0; background:none; padding:0;}  /* inside the pop-up, no second box */
@@ -3036,7 +3041,7 @@ function seenInChatsHTML(chat){
 function skillsSimpleHTML(m, withButton = true, chat = null){
   const button = withButton ? '<button type="button" class="sk-go" data-take-check>Take a skill check</button>' : '';
   const seen = seenInChatsHTML(chat);
-  if(!m || !m.answers) return `<div class="sk-card"><span class="mono-label">From your skill checks</span>
+  if(!m || !m.answers) return `<div class="sk-card sk-empty"><span class="mono-label">From your skill checks</span>
     <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>
     ${seen ? `<div class="sk-cols">${seen}</div>` : ''}${button}</div>`;
   const plain = r => SKILL_PLAIN[r.skill] || r.skill;
