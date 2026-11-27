@@ -85,6 +85,10 @@ Say "This is not one lucky machine. On all 114 failed test machines it found the
 
 If there is time, pick machine L49739 and press Find the cause again. Say "Here every check rules a fault out, until the best answer left is a random failure, and that is right."
 
+**Your own machine.** Open the machine menu and pick Your own machine at the bottom. Press L, then type air 300, process 308, speed 1300 and torque 40, and press Find the cause.
+
+Say "An engineer can type in their own machine. They leave out any reading they do not have, and RootAI works out the gap, the power and the strain from the rest. Here it finds heat dissipation at 96 percent and checks the expert rule on the numbers. Nobody knows the real answer for a new machine, so it does not claim one."
+
 ### 6. Knowledge graph review (2 minutes)
 
 Open the review. This was the main task from the last meeting, so give it time.

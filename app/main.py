@@ -335,8 +335,9 @@ def knowledge_view(case_id: str):
 
 
 class DiagnoseRequest(BaseModel):
-    machine: int
+    machine: int = 0
     done: list[str] = []
+    own: dict | None = None  # the user's own readings, instead of a demo machine
 
 
 @app.get("/api/diagnose")
@@ -350,7 +351,9 @@ def diagnose_machines():
 def diagnose_step(req: DiagnoseRequest):
     """Where one machine's diagnosis stands after the checks done so far."""
     try:
-        return diagnose.step(req.machine, req.done[:len(diagnose.CHECKS)])
+        return diagnose.step(req.machine, req.done[:len(diagnose.CHECKS)], req.own)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
     except KeyError:
         raise HTTPException(404, "This machine is not in the demo.")
 

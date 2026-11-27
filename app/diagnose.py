@@ -60,6 +60,7 @@ FIX_SHORT = {"TWF": "Replace the tool", "HDF": "Improve the cooling", "PWF": "Ke
              "OSF": "Lower the load", "RNF": "Inspect by hand"}
 TESTS = {"wear": ["TWF"], "gap": ["HDF"], "speed": ["HDF"], "power": ["PWF"], "strain": ["OSF"], "torque": []}
 MAX_PER_FAULT = 2
+NEEDS = {"TWF": ["wear"], "HDF": ["gap", "speed"], "PWF": ["power"], "OSF": ["strain"]}  # readings each rule needs
 OSF_LIMIT = {"L": 11000, "M": 12000, "H": 13000}  # wear times torque, min Nm, from the dataset page
 
 
@@ -75,6 +76,9 @@ def rule_check(r, mode):
     check: if the rule's conditions hold, the fault must follow."""
     x = r["raw"]
     num = lambda v, unit, p=0: f"{_down(v, p):,.{p}f} {unit}"
+    missing = [c for c in NEEDS.get(mode, []) if x.get(c) is None]
+    if missing:
+        return {"holds": None, "text": f"The rule cannot be checked, since {_join([CHECK_NAMES[c].lower() for c in missing])} was not given."}
     if mode == "TWF":
         holds = x["wear"] >= 200
         why = f"tool wear is {num(x['wear'], 'min')}, and the rule needs 200 minutes or more"
@@ -89,7 +93,10 @@ def rule_check(r, mode):
         holds = x["strain"] > limit
         why = f"wear times torque is {num(x['strain'], 'min Nm')}, and the rule for type {r['type']} needs over {limit:,}"
     else:  # random failure: the rule is that no other rule explains it
-        others = [m for m in ("TWF", "HDF", "PWF", "OSF") if rule_check(r, m)["holds"]]
+        tried = {m: rule_check(r, m)["holds"] for m in ("TWF", "HDF", "PWF", "OSF")}
+        others = [m for m, h in tried.items() if h]
+        if not others and None in tried.values():
+            return {"holds": None, "text": "The rule cannot be checked, since not every reading was given."}
         holds = not others
         why = ("no other rule fits these readings" if holds
                else f"the rule for {FAULTS[others[0]]} fits these readings")
@@ -192,15 +199,56 @@ def _chances(evidence):
     return net.mode_chances(m["parents"], m["tables"], evidence)
 
 
-def step(udi, done):
-    """Where the diagnosis stands after the checks in `done`, in order."""
-    r = machines().get(udi)
+# The user's own machine: what can be typed in, with a sensible range for each
+OWN = {"air": ("Air temperature", "K", 250, 350), "process": ("Process temperature", "K", 250, 400),
+       "speed": ("Spindle speed", "rpm", 1, 5000), "torque": ("Torque", "Nm", 0.1, 200),
+       "wear": ("Tool wear", "min", 0, 500)}
+
+
+def own_machine(inp):
+    """A machine row from the user's own numbers, banded like the training data.
+    Gap, power and strain are worked out when the numbers they need are given.
+    Raises ValueError on a bad type, a number out of range or no numbers at all."""
+    t = inp.get("type")
+    if t not in OSF_LIMIT:
+        raise ValueError("Pick the product type, L, M or H.")
+    x = {}
+    for k, (name, unit, lo, hi) in OWN.items():
+        v = inp.get(k)
+        if v is None or v == "":
+            continue
+        try:
+            v = float(v)
+        except (TypeError, ValueError):
+            raise ValueError(f"{name} must be a number.")
+        if not (lo <= v <= hi) or v != v:
+            raise ValueError(f"{name} should be between {lo:g} and {hi:g} {unit}.")
+        x[k] = v
+    raw = {"speed": x.get("speed"), "torque": x.get("torque"), "wear": x.get("wear"),
+           "gap": x["process"] - x["air"] if "air" in x and "process" in x else None,
+           "power": x["torque"] * x["speed"] * 2 * math.pi / 60 if "torque" in x and "speed" in x else None,
+           "strain": x["wear"] * x["torque"] if "wear" in x and "torque" in x else None}
+    if all(v is None for v in raw.values()):
+        raise ValueError("Type at least one reading.")
+    cuts = {"speed": ([1380, 1800], ["slow", "normal", "fast"]), "torque": ([30, 50], ["low", "mid", "high"]),
+            "wear": ([200, 240], ["new", "worn", "old"]), "gap": ([8.6], ["small", "normal"]),
+            "power": ([3500, 9000], ["low", "normal", "high"]), "strain": ([11000, 13000], ["low", "mid", "high"])}
+    row = {"udi": 0, "pid": "Your machine", "type": t, "raw": raw, **{m: 0 for m in net.MODES}, "own": True}
+    row.update({c: net._band(raw[c], *cuts[c]) for c in CHECKS if raw[c] is not None})
+    return row
+
+
+def step(udi, done, own=None):
+    """Where the diagnosis stands after the checks in `done`, in order, for a demo
+    machine (udi) or the user's own readings (own)."""
+    r = own_machine(own) if own is not None else machines().get(udi)
     if r is None:
         raise KeyError(udi)
-    done = [c for i, c in enumerate(done) if c in CHECKS and c not in done[:i]]
+    have = [c for c in CHECKS if c in r]
+    done = [c for i, c in enumerate(done) if c in have and c not in done[:i]]
     evidence = {"type": r["type"], "failed": 1, **{c: r[c] for c in done}}
     m = model()
-    left = [c for c in CHECKS if c not in done]
+    left = [c for c in have if c not in done]
     now, values = net.value_of_information(m["parents"], m["tables"], evidence, left) if left else (
         max(_chances(evidence).values()), {})
     chances = _chances(evidence)  # each fault on its own, since a machine can have two at once
@@ -208,7 +256,8 @@ def step(udi, done):
     top = ranked[0]
     finished = now >= CONFIDENT or not left
     out = {
-        "machine": {"udi": r["udi"], "pid": r["pid"], "type": r["type"]},
+        "machine": {"udi": r["udi"], "pid": r["pid"], "type": r["type"], "own": bool(r.get("own"))},
+        "given": have,
         "done": found(r, done),
         "faults": [{"id": x, "name": FAULTS[x], "percent": _pct(chances[x])} for x in ranked],
         "sure": _pct(now),
@@ -219,9 +268,10 @@ def step(udi, done):
     }
     out["checks"].sort(key=lambda c: -c["gain"])
     if finished:
-        truth = _faults_of(r)
+        truth = [] if r.get("own") else _faults_of(r)  # nobody knows the real cause of the user's own machine
         out.update({"named": top, "named_name": FAULTS[top], "rule": RULES[top], "fix": FIXES[top],
-                    "rule_check": rule_check(r, top), "truth": [FAULTS[x] for x in truth], "right": top in truth})
+                    "rule_check": rule_check(r, top), "truth": [FAULTS[x] for x in truth],
+                    "right": (top in truth) if truth else None})
         out["explanation"] = explain(out)
     return out
 
@@ -242,7 +292,8 @@ def machine_list():
     return {"machines": [{"udi": r["udi"], "pid": r["pid"], "type": r["type"]} for r in machines().values()],
             "accuracy": m["accuracy"], "tested": m["tested"], "records": TRAIN_RECORDS,
             "confident": round(100 * CONFIDENT), "graph": graph(), "names": names,
-            "fleet": FLEET, "checks": len(CHECKS)}
+            "fleet": FLEET, "checks": len(CHECKS),
+            "own": [{"id": k, "name": n, "unit": u, "min": lo, "max": hi} for k, (n, u, lo, hi) in OWN.items()]}
 
 
 # ---------- the Diagnosis agent: a plain explanation of the chain ----------
@@ -304,7 +355,7 @@ def clean(text, d):
 
 
 def explain(d):
-    key = (d["machine"]["udi"], tuple(x["check"] for x in d["done"]))
+    key = (d["machine"]["udi"], tuple((x["check"], x["value"]) for x in d["done"]))
     with _lock:
         if key in _cache:
             return _cache[key]

@@ -121,3 +121,32 @@ def test_machine_knowledge_api():
     assert c.get("/api/machine-knowledge").json()["records"] == 7000
     r = c.post("/api/machine-knowledge/what-if", json={"evidence": {"wear": "old"}}).json()
     assert len(r["faults"]) == 5
+
+
+def test_own_machine_is_diagnosed():
+    own = {"type": "L", "air": 300, "process": 308, "speed": 1300, "torque": 40}
+    v = diagnose.step(0, [], own)
+    assert v["machine"]["own"] and "wear" not in v["given"] and "strain" not in v["given"]
+    done = []
+    while not v["finished"]:
+        done.append(v["best"])
+        v = diagnose.step(0, done, own)
+    assert v["named"] == "HDF" and v["rule_check"]["holds"] and v["truth"] == [] and v["right"] is None
+
+
+def test_own_machine_rule_cannot_be_checked_without_its_readings():
+    r = diagnose.own_machine({"type": "M", "speed": 1500})
+    assert diagnose.rule_check(r, "TWF")["holds"] is None
+    assert diagnose.rule_check(r, "RNF")["holds"] is None
+
+
+def test_own_machine_bad_input():
+    import pytest
+    for bad in ({"speed": 1500}, {"type": "L"}, {"type": "L", "speed": 99999}, {"type": "L", "wear": "lots"}):
+        with pytest.raises(ValueError):
+            diagnose.own_machine(bad)
+    from fastapi.testclient import TestClient
+    from app.main import app
+    c = TestClient(app)
+    assert c.post("/api/diagnose/step", json={"machine": 0, "own": {"type": "L"}}).status_code == 400
+    assert c.post("/api/diagnose/step", json={"machine": 0, "done": ["wear"], "own": {"type": "H", "wear": 230}}).json()["finished"]
