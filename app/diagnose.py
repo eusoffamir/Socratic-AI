@@ -321,3 +321,59 @@ def explain(d):
     with _lock:
         _cache[key] = out
     return out
+
+
+# ---------- the Knowledge page for engineers: the same machine, three kinds of knowledge ----------
+
+SOURCE = {"title": "AI4I 2020 Predictive Maintenance Dataset, Matzka (2020)", "url": "https://doi.org/10.24432/C5HS5C"}
+# What each band of a reading means in real numbers (the cuts in eval/pgm_ai4i.load).
+BANDS = {
+    "type": [("L", "Low quality"), ("M", "Medium quality"), ("H", "High quality")],
+    "wear": [("new", "under 200 min"), ("worn", "200 to 240 min"), ("old", "240 min or more")],
+    "strain": [("low", "under 11,000 min Nm"), ("mid", "11,000 to 13,000"), ("high", "13,000 or more")],
+    "power": [("low", "under 3,500 W"), ("normal", "3,500 to 9,000 W"), ("high", "9,000 W or more")],
+    "gap": [("small", "under 8.6 K"), ("normal", "8.6 K or more")],
+    "speed": [("slow", "under 1,380 rpm"), ("normal", "1,380 to 1,800 rpm"), ("fast", "1,800 rpm or more")],
+    "torque": [("low", "under 30 Nm"), ("mid", "30 to 50 Nm"), ("high", "50 Nm or more")],
+}
+# The engineer's checklist, the published rules put in the order an engineer would check
+# them (cheapest and most common first). DRAFT by Claude, until a real expert checks it.
+TREE = {
+    "root": "q_wear",
+    "nodes": [
+        {"id": "q_wear", "kind": "question", "text": "Is tool wear 200 minutes or more?"},
+        {"id": "q_strain", "kind": "question", "text": "Is wear times torque over the limit for its type?",
+         "sub": "11,000 min Nm for L, 12,000 for M, 13,000 for H"},
+        {"id": "q_power", "kind": "question", "text": "Is power under 3,500 W or over 9,000 W?"},
+        {"id": "q_heat", "kind": "question", "text": "Is the temperature gap under 8.6 K and the speed under 1,380 rpm?"},
+        *[{"id": f"d_{m}", "kind": "decision", "fault": m, "text": FAULTS[m].capitalize(), "fix": FIX_SHORT[m]}
+          for m in ("TWF", "OSF", "PWF", "HDF", "RNF")],
+    ],
+    "edges": [["q_wear", "yes", "d_TWF"], ["q_wear", "no", "q_strain"],
+              ["q_strain", "yes", "d_OSF"], ["q_strain", "no", "q_power"],
+              ["q_power", "yes", "d_PWF"], ["q_power", "no", "q_heat"],
+              ["q_heat", "yes", "d_HDF"], ["q_heat", "no", "d_RNF"]],
+}
+
+
+def knowledge():
+    """The machine knowledge in three parts: what the published source says (books),
+    the engineer's checklist (rules of thumb) and the network learned from data."""
+    p = model()["parents"]
+    names = {**CHECK_NAMES, "type": "Product type"}
+    book = [{"id": m, "name": FAULTS[m].capitalize(), "rule": RULES[m][0].upper() + RULES[m][1:] + ".",
+             "fix": FIXES[m], "short": FIX_SHORT[m], "causes": sorted(net.TRUE_PARENTS[m])} for m in net.MODES]
+    learned = {m: sorted(p[m]) for m in net.MODES}
+    return {"names": names, "source": SOURCE, "book": book, "tree": TREE, "records": TRAIN_RECORDS,
+            "learned": learned,
+            # readings that go together (the network's arrows between readings), drawn as arcs
+            "links": [[a, c] for c in CHECKS for a in p[c] if a in CHECKS],
+            "agree": all(set(learned[m]) == net.TRUE_PARENTS[m] for m in net.MODES),
+            "bands": {k: [{"value": v, "text": t} for v, t in b] for k, b in BANDS.items()}}
+
+
+def what_if(evidence):
+    """The chance of each fault for a failed machine, given the readings set so far."""
+    ok = {k: v for k, v in (evidence or {}).items() if k in BANDS and v in dict(BANDS[k])}
+    chances = _chances({"failed": 1, **ok})
+    return {"evidence": ok, "faults": [{"id": m, "name": FAULTS[m], "percent": _pct(chances[m])} for m in net.MODES]}

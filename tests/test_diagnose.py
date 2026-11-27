@@ -94,3 +94,30 @@ def test_expert_rule_fits_every_failed_test_machine():
     failed = [r for r in diagnose.model()["test"] if any(r[m] for m in net.MODES)]
     assert all(any(diagnose.rule_check(r, m)["holds"] for m in net.MODES if r[m]) for r in failed)
     assert diagnose._down(8.595, 2) == 8.59
+
+
+def test_machine_knowledge_three_parts():
+    k = diagnose.knowledge()
+    assert [b["id"] for b in k["book"]] == ["TWF", "HDF", "PWF", "OSF", "RNF"]
+    assert k["agree"] and k["learned"]["OSF"] == ["strain", "type"]
+    assert ["strain", "wear"] in k["links"]
+    ids = {n["id"] for n in k["tree"]["nodes"]}
+    assert all(a in ids and b in ids for a, _, b in k["tree"]["edges"])
+    assert {n["fault"] for n in k["tree"]["nodes"] if n["kind"] == "decision"} == set(diagnose.FAULTS)
+
+
+def test_what_if_moves_the_chances():
+    base = {f["id"]: f["percent"] for f in diagnose.what_if({})["faults"]}
+    got = diagnose.what_if({"type": "L", "strain": "high", "bogus": "x", "wear": "nonsense"})
+    assert got["evidence"] == {"type": "L", "strain": "high"}
+    now = {f["id"]: f["percent"] for f in got["faults"]}
+    assert now["OSF"] > 90 > base["OSF"]
+
+
+def test_machine_knowledge_api():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    c = TestClient(app)
+    assert c.get("/api/machine-knowledge").json()["records"] == 7000
+    r = c.post("/api/machine-knowledge/what-if", json={"evidence": {"wear": "old"}}).json()
+    assert len(r["faults"]) == 5

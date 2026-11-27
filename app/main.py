@@ -355,6 +355,23 @@ def diagnose_step(req: DiagnoseRequest):
         raise HTTPException(404, "This machine is not in the demo.")
 
 
+class WhatIfRequest(BaseModel):
+    evidence: dict[str, str] = {}
+
+
+@app.get("/api/machine-knowledge")
+def machine_knowledge():
+    """The Knowledge page for engineers: the machine's knowledge from the published
+    source, an engineer's checklist and the network learned from data."""
+    return diagnose.knowledge()
+
+
+@app.post("/api/machine-knowledge/what-if")
+def machine_what_if(req: WhatIfRequest):
+    """The chance of each fault for a failed machine, given the readings set so far."""
+    return diagnose.what_if(req.evidence)
+
+
 @app.post("/api/topic/meanings")
 def topic_meanings(req: TopicRequest):
     """The articles an unclear topic could mean, so the learner picks one
