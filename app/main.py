@@ -26,7 +26,7 @@ from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
 
 log = logging.getLogger(__name__)
-app = FastAPI(title="Socratic AI")
+app = FastAPI(title="RootAI")
 
 # Live sessions are kept in memory and also saved after every turn (see
 # storage.py: files on this computer, a free database online), so a learner

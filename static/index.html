@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Socratic AI</title>
-<meta name="description" content="A Socratic tutor that asks questions, step by step, to build your critical thinking on any topic.">
+<title>RootAI</title>
+<meta name="description" content="Reasoning that finds the root. A Socratic tutor that builds critical thinking on any topic, and an agent that finds why a machine failed.">
 <meta name="theme-color" content="#1f6f5c">
 <link rel="icon" href="/static/img/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
 <link rel="manifest" href="/static/manifest.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Socratic AI">
-<meta property="og:description" content="A tutor that asks, so you learn to think. Practise critical thinking on any topic.">
+<meta property="og:title" content="RootAI">
+<meta property="og:description" content="Reasoning that finds the root. Practise critical thinking on any topic, and find why a machine failed.">
 <meta property="og:image" content="/static/img/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1067,13 +1067,13 @@
 <div id="homeView" class="view">
   <div class="nav-menu">  <!-- phones only -->
     <button class="icon-btn" id="navOpen" title="Menu" aria-label="Open the menu"><svg><use href="#i-side"/></svg></button>
-    <img class="brand-mark" src="/static/img/socrates.png" alt=""><b>Socratic AI</b>
+    <img class="brand-mark" src="/static/img/socrates.png" alt=""><b>RootAI</b>
   </div>
   <div class="nav-backdrop" id="navBackdrop"></div>
   <button class="icon-btn nav-unfold" id="navUnfold" title="Open the sidebar" aria-label="Open the sidebar"><svg><use href="#i-side"/></svg></button>
   <nav class="rail nav" aria-label="Main">
     <div class="sn-head">
-      <span class="sn-name"><img class="brand-mark" src="/static/img/socrates.png" alt="">Socratic AI</span>
+      <span class="sn-name"><img class="brand-mark" src="/static/img/socrates.png" alt="">RootAI</span>
       <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
     </div>
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
@@ -1425,7 +1425,7 @@ function startTourOnce(){
   if(!tourSeen('ask') && !$('askMain').classList.contains('hidden') && $('askMain').classList.contains('empty')) setTimeout(() => startTour('ask'), 300);
 }
 $('askBtn').addEventListener('click', () => { askReset(); showPage('ask'); });
-// the "Socratic AI" name (sidebar and phone bar) also starts a new chat
+// the "RootAI" name (sidebar and phone bar) also starts a new chat
 document.querySelectorAll('.sn-name, .nav-menu b').forEach(el => el.addEventListener('click', () => $('askBtn').click()));
 $('navOpen').addEventListener('click', () => $('homeView').classList.add('nav-open'));
 $('navBackdrop').addEventListener('click', () => $('homeView').classList.remove('nav-open'));

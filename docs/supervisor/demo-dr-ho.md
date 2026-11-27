@@ -59,7 +59,7 @@ Say "For the backup paper, we planned a pretest and posttest study with matched 
 2. Are the eleven relation classes right, and is anything missing that inspection engineers use?
 3. Which cohort and topic for the teaching study, and how does ethics approval work at UTP?
 4. Is the Azure access ready, so we can test the agents on it?
-5. The tool now does more than Socratic tutoring. Should we give it a new name? (We have a short list.)
+5. The tool now does more than Socratic tutoring, so we renamed the app RootAI, meaning reasoning that finds the root. Is that name fine with you? (The thesis keeps its title.)
 
 ## Things to say honestly if asked
 

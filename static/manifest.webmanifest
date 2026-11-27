@@ -1,6 +1,6 @@
 {
-  "name": "Socratic AI",
-  "short_name": "Socratic AI",
+  "name": "RootAI",
+  "short_name": "RootAI",
   "description": "A Socratic tutor that asks questions to build your critical thinking.",
   "start_url": "/",
   "display": "standalone",

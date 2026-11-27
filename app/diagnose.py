@@ -169,7 +169,7 @@ def machine_list():
 
 # ---------- the Diagnosis agent: a plain explanation of the chain ----------
 
-SYSTEM = """You are the Diagnosis agent for Socratic AI. A milling machine has failed, and plain code has already found the most likely fault with a Bayesian network. You only explain the reasoning to an engineer in training, in at most """ + str(WORDS) + """ words. Use only the facts given and change no number.
+SYSTEM = """You are the Diagnosis agent for RootAI. A milling machine has failed, and plain code has already found the most likely fault with a Bayesian network. You only explain the reasoning to an engineer in training, in at most """ + str(WORDS) + """ words. Use only the facts given and change no number.
 
 Write 3 or 4 sentences in this order.
 1. Abductive. Which reading in CHECKS points to FAULT, so FAULT is the best explanation at CHANCE. Name the reading and its number.
