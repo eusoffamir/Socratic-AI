@@ -224,7 +224,7 @@ def health():
     if llm_client.PROVIDER == "mock":
         ai_ok, ai = not os.getenv("RENDER"), "Using mock replies, so no real AI. Set GOOGLE_API_KEY to use Gemini."
     else:
-        model = {"gemini": llm_client.GEMINI_MODEL, "groq": llm_client.GROQ_MODEL}.get(llm_client.PROVIDER,
+        model = {"gemini": llm_client.GEMINI_MODEL, "groq": llm_client.GROQ_MODEL, "azure": llm_client.AZURE_DEPLOYMENT}.get(llm_client.PROVIDER,
                                                                                        llm_client.ANTHROPIC_MODEL)
         backup = (f" Groq ({llm_client.GROQ_MODEL}) is the backup." if llm_client.PROVIDER == "gemini"
                   and os.getenv("GROQ_API_KEY") else "")

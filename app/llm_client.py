@@ -4,6 +4,9 @@
   PROVIDER=gemini   Google's free API tier (get a key at https://aistudio.google.com/apikey,
                      no credit card needed for the free-tier models)
   PROVIDER=anthropic  needs a paid Anthropic API key
+  PROVIDER=azure    Azure OpenAI or Azure AI Foundry (the UTP access Dr Ho is arranging):
+                     AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT,
+                     and AZURE_OPENAI_API_VERSION (a date such as 2024-10-21, or "v1")
 
 With PROVIDER=gemini and a GROQ_API_KEY set, Groq's free API takes over any call
 that no Gemini model could answer (get a key at https://console.groq.com/keys).
@@ -95,6 +98,23 @@ GROQ_MODEL = GROQ_MODELS[0] if GROQ_MODELS else ""
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 # gpt-oss thinks before answering and that counts against the token cap, like Gemini
 GROQ_THINKING_HEADROOM = 1024
+
+# Azure (Meeting 3, task 1): "do not redesign everything, just switch the model calls".
+# Prepared 27 November 2026 before the access arrived, so it is checked only against a fake
+# server in the tests. Azure OpenAI and Azure AI Foundry both take the OpenAI-style body.
+AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "").rstrip("/")
+AZURE_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "")
+AZURE_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-10-21")
+AZURE_THINKING_HEADROOM = 1024  # reasoning models count their thinking against the cap
+
+
+def _azure_url():
+    """The chat URL. "v1" is the newer route where the model goes in the body; a date is
+    the classic route with the deployment in the path."""
+    if AZURE_API_VERSION == "v1":
+        return f"{AZURE_ENDPOINT}/openai/v1/chat/completions"
+    return f"{AZURE_ENDPOINT}/openai/deployments/{AZURE_DEPLOYMENT}/chat/completions?api-version={AZURE_API_VERSION}"
+
 
 # The models that answered the current turn, so the transcript can say which ones did.
 _models_used = contextvars.ContextVar("models_used", default=None)
@@ -294,6 +314,44 @@ def _groq_call(model, system, user, max_tokens, json_mode, seed):
     return text.strip().replace("‑", "-").replace(" ", " ").replace(" ", " ")
 
 
+def _generate_azure(system, user, max_tokens, json_mode, seed=None):
+    import httpx
+    if not (AZURE_ENDPOINT and AZURE_DEPLOYMENT and os.getenv("AZURE_OPENAI_API_KEY")):
+        raise LLMError("Azure is not set up. Set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT.")
+    body = {"max_completion_tokens": max_tokens + AZURE_THINKING_HEADROOM,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
+    if AZURE_API_VERSION == "v1":
+        body["model"] = AZURE_DEPLOYMENT
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
+    if seed is not None:
+        body["seed"] = seed
+    for attempt in range(OVERLOAD_RETRIES + 1):
+        try:
+            res = httpx.post(_azure_url(), json=body, timeout=REQUEST_TIMEOUT_SECONDS,
+                             headers={"api-key": os.getenv("AZURE_OPENAI_API_KEY", "")})
+        except httpx.TimeoutException as e:
+            raise LLMError(f"Azure took longer than {REQUEST_TIMEOUT_SECONDS}s to reply. Try again.") from e
+        except httpx.TransportError as e:
+            raise LLMError("Couldn't reach Azure. Check the endpoint and your internet connection.") from e
+        if (res.status_code == 429 or res.status_code >= 500) and attempt < OVERLOAD_RETRIES:
+            time.sleep(2 * (attempt + 1))
+            continue
+        break
+    if res.status_code == 429:
+        raise LLMError("The Azure limit is used up right now. Wait a minute and try again.")
+    if res.status_code != 200:
+        raise LLMError(f"Azure error {res.status_code}: {res.text[:200]}")
+    try:
+        text = res.json()["choices"][0]["message"]["content"] or ""
+    except (ValueError, KeyError, IndexError, TypeError) as e:
+        raise LLMError("Azure sent a reply that could not be read. Try again.") from e
+    if not text.strip():
+        raise LLMError("Azure returned an empty reply. Try again.")
+    _note_model(f"azure:{AZURE_DEPLOYMENT}")
+    return text.strip()
+
+
 class _GroqBusy(Exception):
     def __init__(self, code):
         super().__init__(code)
@@ -337,6 +395,8 @@ def _generate(system, user, max_tokens, json_mode=False, seed=None, thinking="lo
             return text
     if PROVIDER == "groq":
         return _generate_groq(system, user, max_tokens, json_mode, seed)
+    if PROVIDER == "azure":
+        return _generate_azure(system, user, max_tokens, json_mode, seed)
     if PROVIDER == "anthropic":
         _note_model(ANTHROPIC_MODEL)
         return _generate_anthropic(system, user, max_tokens)
