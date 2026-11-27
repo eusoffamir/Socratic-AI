@@ -69,17 +69,17 @@ Say "This is a small Bayesian network. The top box is the cause and the arrows p
 
 Open Diagnosis in the sidebar. Machine L47230 is picked already.
 
-Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. The page says the machine has stopped. What could have caused it shows the chance of each fault before we check anything. The buttons under Check next are the readings we can take, and the green one says Best next check, because it would tell us the most."
+Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. The page says the machine has stopped. What could have caused it shows the chance of each fault before we check anything. On the right, under Check next, the big green button is the reading that would tell us the most, and the smaller ones are the other readings we could take."
 
-Click Strain on the tool.
+Click the big green button, Check strain on the tool.
 
 Say "Strain is low, so under What we checked it says it makes overstrain failure unlikely. The line at the top now shows the best guess so far."
 
-Click Power.
+Click the big green button again, Check power.
 
 Say "Power is low, and low power is a known cause of power failure, so it points straight there. One fault is now at 99 percent, so it stops and says Found it. It walked from the failure back to its cause, which is abductive. Then it applied the published rule and gave the fix, which is deductive. And all the chances were learned from seven thousand past runs, which is inductive. The agent only writes this explanation at the end. The numbers come from the network, because an algorithm can do that part. The last line checks the answer against what really happened."
 
-Then pick machine L49739 from the menu and keep clicking the green check.
+Then pick machine L49739 from the menu and keep clicking the big green button.
 
 Say "Here every check makes one fault unlikely, one by one. In the end no reading explains the failure, so the best answer left is a random failure, and that is right. The system does not pretend to know more than the data shows."
 

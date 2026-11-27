@@ -199,7 +199,16 @@
   .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
   .know-intro, .know-none{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 16px;}
   .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:0;}
-  .ov-tabs{margin:40px 0 18px;}
+  .ov-tabs{margin:40px 0 18px; justify-content:center;}
+  #overallBody .report > h2, #overallBody .report > .ov-by{text-align:center;}
+  #overallBody .ov-std-head{justify-content:center;}
+  #overallBody .ov-three > div{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:18px 20px;
+    background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
+  #overallBody .report-grid.ov-three{gap:18px;}
+  #overallBody .ov-three > div:nth-child(2){padding-left:20px;}
+  #overallBody .ov-three .coach-comment{padding:18px 20px; border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); text-align:center;}
+  #overallBody .ov-three .coach-comment .mono-label{margin-bottom:12px;}
+  #overallBody #ovRadar{display:flex; justify-content:center;}
   .sk-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:18px 20px;
            background:color-mix(in srgb, var(--signal-soft) 35%, var(--panel));}
   .sk-card .mono-label{display:block; margin-bottom:8px;}
@@ -292,8 +301,36 @@
     .know-bar .lab{grid-column:1 / -1;}
   }
   /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
-  .diag .mono-label{display:block; margin:24px 0 8px;}
-  .diag .know-head + #diagPane > .mono-label:first-child{margin-top:0;}
+  .diag{max-width:1080px; margin:0 auto;}
+  .diag .know-head{justify-content:center;}
+  .diag .diag-story{text-align:center; font-size:16px; margin:-4px 0 24px;}
+  .dg-grid{display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:18px; align-items:start;}
+  .dg-side{display:grid; gap:18px;}
+  .dg-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));
+    border-radius:14px; padding:18px 20px;}
+  .dg-card > .mono-label{display:block; margin:0 0 10px;}
+  .dg-fault{padding:8px 0;}
+  .dg-row{display:flex; justify-content:space-between; gap:12px; font-size:14.5px; margin-bottom:6px;}
+  .dg-row b{font-variant-numeric:tabular-nums;}
+  .dg-track{display:block; height:8px; border-radius:999px; background:var(--signal-soft); overflow:hidden;}
+  .dg-track i{display:block; height:100%; border-radius:999px; background:color-mix(in srgb, var(--signal) 50%, transparent); transition:width .4s;}
+  .dg-fault.dg-top .dg-row{color:var(--signal); font-weight:700;}
+  .dg-fault.dg-top .dg-track i{background:var(--signal);}
+  .dg-best{width:100%; display:flex; flex-direction:column; align-items:center; gap:2px; padding:14px; border-radius:12px; border:0;
+    background:var(--signal); color:var(--paper); font-weight:700; font-size:15px;}
+  .dg-best small{font-weight:500; font-size:12px; opacity:.85;}
+  .dg-more{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;}
+  .dg-more button{display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:9px 12px; border-radius:10px; text-align:left;
+    background:var(--panel); border:1px solid var(--rule); color:var(--ink); font-weight:600; font-size:13.5px;}
+  .dg-more button small{font-weight:500; font-size:12px; color:var(--ink-faint);}
+  .dg-more button:hover:not(:disabled){border-color:var(--signal); opacity:1;}
+  .dg-done{list-style:none; margin:0; padding:0; display:grid; gap:12px;}
+  .dg-done li{display:grid; grid-template-columns:24px minmax(0, 1fr); gap:10px; align-items:start;}
+  .dg-done .n{width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+    background:var(--signal-soft); color:var(--signal);}
+  .dg-done p{margin:2px 0 6px; font-size:14px; line-height:1.45;}
+  .dg-done p span{color:var(--ink-soft);}
+  .diag-fx{display:inline-block;}
   .diag-bar{grid-template-columns:minmax(0, 1fr) 200px 48px;}
   .diag-bar.on b{color:var(--signal);}
   .diag-story, .know-story{font-size:15px; line-height:1.6; margin:0 0 8px; color:var(--ink-soft);}
@@ -305,36 +342,22 @@
   .know-decs li{padding:10px 14px; border-radius:12px; border:1px solid var(--rule); color:var(--ink-soft); font-size:14px; line-height:1.5;}
   .know-decs li.on{border-color:var(--signal); background:var(--signal-soft); color:var(--ink); font-weight:600;}
   .know-lesson .mono-label{display:block; margin:0 0 4px;}
-  .diag-done{list-style:none; margin:0; padding:0;}
-  .diag-done li{display:grid; grid-template-columns:28px minmax(0, 1fr) auto; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--rule); font-size:14px;}
-  .diag-done .n{width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
-    background:var(--signal-soft); color:var(--signal);}
-  .diag-done .what b{font-weight:600;}
-  .diag-done .what span{color:var(--ink-soft);}
   .diag-fx{padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; white-space:nowrap;}
   .diag-fx.up{background:var(--signal); color:var(--paper);}
   .diag-fx.down{background:var(--panel-2); color:var(--ink-soft);}
   .diag-fx.none{color:var(--ink-faint);}
-  .diag-checks button .diag-tag{font-weight:500; font-size:12px; color:var(--ink-faint);}
-  .diag-checks button.best .diag-tag{color:var(--signal);}
-  .diag-checks{display:flex; flex-wrap:wrap; gap:10px;}
-  .diag-checks button{display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:10px 16px; border-radius:12px;
-    background:var(--panel); border:1px solid var(--rule); color:var(--ink); font-weight:600; font-size:13.5px;}
 
-  .diag-checks button.best{background:var(--signal-soft); color:var(--signal); border-color:var(--signal);}
 
-  .diag-checks button:hover:not(:disabled){border-color:var(--signal);}
-  .diag-end{border:1px solid var(--signal); background:var(--signal-soft); border-radius:12px; padding:14px 18px; margin:24px 0 18px;}
+  .diag-end{border:1px solid var(--signal); background:var(--signal-soft); border-radius:14px; padding:18px 22px; margin:0 0 18px;}
   .diag-end .mono-label{margin:0 0 4px;}
   .diag-end p{margin:6px 0 0; line-height:1.6; font-size:13.5px;}
   .diag-truth{font-weight:600; color:var(--signal);}
   .diag-truth.no{color:var(--caution);}
   .diag .know-restart{margin-top:18px;}
+  @media (max-width:800px){ .dg-grid{grid-template-columns:1fr;} }
   @media (max-width:700px){
     .diag-bar{grid-template-columns:minmax(0, 1fr) 44px;}
-    .diag-done li{grid-template-columns:28px minmax(0, 1fr);}
-    .diag-done .diag-fx{grid-column:2; justify-self:start;}
-  }
+    }
   /* Overall status: levels, standards and the Coach side by side, like the chat's Status panel */
   .report-grid.ov-three{grid-template-columns:minmax(0, .95fr) minmax(0, 1fr) minmax(0, 1fr);}
   .ov-three > div:nth-child(2){padding-left:28px;}  /* the standards sit a little to the right */
@@ -2785,26 +2808,29 @@ function renderDiagnosis(){
   wireCaseFilter($('diagPick'), L.machines, x => { diag.udi = x.udi; diag.done = []; diag.view = null; diagLoad(); });
 }
 function diagPaneHTML(v, busy){
-  const top = v.faults[0], m = v.machine;
+  const top = v.faults[0], m = v.machine, lead = v.finished || v.done.length;
+  const dis = busy ? ' disabled' : '';
   const story = v.finished ? ''
-    : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> Find out why by checking its readings one at a time.</p>`
-    : `<p class="diag-story"><b>${esc(capFirst(top.name))}</b> is the best guess so far, at ${top.percent}%. Check more until one fault is clear.</p>`;
-  const faults = v.faults.map(f => `<div class="know-bar diag-bar${f.id === top.id && (v.finished || v.done.length) ? ' on' : ''}">
-    <span class="lab">${esc(capFirst(f.name))}</span><span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
-  const done = v.done.map((d, i) => `<li><span class="n">${i + 1}</span>
-    <span class="what"><b>${esc(d.name)}</b> <span>is ${esc(d.band)}, ${esc(d.value)}</span></span>
-    <span class="diag-fx ${d.kind}">${esc(d.text)}</span></li>`).join('');
-  const next = v.finished ? '' : `<span class="mono-label">Check next</span><div class="diag-checks">${v.checks.map(c =>
-    `<button type="button" data-check="${esc(c.check)}" class="${c.check === v.best ? 'best' : ''}"${busy ? ' disabled' : ''}>
-      <span>${esc(c.name)}</span><span class="diag-tag">${c.check === v.best ? 'Best next check' : capFirst(c.tells)}</span></button>`).join('')}</div>`;
+    : !v.done.length ? `<p class="diag-story"><b>Machine ${esc(m.pid)} has stopped.</b> Check its readings to find out why.</p>`
+    : `<p class="diag-story">Best guess so far is <b>${esc(top.name)}</b>, at ${top.percent}%.</p>`;
+  const faults = v.faults.map(f => `<div class="dg-fault${lead && f.id === top.id ? ' dg-top' : ''}">
+    <div class="dg-row"><span>${esc(capFirst(f.name))}</span><b>${f.percent}%</b></div>
+    <span class="dg-track" aria-hidden="true"><i style="width:${f.percent}%"></i></span></div>`).join('');
+  const best = v.checks.find(c => c.check === v.best), rest = v.checks.filter(c => c.check !== v.best);
+  const checks = v.finished ? '' : `<div class="dg-card"><span class="mono-label">Check next</span>
+    ${best ? `<button type="button" class="dg-best" data-check="${esc(best.check)}"${dis}><span>Check ${esc(best.name.toLowerCase())}</span><small>Tells the most</small></button>` : ''}
+    <div class="dg-more">${rest.map(c => `<button type="button" data-check="${esc(c.check)}"${dis}><span>${esc(c.name)}</span><small>${esc(capFirst(c.tells))}</small></button>`).join('')}</div></div>`;
+  const done = v.done.length ? `<div class="dg-card"><span class="mono-label">What we checked</span><ol class="dg-done">${v.done.map((d, i) =>
+    `<li><span class="n">${i + 1}</span><div><p><b>${esc(d.name)}</b> <span>is ${esc(d.band)}, ${esc(d.value)}</span></p>
+      <span class="diag-fx ${d.kind}">${esc(d.text)}</span></div></li>`).join('')}</ol></div>` : '';
   const end = v.finished ? `<div class="diag-end"><span class="mono-label">Found it</span>
     <p><b>${esc(capFirst(v.named_name))}</b>, ${top.percent}%</p>
     <p>${esc(v.explanation.text)}</p>
     <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
-  return `${story}<div class="diag-faults"><span class="mono-label">What could have caused it</span>${faults}</div>
-    ${done ? `<span class="mono-label">What we checked</span><ol class="diag-done">${done}</ol>` : ''}
-    ${next}${end}
-    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${busy ? ' disabled' : ''}>Start again</button>` : ''}`;
+  return `${story}${end}<div class="dg-grid">
+      <div class="dg-card dg-faults"><span class="mono-label">What could have caused it</span>${faults}</div>
+      <div class="dg-side">${checks}${done}</div></div>
+    ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${dis}>Start again</button>` : ''}`;
 }
 $('diagBtn').addEventListener('click', openDiagnosis);
 $('diagBody').addEventListener('click', e => {
@@ -3342,9 +3368,9 @@ const TOURS = {
   ],
   'help-diagnosis': [
     {title: 'Pick a machine', text: '', target: '#diagPick'},
-    {title: 'Chance of each fault', text: '', target: '.diag-faults'},
-    {title: 'Tap the green check', text: '', target: '.diag-checks'},
-    {title: 'What each check found', text: '', target: '.diag-done'},
+    {title: 'Chance of each fault', text: '', target: '.dg-faults'},
+    {title: 'Tap the green check', text: '', target: '.dg-best'},
+    {title: 'What each check found', text: '', target: '.dg-done'},
     {title: 'The answer and the fix', text: '', target: '.diag-end'},
   ],
 };
