@@ -359,6 +359,9 @@
   .diag-end .mono-label{margin:0 0 4px;}
   .diag-end p{margin:6px 0 0; line-height:1.6; font-size:13.5px;}
   .diag-truth{font-weight:600; color:var(--signal);}
+  .diag-rule{padding-top:8px; border-top:1px solid color-mix(in srgb, var(--signal) 25%, transparent);}
+  .diag-rule .mono-label{display:block; margin:0 0 2px;}
+  .diag-rule.no{color:var(--caution);}
   .diag-truth.no{color:var(--caution);}
   .diag .know-restart{margin-top:18px;}
   @media (max-width:800px){ .dg-grid{grid-template-columns:1fr;} }
@@ -2833,6 +2836,7 @@ function diagPaneHTML(v, busy){
   const end = v.finished ? `<div class="diag-end"><span class="mono-label">Found it</span>
     <p><b>${esc(capFirst(v.named_name))}</b>, ${top.percent}%</p>
     <p>${esc(v.explanation.text)}</p>
+    <p class="diag-rule${v.rule_check.holds ? '' : ' no'}"><span class="mono-label">Expert rule</span>${v.rule_check.holds ? '&#10003;' : '&#10007;'} ${esc(v.rule_check.text)}</p>
     <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
   return `${story}${end}<div class="dg-grid">
       <div class="dg-card dg-faults"><span class="mono-label">What could have caused it</span>${faults}</div>

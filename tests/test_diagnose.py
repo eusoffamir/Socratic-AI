@@ -52,6 +52,7 @@ def test_every_demo_machine_is_found_by_following_the_advice():
         s, done = walk(m["udi"])
         assert s["right"], (m, done, s["named"])
         assert s["fix"] and s["rule"] and s["explanation"]["source"] == "fallback"
+        assert s["rule_check"]["holds"], (m, s["rule_check"])  # the expert rule agrees with the network
 
 
 def test_a_reading_has_its_number_and_band():
@@ -86,3 +87,10 @@ def test_api():
     step = c.post("/api/diagnose/step", json={"machine": udi, "done": ["strain"]}).json()
     assert step["done"][0]["check"] == "strain"
     assert c.post("/api/diagnose/step", json={"machine": -1, "done": []}).status_code == 404
+
+
+def test_expert_rule_fits_every_failed_test_machine():
+    from eval import pgm_ai4i as net
+    failed = [r for r in diagnose.model()["test"] if any(r[m] for m in net.MODES)]
+    assert all(any(diagnose.rule_check(r, m)["holds"] for m in net.MODES if r[m]) for r in failed)
+    assert diagnose._down(8.595, 2) == 8.59

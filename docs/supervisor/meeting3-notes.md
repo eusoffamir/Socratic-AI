@@ -80,7 +80,7 @@ Eusoff's idea. Choose the graph-building algorithm adaptively from the input and
 - [ ] Wait for the Ex inspection images and problem details (about 2 months), then build the use case.
 - [ ] Pick one cohort for the teaching study and plan the January 2027 experiment. (Plan drafted 27 November 2026, `docs/evaluation/teaching-study-plan.md`. Cohort still to pick with Dr Ho.)
 - [ ] Standard relation classes (task 5). (Draft 27 November 2026, `relation-classes.md`, waiting for Dr Ho.)
-- [ ] Fuse the three graphs (task 7). (Partly. The Diagnosis page joins the graph and the network, 27 November 2026. The rules of thumb are not used in diagnosis yet.)
+- [ ] Fuse the three graphs (task 7). (Partly. On the Diagnosis page the graph, the network and the expert rule now work together, 27 November 2026; the rule agrees with a real fault on all 114 failed test machines. One single fused graph is still to come.)
 - [ ] State the Ex problem and its impact for the FYP. (Draft 27 November 2026, `ex-problem-statement.md`.)
 - [ ] Ask Dr Ho for one deck of IML slides to try in the tool.
 

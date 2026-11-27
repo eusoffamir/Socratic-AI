@@ -95,7 +95,7 @@ Then ask "Which of these methods do you think fits the inspection case best?"
 
 ### 7. Fusing the three graphs (1 minute)
 
-Say "Task seven was to fuse the three kinds of graph. So far each topic has all three, the map from books, the expert rules and the network from data, and the Diagnosis page already joins the graph with the network. The expert rules are not used in the diagnosis yet, and there is no single fused graph. How do you picture the fusion?"
+Say "Task seven was to fuse the three kinds of graph. Each topic has all three, the map from books, the expert rules and the network from data. On the Diagnosis page they now work together. The graph says which reading can cause which fault, the network ranks the faults and picks the next check, and at the end the expert rule is tested on the real numbers. On all 114 failed test machines the rule agreed with a real fault. What we do not have yet is one single fused graph that the agents walk. How do you picture that?"
 
 ### 8. Relation classes (1 minute)
 

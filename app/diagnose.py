@@ -18,6 +18,7 @@ The edges use the standard relation classes drafted for task 5
 (docs/supervisor/relation-classes.md). DRAFT by Claude, 27 November 2026.
 """
 import json
+import math
 import threading
 from functools import lru_cache
 
@@ -54,6 +55,40 @@ FIXES = {
 # What each reading tests, as "tests" edges (the true causes from the dataset page).
 TESTS = {"wear": ["TWF"], "gap": ["HDF"], "speed": ["HDF"], "power": ["PWF"], "strain": ["OSF"], "torque": []}
 MAX_PER_FAULT = 2
+OSF_LIMIT = {"L": 11000, "M": 12000, "H": 13000}  # wear times torque, min Nm, from the dataset page
+
+
+def _down(v, places):
+    """Round down for display, so 8.595 K shows as 8.59 K and never looks like it meets an 8.6 K limit."""
+    f = 10 ** places
+    return math.floor(v * f) / f
+
+
+def rule_check(r, mode):
+    """The expert rule for a fault, tested on the machine's real numbers (task 7, the
+    rules of thumb joined to the data network and the graph). This is the deductive
+    check: if the rule's conditions hold, the fault must follow."""
+    x = r["raw"]
+    num = lambda v, unit, p=0: f"{_down(v, p):,.{p}f} {unit}"
+    if mode == "TWF":
+        holds = x["wear"] >= 200
+        why = f"tool wear is {num(x['wear'], 'min')}, and the rule needs 200 minutes or more"
+    elif mode == "HDF":
+        holds = x["gap"] < 8.6 and x["speed"] < 1380
+        why = f"the gap is {num(x['gap'], 'K', 2)} and the speed is {num(x['speed'], 'rpm')}, and the rule needs under 8.6 K and under 1,380 rpm"
+    elif mode == "PWF":
+        holds = x["power"] < 3500 or x["power"] > 9000
+        why = f"power is {num(x['power'], 'W')}, and the rule needs under 3,500 W or over 9,000 W"
+    elif mode == "OSF":
+        limit = OSF_LIMIT[r["type"]]
+        holds = x["strain"] > limit
+        why = f"wear times torque is {num(x['strain'], 'min Nm')}, and the rule for type {r['type']} needs over {limit:,}"
+    else:  # random failure: the rule is that no other rule explains it
+        others = [m for m in ("TWF", "HDF", "PWF", "OSF") if rule_check(r, m)["holds"]]
+        holds = not others
+        why = ("no other rule fits these readings" if holds
+               else f"the rule for {FAULTS[others[0]]} fits these readings")
+    return {"holds": holds, "text": f"{'The rule holds' if holds else 'The rule does not hold'}, since {why}."}
 WORDS = 70
 
 
@@ -96,7 +131,7 @@ def machines():
 def reading(r, check):
     """'2,912 W, which is low' for one check on one machine."""
     unit, places = UNITS[check]
-    value = f"{r['raw'][check]:,.{places}f}"
+    value = f"{_down(r['raw'][check], places):,.{places}f}"
     return {"check": check, "name": CHECK_NAMES[check], "value": f"{value} {unit}", "band": r[check]}
 
 
@@ -181,7 +216,7 @@ def step(udi, done):
     if finished:
         truth = _faults_of(r)
         out.update({"named": top, "named_name": FAULTS[top], "rule": RULES[top], "fix": FIXES[top],
-                    "truth": [FAULTS[x] for x in truth], "right": top in truth})
+                    "rule_check": rule_check(r, top), "truth": [FAULTS[x] for x in truth], "right": top in truth})
         out["explanation"] = explain(out)
     return out
 
@@ -221,6 +256,7 @@ _cache, _lock = {}, threading.Lock()
 def facts(d):
     return {"type": d["machine"]["type"], "checks": [f"{x['name']} {x['value']} ({x['band']})" for x in d["done"]],
             "fault": d["named_name"], "chance": f"{d['faults'][0]['percent']}%", "rule": d["rule"],
+            "rule_check": d["rule_check"]["text"],
             "fix": d["fix"], "records": TRAIN_RECORDS}
 
 
