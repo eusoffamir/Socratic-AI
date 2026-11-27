@@ -339,6 +339,7 @@
   .diag-story, .know-story{font-size:15px; line-height:1.6; margin:0 0 8px; color:var(--ink-soft);}
   .diag-story b, .know-story b{color:var(--ink);}
   .know-story{margin-bottom:18px;}
+  .know-purpose{margin:-8px 0 16px;}
   .know-net .mono-label, .know-rules ~ .mono-label, #knowPane > .mono-label{display:block; margin:24px 0 8px;}
   .know-tree.know-rules{margin:8px 0 0; width:auto; max-width:none;}
   .know-decs{list-style:none; margin:0 0 8px; padding:0; display:grid; gap:8px;}
@@ -2664,6 +2665,7 @@ function renderKnowledge(){
         <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="ov-menu" role="menu">${cases.map((x, i) =>
         `<button type="button" role="menuitemradio" aria-checked="${x.id === c.id}" data-i="${i}">${esc(knowName(x))}</button>`).join('')}</div></div></div>
+    <p class="know-story know-purpose">This is the knowledge RootAI reasons with for this case, kept in three forms, from books, from an expert and from data, so you can see where every idea comes from.</p>
     <div class="know-tabs" role="tablist">${KNOW_TABS.map(([k, name]) =>
       `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === know.tab}">${name}</button>`).join('')}</div>
     <div id="knowPane" role="tabpanel"></div></div>`;
