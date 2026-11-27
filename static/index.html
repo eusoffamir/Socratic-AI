@@ -199,14 +199,12 @@
   .know-tabs button[aria-selected="true"]{color:var(--signal); border-bottom-color:var(--signal); font-weight:600;}
   .know-intro, .know-none{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 16px;}
   .kdot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:0;}
-  .ov-tabs{margin:40px 0 18px; justify-content:center;}
-  #overallBody .report > h2, #overallBody .report > .ov-by{text-align:center;}
-  #overallBody .ov-std-head{justify-content:center;}
+  .ov-tabs{margin:40px 0 18px;}
   #overallBody .ov-three > div{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:18px 20px;
     background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));}
   #overallBody .report-grid.ov-three{gap:18px;}
   #overallBody .ov-three > div:nth-child(2){padding-left:20px;}
-  #overallBody .ov-three .coach-comment{padding:18px 20px; border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); text-align:center;}
+  #overallBody .ov-three .coach-comment{padding:18px 20px; border:1px solid color-mix(in srgb, var(--signal) 22%, transparent);}
   #overallBody .ov-three .coach-comment .mono-label{margin-bottom:12px;}
   #overallBody #ovRadar{display:flex; justify-content:center;}
   .sk-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius:14px; padding:18px 20px;
@@ -302,7 +300,7 @@
   }
   /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
   .diag{max-width:1080px; margin:0 auto;}
-  .diag .diag-story{text-align:center; font-size:16px; margin:-4px 0 24px;}
+  .diag .diag-story{font-size:16px; margin:-4px 0 24px;}
   .dg-grid{display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:18px; align-items:start;}
   .dg-side{display:grid; gap:18px;}
   .dg-card{border:1px solid color-mix(in srgb, var(--signal) 22%, transparent); background:color-mix(in srgb, var(--signal-soft) 40%, var(--panel));
@@ -343,11 +341,12 @@
   .know-lesson .mono-label{display:block; margin:0 0 4px;}
   /* Knowledge page centred, like Diagnosis and Overall status */
   .report.know{max-width:1080px; margin:0 auto;}
-  .report.know .know-tabs, .report.know .know-pick{justify-content:center;}
-  .report.know .know-story, .report.know #knowPane > .mono-label, .report.know .know-net > .mono-label, .report.know .know-none{text-align:center;}
+  /* section headings sit on the left of the centred column they head */
+  .report.know #knowPane > .mono-label{max-width:720px; margin-left:auto; margin-right:auto;}
+  .report.know .know-net > .mono-label{max-width:820px; margin-left:auto; margin-right:auto;}
   .report.know .know-tree.know-rules, .report.know .know-decs{max-width:720px; margin-left:auto; margin-right:auto;}
   .report.know .know-net .diag-bar, .report.know .know-lesson{max-width:820px; margin-left:auto; margin-right:auto;}
-  .report.know .know-lesson{text-align:center;}
+  .report.know .know-lesson{text-align:left;}
   .report.know .know-restart{margin-top:18px;}
   .report.know .am-map .legend{justify-content:center;}
   .diag-fx{padding:4px 12px; border-radius:999px; font-size:12.5px; font-weight:600; white-space:nowrap;}
