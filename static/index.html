@@ -3075,7 +3075,7 @@ function skillsSimpleHTML(m, withButton = true, chat = null){
   const button = withButton ? '<button type="button" class="sk-go" data-take-check>Take a skill check</button>' : '';
   const seen = seenInChatsHTML(chat);
   if(!m || !m.answers) return `<div class="sk-card sk-empty"><span class="mono-label">From your skill checks</span>
-    <p class="sk-lead">Take a 6-question skill check to see which kinds of thinking you are good at.</p>
+    <p class="sk-lead">See which kinds of thinking you are good at.</p>
     ${seen ? `<div class="sk-cols">${seen}</div>` : ''}${button}</div>`;
   const plain = r => SKILL_PLAIN[r.skill] || r.skill;
   const strong = m.skills.filter(r => r.status === 'mastered');
