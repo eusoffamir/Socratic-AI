@@ -8,6 +8,7 @@ About 15 minutes of demo, then questions. Written 27 November 2026.
 2. Open /api/health and check it says ok. Open /api/config and check ai_guard is true.
 3. Open the Diagnosis page once, so the network is already learned (the first load takes a few seconds).
 4. Have these open in tabs, the relation classes doc, the teaching study plan and the AI4I results.
+5. If you forget what a page does, press the question mark at the bottom of the sidebar. It walks through the page that is open.
 
 ## What to show and what to say
 

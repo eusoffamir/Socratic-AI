@@ -217,6 +217,8 @@
   .sk-pill b{min-width:22px; height:22px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
     background:var(--panel); color:var(--signal); font-size:12px; font-weight:700;}
   .sk-card .sk-go{margin-top:18px;}
+  .ov-empty{display:flex; flex-wrap:wrap; gap:10px;}
+  .sk-go.ghost-go{background:transparent; color:var(--signal);}
   .sk-col li small{display:block; font-size:13px; color:var(--ink-soft); margin-top:1px;}
   .sk-flat .sk-card{border:0; background:none; padding:0;}  /* inside the pop-up, no second box */
   .sk-flat .sk-card > .mono-label{display:none;}
@@ -289,8 +291,15 @@
   .diag .know-head + #diagPane > .mono-label:first-child{margin-top:0;}
   .diag-bar{grid-template-columns:minmax(0, 1fr) 200px 48px;}
   .diag-bar.on b{color:var(--signal);}
-  .diag-story{font-size:15px; line-height:1.6; margin:0 0 8px; color:var(--ink-soft);}
-  .diag-story b{color:var(--ink);}
+  .diag-story, .know-story{font-size:15px; line-height:1.6; margin:0 0 8px; color:var(--ink-soft);}
+  .diag-story b, .know-story b{color:var(--ink);}
+  .know-story{margin-bottom:18px;}
+  .know-net .mono-label, .know-rules ~ .mono-label, #knowPane > .mono-label{display:block; margin:24px 0 8px;}
+  .know-tree.know-rules{margin:8px 0 0; width:auto; max-width:none;}
+  .know-decs{list-style:none; margin:0 0 8px; padding:0; display:grid; gap:8px;}
+  .know-decs li{padding:10px 14px; border-radius:12px; border:1px solid var(--rule); color:var(--ink-soft); font-size:14px; line-height:1.5;}
+  .know-decs li.on{border-color:var(--signal); background:var(--signal-soft); color:var(--ink); font-weight:600;}
+  .know-lesson .mono-label{display:block; margin:0 0 4px;}
   .diag-done{list-style:none; margin:0; padding:0;}
   .diag-done li{display:grid; grid-template-columns:28px minmax(0, 1fr) auto; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--rule); font-size:14px;}
   .diag-done .n{width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
@@ -1104,7 +1113,7 @@
     <div class="sn-recents" id="recents"></div>
     <div class="sn-account" id="account"></div>  <!-- Sign in with Google, only when the server has a client id -->
     <div class="sn-foot">
-      <button class="icon-btn help-btn" data-tour="ask" title="How to use"><svg><use href="#i-help"/></svg></button>
+      <button class="icon-btn help-btn" title="How to use this page" aria-label="How to use this page"><svg><use href="#i-help"/></svg></button>
       <button class="icon-btn theme-btn" title="Light or dark"><svg><use href="#i-moon"/></svg></button>
     </div>
   </nav>
@@ -2420,7 +2429,9 @@ function overallHTML(d){
     ? `<div class="report" data-ex-general><h2>Your skill checks</h2>
       <p class="lead">Start a chat too, and your Socratic levels will show here.</p>${ovSkillsHTML(d)}</div>`
     : `<div class="report"><h2>Nothing yet</h2>
-      <p class="lead">Play a case or a skill check, and your overall status will show here.</p></div>`;
+      <p class="lead">Start a chat or take a skill check, and your progress will show here.</p>
+      <div class="ov-empty"><button type="button" class="sk-go" data-new-chat>Start a chat</button>
+        <button type="button" class="sk-go ghost-go" data-take-check>Take a skill check</button></div></div>`;
   const reachedIdx = d.levels.findIndex(l => l.name === s.highest_level_reached);
   const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
   const levelNo = name => d.levels.findIndex(l => l.name === name) + 1;
@@ -2480,6 +2491,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(e.target.closest('[data-take-check]')) openCheck();
+  if(e.target.closest('[data-new-chat]')) $('askBtn').click();
 });
 
 // "All cases" or one case: the small teal pill filter in the overall status panel
@@ -2624,7 +2636,8 @@ async function renderKnowPane(c){
     const opts = [{label: 'All ideas', view: null}, ...['deductive', 'inductive', 'abductive'].map(m => ({label: `${capFirst(m)} reasoning`, view: {move: m}}))];
     const on = o => (o.view || {}).focus === v.focus && (o.view || {}).move === v.move;
     const item = (o, i) => `<button type="button" role="menuitemradio" aria-checked="${on(o)}" data-i="${i}">${o.dot ? `<i class="kdot" style="background:${o.dot}"></i>` : ''}${esc(o.label)}</button>`;
-    pane.innerHTML = `<div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
+    pane.innerHTML = `<p class="know-story"><b>The ideas behind this case.</b> Each box is one idea, and each arrow says how two ideas link. Tap a box to see where it came from.</p>
+      <div class="know-pick"><span class="mono-label">Show</span><div class="ov-filter" id="knowView">
         <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc((opts.find(on) || opts[0]).label)}</span>
           <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="ov-menu" role="menu">${opts.map(item).join('')}</div></div></div>
@@ -2664,13 +2677,19 @@ function knowTreeHTML(t, answers){
     done.push(`<li class="done"><p>${esc(nodes[at].text)}</p><span class="know-ans">${esc(capFirst(answers[at]))}</span></li>`);
     at = next[2];
   }
-  const n = nodes[at];
-  const now = n.kind === 'question'
+  const n = nodes[at], ended = n.kind !== 'question';
+  const now = !ended
     ? `<li class="now"><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
         `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
-    : `<li class="end"><div class="card"><span class="mono-label">Decision</span><p><b>${esc(n.text)}</b></p>${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
-  return `<p class="know-intro">An expert asks these questions in order. Answer each to see where it leads. Following fixed rules like this is deductive reasoning.</p>
-    <ol class="know-tree">${done.join('')}${now}</ol>
+    : `<li class="end"><div class="card"><span class="mono-label">The expert decides</span><p><b>${esc(n.text)}</b></p>
+        <p class="why">Your answers led here by fixed rules, so the decision follows from them. That is deductive reasoning.</p>
+        ${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
+  const decisions = t.nodes.filter(x => x.kind !== 'question');
+  return `<p class="know-story"><b>How would an expert decide?</b> Answer each question, and the rules lead to one of the decisions below.</p>
+    <span class="mono-label">Questions</span>
+    <ol class="know-tree know-rules">${done.join('')}${now}</ol>
+    <span class="mono-label">Possible decisions</span>
+    <ul class="know-decs">${decisions.map(d => `<li class="${ended && d.id === at ? 'on' : ''}">${esc(d.text)}</li>`).join('')}</ul>
     ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
 }
 // The Bayesian network: causes on top, what they cause below, then the chances it learned.
@@ -2692,14 +2711,19 @@ function knowNetHTML(v){
     return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
       `<text x="${x + W / 2}" y="${top + k * 14}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
   }).join('');
-  const bars = v.findings.map(f => `<div class="know-bar"><span class="lab">${esc(f.label)}</span><span class="mv">${esc(f.move)}</span>
-    <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`).join('');
-  return `<div class="know-net">
+  const bar = f => `<div class="know-bar diag-bar"><span class="lab">${esc(capFirst(f.label))}</span>
+    <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`;
+  const forward = v.findings.filter(f => f.move !== 'abductive'), back = v.findings.filter(f => f.move === 'abductive');
+  const bars = (forward.length ? `<span class="mono-label">From cause to sign, deductive</span>${forward.map(bar).join('')}` : '')
+    + (back.length ? `<span class="mono-label">From signs back to the cause, abductive</span>${back.map(bar).join('')}` : '');
+  return `<div class="know-net"><p class="know-story"><b>What the data says.</b> Each arrow shows what causes what. ${v.guessed
+      ? 'The chances below are rough guesses by the AI, since this topic has no data to count.'
+      : 'Every chance below was counted from simulated data, which is inductive reasoning.'}</p>
     <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
-    <span class="mono-label">The chance that</span>${bars}
-    <div class="know-lesson">${esc(v.lesson)}</div></div>`;
+    ${bars}
+    <div class="know-lesson"><span class="mono-label">What this shows</span>${esc(v.lesson)}</div></div>`;
 }
 // Where one box of the map comes from: a book quote, a simulation, a rule of thumb or the case story.
 function knowSourceHTML(c, n){
@@ -2772,7 +2796,7 @@ function diagPaneHTML(v, busy){
     <p><b>${esc(capFirst(v.named_name))}</b>, ${top.percent}%</p>
     <p>${esc(v.explanation.text)}</p>
     <p class="diag-truth ${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p></div>` : '';
-  return `${story}<span class="mono-label">What could have caused it</span>${faults}
+  return `${story}<div class="diag-faults"><span class="mono-label">What could have caused it</span>${faults}</div>
     ${done ? `<span class="mono-label">What we checked</span><ol class="diag-done">${done}</ol>` : ''}
     ${next}${end}
     ${v.done.length ? `<button type="button" class="know-restart" data-diag-restart${busy ? ' disabled' : ''}>Start again</button>` : ''}`;
@@ -3280,7 +3304,52 @@ const TOURS = {
   ask: [
     {title: 'Type any topic to start', text: '', target: '.ask-box'},
   ],
+  // The ? button: a short guide to the page that is open
+  'help-ask': [
+    {title: 'Start with any topic', text: 'Type a topic, a question or a short reading, or add a file with the plus button. The tutor turns it into short cases and asks you questions about them.', target: '.ask-box'},
+    {title: 'Choose how long', text: 'Pick how many questions each case has, or keep no limit and stop when you like.', target: '#askRoundsBtn'},
+    {title: 'Find your thinking style', text: 'A 6 question skill check shows which kinds of reasoning you are good at.', target: '#askCheck'},
+    {title: 'Your progress', text: 'Overall status shows your levels, your thinking standards and your skill checks across all chats.', target: '#overallBtn'},
+    {title: 'How the ideas fit', text: 'Knowledge shows the ideas behind each case in three ways, from books, from an expert and from data.', target: '#knowBtn'},
+    {title: 'Find a fault', text: 'Diagnosis uses the same reasoning to find out why a machine failed.', target: '#diagBtn'},
+  ],
+  'help-chat': [
+    {title: 'Read the case', text: 'Each case is a short story. Tap Read more for the full notes.', target: () => lastOf('.am-case')},
+    {title: 'Answer, then say why', text: 'Pick A or B if there are choices, then write your reason in the box. A clear reason with evidence moves you up a level.', target: () => lastOf('.am-opts') || lastOf('.am-qrow')},
+    {title: 'Stuck? Tap the bulb', text: 'It gives a hint without giving the answer away.', target: () => lastOf('.am-qrow .hint-btn')},
+    {title: 'Your progress in this case', text: 'Tap here to see your level on the 6 Socratic questions, your 9 thinking standards and the Coach.', target: '#askStrip'},
+  ],
+  'help-status': [
+    {title: 'Your progress in one place', text: 'This page adds up every chat and skill check you have done.', target: '#overallBody h2'},
+    {title: 'Summary or full data', text: 'Summary says it in plain words. Full data shows the bars and grids behind it.', target: '[data-ovtab="full"]'},
+    {title: 'Your skill checks', text: 'Take a skill check to see which kinds of reasoning you have mastered. A skill counts after 3 or more answers on it.', target: () => lastOf('.sk-card')},
+    {title: 'Your cases', text: 'Tap a case to open its chat again.', target: '.ov-cases'},
+  ],
+  'help-knowledge': [
+    {title: 'Pick a case', text: 'Switch between the cases from your chats.', target: '#knowCase'},
+    {title: 'Three ways to know', text: 'From books is the map of ideas. Rules of thumb is how an expert decides. From data shows the chances behind it.', target: '.know-tabs'},
+    {title: 'Tap a box', text: 'Each box is one idea. Tap it to see the quote it came from.', target: '#knowPane .am-map'},
+    {title: 'Show one kind of reasoning', text: 'Light up the path a learner walks when they reason in a deductive, inductive or abductive way.', target: '#knowView'},
+    {title: 'Answer like an expert', text: 'Answer each question and the rules lead you to a decision. That is deductive reasoning.', target: '.know-rules'},
+    {title: 'The possible decisions', text: 'Your answers pick one of these. The one you reach turns green.', target: '.know-decs'},
+    {title: 'What causes what', text: 'Causes are on top and the arrows point to the signs they cause.', target: '.know-net-fig'},
+    {title: 'Read the chances', text: 'The first group goes from a cause to its signs. The second goes back from the signs to the cause, which is how you find the best explanation.', target: () => lastOf('#knowPane .diag-bar')},
+  ],
+  'help-diagnosis': [
+    {title: 'Pick a machine', text: 'Each machine has failed for its own reason. Your job is to find out why.', target: '#diagPick'},
+    {title: 'What could have caused it', text: 'The chance of each fault. It changes after every check.', target: '.diag-faults'},
+    {title: 'Do a check', text: 'The green check tells you the most. You can also pick another one and see what it finds.', target: '.diag-checks'},
+    {title: 'What each check found', text: 'Each reading either points to a fault or makes one unlikely, so the list of suspects gets shorter.', target: '.diag-done'},
+    {title: 'Found it', text: 'Once one fault is clear, you get the rule behind it, the fix, and whether it was really right.', target: '.diag-end'},
+  ],
 };
+// The guide for the page that is open now
+function helpTour(){
+  if(!$('statusMain').classList.contains('hidden')) return 'help-status';
+  if(!$('knowMain').classList.contains('hidden')) return 'help-knowledge';
+  if(!$('diagMain').classList.contains('hidden')) return 'help-diagnosis';
+  return $('askMain').classList.contains('empty') ? 'help-ask' : 'help-chat';
+}
 
 const tour = {name: null, steps: [], i: 0, onEnd: null};
 
@@ -3405,7 +3474,7 @@ function endTour(markSeen){
 
 window.addEventListener('resize', placeTour);
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && tour.name) endTour(true); });
-document.querySelectorAll('.help-btn').forEach(b => b.addEventListener('click', () => startTour(b.dataset.tour)));
+document.querySelectorAll('.help-btn').forEach(b => b.addEventListener('click', () => { $('homeView').classList.remove('nav-open'); startTour(helpTour()); }));
 
 // ---------- study mode: consent and participant code ----------
 // Only when the server has STUDY_CODES set. The code is kept in this browser
