@@ -141,7 +141,6 @@
   .sn-item svg{width:18px; height:18px; flex:none;}
   .sn-item:hover:not(:disabled){background:rgba(255,255,255,.12); color:var(--rail-ink); opacity:1;}
   .sn-item[aria-current="page"]{background:rgba(255,255,255,.18); opacity:1;}
-  .sn-sep{height:1px; background:rgba(255,255,255,.12); margin:8px 10px;}
   .sn-label{font-size:12px; opacity:.6; padding:14px 12px 6px; margin-top:56px; border-top:1px solid rgba(255,255,255,.12); white-space:nowrap;}
   .sn-recents{flex:1; min-height:0; overflow-y:auto; margin:0 -4px; padding:0 4px;}
   /* a thin, see-through scrollbar that only shows on hover, so the green sidebar stays clean */
@@ -1242,7 +1241,6 @@
     </div>
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
     <button class="sn-item" id="overallBtn" title="My overall status"><svg><use href="#i-stats"/></svg><span>Overall status</span></button>
-    <div class="sn-sep" role="separator"></div>
     <button class="sn-item" id="knowBtn" title="What RootAI knows about the machine"><svg><use href="#i-graph"/></svg><span>Knowledge</span></button>
     <button class="sn-item" id="diagBtn" title="Find the fault in a machine"><svg><use href="#i-diag"/></svg><span>Diagnosis</span></button>
     <div class="sn-label">Recents</div>

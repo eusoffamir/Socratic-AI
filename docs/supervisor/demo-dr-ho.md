@@ -23,10 +23,10 @@ The story to tell is simple. RootAI has two kinds of users. For students, it tea
 
 Point to the logo and the name in the sidebar.
 
-Say "The tool now does more than Socratic tutoring, so we call it RootAI, reasoning that finds the root. The sidebar has two groups. New chat and Overall status are for students, the chat teaches and Overall status measures. Below the line, Knowledge and Diagnosis are for engineers, so they show what RootAI knows about a machine and use it to find a fault."
+Say "The tool now does more than Socratic tutoring, so we call it RootAI, reasoning that finds the root. The sidebar has two groups. New chat and Overall status are for students, the chat teaches and Overall status measures. Then Knowledge and Diagnosis are for engineers, so they show what RootAI knows about a machine and use it to find a fault."
 
 **Why it looks like this.**
-- Two groups, because there are two users with different jobs. A student never needs the machine pages, and an engineer never needs the tutor, so a line keeps them apart without hiding anything.
+- Two groups, because there are two users with different jobs. A student never needs the machine pages, and an engineer never needs the tutor, so the student pages come first and the engineer pages after, without hiding anything.
 - The start page is one box, like the chat tools students already use, so there is nothing to learn before starting.
 - Labels are plain and there are no long help texts on the page. The question mark at the bottom gives a one line guide for whichever page is open, so help is there only when someone asks for it.
 
