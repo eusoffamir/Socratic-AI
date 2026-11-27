@@ -2551,13 +2551,28 @@ document.addEventListener('click', e => {
 const know = {id: null, tab: 'books', views: {}, answers: {}, view: null};  // view is {focus: type} or {move: reasoning type}
 const KNOW_TABS = [['books', 'From books'], ['rules', 'Rules of thumb'], ['data', 'From data']];
 const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
-// the 3 quant cases, then the cases on the learner's own topic in the open chat
+// the cases on the learner's own topics, the open chat first, then every recent chat
+// (loaded once by knowLoadRecents), so the page is not empty after New chat
 function knowCases(){
-  const mine = ask.cases.filter(c => c.generated);
+  const mine = [...ask.cases, ...(know.recent || [])].filter(c => c.generated);
   return mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i);
 }
-function openKnowledge(){
+const KNOW_RECENT_CHATS = 10;
+async function knowLoadRecents(){
+  const sids = askChats().slice(0, KNOW_RECENT_CHATS).flatMap(r => r.sids);
+  const key = sids.join();
+  if(know.recentKey === key) return;
+  const got = await Promise.all(sids.map(sid => api(`/api/session/${encodeURIComponent(sid)}`).catch(() => null)));
+  know.recent = got.map(d => d && d.case).filter(Boolean);
+  know.recentKey = key;
+}
+async function openKnowledge(){
   showPage('knowledge');
+  if(!ask.cases.length && askChats().length){
+    $('knowBody').innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
+    await knowLoadRecents();
+    if($('knowMain').classList.contains('hidden')) return;  // the learner moved on while it loaded
+  } else knowLoadRecents().then(() => { if(!$('knowMain').classList.contains('hidden')) renderKnowledge(); });
   const cases = knowCases(), last = ask.cases[ask.cases.length - 1];
   if(last) know.id = last.id;  // the case the open chat is on
   if(!cases.some(c => c.id === know.id)) know.id = (cases[0] || {}).id;
