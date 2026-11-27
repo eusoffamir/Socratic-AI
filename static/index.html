@@ -129,7 +129,8 @@
   /* the wide sidebar (like Claude): New chat, Home, Overall status, Recents. Folds back to icons. */
   .nav{align-items:stretch; gap:3px; padding:14px 12px; min-height:0; overflow:hidden;}
   .nav .sn-head{display:flex; align-items:center; gap:10px; padding:0 4px 0 12px; margin:-14px 0 8px; height:56px; flex:none;}  
-  .brand-mark{width:26px; height:26px; flex:none; vertical-align:-6px; margin-right:10px; border-radius:50%; object-fit:cover;}  /* Socrates beside the name */
+  .brand-mark{display:inline-block; width:28px; height:28px; flex:none; vertical-align:-7px; margin-right:9px; background:currentColor;
+    -webkit-mask:url(/static/img/root-bold.png) center/contain no-repeat; mask:url(/static/img/root-bold.png) center/contain no-repeat;}  /* the root logo, in the colour of the text beside it */
   .nav-menu .brand-mark{margin-right:-2px;}
   .nav .sn-name{font-family:var(--serif); font-weight:600; font-size:18px; white-space:nowrap; flex:1; cursor:pointer;}
   .nav-menu b{cursor:pointer;}
@@ -481,7 +482,7 @@
           border-radius:10px; padding:12px 16px; margin:0 0 20px; scroll-margin-bottom:28px;}  /* opened near the end, it stops above the answer box */
   .ask-greet{display:flex; align-items:center; justify-content:center; gap:12px; margin:0 0 52px;
              font-family:var(--serif); font-weight:500; font-size:clamp(24px, 2.6vw, 30px); line-height:1.2; text-align:center;}
-  .ask-greet img{width:36px; height:36px; border-radius:50%; object-fit:cover; flex:none;}
+  .ask-greet .brand-mark{width:52px; height:52px; margin:0; color:var(--signal);}
   .ask-box{background:var(--panel); border:1px solid var(--rule); border-radius:18px; box-shadow:var(--shadow);
            padding:10px 10px 8px; transition:border-color .15s ease, background .15s ease;}
   .ask-box:focus-within{border-color:var(--signal);}
@@ -995,7 +996,7 @@
     .ask-greet{flex-direction:column; gap:12px;}
     .ask-stats{grid-template-columns:1fr; padding:18px 16px 22px;}
     .ask-top .ticks, .ask-lv-label{display:none;}
-    .ask-greet img{width:44px; height:44px;}
+    .ask-greet .brand-mark{width:52px; height:52px;}
     .rounds{margin-left:0; padding-left:0; border-left:none;}
     .mode{margin-left:0; padding-left:0; border-left:none;}
     .chat-top{padding:0 12px; gap:10px;}
@@ -1067,13 +1068,13 @@
 <div id="homeView" class="view">
   <div class="nav-menu">  <!-- phones only -->
     <button class="icon-btn" id="navOpen" title="Menu" aria-label="Open the menu"><svg><use href="#i-side"/></svg></button>
-    <img class="brand-mark" src="/static/img/socrates.png" alt=""><b>RootAI</b>
+    <span class="brand-mark" aria-hidden="true"></span><b>RootAI</b>
   </div>
   <div class="nav-backdrop" id="navBackdrop"></div>
   <button class="icon-btn nav-unfold" id="navUnfold" title="Open the sidebar" aria-label="Open the sidebar"><svg><use href="#i-side"/></svg></button>
   <nav class="rail nav" aria-label="Main">
     <div class="sn-head">
-      <span class="sn-name"><img class="brand-mark" src="/static/img/socrates.png" alt="">RootAI</span>
+      <span class="sn-name"><span class="brand-mark" aria-hidden="true"></span>RootAI</span>
       <button class="icon-btn sn-fold" id="navFold" title="Fold the sidebar" aria-label="Fold the sidebar"><svg><use href="#i-side"/></svg></button>
     </div>
     <button class="sn-item sn-new" id="askBtn" title="New chat"><svg><use href="#i-plus"/></svg><span>New chat</span></button>
@@ -1119,7 +1120,7 @@
       <div class="ask-thread" id="askThread" aria-live="polite"></div>
     </div>
     <div class="ask-inner ask-dock">
-      <h2 class="ask-greet"><img src="/static/img/socrates.png" alt="">Train your critical thinking</h2>
+      <h2 class="ask-greet"><span class="brand-mark" aria-hidden="true"></span>Train your critical thinking</h2>
       <form class="ask-box" id="askForm" autocomplete="off">
         <div class="tb-files hidden" id="askFiles"></div>
         <textarea id="askInput" rows="1" maxlength="4000" aria-label="Any topic"
