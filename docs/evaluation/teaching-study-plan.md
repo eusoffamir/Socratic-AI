@@ -47,7 +47,7 @@ So a class of 40 can only show a large effect. The main study needs about 100 st
 ## What we measure
 
 1. **Main measure, the reasoning test (pre and post).** It must not favour the tool group, so both groups take it the same way, outside the tutor. Two options.
-   - Use our skill check question bank (A or B choice with a reason, each question tagged inductive, deductive or abductive). It is ours, so it is free, but it needs a check that the questions are sound.
+   - Use our skill check question bank (A or B choice with a reason, each question tagged inductive, deductive or abductive). It is ours, so it is free, but it needs a check that the questions are sound. The everyday skill check in the app is only 3 questions (one per reasoning type, since 27 November 2026), so the study test would be a longer form from the same bank, for example 12 questions.
    - Use a published critical thinking test. Most known ones are paid or licensed, so check the cost and the licence first.
    Two parallel forms (A and B) are needed, and half the students get A first, half get B first.
 2. **During the session, tool group only.** The Assessor's marks on the 9 standards and the reasoning types, the highest level reached, and the time spent. These describe how students used the tool but are not compared between groups.

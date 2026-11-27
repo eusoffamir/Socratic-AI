@@ -41,7 +41,7 @@ Say "Here is the level I reached, the nine standards as a radar, and the Coach, 
 
 Open Overall status in the sidebar.
 
-Say "This adds up every chat and skill check. Summary says it in plain words, and Full data shows the bars and grids we use for the study. The skill check is six questions, each tagged with one kind of reasoning, and a skill only counts as mastered after three or more answers on it."
+Say "This adds up every chat and skill check. Summary says it in plain words, and Full data shows the bars and grids we use for the study. The skill check is three short questions, one for each kind of reasoning, and a skill only counts as mastered after three or more answers on it, so it builds up over a few checks."
 
 ### 4. Knowledge page (3 minutes)
 

@@ -21,7 +21,7 @@ from .content import CONCEPTS
 from .knowledge import KNOWLEDGE_TYPES
 from .reasoning import CORE_KNOWLEDGE, REASONING_TYPES
 
-QUESTIONS_PER_CHECK = 6
+QUESTIONS_PER_CHECK = 3  # one per reasoning type (27 November 2026, Eusoff found 6 too long)
 MAX_WORDS = 100  # "a few sentences"; a longer answer is sent back, which also stops most pasted AI replies
 
 # (reasoning, knowledge, case, situation, question). Two per pair of reasoning
@@ -247,13 +247,18 @@ def pick(seen=(), n=QUESTIONS_PER_CHECK, rng=random, items=None):
         pool = [i for i in items.values() if i["reasoning"] == r]
         rng.shuffle(pool)
         pool.sort(key=lambda i: i["id"] in seen)  # stable, so unseen ones first, still shuffled
-        kinds = set()
-        for i in pool:
-            if len([c for c in chosen if c["reasoning"] == r]) == per_type:
-                break
-            if i["knowledge"] not in kinds:
-                chosen.append(i)
-                kinds.add(i["knowledge"])
+        mine = []
+        # knowledge types not used yet in this check first, so a short check still covers several
+        for fresh_only in (True, False):
+            for i in pool:
+                if len(mine) == per_type:
+                    break
+                if i in mine or any(i["knowledge"] == m["knowledge"] for m in mine):
+                    continue
+                if fresh_only and any(i["knowledge"] == c["knowledge"] for c in chosen):
+                    continue
+                mine.append(i)
+        chosen += mine
     rng.shuffle(chosen)
     return [i["id"] for i in chosen]
 

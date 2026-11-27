@@ -37,9 +37,11 @@ def test_pick_is_balanced_and_prefers_new_questions():
     ids = skillcheck.pick(rng=random.Random(1))
     items = [skillcheck.ITEMS[i] for i in ids]
     assert len(ids) == skillcheck.QUESTIONS_PER_CHECK == len(set(ids))
+    per = skillcheck.QUESTIONS_PER_CHECK // len(REASONING_TYPES)
     for r in REASONING_TYPES:
         mine = [i for i in items if i["reasoning"] == r]
-        assert len(mine) == 2 and mine[0]["knowledge"] != mine[1]["knowledge"]
+        assert len(mine) == per and len({i["knowledge"] for i in mine}) == per
+    assert len({i["knowledge"] for i in items}) == len(items)  # a short check still covers different knowledge
     again = skillcheck.pick(seen=ids, rng=random.Random(2))
     assert not set(again) & set(ids)
 
