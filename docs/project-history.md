@@ -175,21 +175,22 @@ R1 clear mission at start. R2 fixed rounds and visible progress. R3 remember wha
 
 ## Honest status
 
-- **Real Gemini calls now work (6 October 2026).** A few short sessions were run with the student's free key. The Tutor gave short, simple replies with one question each. The Assessor's JSON was read without errors. These test transcripts were not saved.
-- Not checked yet: whether `gemini-3.5-flash-lite` stays inside the free-tier limits, and a full session from start to the stats screen.
-- Knowledge base is hand-written notes in `content.py`, not real RAG yet.
-- Sessions are saved to `sessions/` and can be continued. No real per-user history yet (no logins): the overall status only combines sessions played in the same browser.
-- Assessor reliability against human scoring is untested.
+Updated 28 November 2026.
+
+- **Works and is live.** Tutor, Assessor, Planner, Checker, Coach, Reasoning, Explainer and Topic Builder agents, the skill check, Overall status, Knowledge and Diagnosis pages, Sign in with Google. Real Gemini calls work on the free tier, with Groq as backup. Sessions save to Supabase. 227 tests pass in mock mode.
+- **Not checked yet.** The Assessor and the Reasoning agent against a human marker (the marking kit is ready, and the 61 answers can be marked on the "Assessor Marking Sheet" artifact, https://claude.ai/artifact/GBUq5xtLTMfuqyzaHZtu9D, then saved as `eval/marks_eusoff.csv`). The step 5 graph reading against a human marker. Builder topics other than quant on many runs.
+- **Still drafts.** Knowledge type tags, mastery thresholds, the engineer checklist, relation classes, the Ex problem statement and the teaching study plan, all waiting for Dr Ho.
+- **Not built.** Real RAG from a quant book (Wikipedia stands in). Azure is coded but only tested against a fake server.
 
 ## Next steps, in order
 
-0. **Goal 1 from Meeting 2 comes first** (target mid November 2026): see `docs/supervisor/meetings/meeting2-notes.md` section 8, one step at a time, with the student's OK before each step. In parallel, the interim report gaps in section 6 of those notes (abstract, Chapter 4 Conclusion and Future Work, timeline, agent flow diagram, 20-page limit).
-1. Partly done. Real Gemini runs worked for the old 2-agent version. Transcript saving is now built. Still to do: run full sessions with the new agents on Gemini. Check that the Tutor returns valid JSON, uses a tool, stays short, and that the Planner and Checker give sensible output. Check the free-tier limits with about 25 to 30 calls per session.
-2. Improve the Tutor and Assessor prompts based on real transcripts. Keep every transcript, since they become thesis Results.
-3. Replace the hand-written notes with real quant reading material chosen with the supervisor, then add simple RAG.
-4. Add saving of sessions to a file or SQLite so the stats page can show progress over time.
-5. Evaluation (FYP2): requirement check R1 to R9 against the two baseline gems, assessor vs human scoring (percent agreement and Cohen's kappa, small sample), and a small learner questionnaire if ethics allows.
-6. Keep `docs/` thesis files in sync with what is really built.
+1. Eusoff marks the 61 answers, then run `python eval/compare_marks.py eval/marks_eusoff.csv eval/ai_marks_<version>.csv --graph` (Assessor, Reasoning agent and graph reading in one go).
+2. Demo to Dr Ho (`docs/industrial/demo-dr-ho.md`) and go through `docs/supervisor/questions-for-dr-ho.md`.
+3. After his answers, task 3 (graph prompt) and task 5 (relation classes) for the Ex inspection use case.
+4. Plan the January 2027 teaching study (cohort, test forms, ethics).
+5. Try many topics on Gemini and tighten the Builder prompts.
+6. A real quant book with Dr Ho, then simple RAG.
+7. FYP2 evaluation, R1 to R9, Assessor against human markers, the teaching study.
 
 ## FYP1 and FYP2 split (my assumption, confirm with the supervisor)
 
