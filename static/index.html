@@ -515,6 +515,7 @@
   .diag-story, .know-story{font-size:15px; line-height:1.6; margin:0 0 8px; color:var(--ink-soft);}
   .diag-story b, .know-story b{color:var(--ink);}
   .know-story{margin-bottom:18px;}
+  .know-story a{color:var(--signal); font-weight:600; text-decoration:underline; text-underline-offset:3px;}
   .know-purpose{margin:-8px 0 16px;}
   .know-net .mono-label, .know-rules ~ .mono-label, #knowPane > .mono-label{display:block; margin:24px 0 8px;}
   .know-tree.know-rules{margin:8px 0 0; width:auto; max-width:none;}
@@ -3140,7 +3141,7 @@ function knowBookHTML(){
     return {cls: `nd rd${mine(id) ? ' up' : ''}`, title: d.names[id]};
   };
   const b = pick && knFault(d, pick);
-  return `<p class="know-story"><b>What the published source says.</b> Each reading can cause a fault, and each fault has a fix. Tap a fault to read its rule.</p>
+  return `<p class="know-story">Rules published with the <a href="${esc(d.source.url)}" target="_blank" rel="noopener noreferrer">${esc(d.source.title)}</a>. Tap a fault to read its rule.</p>
     <div class="dg-card kn-book">${knowGraph([KN_READINGS, faults, faults.map(f => 'fix_' + f)],
       ['READINGS', 'FAULTS', 'WHAT TO DO'], edges, node, 'Readings, the faults they cause and the fix, from the published source')}</div>
     ${b ? `<div class="know-quote kn-rule"><span class="mono-label">${esc(b.name)}</span>${esc(b.rule)} ${esc(b.fix)}
