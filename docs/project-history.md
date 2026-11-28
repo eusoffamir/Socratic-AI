@@ -178,7 +178,8 @@ R1 clear mission at start. R2 fixed rounds and visible progress. R3 remember wha
 Updated 28 November 2026.
 
 - **Works and is live.** Tutor, Assessor, Planner, Checker, Coach, Reasoning, Explainer and Topic Builder agents, the skill check, Overall status, Knowledge and Diagnosis pages, Sign in with Google. Real Gemini calls work on the free tier, with Groq as backup. Sessions save to Supabase. 227 tests pass in mock mode.
-- **Not checked yet.** The Assessor and the Reasoning agent against a human marker (the marking kit is ready, and the 61 answers can be marked on the "Assessor Marking Sheet" artifact, https://claude.ai/artifact/GBUq5xtLTMfuqyzaHZtu9D, then saved as `eval/marks_eusoff.csv`). The step 5 graph reading against a human marker. Builder topics other than quant on many runs.
+- **Checked once.** The Assessor and the Reasoning agent against one human marker (28 November, `docs/evaluation/human-marks-2026-11-28.md`), 7 of 9 standards agree well, inductive cannot be judged yet (1 test answer). The graph reading lands on real links in only 11 of 60 answers.
+- **Not checked yet.** A second human marker. Builder topics other than quant on many runs.
 - **Still drafts.** Knowledge type tags, mastery thresholds, the engineer checklist, relation classes, the Ex problem statement and the teaching study plan, all waiting for Dr Ho.
 - **Not built.** Real RAG from a quant book (Wikipedia stands in). Azure is coded but only tested against a fake server.
 
