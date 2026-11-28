@@ -38,7 +38,7 @@ Gathered 27 November 2026 from every open question in the project files, so noth
 
 24. **Subscriptions.** Remind him about the Claude and Render subscription requests. He asked to be reminded at Meeting 2. (`meeting2-notes.md`)
 25. **Pedagogy expert's name.** Check the correct name of the pedagogy expert, heard as "Dr Chong Suli". (history file, open items)
-26. **Your 25 November message.** A message to Dr Ho was drafted on 25 November, but it is not confirmed as sent. Check WhatsApp, and send it if not.
+26. ~~**Your 25 November message.**~~ Done. A new update message with screenshots was sent on 28 November 2026 (progress since Meeting 3, the human marking, and questions 1, 3, 7, 8 and 24 of this list).
 
 ## 5. Things to tell him (no answer needed)
 
