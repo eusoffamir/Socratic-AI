@@ -100,11 +100,9 @@ Tap Machine 1.
 
 Say "RootAI does not check everything. It asks for the one reading that tells the most. Here it asks for the strain on the tool first."
 
-Press Check strain on the tool.
+Press Check all for me, and talk while it runs.
 
-Say "Strain is low, so overstrain is unlikely. The bars below show the chance of each fault, and they move after every check. Now it asks for power."
-
-Press Check power.
+Say "Strain is low, so overstrain is unlikely. The bars below show the chance of each fault, and they move after every check. Next it checks power."
 
 Say "Power is low, so it points to power failure, at 99 percent. It found the cause after 2 of the 6 readings, it gives the fix, and the expert rule agrees. And because this machine is from the test data, we know it really was power failure."
 
@@ -116,7 +114,7 @@ Open the Full data tab.
 
 Say "Here is the same reasoning as a graph, the readings, the faults they can cause and the fix. The lit path is the path RootAI followed." Point to the line at the bottom. "And this is not one lucky machine. On all 114 failed test machines it found the right cause 98 percent of the time, with about 2 of the 6 readings."
 
-If there is time, press Other machines, pick Machine 3 and press Check all for me. Say "This machine had two faults at once. RootAI rules out power and heat, then finds overstrain, one of the two real faults."
+If there is time, press Other machines, pick Machine 3 and this time press the smaller Check button each time, one reading at a time. Say "This machine had two faults at once. RootAI rules out power and heat, then finds overstrain, one of the two real faults."
 
 **Your own machine.** Press Other machines, then Type its readings. Press L, then type air 300, process 308, speed 1300 and torque 40, and press Find the cause.
 
@@ -124,7 +122,7 @@ Say "An engineer can type in their own machine. They leave out any reading they 
 
 **Why it looks like this.**
 - It starts like New chat, a title and three things to tap, so nobody has to learn the page first. The machines have plain names, Machine 1 to 3, instead of data IDs.
-- RootAI asks for one reading at a time, so the viewer follows the reasoning step by step, the same way the tutor asks one question at a time. Check all for me is there when the presenter just wants to talk.
+- RootAI asks for one reading at a time, so the viewer follows the reasoning step by step, the same way the tutor asks one question at a time. Check all for me is the main button, so the presenter can just talk, and the smaller button makes one check at a time.
 - Each check is one plain sentence, what the reading is and what it means, so the reasoning reads like a short story.
 - The bars show the chance of each fault, the one number that matters while checking. The big graph sits behind Full data, like Overall status, for anyone who wants the evidence.
 - The answer card has the cause, the fix, how many readings it needed, how sure it is and whether the expert rule holds, because that is what an engineer acts on.
