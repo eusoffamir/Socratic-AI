@@ -341,10 +341,19 @@
   @media (max-width:860px){ .kd-two{grid-template-columns:1fr;} }
   .kd-two .dg-bars{margin:0;}
   .kd-row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 0; font-size:14.5px; color:var(--ink);}
-  .kd-row select{font:inherit; font-size:14px; padding:7px 12px; border-radius:10px; min-width:130px; cursor:pointer;
-                 background:var(--paper); color:var(--ink); border:1px solid var(--rule);}
-  .kd-row select:focus{outline:none; border-color:var(--signal);}
   .kd-clear{margin-top:10px;}
+  .kd-pick > button{font-size:13.5px; padding:6px 12px 6px 14px; min-width:120px; justify-content:space-between;
+                    background:transparent; color:var(--ink-soft); border:1px solid var(--rule);}
+  .kd-pick.set > button{background:var(--signal-soft); color:var(--signal); border-color:color-mix(in srgb, var(--signal) 45%, transparent);}
+  .kd-pick .ov-menu{left:auto; right:0; min-width:150px;}
+  /* A chat case's From data: each chance as a sentence with its bar */
+  .kf-group{margin:24px 0 0;}
+  .know-net .kf-group .mono-label{margin:0 0 14px; display:block;}
+  .kf-row{padding:10px 0; border-top:1px solid var(--rule);}
+  .kf-group .mono-label + .kf-row{border-top:0; padding-top:0;}
+  .kf-row p{margin:0 0 8px; font-size:14.5px; line-height:1.55; color:var(--ink);}
+  .dg-bar.kf-bar{grid-template-columns:minmax(0, 1fr) 44px; padding:0;}
+  .kn-whole .know-decs{max-width:720px; margin:0 auto;}
   /* Rules of thumb: one question in focus, the answers so far above it, the flowchart folded */
   .kn-rules{max-width:720px; margin:0 auto;}
   .kq-trail{margin:0 0 28px;}
@@ -3061,6 +3070,7 @@ function renderKnowPane(){
   else {
     if(!know.chances){ knowWhatIf(); pane.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
     pane.innerHTML = knowDataHTML();
+    knowDataWire();
   }
 }
 // Summary: each fault in one row, what causes it, what to do, and which of the three kinds of
@@ -3203,6 +3213,19 @@ async function knowWhatIf(){
   } catch(e){ const pane = $('knowPane'); if(pane){ pane.innerHTML = ''; note('error', e.message, pane); } return; }
   if(know.src === 'machine' && know.tab === 'data' && !$('knowMain').classList.contains('hidden')) renderKnowPane();
 }
+function knowDataOpts(k){
+  return [{v: '', label: "Don't know"}, ...know.data.bands[k].map(b => ({v: b.value, label: k === 'type' ? `Type ${b.value}` : capFirst(b.value)}))];
+}
+function knowDataWire(){
+  document.querySelectorAll('#knowPane [data-kpick]').forEach(f => {
+    const k = f.dataset.kpick;
+    wireCaseFilter(f, knowDataOpts(k), o => {
+      const ev = {...know.ev};
+      if(o.v) ev[k] = o.v; else delete ev[k];
+      know.ev = ev; knowWhatIf();
+    });
+  });
+}
 function knowDataHTML(){
   const d = know.data, ev = know.ev, faults = know.chances;
   const lead = Object.keys(ev).length ? faults.reduce((a, b) => b.percent > a.percent ? b : a).id : null;
@@ -3217,9 +3240,15 @@ function knowDataHTML(){
   };
   // Laid out like Diagnosis (Eusoff, 28 November 2026): a short list of what you know on the left,
   // the chance of each fault on the right, and the network folded away.
-  const pick = k => `<label class="kd-row"><span>${esc(d.names[k])}</span><select data-kevsel="${k}">
-      <option value=""${ev[k] ? '' : ' selected'}>Don't know</option>
-      ${d.bands[k].map(b => `<option value="${esc(b.value)}"${ev[k] === b.value ? ' selected' : ''}>${esc(k === 'type' ? `Type ${b.value}` : capFirst(b.value))}</option>`).join('')}</select></label>`;
+  // the same pill and menu as the Milling machine picker (Eusoff, 28 November 2026), not the browser's select
+  const pick = k => {
+    const opts = knowDataOpts(k), on = opts.find(o => o.v === (ev[k] || '')) || opts[0];
+    return `<div class="kd-row"><span>${esc(d.names[k])}</span><div class="ov-filter kd-pick${ev[k] ? ' set' : ''}" data-kpick="${k}">
+      <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(d.names[k])}"><span>${esc(on.label)}</span>
+        <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="ov-menu" role="menu">${opts.map((o, i) =>
+        `<button type="button" role="menuitemradio" aria-checked="${o === on}" data-i="${i}">${esc(o.label)}</button>`).join('')}</div></div></div>`;
+  };
   const sorted = [...faults].sort((a, b) => b.percent - a.percent);
   const bars = `<div class="dg-bars kd-bars"><span class="mono-label">Chance of each fault</span>${sorted.map((f, i) =>
     `<div class="dg-bar${i === 0 && lead ? ' top' : ''}"><span>${esc(capFirst(f.name))}</span><i><b style="width:${Math.max(1, f.percent)}%"></b></i><em>${f.percent}%</em></div>`).join('')}</div>`;
@@ -3292,28 +3321,28 @@ async function renderCasePane(c){
 }
 // The decision tree, walked one answer at a time. Reaching a decision is deductive reasoning.
 function knowTreeHTML(t, answers){
+  // Like the machine's Rules of thumb: one question in focus, the answers so far above it,
+  // and every decision folded away (Eusoff, 28 November 2026).
   const nodes = Object.fromEntries(t.nodes.map(n => [n.id, n])), done = [];
   let at = t.root;
   while(nodes[at].kind === 'question' && answers[at]){
     const next = t.edges.find(([a, ans]) => a === at && ans === answers[at]);
     if(!next) break;
-    done.push(`<li class="done"><p>${esc(nodes[at].text)}</p><span class="know-ans">${esc(capFirst(answers[at]))}</span></li>`);
+    done.push(`<li class="dg-t${answers[at] === 'yes' ? ' up' : ''}">${esc(nodes[at].text)} <b>${esc(capFirst(answers[at]))}</b></li>`);
     at = next[2];
   }
   const n = nodes[at], ended = n.kind !== 'question';
   const now = !ended
-    ? `<li class="now"><p>${esc(n.text)}</p><div class="row">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
-        `<button type="button" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div></li>`
-    : `<li class="end"><div class="card"><span class="mono-label">The expert decides</span><p><b>${esc(n.text)}</b></p>
-        <p class="why">Your answers led here by fixed rules, so the decision follows from them. That is deductive reasoning.</p>
-        ${n.why_text ? `<p class="why"><span class="mono-label">Rests on</span>${esc(n.why_text)}</p>` : ''}</div></li>`;
+    ? `<div class="kq-card"><p class="kq-q">${esc(n.text)}</p><div class="kq-yn">${t.edges.filter(([a]) => a === at).map(([, ans]) =>
+        `<button type="button" class="dg-run" data-q="${esc(at)}" data-ans="${esc(ans)}">${esc(capFirst(ans))}</button>`).join('')}</div>
+        ${done.length ? '<button type="button" class="dg-link" data-restart>Start again</button>' : ''}</div>`
+    : `<div class="diag-end kq-end"><span class="mono-label">The expert decides</span><p class="dg-res-name">${esc(n.text)}</p>
+        ${n.why_text ? `<p class="dg-res-fix">Rests on ${esc(dgLow(n.why_text))}</p>` : ''}</div>
+      <div class="dg-controls dg-again"><button type="button" class="dg-step" data-restart>Start again</button></div>`;
   const decisions = t.nodes.filter(x => x.kind !== 'question');
-  return `<p class="know-story"><b>How would an expert decide?</b> Answer each question, and the rules lead to one of the decisions below.</p>
-    <span class="mono-label">Questions</span>
-    <ol class="know-tree know-rules">${done.join('')}${now}</ol>
-    <span class="mono-label">Possible decisions</span>
-    <ul class="know-decs">${decisions.map(d => `<li class="${ended && d.id === at ? 'on' : ''}">${esc(d.text)}</li>`).join('')}</ul>
-    ${done.length ? '<button type="button" class="know-restart" data-restart>Start again</button>' : ''}`;
+  return `<div class="kn-rules">${done.length ? `<ol class="dg-thread kq-trail">${done.join('')}</ol>` : ''}${now}
+    <details class="kn-whole" data-k="wholeDec"${know.wholeDec ? ' open' : ''}><summary>All decisions</summary>
+    <ul class="know-decs">${decisions.map(d => `<li class="${ended && d.id === at ? 'on' : ''}">${esc(d.text)}</li>`).join('')}</ul></details></div>`;
 }
 // The Bayesian network: causes on top, what they cause below, then the chances it learned.
 function knowNetHTML(v){
@@ -3334,19 +3363,17 @@ function knowNetHTML(v){
     return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
       `<text x="${x + W / 2}" y="${top + k * 14}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
   }).join('');
-  const bar = f => `<div class="know-bar diag-bar"><span class="lab">${esc(capFirst(f.label))}</span>
-    <span class="track" aria-hidden="true"><i style="width:${f.percent}%"></i></span><b>${f.percent}%</b></div>`;
+  // Each chance as one sentence with its bar under it, in two plain groups (Eusoff, 28 November 2026)
+  const bar = f => `<div class="kf-row"><p>${esc(capFirst(f.label))}</p><div class="dg-bar kf-bar"><i><b style="width:${Math.max(1, f.percent)}%"></b></i><em>${f.percent}%</em></div></div>`;
   const forward = v.findings.filter(f => f.move !== 'abductive'), back = v.findings.filter(f => f.move === 'abductive');
-  const bars = (forward.length ? `<span class="mono-label">From cause to sign, deductive</span>${forward.map(bar).join('')}` : '')
-    + (back.length ? `<span class="mono-label">From signs back to the cause, abductive</span>${back.map(bar).join('')}` : '');
-  return `<div class="know-net"><p class="know-story"><b>What the data says.</b> Each arrow shows what causes what. ${v.guessed
-      ? 'The chances below are rough guesses by the AI, since this topic has no data to count.'
-      : 'Every chance below was counted from simulated data, which is inductive reasoning.'}</p>
+  const group = (title, list) => list.length ? `<div class="dg-bars kf-group"><span class="mono-label">${title}</span>${list.map(bar).join('')}</div>` : '';
+  const bars = group('If the cause is there', forward) + group('Working back to the cause', back);
+  return `<div class="know-net kn-rules">
     <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 10 5 0 10z" fill="var(--ink-faint)"/></marker></defs>${lines}${boxes}</svg></div>
     ${bars}
-    <div class="know-lesson"><span class="mono-label">What this shows</span>${esc(v.lesson)}</div></div>`;
+    ${v.guessed ? '<p class="dg-fleet">These chances are rough guesses by the AI, since this topic has no data to count.</p>' : ''}</div>`;
 }
 // Where one box of the map comes from: a book quote, a simulation, a rule of thumb or the case story.
 function knowSourceHTML(c, n){
@@ -3431,13 +3458,7 @@ $('knowBody').addEventListener('click', e => {
   }
   if(e.target.closest('[data-kclear]')){ know.ev = {}; knowWhatIf(); }
 });
-$('knowBody').addEventListener('change', e => {
-  const s = e.target.closest('[data-kevsel]');
-  if(!s) return;
-  const ev = {...know.ev};
-  if(s.value) ev[s.dataset.kevsel] = s.value; else delete ev[s.dataset.kevsel];
-  know.ev = ev; knowWhatIf();
-});
+
 $('knowBody').addEventListener('keydown', e => {
   const f = e.target.closest('[data-kfault]');
   if(f && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); f.dispatchEvent(new MouseEvent('click', {bubbles: true})); }
