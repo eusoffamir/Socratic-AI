@@ -387,23 +387,26 @@ BANDS = {
     "speed": [("slow", "under 1,380 rpm"), ("normal", "1,380 to 1,800 rpm"), ("fast", "1,800 rpm or more")],
     "torque": [("low", "under 30 Nm"), ("mid", "30 to 50 Nm"), ("high", "50 Nm or more")],
 }
-# The engineer's checklist, the published rules put in the order an engineer would check
-# them (cheapest and most common first). DRAFT by Claude, until a real expert checks it.
+# The engineer's checklist, the published rules in the order that names the right fault
+# most often on the 7,000 training runs (eval/graph_build_test.py, 28 November 2026).
+# Tool wear goes last, since many worn tools fail from overstrain instead; checking it
+# first gave 82%, this order gives 100% on the failed test machines. DRAFT by Claude,
+# until a real expert checks it.
 TREE = {
-    "root": "q_wear",
+    "root": "q_strain",
     "nodes": [
-        {"id": "q_wear", "kind": "question", "text": "Is tool wear 200 minutes or more?"},
         {"id": "q_strain", "kind": "question", "text": "Is wear times torque over the limit for its type?",
          "sub": "11,000 min Nm for L, 12,000 for M, 13,000 for H"},
         {"id": "q_power", "kind": "question", "text": "Is power under 3,500 W or over 9,000 W?"},
         {"id": "q_heat", "kind": "question", "text": "Is the temperature gap under 8.6 K and the speed under 1,380 rpm?"},
+        {"id": "q_wear", "kind": "question", "text": "Is tool wear 200 minutes or more?"},
         *[{"id": f"d_{m}", "kind": "decision", "fault": m, "text": FAULTS[m].capitalize(), "fix": FIX_SHORT[m]}
-          for m in ("TWF", "OSF", "PWF", "HDF", "RNF")],
+          for m in ("OSF", "PWF", "HDF", "TWF", "RNF")],
     ],
-    "edges": [["q_wear", "yes", "d_TWF"], ["q_wear", "no", "q_strain"],
-              ["q_strain", "yes", "d_OSF"], ["q_strain", "no", "q_power"],
+    "edges": [["q_strain", "yes", "d_OSF"], ["q_strain", "no", "q_power"],
               ["q_power", "yes", "d_PWF"], ["q_power", "no", "q_heat"],
-              ["q_heat", "yes", "d_HDF"], ["q_heat", "no", "d_RNF"]],
+              ["q_heat", "yes", "d_HDF"], ["q_heat", "no", "q_wear"],
+              ["q_wear", "yes", "d_TWF"], ["q_wear", "no", "d_RNF"]],
 }
 
 
