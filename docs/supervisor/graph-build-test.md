@@ -77,7 +77,7 @@ Each network is trained with one leak left out, then tested on that leak and the
 | Build | Rank | Leaks caught |
 |---|---|---|
 | Rule from the sensor notes (a leak makes the compressor load more), no training | 90% | 4 of 4 |
-| AI rule, as drafted by Gemini | 15% | 2 of 4 |
+| AI rule, as drafted by Gemini | 13% | 0 of 4 |
 | AI rule, after a person says what 0 and 1 mean | 92% | 2 of 4 |
 | Network, raw readings, bands at the data's thirds | 94% | 4 of 4 |
 | Network, engineer readings, bands at the data's thirds | 85% | 0 of 4 |
@@ -92,7 +92,31 @@ What it means.
 1. **A simple rule from how the machine works caught every leak with no failure data at all.** That matters on a real plant, where failures are rare and records are few.
 2. **Choosing engineer nodes did not help here, unlike AI4I.** A leak is a large fault that moves many sensors at once, so even the raw averages show it. Engineer nodes matter most when the cause hides in a combination of readings, as overstrain does in AI4I.
 3. **How readings are cut into bands matters.** Cutting at the data's thirds hid the leak inside the top third (0 of 4 caught for the engineer network). Bands set like alarm limits from normal running fixed it (3 of 4).
-4. **An AI model reasoned well but misread the data.** Gemini rightly said the low pressure signals should change in a leak, but the dataset page never says what 0 and 1 mean, and in this data the signal reads 0 when "active". Its rule scored 15%, worse than a coin toss, until a person fixed the meaning (92%). So an AI draft needs a person to check what the data means, not only the logic.
+4. **An AI model reasoned well but misread the data.** Gemini rightly said the low pressure signals should change in a leak, but the dataset page never says what 0 and 1 mean, and in this data the signal reads 0 when "active". Its rule scored 13%, worse than a coin toss, until a person fixed the meaning (92%). So an AI draft needs a person to check what the data means, not only the logic.
 5. **The mix did not beat the best single build here.** On AI4I it won every test. With one kind of fault and only 4 cases, there was little for it to add.
 
+The AI rules are scored by where each picked reading ranks among all hours (no leak labels used), averaged over the picks, so a reading that hardly moves in normal running cannot swamp the others.
+
 Limits. Only 4 leaks, all of one kind, so a difference of one leak caught is not meaningful. The page's failure table has a few odd details (two rows numbered 1, and report dates that do not match the table dates), and we used the table's start and end times as printed.
+
+## A real manual (28 November 2026)
+
+Code `eval/manual_test.py`. The AI read the troubleshooting tables of two real rotary screw compressor manuals, the Champion D5 manual (D5-MANS, March 2019, Troubleshooting Guide pages 30 to 32) and the SSR UP6 40 / 50PE / 50PEI operation manual, as `pdftotext` gives them (table columns run into each other, as in a real scan). It also read the MetroPT-3 sensor notes, this time with what 0 and 1 mean, so only the manual differs between the two kinds of run. It picked which hourly readings move in an air leak and had to quote the manual for each pick. The manuals are copyrighted, so their text is not in the repo. 5 runs with the manual and 5 without, on Gemini (gemini-3.5-flash-lite, free tier).
+
+| Runs | Rule picked | Rank | Leaks caught | Quotes found in the manual |
+|---|---|---|---|---|
+| With manual, run 1 | load share up, starts up, compressor pressure down, reservoir pressure down | 88% | 4 of 4 | 4 of 4 |
+| With manual, run 2 | load share up, starts up | 93% | 4 of 4 | 2 of 2 |
+| With manual, runs 3 to 5 | load share up, starts up, lowest compressor pressure down | 75% | 0 of 4 | 9 of 9 |
+| Without manual, 5 runs | panel or compressor pressure down, reservoir down, motor current up, starts up | 90% to 94% | 4 of 4 every run | |
+
+Averages, 81% with the manual and 92% without.
+
+What it means.
+
+1. **The AI never made up the manual.** All 15 quotes were really in the manual (the check allows words split across lines by the table layout, and a made-up phrase fails it).
+2. **A real quote is not a right rule.** The manual lists "Air system leaks" as a cause of "Low system air pressure". In 3 of 5 runs the AI turned that into "the lowest compressor pressure falls". On this train the opposite happens. The compressor hardly rests during a leak, so its pressure stays up. The quote was real, but the sensor it was mapped to was wrong, and those rules caught no leak.
+3. **The manual did not help here.** Without it the AI did better and gave nearly the same rule every time. With it, the AI anchored on the manual's symptom words. A manual is written for a person who sees symptoms ("low pressure", "noise"), not for sensors, so the hard step is linking the manual's words to the right sensor.
+4. **So check AI rules against data, not only against the text.** The quote check proves the source is real. Only the data showed the mapping was wrong.
+
+Limits. The manuals are for factory screw compressors, not this train's air production unit, so they fit only roughly. Only 4 leaks of one kind.

@@ -148,11 +148,24 @@ def normal_stats(rows, keys):
         v = [r["x"][k] for r in base]
         m = sum(v) / len(v)
         out[k] = (m, math.sqrt(sum((x - m) ** 2 for x in v) / len(v)) or 1e-9)
+    out["_base"] = {k: sorted(r["x"][k] for r in rows) for k in keys}  # all hours, no labels used
     return out
 
 
 def ai_score(rule, stats):
-    return lambda r: sum(d * (r["x"][k] - stats[k][0]) / stats[k][1] for k, d in rule.items())
+    """Where each picked reading ranks among all hours, as a share from 0 to 1 (no leak
+    labels are used, and a reading that hardly moves normally cannot swamp the others),
+    flipped for readings the rule says fall, then averaged."""
+    import bisect
+    base = stats["_base"]
+    def score(r):
+        total = 0.0
+        for k, d in rule.items():
+            v = base[k]
+            share = (bisect.bisect_left(v, r["x"][k]) + bisect.bisect_right(v, r["x"][k])) / (2 * len(v))
+            total += share if d > 0 else 1 - share
+        return total / len(rule)
+    return score
 
 
 # ---------- scores ----------

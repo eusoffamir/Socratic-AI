@@ -1,0 +1,256 @@
+[
+ {
+  "kind": "manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 22552,
+  "rule": {
+   "load_share": 1,
+   "starts": 1,
+   "TP2_mean": -1,
+   "Reservoirs_mean": -1
+  },
+  "quote": {
+   "load_share": "Air system leaks",
+   "starts": "Air system leaks",
+   "TP2_mean": "Low system air pressure",
+   "Reservoirs_mean": "Low system air pressure"
+  },
+  "quote_ok": {
+   "load_share": true,
+   "starts": true,
+   "TP2_mean": true,
+   "Reservoirs_mean": true
+  },
+  "why": {
+   "load_share": "leaks cause the compressor to load more often to maintain pressure",
+   "starts": "leaks force the motor to start loading more frequently",
+   "TP2_mean": "leaks cause a drop in system pressure",
+   "Reservoirs_mean": "leaks reduce downstream reservoir pressure"
+  },
+  "reply": "{\n  \"rule\": {\n    \"load_share\": 1,\n    \"starts\": 1,\n    \"TP2_mean\": -1,\n    \"Reservoirs_mean\": -1\n  },\n  \"quote\": {\n    \"load_share\": \"Air system leaks\",\n    \"starts\": \"Air system leaks\",\n    \"TP2_mean\": \"Low system air pressure\",\n    \"Reservoirs_mean\": \"Low system air pressure\"\n  },\n  \"why\": {\n    \"load_share\": \"leaks cause the compressor to load more often to maintain pressure\",\n    \"starts\": \"leaks force the motor to start loading more frequently\",\n    \"TP2_mean\": \"leaks cause a drop in system pressure\",\n    \"Reservoirs_mean\": \"leaks reduce downstream reservoir pressure\"\n  }\n}"
+ },
+ {
+  "kind": "manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 22552,
+  "rule": {
+   "load_share": 1,
+   "starts": 1
+  },
+  "quote": {
+   "load_share": "Air system leaks.",
+   "starts": "Air system leaks."
+  },
+  "quote_ok": {
+   "load_share": true,
+   "starts": true
+  },
+  "why": {
+   "load_share": "Leaks cause the system to lose pressure, increasing the time the compressor spends working under load.",
+   "starts": "Pressure drops from leaks force the compressor to cycle and start pumping more frequently."
+  },
+  "reply": "{\n  \"rule\": {\n    \"load_share\": 1,\n    \"starts\": 1\n  },\n  \"quote\": {\n    \"load_share\": \"Air system leaks.\",\n    \"starts\": \"Air system leaks.\"\n  },\n  \"why\": {\n    \"load_share\": \"Leaks cause the system to lose pressure, increasing the time the compressor spends working under load.\",\n    \"starts\": \"Pressure drops from leaks force the compressor to cycle and start pumping more frequently.\"\n  }\n}"
+ },
+ {
+  "kind": "manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 22552,
+  "rule": {
+   "load_share": 1,
+   "starts": 1,
+   "TP2_min": -1
+  },
+  "quote": {
+   "load_share": "Air system leaks.",
+   "starts": "Air system leaks.",
+   "TP2_min": "Low system air pressure"
+  },
+  "quote_ok": {
+   "load_share": true,
+   "starts": true,
+   "TP2_min": true
+  },
+  "why": {
+   "load_share": "leaks cause the compressor to load more often to maintain pressure",
+   "starts": "leaks increase the frequency of motor starts as pressure drops",
+   "TP2_min": "system leaks directly lead to lower minimum pressure readings"
+  },
+  "reply": "{\n  \"rule\": {\n    \"load_share\": 1,\n    \"starts\": 1,\n    \"TP2_min\": -1\n  },\n  \"quote\": {\n    \"load_share\": \"Air system leaks.\",\n    \"starts\": \"Air system leaks.\",\n    \"TP2_min\": \"Low system air pressure\"\n  },\n  \"why\": {\n    \"load_share\": \"leaks cause the compressor to load more often to maintain pressure\",\n    \"starts\": \"leaks increase the frequency of motor starts as pressure drops\",\n    \"TP2_min\": \"system leaks directly lead to lower minimum pressure readings\"\n  }\n}"
+ },
+ {
+  "kind": "manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 22552,
+  "rule": {
+   "load_share": 1,
+   "starts": 1,
+   "TP2_min": -1
+  },
+  "quote": {
+   "load_share": "Air system leaks.",
+   "starts": "Air system leaks.",
+   "TP2_min": "Low system air"
+  },
+  "quote_ok": {
+   "load_share": true,
+   "starts": true,
+   "TP2_min": true
+  },
+  "why": {
+   "load_share": "Leaks increase compressor loading time",
+   "starts": "Leaks cause more frequent cycles",
+   "TP2_min": "System pressure drops during leaks"
+  },
+  "reply": "{\n  \"rule\": {\n    \"load_share\": 1,\n    \"starts\": 1,\n    \"TP2_min\": -1\n  },\n  \"quote\": {\n    \"load_share\": \"Air system leaks.\",\n    \"starts\": \"Air system leaks.\",\n    \"TP2_min\": \"Low system air\"\n  },\n  \"why\": {\n    \"load_share\": \"Leaks increase compressor loading time\",\n    \"starts\": \"Leaks cause more frequent cycles\",\n    \"TP2_min\": \"System pressure drops during leaks\"\n  }\n}"
+ },
+ {
+  "kind": "manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 22552,
+  "rule": {
+   "load_share": 1,
+   "starts": 1,
+   "TP2_min": -1
+  },
+  "quote": {
+   "load_share": "Air system leaks.",
+   "starts": "Air system leaks.",
+   "TP2_min": "Low system air"
+  },
+  "quote_ok": {
+   "load_share": true,
+   "starts": true,
+   "TP2_min": true
+  },
+  "why": {
+   "load_share": "Leaks increase compressor activity and loading time.",
+   "starts": "Leaks cause pressure to drop faster, increasing start cycles.",
+   "TP2_min": "Leaks lower system pressure minimums."
+  },
+  "reply": "{\n  \"rule\": {\n    \"load_share\": 1,\n    \"starts\": 1,\n    \"TP2_min\": -1\n  },\n  \"quote\": {\n    \"load_share\": \"Air system leaks.\",\n    \"starts\": \"Air system leaks.\",\n    \"TP2_min\": \"Low system air\"\n  },\n  \"why\": {\n    \"load_share\": \"Leaks increase compressor activity and loading time.\",\n    \"starts\": \"Leaks cause pressure to drop faster, increasing start cycles.\",\n    \"TP2_min\": \"Leaks lower system pressure minimums.\"\n  }\n}"
+ },
+ {
+  "kind": "no_manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 3571,
+  "rule": {
+   "TP2_mean": -1,
+   "Reservoirs_mean": -1,
+   "Motor_current_mean": 1,
+   "starts": 1
+  },
+  "quote": {},
+  "quote_ok": null,
+  "why": {
+   "TP2_mean": "Pressure drops due to escaping air from the leak.",
+   "Reservoirs_mean": "Downstream pressure falls as air is lost.",
+   "Motor_current_mean": "Compressor runs more frequently to compensate for the air leak.",
+   "starts": "More cycles are triggered to maintain system pressure."
+  },
+  "reply": "{\n  \"rule\": {\n    \"TP2_mean\": -1,\n    \"Reservoirs_mean\": -1,\n    \"Motor_current_mean\": 1,\n    \"starts\": 1\n  },\n  \"why\": {\n    \"TP2_mean\": \"Pressure drops due to escaping air from the leak.\",\n    \"Reservoirs_mean\": \"Downstream pressure falls as air is lost.\",\n    \"Motor_current_mean\": \"Compressor runs more frequently to compensate for the air leak.\",\n    \"starts\": \"More cycles are triggered to maintain system pressure.\"\n  }\n}"
+ },
+ {
+  "kind": "no_manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 3571,
+  "rule": {
+   "TP2_mean": -1,
+   "Reservoirs_mean": -1,
+   "Motor_current_mean": 1,
+   "starts": 1
+  },
+  "quote": {},
+  "quote_ok": null,
+  "why": {
+   "TP2_mean": "Pressure drops due to escaping air from the leak.",
+   "Reservoirs_mean": "Downstream pressure decreases as air leaks out of the system.",
+   "Motor_current_mean": "Compressor runs more frequently and stays under load longer to compensate for the leak.",
+   "starts": "Compressor has to start more often to maintain pressure."
+  },
+  "reply": "{\n  \"rule\": {\n    \"TP2_mean\": -1,\n    \"Reservoirs_mean\": -1,\n    \"Motor_current_mean\": 1,\n    \"starts\": 1\n  },\n  \"why\": {\n    \"TP2_mean\": \"Pressure drops due to escaping air from the leak.\",\n    \"Reservoirs_mean\": \"Downstream pressure decreases as air leaks out of the system.\",\n    \"Motor_current_mean\": \"Compressor runs more frequently and stays under load longer to compensate for the leak.\",\n    \"starts\": \"Compressor has to start more often to maintain pressure.\"\n  }\n}"
+ },
+ {
+  "kind": "no_manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 3571,
+  "rule": {
+   "TP3_mean": -1,
+   "Reservoirs_mean": -1,
+   "Motor_current_mean": 1,
+   "COMP_share": -1,
+   "starts": 1
+  },
+  "quote": {},
+  "quote_ok": null,
+  "why": {
+   "TP3_mean": "Air leaks lower overall pneumatic panel pressure.",
+   "Reservoirs_mean": "Downstream reservoir pressure drops due to the leak.",
+   "Motor_current_mean": "The compressor runs more frequently to compensate for the leak.",
+   "COMP_share": "The compressor spends less time resting as it pumps more often.",
+   "starts": "The compressor must restart more often to maintain pressure."
+  },
+  "reply": "{\n  \"rule\": {\n    \"TP3_mean\": -1,\n    \"Reservoirs_mean\": -1,\n    \"Motor_current_mean\": 1,\n    \"COMP_share\": -1,\n    \"starts\": 1\n  },\n  \"why\": {\n    \"TP3_mean\": \"Air leaks lower overall pneumatic panel pressure.\",\n    \"Reservoirs_mean\": \"Downstream reservoir pressure drops due to the leak.\",\n    \"Motor_current_mean\": \"The compressor runs more frequently to compensate for the leak.\",\n    \"COMP_share\": \"The compressor spends less time resting as it pumps more often.\",\n    \"starts\": \"The compressor must restart more often to maintain pressure.\"\n  }\n}"
+ },
+ {
+  "kind": "no_manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 3571,
+  "rule": {
+   "TP3_mean": -1,
+   "Reservoirs_mean": -1,
+   "Motor_current_mean": 1,
+   "starts": 1
+  },
+  "quote": {},
+  "quote_ok": null,
+  "why": {
+   "TP3_mean": "Pressure drops across the pneumatic panel due to air leaks",
+   "Reservoirs_mean": "Downstream pressure falls as air escapes from the system",
+   "Motor_current_mean": "Compressor runs more frequently to compensate for lost air",
+   "starts": "Motor must restart more often to maintain pressure against the leak"
+  },
+  "reply": "{\n  \"rule\": {\n    \"TP3_mean\": -1,\n    \"Reservoirs_mean\": -1,\n    \"Motor_current_mean\": 1,\n    \"starts\": 1\n  },\n  \"why\": {\n    \"TP3_mean\": \"Pressure drops across the pneumatic panel due to air leaks\",\n    \"Reservoirs_mean\": \"Downstream pressure falls as air escapes from the system\",\n    \"Motor_current_mean\": \"Compressor runs more frequently to compensate for lost air\",\n    \"starts\": \"Motor must restart more often to maintain pressure against the leak\"\n  }\n}"
+ },
+ {
+  "kind": "no_manual",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ],
+  "chars_in": 3571,
+  "rule": {
+   "TP2_mean": -1,
+   "Reservoirs_mean": -1,
+   "Motor_current_mean": 1,
+   "COMP_share": -1,
+   "starts": 1
+  },
+  "quote": {},
+  "quote_ok": null,
+  "why": {
+   "TP2_mean": "Pressure drops due to the leak",
+   "Reservoirs_mean": "Downstream pressure decreases with air loss",
+   "Motor_current_mean": "Compressor runs more frequently to compensate for the leak",
+   "COMP_share": "Less time resting as the compressor works harder",
+   "starts": "Compressor triggers more often to maintain pressure"
+  },
+  "reply": "{\n  \"rule\": {\n    \"TP2_mean\": -1,\n    \"Reservoirs_mean\": -1,\n    \"Motor_current_mean\": 1,\n    \"COMP_share\": -1,\n    \"starts\": 1\n  },\n  \"why\": {\n    \"TP2_mean\": \"Pressure drops due to the leak\",\n    \"Reservoirs_mean\": \"Downstream pressure decreases with air loss\",\n    \"Motor_current_mean\": \"Compressor runs more frequently to compensate for the leak\",\n    \"COMP_share\": \"Less time resting as the compressor works harder\",\n    \"starts\": \"Compressor triggers more often to maintain pressure\"\n  }\n}"
+ }
+]
