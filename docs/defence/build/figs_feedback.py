@@ -30,21 +30,21 @@ uses = [("Every agent", "structured JSON prompts", "ai"),
         ("Assessor, Planner, Tutor, Checker", "one job each, joined in a graph", "ai"),
         ("Topic Builder", "Wikipedia or the learner's file now, knowledge graph RAG in FYP2", "plan"),
         ("Knowledge graph and learner records", "planned", "plan")]
-# The slides cite by number, the thesis cites in APA, so the figure is drawn twice.
+# The slides and the interim report number their references differently (both IEEE), so the figure is drawn twice.
 ideas_slides = [("Prompting", "2025", "instruction plus context", "[15]"),
                 ("Chain of Thought", "2022", "think in steps first", "[16]"),
                 ("ReAct", "2023", "reason, act, observe", "[17]"),
                 ("Multi-agent systems", "2024", "MetaGPT, AgileCoder", "[20], [21]"),
                 ("RAG", "2023", "answer from retrieved text", "[14], [18]"),
                 ("Model Context Protocol", "2024", "standard tool access", "[19]")]
-ideas_thesis = [("Prompting", "2025", "instruction plus context, Ho (2025a)", ""),
-                ("Chain of Thought", "2022", "think in steps first, Wei et al. (2022)", ""),
-                ("ReAct", "2023", "reason, act, observe, Yao et al. (2023b)", ""),
-                ("Multi-agent systems", "2024", "MetaGPT, AgileCoder, Hong et al. (2024)", ""),
-                ("RAG", "2020", "answer from retrieved text, Lewis et al. (2020)", ""),
-                ("Model Context Protocol", "2024", "standard tool access, Anthropic (2024)", "")]
+ideas_thesis = [("Prompting", "2025", "instruction plus context", "[6], [7]"),
+                ("Chain of Thought", "2022", "think in steps first", "[8]"),
+                ("ReAct", "2023", "reason, act, observe", "[9]"),
+                ("Multi-agent systems", "2024", "MetaGPT, AgileCoder", "[13], [14]"),
+                ("RAG", "2020", "answer from retrieved text", "[10], [11]"),
+                ("Model Context Protocol", "2024", "standard tool access", "[12]")]
 uses_thesis = uses[:5] + [("Knowledge graph and learner records", "graph and records built, MCP access planned for FYP2", "plan")]
-for ideas, uses_, fname in [(ideas_slides, uses, "lit_agentic"), (ideas_thesis, uses_thesis, "lit_agentic_apa")]:
+for ideas, uses_, fname in [(ideas_slides, uses, "lit_agentic"), (ideas_thesis, uses_thesis, "lit_agentic_ieee")]:
   fig, ax = plt.subplots(figsize=(12.2, 5.4))
   ax.set_xlim(0, 12.2); ax.set_ylim(-0.45, 5.4); ax.axis("off")
   ax.text(2.2, 5.15, "Idea from the literature", ha="center", fontsize=12, weight="bold", color=TEAL)
