@@ -1,0 +1,14 @@
+{
+ "rule": {
+  "MPG_share": 1,
+  "LPS_share": 1
+ },
+ "why": {
+  "MPG_share": "MPG starts the compressor under load when pressure falls below 8.2 bar, which happens more often in an air leak.",
+  "LPS_share": "LPS activates when pressure drops below 7 bar, which happens more often in an air leak."
+ },
+ "models": [
+  "gemini-3.5-flash-lite"
+ ],
+ "reply": "{\n  \"rule\": {\n    \"MPG_share\": 1,\n    \"LPS_share\": 1\n  },\n  \"why\": {\n    \"MPG_share\": \"MPG starts the compressor under load when pressure falls below 8.2 bar, which happens more often in an air leak.\",\n    \"LPS_share\": \"LPS activates when pressure drops below 7 bar, which happens more often in an air leak.\"\n  }\n}"
+}

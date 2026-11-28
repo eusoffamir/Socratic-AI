@@ -67,3 +67,32 @@ This is the easy case for the model, since the source states every rule in one c
 - One machine, one dataset. The same test should be run on real inspection records when the partner shares them.
 - The AI model read a short, clear text. Next, give it a real manual or standard.
 - Real data with known causes is rare. MetroPT-3 (UCI, CC BY 4.0) is real metro train compressor data with failures from the operator's maintenance reports, so it is the next dataset to try, but it has no published cause rules to check against.
+
+## Real data, MetroPT-3 (28 November 2026)
+
+Code `eval/metropt_test.py` (the 208 MB CSV stays outside the repo; download it from https://doi.org/10.24432/C5VW3R and pass its path). Real readings from the compressor of a Porto metro train, February to August 2020, about one every 10 seconds (Davari et al., 2021, UCI, CC BY 4.0). The only labels are the operator's 4 failure reports, all air leaks. So this test asks "is this hour a leak?", not "which fault is it?". 4,278 logged hours, 86 of them inside a leak.
+
+Each network is trained with one leak left out, then tested on that leak and the 3 days either side. Rank is the chance a leak hour scores above a normal hour (50% is a coin toss). Caught means an alarm inside the leak, at a limit that allows about 1 false alarm a day.
+
+| Build | Rank | Leaks caught |
+|---|---|---|
+| Rule from the sensor notes (a leak makes the compressor load more), no training | 90% | 4 of 4 |
+| AI rule, as drafted by Gemini | 15% | 2 of 4 |
+| AI rule, after a person says what 0 and 1 mean | 92% | 2 of 4 |
+| Network, raw readings, bands at the data's thirds | 94% | 4 of 4 |
+| Network, engineer readings, bands at the data's thirds | 85% | 0 of 4 |
+| Network, raw readings, bands like alarm limits from the normal first month | 95% | 3 of 4 |
+| Network, engineer readings, alarm limit bands | 90% | 3 of 4 |
+| Mix (engineer network, the rule may rule a leak out) | 90% | 3 of 4 |
+
+What a leak looks like here. The compressor works almost all the time. It is under load 67% of the hour against 12% normally, and it starts about 64 times an hour against 5.
+
+What it means.
+
+1. **A simple rule from how the machine works caught every leak with no failure data at all.** That matters on a real plant, where failures are rare and records are few.
+2. **Choosing engineer nodes did not help here, unlike AI4I.** A leak is a large fault that moves many sensors at once, so even the raw averages show it. Engineer nodes matter most when the cause hides in a combination of readings, as overstrain does in AI4I.
+3. **How readings are cut into bands matters.** Cutting at the data's thirds hid the leak inside the top third (0 of 4 caught for the engineer network). Bands set like alarm limits from normal running fixed it (3 of 4).
+4. **An AI model reasoned well but misread the data.** Gemini rightly said the low pressure signals should change in a leak, but the dataset page never says what 0 and 1 mean, and in this data the signal reads 0 when "active". Its rule scored 15%, worse than a coin toss, until a person fixed the meaning (92%). So an AI draft needs a person to check what the data means, not only the logic.
+5. **The mix did not beat the best single build here.** On AI4I it won every test. With one kind of fault and only 4 cases, there was little for it to add.
+
+Limits. Only 4 leaks, all of one kind, so a difference of one leak caught is not meaningful. The page's failure table has a few odd details (two rows numbered 1, and report dates that do not match the table dates), and we used the table's start and end times as printed.

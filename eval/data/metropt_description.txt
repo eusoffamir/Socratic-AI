@@ -1,0 +1,21 @@
+MetroPT-3 Dataset. Davari, Veloso, Ribeiro and Gama (2021), UCI Machine Learning Repository, https://doi.org/10.24432/C5VW3R, CC BY 4.0.
+Facts from the dataset page's attribute information, read on 28 November 2026 (close paraphrase, not the page's exact words).
+
+Readings from the air production unit (APU, the compressor) of a metro train, February to August 2020.
+Analogue sensors:
+TP2 (bar): pressure on the compressor.
+TP3 (bar): pressure generated at the pneumatic panel.
+H1 (bar): pressure from the pressure drop when the cyclonic separator filter discharges.
+DV_pressure (bar): pressure drop when the towers discharge the air dryers; zero means the compressor is working under load.
+Reservoirs (bar): downstream pressure of the reservoirs, which should be close to TP3.
+Motor_current (A): current of one phase of the three-phase motor; about 0 A when off, about 4 A working offloaded, about 7 A under load, about 9 A when starting.
+Oil_temperature (C): oil temperature on the compressor.
+Digital signals:
+COMP: air intake valve signal, active when there is no air intake (compressor off or offloaded).
+DV_eletric: compressor outlet valve signal, active when under load, inactive when off or offloaded.
+Towers: which air-drying tower is working.
+MPG: starts the compressor under load by activating the intake valve when the APU pressure falls below 8.2 bar.
+LPS: activates when the pressure drops below 7 bar.
+Pressure_switch: detects discharge in the air-drying towers.
+Oil_level: active when the oil is below the expected level.
+Caudal_impulses: counts pulses of the absolute air flow from the APU to the reservoirs.
