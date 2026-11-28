@@ -83,3 +83,21 @@ def test_tool_group_only_starts_study_cases(monkeypatch, tmp_path):
     assert r.status_code == 200
     s = main.SESSIONS[r.json()["session_id"]]
     assert s["case"]["id"] == t["cases"][1]["id"] and s["participant_code"] == "P001"
+
+
+def test_study_export_one_row_per_student():
+    from eval.export_study import rows_of
+    sessions = [
+        ("a", {"mode": "control_reading", "participant_code": "C001", "concept_id": "t-1",
+               "reading_seconds": 300, "consent_at": "2027-01-20T02:00:00+00:00", "turns": []}, "2027-01-20T02:05:00+00:00"),
+        ("b", {"mode": "control_reading", "participant_code": "C001", "concept_id": "t-2",
+               "reading_seconds": 420, "consent_at": "2027-01-20T02:05:00+00:00", "turns": []}, "2027-01-20T02:12:00+00:00"),
+        ("c", {"participant_code": "P001", "concept_id": "t-1", "consent_at": "2027-01-20T02:00:00+00:00",
+               "turns": [{"answer": None}, {"answer": "x"}, {"answer": "y"}]}, "2027-01-20T02:10:00+00:00"),
+        ("d", {"mode": "skill_check", "participant_code": "P001", "turns": []}, "2027-01-20T02:20:00+00:00"),
+        ("e", {"concept_id": "pattern_or_luck", "turns": []}, "2027-01-20T02:20:00+00:00"),  # not in the study
+    ]
+    rows = {r["participant_code"]: r for r in rows_of(sessions)}
+    assert set(rows) == {"C001", "P001"}
+    assert rows["C001"]["group"] == "control" and rows["C001"]["cases"] == 2 and rows["C001"]["minutes"] == 12.0
+    assert rows["P001"]["group"] == "tool" and rows["P001"]["answers"] == 2 and rows["P001"]["minutes"] == 10.0

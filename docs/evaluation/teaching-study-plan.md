@@ -20,6 +20,20 @@ A pretest and posttest study with a control group, which is what Dr Ho described
 
 Both groups get the same time and the same content, so the only difference is how they learn.
 
+## Running it in the app
+
+Built 28 November 2026. The topic does not have to be quant. It is whatever Dr Ho picks.
+
+1. **Build the topic once.** Run `npx.cmd dotenvx run -- python -m eval.build_study_topic "the topic"`. It saves 3 cases to `study/topic.json` and a readable copy to `study/topic.md`. Check every line by hand, fix anything wrong in the JSON, then commit it.
+2. **Make the codes.** After the pretest and the matched split, give each tool group student a code in `STUDY_CODES` and each control student a code in `STUDY_CONTROL` (for example `P001,P002` and `C001,C002`). Set both on Render, in the Environment tab.
+3. **On the day.** Every student opens the app, types their code and agrees to take part.
+   - Tool group. Only the 3 study cases show, as buttons under the chat box, and they chat through them with the tutor. They cannot type their own topic.
+   - Control group. They see a reading screen with the same story, reading and notes for each case, one part at a time, with no AI. Each part they finish is saved with its time.
+4. **After.** Run `python eval/export_study.py` for one row per student (group, cases, answers, minutes), and `python eval/export_answers.py` for the tool group's answers. The test scores come from the pre and post test forms.
+5. **Switch it off.** Empty `STUDY_CODES` and `STUDY_CONTROL` on Render after the study.
+
+The consent text is still a draft. It says answers go to an AI service, which is true only for the tool group, so the final wording from the ethics approval should cover both groups.
+
 ## Which cohort
 
 Dr Ho listed four. The choice depends on the topic and on how many students we can get.

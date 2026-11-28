@@ -1187,6 +1187,16 @@
   .study-agree{display:flex; gap:10px; align-items:flex-start; font-size:14.5px; margin-bottom:14px; cursor:pointer;}
   .study-agree input{width:18px; height:18px; margin-top:2px; accent-color:var(--signal);}
   #studyGo:disabled{opacity:.5; cursor:not-allowed;}
+  /* the control group's reading screen (teaching study), the same material with no AI */
+  .sr-body{font-size:15.5px; line-height:1.65;}
+  .sr-body p{margin:0 0 12px;}
+  .sr-body ul{margin:0 0 12px; padding-left:22px;}
+  .sr-body li{margin-bottom:6px;}
+  .sr-body .mono-label{display:block; margin-bottom:8px; color:var(--ink-faint);}
+  .sr-story{font-family:var(--serif); font-size:18px;}
+  .sr-words{margin-bottom:12px;}
+  .sr-words div{margin-bottom:6px;}
+  .sr-done{text-align:center; padding:40px 0;}
 
   /* ---------- first-time tour: small pop-ups that point at one thing at a time ---------- */
   .tour-block{position:fixed; inset:0; z-index:48;}               /* stops clicks on the page during the tour */
@@ -1491,6 +1501,21 @@
     </footer>
   </div>
 </div>
+<div class="read-modal hidden" id="studyRead" role="dialog" aria-modal="true" aria-labelledby="srTitle">
+  <div class="rm-backdrop"></div>
+  <div class="rm-card">
+    <header class="rm-head">
+      <span class="tag t1" id="srStep"></span>
+      <h2 id="srTitle"></h2>
+      <div class="rm-sub" id="srTopic"></div>
+    </header>
+    <div class="rm-body sr-body" id="srBody"></div>
+    <footer class="rm-foot">
+      <div id="srStatus" aria-live="polite"></div>
+      <button class="rm-start" id="srNext">Next part</button>
+    </footer>
+  </div>
+</div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -1770,12 +1795,17 @@ $('recents').addEventListener('click', e => {
 renderRecents();
 
 function renderAskChips(){
+  if(studyTool()){
+    $('askChips').innerHTML = study.cases.map((c, i) => `<button type="button" data-case="${i}">${esc(c.title)}</button>`).join('');
+    return;
+  }
   $('askChips').innerHTML = pickTopics(3).map(t => `<button type="button" data-fill="${esc(t)}">${esc(t)}</button>`).join('');
 }
 renderAskChips();
 $('askChips').addEventListener('click', e => {
   const b = e.target.closest('button');
   if(!b || $('askSend').disabled) return;
+  if(b.dataset.case) return studyStart(study.cases[+b.dataset.case]);  // study, a saved case
   $('askInput').value = b.dataset.fill;  // fills only, so no AI call until they press Enter
   $('askInput').focus();
 });
@@ -2378,12 +2408,14 @@ async function askStart(c, name, ctx = askCtx()){
 // because the file is never kept.
 function askCanNext(){
   if(!ask.sid) return false;
+  if(studyTool()) return !!studyNextCase();
   if(ask.cases[0] && !ask.cases[0].generated) return quantCases.some(q => !ask.cases.some(c => c.id === q.id));
   return !!ask.request;
 }
 
 async function askNext(){
   if(ask.busy || !askCanNext()) return;
+  if(studyTool()) return askStart(studyNextCase());
   if(!ask.cases[0].generated) return askStart(quantCases.find(q => !ask.cases.some(c => c.id === q.id)));
   const ctx = askCtx(), gen = ctx.gen;
   askPending.set(ctx.chatId, {name: (askChats().find(x => x.id === ctx.chatId) || {}).name || ask.cases[0].title});
@@ -2569,6 +2601,7 @@ $('askForm').addEventListener('submit', e => {
   if(ask.busy || ask.done) return;
   const text = $('askInput').value.trim();
   if(ask.sid) return askAnswer(text);
+  if(studyTool()){ $('askInput').value = ''; return studyStart(studyNextCase()); }  // the study topic, never a typed one
   if(!text && !askFile){ $('askInput').focus(); return; }
   $('askInput').value = '';
   $('askInput').style.height = '';
@@ -4152,7 +4185,7 @@ document.querySelectorAll('.help-btn').forEach(b => b.addEventListener('click', 
 // ---------- study mode: consent and participant code ----------
 // Only when the server has STUDY_CODES set. The code is kept in this browser
 // and sent with every new session, so a student's sessions can be linked.
-const study = {on: false, code: null};
+var study = {on: false, code: null};  // var, so renderAskChips can look at it before this line runs
 function openStudy(message){
   $('studyModal').classList.remove('hidden');
   $('studyStatus').innerHTML = '';
@@ -4172,7 +4205,72 @@ $('studyGo').addEventListener('click', async () => {
   study.code = code;
   try { localStorage.setItem('study', JSON.stringify({code, consentAt: new Date().toISOString()})); } catch(e){}
   $('studyModal').classList.add('hidden');
-  startTourOnce();
+  if(await studyEnter()) startTourOnce();
+});
+
+// After the code, the study topic. The tool group chats through its cases (as
+// buttons under the chat box); the control group only reads them, one part at a time.
+function studyTool(){ return !!study && study.group === 'tool' && !!(study.cases || []).length; }
+function studyStart(c){ askChatting(true); return askStart(c, study.topic); }
+function studyNextCase(){ return (study.cases || []).find(c => !ask.cases.some(x => x.id === c.id)) || null; }
+async function studyEnter(){
+  try {
+    const d = await postJSON('/api/study/topic', {code: study.code});
+    Object.assign(study, {group: d.group, topic: d.topic, cases: d.cases});
+  } catch(e){ study.group = null; }  // no study topic yet, so the app works as usual
+  if(study.group === 'control'){ openReading(); return false; }
+  if(studyTool()){
+    $('askInput').placeholder = `Press Enter to start ${study.topic}, or pick a case below`;
+    document.querySelectorAll('.ask-start').forEach(x => x.classList.add('hidden'));
+  }
+  renderAskChips();
+  return true;
+}
+const reading = {i: 0, t0: 0};
+function readingSaved(){
+  try { const r = JSON.parse(localStorage.getItem('study-read')) || {}; return r.code === study.code ? r.i : 0; }
+  catch(e){ return 0; }
+}
+function openReading(){
+  $('studyRead').classList.remove('hidden');
+  showReading(readingSaved());
+}
+function showReading(i){
+  const n = study.cases.length;
+  reading.i = i;
+  reading.t0 = Date.now();
+  $('srStatus').innerHTML = '';
+  $('srTopic').textContent = study.topic;
+  if(i >= n){
+    $('srStep').textContent = 'Done';
+    $('srTitle').textContent = 'Thank you';
+    $('srBody').innerHTML = `<p class="sr-done">You have finished the reading, so please wait for your lecturer.</p>`;
+    $('srNext').classList.add('hidden');
+    return;
+  }
+  const c = study.cases[i], r = c.reading || {}, ideas = r.idea || [], words = r.key_words || [];
+  $('srStep').textContent = `Part ${i + 1} of ${n}`;
+  $('srTitle').textContent = c.title;
+  $('srBody').innerHTML = `<p class="sr-story">${esc(c.scenario)}</p>
+    ${ideas.length ? `<span class="mono-label">The idea</span><p>${ideas.map(esc).join(' ')}</p>` : ''}
+    ${r.example ? `<span class="mono-label">Example</span><p>${esc(r.example)}</p>` : ''}
+    ${words.length ? `<span class="mono-label">Key words</span><div class="sr-words">${words.map(([w, m]) => `<div><b>${esc(w)}</b> means ${esc(m)}</div>`).join('')}</div>` : ''}
+    ${(c.notes || []).length ? `<span class="mono-label">Notes</span><ul>${c.notes.map(x => `<li>${esc(x.text || x)}</li>`).join('')}</ul>` : ''}
+    ${r.think ? `<div class="rm-think"><span class="mono-label">Think about</span><p>${esc(r.think)}</p></div>` : ''}`;
+  $('srBody').scrollTop = 0;
+  $('srNext').classList.remove('hidden');
+  $('srNext').textContent = i + 1 < n ? 'Next part' : 'I have finished';
+}
+$('srNext').addEventListener('click', async () => {
+  const c = study.cases[reading.i];
+  $('srNext').disabled = true;
+  try {
+    await postJSON('/api/study/read', {code: study.code, consent: true, case_id: c.id,
+                                       seconds: Math.round((Date.now() - reading.t0) / 1000)});
+    try { localStorage.setItem('study-read', JSON.stringify({code: study.code, i: reading.i + 1})); } catch(e){}
+    showReading(reading.i + 1);
+  } catch(e){ note('error', e.message, $('srStatus')); }
+  finally { $('srNext').disabled = false; }
 });
 // ---------- optional Sign in with Google (app/auth.py) ----------
 // Guests keep everything in this browser, as before. A signed-in learner's lists
@@ -4292,7 +4390,7 @@ async function initStudy(){
   } catch(e){ study.on = false; }
   if(!study.on) return true;
   try { study.code = (JSON.parse(localStorage.getItem('study')) || {}).code || null; } catch(e){}
-  if(study.code) return true;
+  if(study.code) return studyEnter();
   openStudy();
   return false;
 }
