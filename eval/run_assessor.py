@@ -67,6 +67,7 @@ def main():
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--limit", type=int, default=0, help="only the first N answers (0 = all)")
     ap.add_argument("--split", choices=["tune", "test"], help="only rows of this split")
+    ap.add_argument("--ids", help="only these answers, comma separated, for example C25,C26")
     ap.add_argument("--out", help="output file (default eval/ai_marks_<assessor version>.csv, which a run of the same version overwrites)")
     args = ap.parse_args()
 
@@ -79,6 +80,8 @@ def main():
     rows = list(csv.DictReader(open(ROOT / "eval" / "test_set.csv", encoding="utf-8-sig")))  # -sig: the file starts with an Excel marker
     if args.split:
         rows = [r for r in rows if r["split"] == args.split]
+    if args.ids:
+        rows = [r for r in rows if r["id"] in {i.strip() for i in args.ids.split(",")}]
     if args.limit:
         rows = rows[:args.limit]
 
