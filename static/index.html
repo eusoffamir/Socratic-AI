@@ -310,21 +310,23 @@
     .know-bar .lab{grid-column:1 / -1;}
   }
   /* Knowledge Summary: one row per fault, with the sources that know it */
-  .ks-table{border:1px solid var(--rule); background:var(--panel); border-radius:14px; padding:6px 20px;}
-  .ks-row{display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) 270px; gap:14px; align-items:center;
-          padding:13px 0; border-top:1px solid var(--rule); font-size:14.5px;}
+  .ks-table{border:1px solid var(--rule); background:var(--panel); border-radius:16px; padding:10px 32px; margin-top:8px;}
+  .ks-table + .dg-fleet{margin-top:22px;}
+  .ks-row{display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) 290px; gap:24px; align-items:center;
+          padding:22px 0; border-top:1px solid var(--rule); font-size:14.5px;}
   .ks-row:first-child{border-top:0;}
-  .ks-th{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:10px 0 8px;}
+  .ks-th{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:16px 0 12px;}
   .ks-name{font-family:var(--serif); font-size:17px; color:var(--ink);}
   .ks-cause, .ks-fix{color:var(--ink-soft);}
-  .ks-srcs{display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;}
+  .ks-srcs{display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-start;}
   .ks-src{padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:600; background:var(--signal-soft); color:var(--signal);
           border:1px solid color-mix(in srgb, var(--signal) 30%, transparent); cursor:pointer;}
   .ks-src:hover{border-color:var(--signal);}
   .ks-src.no{background:none; color:var(--ink-faint); border-color:var(--rule);}
   @media (max-width:800px){
     .ks-th{display:none;}
-    .ks-row{grid-template-columns:1fr; gap:4px;}
+    .ks-table{padding:6px 20px;}
+    .ks-row{grid-template-columns:1fr; gap:6px; padding:18px 0;}
     .ks-row:nth-child(2){border-top:0;}
     .ks-srcs{justify-content:flex-start; margin-top:6px;}
     .ks-cause::before{content:"Caused by "; color:var(--ink-faint);}
