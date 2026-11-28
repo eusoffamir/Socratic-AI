@@ -309,6 +309,64 @@
     .know-bar{grid-template-columns:auto minmax(0, 1fr) 44px;}
     .know-bar .lab{grid-column:1 / -1;}
   }
+  /* Knowledge Summary: one row per fault, with the sources that know it */
+  .ks-head{font-size:16px; margin:0 0 16px; color:var(--ink-soft);}
+  .ks-head b{color:var(--ink);}
+  .ks-table{border:1px solid var(--rule); background:var(--panel); border-radius:14px; padding:6px 20px;}
+  .ks-row{display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) 270px; gap:14px; align-items:center;
+          padding:13px 0; border-top:1px solid var(--rule); font-size:14.5px;}
+  .ks-row:first-child{border-top:0;}
+  .ks-th{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:10px 0 8px;}
+  .ks-name{font-family:var(--serif); font-size:17px; color:var(--ink);}
+  .ks-cause, .ks-fix{color:var(--ink-soft);}
+  .ks-srcs{display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;}
+  .ks-src{padding:4px 10px; border-radius:999px; font-size:12.5px; font-weight:600; background:var(--signal-soft); color:var(--signal);
+          border:1px solid color-mix(in srgb, var(--signal) 30%, transparent); cursor:pointer;}
+  .ks-src:hover{border-color:var(--signal);}
+  .ks-src.no{background:none; color:var(--ink-faint); border-color:var(--rule);}
+  @media (max-width:800px){
+    .ks-th{display:none;}
+    .ks-row{grid-template-columns:1fr; gap:4px;}
+    .ks-row:nth-child(2){border-top:0;}
+    .ks-srcs{justify-content:flex-start; margin-top:6px;}
+    .ks-cause::before{content:"Caused by "; color:var(--ink-faint);}
+    .ks-fix::before{content:"What to do "; color:var(--ink-faint);}
+  }
+  /* Diagnosis laid out like New chat: a start with three machines, then one check at a time */
+  .dg-start{max-width:720px; margin:0 auto; padding-top:16vh; text-align:center;}
+  .dg-pick{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px;}
+  @media (max-width:700px){ .dg-pick{grid-template-columns:1fr;} }
+  .dg-pick button{display:flex; flex-direction:column; gap:4px; align-items:flex-start; padding:18px 20px; border-radius:16px;
+                  background:var(--panel); border:1px solid var(--rule); box-shadow:var(--shadow); cursor:pointer; text-align:left;
+                  transition:border-color .15s, transform .15s;}
+  .dg-pick button:hover{border-color:var(--signal); transform:translateY(-1px);}
+  .dg-pick b{font-family:var(--serif); font-size:19px; color:var(--ink);}
+  .dg-pick span{font-size:13px; color:var(--ink-faint);}
+  .report.know.diag.dg-narrow{max-width:720px;}
+  .diag .know-head{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .dg-back{padding:7px 14px; font-size:13px;}
+  .dg-tabs{margin:18px 0 22px;}
+  .dg-thread{list-style:none; margin:0 0 22px; padding:0 0 0 22px; border-left:2px solid color-mix(in srgb, var(--signal) 30%, transparent);}
+  .dg-t{position:relative; margin:0 0 16px; font-size:15.5px; line-height:1.6; color:var(--ink-soft);}
+  .dg-t b{color:var(--ink);}
+  .dg-t::before{content:""; position:absolute; left:-29px; top:7px; width:12px; height:12px; border-radius:50%;
+                background:var(--paper); border:2px solid color-mix(in srgb, var(--signal) 45%, transparent);}
+  .dg-t.up::before{background:var(--signal); border-color:var(--signal);}
+  .dg-t.ask::before{border-color:var(--signal);}
+  .dg-t.ask p{margin:0 0 12px; color:var(--ink);}
+  .dg-t .dg-controls{margin:0;}
+  .dg-link{background:none; border:0; padding:6px 4px; font:inherit; font-size:14px; font-weight:600; color:var(--signal); cursor:pointer;}
+  .dg-link:disabled{opacity:.4;}
+  .dg-again{justify-content:center;}
+  .dg-bars{border:1px solid var(--rule); background:var(--panel); border-radius:14px; padding:16px 20px; margin:6px 0 0;}
+  .dg-bars .mono-label{display:block; margin:0 0 10px;}
+  .dg-bar{display:grid; grid-template-columns:minmax(0, 190px) minmax(0, 1fr) 44px; align-items:center; gap:12px; padding:5px 0; font-size:14px;}
+  .dg-bar i{display:block; height:8px; border-radius:4px; background:var(--signal-soft); overflow:hidden;}
+  .dg-bar i b{display:block; height:100%; border-radius:4px; background:color-mix(in srgb, var(--signal) 50%, transparent); transition:width .6s ease;}
+  .dg-bar em{font-style:normal; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink-soft);}
+  .dg-bar.top span, .dg-bar.top em{font-weight:700; color:var(--signal);}
+  .dg-bar.top i b{background:var(--signal);}
+  @media (max-width:700px){ .dg-bar{grid-template-columns:minmax(0, 130px) minmax(0, 1fr) 40px;} }
   /* Diagnosis page: the chance of each fault, the checks done, the next check and the answer */
   .diag{max-width:1080px; margin:0 auto;}
   .diag .diag-story{font-size:16px; margin:-4px 0 24px;}
@@ -2715,11 +2773,16 @@ document.addEventListener('click', e => {
 // ---------- Diagnosis page: why did this machine fail (the industrial use case, on open data) ----------
 // The chances and the best next check come from a Bayesian network (app/diagnose.py);
 // the Diagnosis agent only explains the answer at the end.
-const diag = {list: null, udi: null, done: [], view: null, busy: false, auto: false, own: null, form: {}, err: ''};
-// udi 0 is the user's own machine: they type its readings, and diag.own holds them once sent
-const OWN = {udi: 0, pid: 'Your own machine'};
-const diagName = m => m.udi === 0 ? 'Your own machine' : `Machine ${m.pid}, type ${m.type}`;
-const diagMachines = () => [...diag.list.machines, OWN];
+const diag = {list: null, udi: null, done: [], view: null, busy: false, auto: false, own: null, form: {}, err: '', tab: 'simple'};
+// Laid out like New chat (Eusoff, 28 November 2026): one title, three machines to tap and one line for
+// your own machine. Then RootAI asks for one reading at a time, and Full data holds the big graph,
+// like Overall status. udi 0 is the user's own machine, and diag.own holds its readings once sent.
+const DG_EXAMPLES = [51, 3830, 8847];  // three different causes, found in 2, 2 and 3 checks
+function dgExamples(){
+  const ms = diag.list.machines, picked = DG_EXAMPLES.map(u => ms.find(m => m.udi === u)).filter(Boolean);
+  return picked.length === 3 ? picked : ms.slice(0, 3);
+}
+const diagName = udi => udi === 0 ? 'Your machine' : `Machine ${dgExamples().findIndex(m => m.udi === udi) + 1}`;
 async function openDiagnosis(){
   showPage('diagnosis');
   if(diag.list){ renderDiagnosis(); return; }
@@ -2727,8 +2790,7 @@ async function openDiagnosis(){
   body.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>';
   try { diag.list = await api('/api/diagnose'); }
   catch(e){ body.innerHTML = ''; note('error', e.message, body); return; }
-  diag.udi = diag.list.machines[0].udi;
-  diagLoad();
+  renderDiagnosis();
 }
 async function diagLoad(){
   const udi = diag.udi, done = diag.done.slice();
@@ -2747,21 +2809,31 @@ async function diagLoad(){
   renderDiagnosis();
   diagAutoNext();
 }
+function diagStart(udi){
+  Object.assign(diag, {udi, done: [], view: null, own: null, err: '', auto: false, tab: 'simple'});
+  if(udi === 0) renderDiagnosis(); else diagLoad();
+}
 function renderDiagnosis(){
-  const L = diag.list, all = diagMachines(), m = all.find(x => x.udi === diag.udi);
+  const body = $('diagBody');
+  if(diag.udi === null){
+    body.innerHTML = `<div class="dg-start">
+      <h2 class="ask-greet"><span class="brand-mark" aria-hidden="true"></span>Find why a machine stopped</h2>
+      <div class="dg-pick">${dgExamples().map((m, i) =>
+        `<button type="button" data-dg-go="${m.udi}"><b>Machine ${i + 1}</b><span>Stopped, type ${esc(m.type)}</span></button>`).join('')}</div>
+      <p class="ask-start">Have your own machine? <button type="button" data-dg-go="0">Type its readings</button></p></div>`;
+    return;
+  }
   const v = diag.view && diag.view.machine.udi === diag.udi ? diag.view : null;
-  $('diagBody').innerHTML = `<div class="report know diag">
-    <div class="know-head"><h2>Find the fault</h2><div class="ov-filter" id="diagPick">
-      <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(diagName(m))}</span>
-        <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <div class="ov-menu" role="menu">${all.map((x, i) =>
-        `<button type="button" role="menuitemradio" aria-checked="${x.udi === m.udi}" data-i="${i}"${x.udi === 0 ? ' class="dg-own-item"' : ''}>${esc(diagName(x))}</button>`).join('')}</div></div></div>
-    <div id="diagPane">${m.udi === 0 && !diag.own ? diagOwnHTML()
-      : v ? diagPaneHTML(v, diag.busy) : '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'}</div></div>`;
-  wireCaseFilter($('diagPick'), all, x => {
-    diag.auto = false; diag.udi = x.udi; diag.done = []; diag.view = null; diag.own = null; diag.err = '';
-    if(x.udi === 0) renderDiagnosis(); else diagLoad();
-  });
+  const formOpen = diag.udi === 0 && !diag.own, full = diag.tab === 'full';
+  body.innerHTML = `<div class="report know diag${full ? '' : ' dg-narrow'}">
+    <div class="know-head"><h2>${esc(diagName(diag.udi))}</h2>
+      <button type="button" class="dg-step dg-back" data-dg-home>Other machines</button></div>
+    ${formOpen || !v ? '' : `<div class="know-tabs ov-tabs dg-tabs" role="tablist">
+      <button type="button" role="tab" data-dgtab="simple" aria-selected="${!full}">Summary</button>
+      <button type="button" role="tab" data-dgtab="full" aria-selected="${full}">Full data</button></div>`}
+    <div id="diagPane">${formOpen ? diagOwnHTML()
+      : !v ? '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'
+      : full ? `${diagGraphHTML(v)}${dgFleetHTML(v)}` : diagPaneHTML(v, diag.busy)}</div></div>`;
 }
 // The user's own machine: type the readings you have, and RootAI works out gap, power and strain.
 function diagOwnHTML(){
@@ -2769,7 +2841,7 @@ function diagOwnHTML(){
   const field = o => `<label class="dg-own-f"><span>${esc(o.name)}</span><span class="dg-own-in">
       <input type="number" inputmode="decimal" step="any" min="${o.min}" max="${o.max}" data-own="${o.id}" value="${esc(f[o.id] ?? '')}">
       <i>${esc(o.unit)}</i></span></label>`;
-  return `<p class="diag-story"><b>Type your machine's readings.</b> Leave out any you do not have, and RootAI works out the rest.</p>
+  return `<p class="diag-story"><b>Type the readings you have.</b> Leave out any you do not know.</p>
     <div class="dg-own">
       <div class="dg-own-f"><span>Product type</span><div class="kn-seg" role="group" aria-label="Product type">${['L', 'M', 'H'].map(x =>
         `<button type="button" data-own-type="${x}" aria-pressed="${t === x}">${x}</button>`).join('')}</div></div>
@@ -2780,29 +2852,33 @@ function diagOwnHTML(){
 function diagOwnRead(){
   document.querySelectorAll('#diagPane [data-own]').forEach(i => { diag.form[i.dataset.own] = i.value; });
 }
+const dgLow = s => s.charAt(0).toLowerCase() + s.slice(1);
+function dgFleetHTML(v){
+  const F = diag.list.fleet;
+  return `<p class="dg-fleet">Tested on ${F.machines} failed machines, RootAI found the right cause ${F.right_pct}% of the time, checking ${F.avg_checks} of ${v.given.length} readings on average.</p>`;
+}
+// Summary: what RootAI checked, one line each, then the next check to make (or the answer),
+// and the chance of each fault as plain bars.
 function diagPaneHTML(v, busy){
-  const top = v.faults[0], m = v.machine, F = diag.list.fleet, n = v.given.length, running = diag.auto;
-  const last = v.done[v.done.length - 1];
-  const story = v.finished ? ''
-    : `<p class="diag-story"><b>${m.own ? 'Your machine' : `Machine ${esc(m.pid)}`} has stopped.</b> ${last
-      ? `${esc(last.name)} is ${esc(last.band)}, ${esc(last.value)}, so ${esc(last.text.charAt(0).toLowerCase() + last.text.slice(1))}. Best guess so far is ${esc(top.name)}, at ${top.percent}%.`
-      : 'Press Find the cause, and RootAI checks the most useful readings until it is sure.'}</p>`;
-  const controls = v.finished
-    ? `<div class="dg-controls"><button type="button" class="dg-step" data-diag-restart>${m.own ? 'Change the readings' : 'Start again'}</button></div>`
-    : `<div class="dg-controls"><button type="button" class="dg-run" data-diag-play>${running ? 'Stop' : v.done.length ? 'Keep going' : 'Find the cause'}</button>
-        <button type="button" class="dg-step" data-check="${esc(v.best || '')}"${busy || running || !v.best ? ' disabled' : ''}>One step</button>
-        ${v.done.length && !running ? `<button type="button" class="dg-step" data-diag-restart${busy ? ' disabled' : ''}>Start again</button>` : ''}</div>`;
+  const top = v.faults[0], m = v.machine, names = diag.list.names, running = diag.auto;
+  const next = v.best ? dgLow(names[v.best] || v.best) : '';
+  const steps = v.done.map(d => `<li class="dg-t ${d.kind}"><b>${esc(d.name)}</b> is ${esc(d.band)}, ${esc(d.value)}, so it ${esc(dgLow(d.text))}.</li>`).join('');
+  const intro = `<li class="dg-t intro"><b>${esc(diagName(m.udi))} has stopped.</b> RootAI checks the reading that tells the most first, until it is sure.</li>`;
+  const ask = v.finished ? '' : `<li class="dg-t ask"><p>${v.done.length ? 'Next, check' : 'Check'} <b>${esc(next)}</b>, because it tells the most${v.done.length ? ' now' : ''}.</p>
+      <div class="dg-controls"><button type="button" class="dg-run" data-check="${esc(v.best || '')}"${busy || running || !v.best ? ' disabled' : ''}>${running || busy ? 'Checking...' : `Check ${esc(next)}`}</button>
+      ${running ? '' : `<button type="button" class="dg-link" data-diag-play${busy ? ' disabled' : ''}>Check all for me</button>`}</div></li>`;
   const result = v.finished ? `<div class="diag-end dg-result">
       <div><span class="mono-label">The cause</span><p class="dg-res-name">${esc(capFirst(v.named_name))}</p>
         <p class="dg-res-fix">${esc(v.fix)}</p></div>
-      <div class="dg-res-facts"><p><b>${v.done.length} of ${n}</b> readings checked</p><p><b>${top.percent}%</b> sure</p>
+      <div class="dg-res-facts"><p><b>${v.done.length} of ${v.given.length}</b> readings checked</p><p><b>${top.percent}%</b> sure</p>
         <p class="${v.rule_check.holds ? '' : 'no'}">${v.rule_check.holds ? '&#10003; Expert rule holds'
           : v.rule_check.holds === null ? 'Expert rule cannot be checked' : '&#10007; Expert rule does not hold'}</p>
         ${v.truth.length ? `<p class="${v.right ? '' : 'no'}">${v.right ? '&#10003;' : '&#10007;'} It really was ${esc(v.truth.join(' and '))}</p>` : ''}</div>
-      <details class="dg-why"><summary>Why</summary><p>${esc(v.explanation.text)}</p><p>${esc(v.rule_check.text)}</p>
-        <ol class="dg-steps">${v.done.map(d => `<li><b>${esc(d.name)}</b> is ${esc(d.band)}, ${esc(d.value)}. ${esc(d.text)}.</li>`).join('')}</ol></details></div>` : '';
-  const fleet = `<p class="dg-fleet">Tested on ${F.machines} failed machines, RootAI found the right cause ${F.right_pct}% of the time, checking ${F.avg_checks} of ${n} readings on average.</p>`;
-  return `${story}${controls}${result}${diagGraphHTML(v)}${fleet}`;
+      <details class="dg-why"><summary>Why</summary><p>${esc(v.explanation.text)}</p><p>${esc(v.rule_check.text)}</p></details></div>
+    <div class="dg-controls dg-again"><button type="button" class="dg-step" data-diag-restart>${m.own ? 'Change the readings' : 'Start again'}</button></div>` : '';
+  const bars = `<div class="dg-bars"><span class="mono-label">Chance of each fault</span>${v.faults.map((f, i) =>
+    `<div class="dg-bar${i === 0 && (v.done.length || v.finished) ? ' top' : ''}"><span>${esc(capFirst(f.name))}</span><i><b style="width:${Math.max(1, f.percent)}%"></b></i><em>${f.percent}%</em></div>`).join('')}</div>`;
+  return `<ol class="dg-thread">${intro}${steps}${ask}</ol>${result}${bars}${v.finished ? dgFleetHTML(v) : ''}`;
 }
 // The reasoning as a graph: readings, the faults they can cause (learned from data), and the fix
 // (the expert rule). Each check lights its reading and the link it followed, so the path to the
@@ -2879,6 +2955,11 @@ function diagAutoNext(){
 }
 $('diagBtn').addEventListener('click', openDiagnosis);
 $('diagBody').addEventListener('click', e => {
+  const go = e.target.closest('[data-dg-go]');
+  if(go){ diagStart(Number(go.dataset.dgGo)); return; }
+  if(e.target.closest('[data-dg-home]')){ Object.assign(diag, {udi: null, auto: false, view: null, done: []}); renderDiagnosis(); return; }
+  const tab = e.target.closest('[data-dgtab]');
+  if(tab){ diag.tab = tab.dataset.dgtab; renderDiagnosis(); return; }
   const ot = e.target.closest('[data-own-type]');
   if(ot){ diagOwnRead(); diag.form.type = ot.dataset.ownType; renderDiagnosis(); return; }
   if(e.target.closest('[data-own-go]')){
@@ -2891,22 +2972,18 @@ $('diagBody').addEventListener('click', e => {
   if(e.target.closest('[data-diag-restart]') && diag.udi === 0 && !diag.busy){
     diag.auto = false; diag.own = null; diag.done = []; diag.view = null; renderDiagnosis(); return;
   }
-  if(e.target.closest('[data-diag-play]')){
-    diag.auto = !diag.auto;
-    renderDiagnosis();
-    diagAutoNext();
-    return;
-  }
+  if(e.target.closest('[data-diag-play]')){ diag.auto = true; renderDiagnosis(); diagAutoNext(); return; }
   const b = e.target.closest('[data-check]');
-  if(b && !diag.busy){ diag.auto = false; diag.done.push(b.dataset.check); diagLoad(); return; }
+  if(b && !diag.busy){ diag.done.push(b.dataset.check); diagLoad(); return; }
   if(e.target.closest('[data-diag-restart]') && !diag.busy){ diag.auto = false; diag.done = []; diag.view = null; diagLoad(); }
 });
+
 // ---------- Knowledge page (for engineers): what RootAI knows about the machine ----------
 // The same milling machine the Diagnosis page works on, in three kinds of knowledge: what the
 // published source says (books), an engineer's checklist (rules of thumb) and the network
 // learned from 7,000 past runs (data). Students see their own case maps in the chat instead.
 // src is 'machine' or a case id from the learner's chats (for Dr Ho, to see what the AI built for each topic)
-const know = {src: 'machine', tab: 'books', data: null, pick: null, flow: [], ev: {}, chances: null, id: null, views: {}, answers: {}, view: null};
+const know = {src: 'machine', tab: 'summary', data: null, pick: null, flow: [], ev: {}, chances: null, id: null, views: {}, answers: {}, view: null};
 const KNOW_TABS = [['books', 'From books'], ['rules', 'Rules of thumb'], ['data', 'From data']];
 const capFirst = t => t.charAt(0).toUpperCase() + t.slice(1);
 const KN_READINGS = DG_READINGS;  // the same order as the Diagnosis graph
@@ -2927,6 +3004,9 @@ function renderKnowledge(){
   if(know.src !== 'machine' && !cases.some(c => c.id === know.src)) know.src = 'machine';
   const items = [{label: 'Milling machine', src: 'machine'}, ...cases.map(c => ({label: knowName(c), src: c.id}))];
   const on = items.find(x => x.src === know.src);
+  // the machine opens on a plain Summary, like Overall status; a chat's case has only the three kinds
+  const tabs = know.src === 'machine' ? [['summary', 'Summary'], ...KNOW_TABS] : KNOW_TABS;
+  if(!tabs.some(([k]) => k === know.tab)) know.tab = tabs[0][0];
   $('knowBody').innerHTML = `<div class="report know">
     <div class="know-head"><h2>Knowledge</h2><div class="ov-filter" id="knowCase">
       <button type="button" aria-haspopup="menu" aria-expanded="false"><span>${esc(on.label)}</span>
@@ -2935,7 +3015,7 @@ function renderKnowledge(){
         `<button type="button" role="menuitemradio" aria-checked="${x.src === know.src}" data-i="${i}"${i === 1 ? ' class="dg-own-item"' : ''}>${esc(x.label)}</button>`).join('')}</div></div>
       <p class="kn-purpose">${know.src === 'machine' ? 'What RootAI knows about a milling machine, from a book, an engineer and data.'
         : 'What the AI built for this case, from books, an expert and data.'}</p></div>
-    <div class="know-tabs" role="tablist">${KNOW_TABS.map(([k, name]) =>
+    <div class="know-tabs" role="tablist">${tabs.map(([k, name]) =>
       `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === know.tab}">${name}</button>`).join('')}</div>
     <div id="knowPane" role="tabpanel"></div></div>`;
   wireCaseFilter($('knowCase'), items, x => { know.src = x.src; know.id = x.src === 'machine' ? null : x.src; renderKnowledge(); });
@@ -2946,12 +3026,29 @@ function renderKnowPane(){
   const pane = $('knowPane');
   if(!pane) return;
   if(know.src !== 'machine'){ const c = knowCases().find(x => x.id === know.src); if(c) renderCasePane(c); return; }
-  if(know.tab === 'books') pane.innerHTML = knowBookHTML();
+  if(know.tab === 'summary') pane.innerHTML = knowSummaryHTML();
+  else if(know.tab === 'books') pane.innerHTML = knowBookHTML();
   else if(know.tab === 'rules') pane.innerHTML = knowRulesHTML();
   else {
     if(!know.chances){ knowWhatIf(); pane.innerHTML = '<div class="thinking"><span class="dots"><i></i><i></i><i></i></span>Loading...</div>'; return; }
     pane.innerHTML = knowDataHTML();
   }
+}
+// Summary: each fault in one row, what causes it, what to do, and which of the three kinds of
+// knowledge has it. Tapping a source opens its tab.
+function knowSummaryHTML(){
+  const d = know.data, n = d.names, inRules = new Set(d.tree.nodes.filter(x => x.fault).map(x => x.fault));
+  const list = a => a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0];
+  const same = (a, b) => [...a].sort().join() === [...b].sort().join();
+  const src = (ok, tab, label) => `<button type="button" class="ks-src${ok ? '' : ' no'}" data-tab="${tab}">${ok ? '&#10003;' : '&#10007;'} ${label}</button>`;
+  const rows = d.book.map(f => {
+    const cause = f.causes.length ? capFirst(list(f.causes.map(c => dgLow(n[c] || c)))) : 'Nothing in the readings';
+    return `<div class="ks-row"><b class="ks-name">${esc(f.name)}</b><span class="ks-cause">${esc(cause)}</span><span class="ks-fix">${esc(f.short)}</span>
+      <span class="ks-srcs">${src(true, 'books', 'Book')}${src(inRules.has(f.id), 'rules', 'Rules of thumb')}${src(same(d.learned[f.id] || [], f.causes), 'data', 'Data')}</span></div>`;
+  }).join('');
+  return `<p class="ks-head">RootAI knows <b>${d.book.length} ways</b> this machine can fail, and what to do about each.</p>
+    <div class="ks-table"><div class="ks-row ks-th"><span>Fault</span><span>Caused by</span><span>What to do</span><span>Known from</span></div>${rows}</div>
+    ${d.agree ? `<p class="dg-fleet">The data from ${d.records.toLocaleString('en')} past runs found the same causes as the book, without being told them.</p>` : ''}`;
 }
 // A graph in columns, drawn like the Diagnosis graph. cols is a list of id lists; the first
 // column sets the rows and the others spread over the same height.
@@ -3825,6 +3922,7 @@ const TOURS = {
   ],
   'help-knowledge': [
     {title: 'The machine, or a case from your chats', text: '', target: '#knowCase'},
+    {title: 'Each fault, its cause and its fix', text: '', target: '.ks-table'},
     {title: 'Three kinds of knowledge', text: '', target: '.know-tabs'},
     {title: 'Tap a fault to read its rule', text: '', target: '.kn-book'},
     {title: 'Answer like an engineer', text: '', target: '.kn-ask'},
@@ -3836,11 +3934,12 @@ const TOURS = {
     {title: 'Read the chances', text: '', target: () => lastOf('#knowPane .diag-bar')},
   ],
   'help-diagnosis': [
-    {title: 'Pick a machine, or type in your own', text: '', target: '#diagPick'},
-    {title: 'Press Find the cause', text: '', target: '.dg-run'},
-    {title: 'Or go one step at a time', text: '', target: '.dg-step'},
-    {title: 'Watch it reason', text: '', target: '.dg-graph'},
+    {title: 'Pick a stopped machine', text: '', target: '.dg-pick'},
+    {title: 'Or type in your own', text: '', target: '.dg-start .ask-start'},
+    {title: 'Make the check RootAI asks for', text: '', target: '.dg-t.ask'},
+    {title: 'Watch the chances change', text: '', target: '.dg-bars'},
     {title: 'The cause and the fix', text: '', target: '.dg-result'},
+    {title: 'See the whole graph', text: '', target: '.dg-tabs'},
   ],
 };
 // The guide for the page that is open now

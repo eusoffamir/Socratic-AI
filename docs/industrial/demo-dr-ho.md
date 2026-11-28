@@ -1,6 +1,6 @@
 # Demo for Dr Ho (after Meeting 3)
 
-About 15 minutes of demo, 5 minutes on the papers, then questions. Written 27 November 2026, updated 28 November 2026 for the two user groups, the engineer Knowledge page and Your own machine on Diagnosis.
+About 15 minutes of demo, 5 minutes on the papers, then questions. Written 27 November 2026, updated 28 November 2026 for the two user groups, the engineer Knowledge page, Your own machine on Diagnosis, and the simpler Knowledge Summary and step by step Diagnosis.
 
 Each page has a short part called "Why it looks like this". Those are not to read out. They are the reasons to give if Dr Ho asks why a page is designed the way it is.
 
@@ -13,7 +13,7 @@ The story to tell is simple. RootAI has two kinds of users. For students, it tea
 3. Record a short screen video of the whole flow as a backup, in case the wifi or Gemini fails.
 4. Open https://socratic-ai-qlk6.onrender.com about 5 minutes before, so the server is awake, and press Ctrl+Shift+R so the RootAI logo shows.
 5. Open /api/health and check it says ok. Open /api/config and check ai_guard is true.
-6. Open the Diagnosis page once, so the network is already learned (the first load takes a few seconds). Then open Knowledge, press Start again on Rules of thumb and Clear all on From data, so both start clean.
+6. Open the Diagnosis page once, so the network is already learned (the first load takes a few seconds), then press Other machines so it starts on the three machines. Open Knowledge once too, so it opens on Summary.
 7. Have these open in tabs, the knowledge graph review (thesis section 2.8 or `docs/thesis/drafts/kg-generation-review.md`), the relation classes doc, the Ex problem statement, the teaching study plan and the AI4I results.
 8. If you forget what a page does, press the question mark at the bottom of the sidebar. It walks through the page that is open, and Dr Ho can see it too.
 
@@ -68,78 +68,67 @@ Say "This adds up every chat and skill check. Summary says it in plain words, an
 - A skill counts as mastered only after three or more answers on it, so one lucky check can never show a skill as mastered.
 - "Seen in your chats" only gives credit and never changes mastery, because chat marks are not checked against a human marker yet.
 
-### 4. Knowledge page (3 minutes)
+### 4. Knowledge page (2 minutes)
 
-Open Knowledge in the sidebar. It shows what RootAI knows about one milling machine from the open AI4I data, the same machine the Diagnosis page works on.
+Open Knowledge in the sidebar. It opens on Summary, one row for each way the milling machine from the open AI4I data can fail.
 
-Say "From here on the user is an engineer, not a student. The same machine is stored in three ways, from a book, from an engineer and from data, and each way matches one kind of reasoning."
+Say "From here on the user is an engineer, not a student. RootAI knows five ways this machine can fail. Each row says what causes the fault and what to do. On the right, the green ticks show where each fact is known from, a book, an engineer's rules of thumb and data from 7,000 past runs. All three agree, and the line at the bottom says the data found the same causes as the book without being told them."
 
-**From books.** Tap Overstrain.
+Tap the Data tick on Overstrain failure. It opens From data.
 
-Say "This is what the published source says. Each reading can cause a fault, and each fault has a fix. When I tap a fault, its links light up and the rule shows with its source, so nothing is made up."
+Say "Each tick opens that source. This is the network learned from the data." Set Tool wear to Old. "Old tool wear makes overstrain the most likely, because the data learned that a worn tool usually carries high strain."
 
-**Rules of thumb.** Press No, then Yes.
-
-Say "This is how an engineer checks a stopped machine, as a flowchart. Each answer lights the path until it reaches a fault and its fix. Following fixed rules like this is deductive reasoning. The checklist is our draft for now, and the Ex partner's inspectors would give us the real one."
-
-**From data.** Set Tool wear to Old.
-
-Say "This is the Bayesian network learned from 7,000 past runs, which is inductive. I say what I know about a stopped machine, and the chance of each fault changes, so it reasons back from the signs to the cause, which is abductive. Look, old tool wear makes overstrain the most likely, not tool wear failure. The arc on the left shows why, since the data learned that a worn tool usually carries high strain."
-
-Then set Product type to L.
-
-Say "Overstrain goes up again, because type L has the lowest strain limit. And the box at the bottom says the data found the same causes as the book, without being told them."
+If Dr Ho asks, show From books (tap a fault to see its rule and source) and Rules of thumb (press No, then Yes, to walk the checklist).
 
 **A case from a chat.** Open the menu next to the title and pick the case from your prepared chat.
 
-Say "The same page also shows what the AI built for every topic a student chats about. Here is the map from books, with the source of each box, the expert rules and the network. So for any topic, not only the machine, we can check the knowledge the tutor reasons with."
-
-Press Walk through it.
-
-Say "This lights the map one link at a time, the way a student walks it when they reason."
+Say "The same page shows what the AI built for every topic a student chats about, the map from books with the source of each box, the expert rules and the network. So for any topic, we can check the knowledge the tutor reasons with."
 
 **Why it looks like this.**
+- It opens on Summary, like Overall status, so the first look is one plain table and not three graphs. The graphs are one tap away for anyone who wants the detail.
+- One row per fault, because that is how an engineer thinks, "what can go wrong, why, and what do I do".
+- The three ticks show the three kinds of knowledge from Goal 3 side by side, and each tick opens its own tab, so every fact can be traced to its source.
 - It opens on the machine, the same one Diagnosis works on, so the two pages are a pair. Knowledge is what RootAI knows, and Diagnosis is RootAI using it.
-- The menu next to the title also lists the case from every recent chat, so we can check what the AI built for any topic. The machine comes first because the page is for engineers, and the cases are there for us and for you to review.
-- Three tabs for the three kinds of knowledge from Goal 3, books, rules of thumb and data, and each one matches one kind of reasoning. Keeping them apart lets an engineer check each source on its own.
-- Every tab is something to try, not text to read, because an engineer trusts what they can test. Tapping a fault shows its source, so every claim can be traced.
-- Rules of thumb is a flowchart and not one question at a time, so the engineer sees the whole checklist at once and can say where it is wrong.
-- From data is a what if, because that is how engineers already think, as in "if the tool is worn and the torque is high, what is likely?" The chance moves as soon as a reading is set.
-- The arcs and the "Most likely" line explain the answer, so the network is not a black box. Chances are always percentages.
-- The graphs use the same boxes, colours and arrows as Diagnosis, so learning one page teaches the other.
 
-### 5. Diagnosis page, the main new part (5 minutes)
+### 5. Diagnosis page, the main new part (4 minutes)
 
-Open Diagnosis in the sidebar. Machine L47230 is picked already.
+Open Diagnosis in the sidebar. It looks like the New chat page, a title and three stopped machines to pick.
 
-Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. This machine has stopped. The card is how RootAI reasons. On the left are the readings it can check, in the middle the faults they can cause, with their chances, and on the right the fix for each. The arrows are the causes, learned from seven thousand past runs. The dashed box is the reading it will check next, because that one tells the most."
+Say "This is a first working version of the industrial use case, on open data while we wait for the partner's data. Three machines have stopped. Let us find out why."
 
-Press Find the cause, and talk while it runs.
+Tap Machine 1.
 
-Say "Strain is low, so overstrain drops. Power is low, and the link from power to power failure lights up. One fault is now at 99 percent, so it stops."
+Say "RootAI does not check everything. It asks for the one reading that tells the most. Here it asks for the strain on the tool first."
 
-Point to the result card.
+Press Check strain on the tool.
 
-Say "It found power failure after checking 2 of the 6 readings, it gives the fix, and the expert rule agrees. It walked from the failure back to its cause, which is abductive. It applied the published rule, which is deductive. And the chances were learned from data, which is inductive. The agent only writes the explanation behind Why. The numbers come from the network, because an algorithm can do that part."
+Say "Strain is low, so overstrain is unlikely. The bars below show the chance of each fault, and they move after every check. Now it asks for power."
 
-Point to the line at the bottom.
+Press Check power.
 
-Say "This is not one lucky machine. On all 114 failed test machines it found the right cause 98 percent of the time, checking about 2 of the 6 readings on average."
+Say "Power is low, so it points to power failure, at 99 percent. It found the cause after 2 of the 6 readings, it gives the fix, and the expert rule agrees. And because this machine is from the test data, we know it really was power failure."
 
-If there is time, pick machine L49739 and press Find the cause again. Say "Here every check rules a fault out, until the best answer left is a random failure, and that is right."
+Open Why.
 
-**Your own machine.** Open the machine menu and pick Your own machine at the bottom. Press L, then type air 300, process 308, speed 1300 and torque 40, and press Find the cause.
+Say "Only this text comes from the agent. The numbers come from the network, so the model cannot change a number. RootAI walked from the failure back to its cause, which is abductive. It applied the published rule, which is deductive. And the chances were learned from data, which is inductive."
 
-Say "An engineer can type in their own machine. They leave out any reading they do not have, and RootAI works out the gap, the power and the strain from the rest. Here it finds heat dissipation at 96 percent and checks the expert rule on the numbers. Nobody knows the real answer for a new machine, so it does not claim one."
+Open the Full data tab.
+
+Say "Here is the same reasoning as a graph, the readings, the faults they can cause and the fix. The lit path is the path RootAI followed." Point to the line at the bottom. "And this is not one lucky machine. On all 114 failed test machines it found the right cause 98 percent of the time, with about 2 of the 6 readings."
+
+If there is time, press Other machines, pick Machine 3 and press Check all for me. Say "This machine had two faults at once. RootAI rules out power and heat, then finds overstrain, one of the two real faults."
+
+**Your own machine.** Press Other machines, then Type its readings. Press L, then type air 300, process 308, speed 1300 and torque 40, and press Find the cause.
+
+Say "An engineer can type in their own machine. They leave out any reading they do not have, and RootAI works out the rest. Here it finds heat dissipation. Nobody knows the real answer for a new machine, so it does not claim one."
 
 **Why it looks like this.**
-- One button, Find the cause, runs it all, because an engineer with a stopped machine wants the answer, not a lesson. One step is still there for anyone who wants to follow each check.
-- The result card comes first, with the cause, the fix, how many readings it needed, how sure it is and whether the expert rule holds, because that is what an engineer acts on.
-- The graph sits under the card as the evidence. The lit path is the reasoning, as you said in Meeting 3, that the path through the graph is what explains the answer.
-- The dashed box shows the reading it will check next. It picks the reading that tells the most, so an inspector measures fewer things, about 2 of 6 on average.
-- The 114 machine line is there so nobody thinks the demo machine was picked to look good.
-- The agent only writes the Why text, and the numbers come from the network, so the model cannot change a number. That follows "agents decide, rules guard".
-- Your own machine makes it a tool and not only a demo. It is honest about what it does not know, so a reading left out shows as Not given, a rule without its readings says it cannot be checked, and there is no "It really was" line.
+- It starts like New chat, a title and three things to tap, so nobody has to learn the page first. The machines have plain names, Machine 1 to 3, instead of data IDs.
+- RootAI asks for one reading at a time, so the viewer follows the reasoning step by step, the same way the tutor asks one question at a time. Check all for me is there when the presenter just wants to talk.
+- Each check is one plain sentence, what the reading is and what it means, so the reasoning reads like a short story.
+- The bars show the chance of each fault, the one number that matters while checking. The big graph sits behind Full data, like Overall status, for anyone who wants the evidence.
+- The answer card has the cause, the fix, how many readings it needed, how sure it is and whether the expert rule holds, because that is what an engineer acts on.
+- Your own machine makes it a tool and not only a demo. A reading left out shows as Not given, and there is no "It really was" line.
 
 ### 6. Knowledge graph review (2 minutes)
 
