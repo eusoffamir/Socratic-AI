@@ -1,6 +1,6 @@
 # Standard relation classes for diagnosis (Meeting 3, task 5)
 
-Draft 1, 27 November 2026, by Claude for Eusoff, to be checked by Dr Ho. Builds on the knowledge graph review (thesis section 2.8, `docs/thesis/drafts/kg-generation-review.md`) and the storage note (`docs/industrial/kg-storage.md`).
+Draft 2, 28 November 2026 (draft 1 was 27 November), by Claude for Eusoff, to be checked by Dr Ho. Builds on the knowledge graph review (thesis section 2.8, `docs/thesis/drafts/kg-generation-review.md`) and the storage note (`docs/industrial/kg-storage.md`).
 
 ## Why we need a fixed set
 
@@ -39,16 +39,16 @@ We did not add "symptom_of", because it is just "causes" read backward. Walking 
 5. **Update with "supports" and "weakens" (inductive).** The result of the check changes the chances. Repeat from step 3 until one fault is clear enough.
 6. **Act with "fixed_by".** Give the repair, and use "then" to order the steps.
 
-This is the same loop as the Bayesian network test on the AI4I data (`docs/industrial/pgm-ai4i.md`). There, each check was a reading such as power or strain, and the network named the right fault after one to three checks every time.
+This is the same loop as the Bayesian network test on the AI4I data (`docs/industrial/pgm-ai4i.md`). There, each check was a reading such as power or strain, and the network named the right fault after one to three checks on each of the five test machines tried.
 
 ## Worked example 1, the AI4I milling machine (open data)
 
 The dataset publishes the rule behind each failure mode, so the edges below are known to be true. The diagnosis demo (`app/diagnose.py`, the Diagnosis page) already uses the causes, tests and fixed_by edges. Its causes edges are learned from the data, not written by hand.
 
 - spindle part_of machine, tool part_of machine
-- low temperature gap causes heat dissipation failure, slow speed causes heat dissipation failure
+- low temperature gap (below 8.6 K) and slow speed (below 1380 rpm) together cause heat dissipation failure. Neither causes it alone, and the 11 classes cannot say "only together" yet (see question 2)
 - power out of range causes power failure
-- high strain causes overstrain failure, product type L causes overstrain failure (its strain limit is the lowest)
+- high strain causes overstrain failure. Product type L does not cause it, it lowers the strain limit (11,000 minNm for L, 13,000 for H), which the 11 classes cannot say yet (see question 3)
 - long tool wear causes tool wear failure
 - power reading tests power failure, strain reading tests overstrain failure, and so on
 - normal power rules_out power failure
@@ -71,7 +71,7 @@ When a model or a person writes a relation in their own words, plain code maps i
 
 | Class | Words that map to it |
 |---|---|
-| causes | leads to (for events), results in, produces, triggers, makes, raises the chance of |
+| causes | results in, produces, triggers, makes, raises the chance of |
 | part_of | is in, belongs to, is a component of, sits inside |
 | prevents | protects against, stops, guards against, seals against |
 | tests | checks, measures, detects, inspects, reveals |
@@ -81,9 +81,15 @@ When a model or a person writes a relation in their own words, plain code maps i
 | fixed_by | is repaired by, is solved by, is corrected by |
 | then | after that, next, followed by |
 
+"leads to" is not on the list for causes, because it is its own teaching class (knowledge points to a choice).
+
+A page with the table, this example as a picture and the questions, for showing Dr Ho, is at https://claude.ai/artifact/QjNUENhbWPNoyFxn185DEv
+
 ## Questions for Dr Ho
 
 1. Is 11 a good size, or should the teaching classes and the diagnosis classes be two separate sets?
-2. Should "causes" always carry a chance, even when an engineer only says "often"? We could map words to numbers, for example "rarely" to 10 percent and "often" to 60 percent, and mark them as guesses.
-3. For the Ex case, are there relations the engineers use that are missing here, for example "requires" (a check that needs a permit or isolation first)?
-4. Once agreed, we change `RELATIONS` in `app/knowledge.py` and the Topic Builder prompt, so every new graph uses this set.
+2. Some causes count only together, like heat dissipation failure. Should we add a way to mark that (an AND), or leave it to the Bayesian network, which already handles it?
+3. Some things change a limit instead of causing a fault, like product type L. Do we need a class such as sets_limit?
+4. Should "causes" always carry a chance, even when an engineer only says "often"? We could map words to numbers, for example "rarely" to 10 percent and "often" to 60 percent, and mark them as guesses.
+5. For the Ex case, are there relations the engineers use that are missing here, for example "requires" (a check that needs a permit or isolation first)?
+6. Once agreed, we change `RELATIONS` in `app/knowledge.py` and the Topic Builder prompt, so every new graph uses this set.
