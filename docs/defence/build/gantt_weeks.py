@@ -13,7 +13,7 @@ plt.rcParams.update({"font.family": "DejaVu Sans"})
 
 fyp1 = ["7 Sep", "14 Sep", "21 Sep", "28 Sep", "5 Oct", "12 Oct", "19 Oct", "26 Oct", "2 Nov", "9 Nov", "16 Nov", "23 Nov", "30 Nov", "7 Dec"]
 fyp2 = ["11 Jan", "18 Jan", "25 Jan", "1 Feb", "8 Feb", "15 Feb", "22 Feb", "1 Mar", "8 Mar", "15 Mar", "22 Mar", "29 Mar", "5 Apr", "12 Apr"]
-NOW = 10  # FYP 1 week 10 (9 Nov), the draft interim report is due 13 Nov
+NOW = 12  # FYP 1 week 12 (23 Nov), the final interim report is due 29 Nov
 
 # (task, objectives, (sem, start week), (sem, end week), status, milestone week or None, bar colour)
 tasks = [
@@ -24,8 +24,8 @@ tasks = [
     ("Reasoning and knowledge layer (Goal 1)", "O2, O3", (1, 7), (1, 7), "Done", None),
     ("Any topic with a Topic Builder (Goal 2)", "O1", (1, 7), (1, 7), "Done", None),
     ("Trees and Bayesian networks (Goal 3)", "O1, O2", (1, 7), (1, 7), "Done", None),
-    ("Mock presentation and product demo", "", (1, 10), (1, 11), "Not started", (1, 11)),
-    ("Interim report (draft due week 10)", "", (1, 9), (1, 14), "In progress", (1, 14)),
+    ("Product demo to the supervisor", "", (1, 10), (1, 12), "Done", (1, 12)),
+    ("Interim report (final due week 12)", "", (1, 9), (1, 12), "In progress", (1, 12)),
     ("Assessor vs human markers (kappa)", "O2", (2, 1), (2, 5), "Not started", None),
     ("Bigger question bank, check thresholds", "O2, O3", (2, 2), (2, 7), "Not started", None),
     ("Learner tests (with ethics approval)", "O1, O2, O3", (2, 7), (2, 11), "Not started", None),
@@ -104,7 +104,7 @@ ly = total_h + 0.35
 for k, (lab, c) in enumerate([("Done", DONE), ("In progress", PROG), ("Planned", BAR)]):
     box(0.2 + k * 2.3, ly - 0.14, 0.45, 0.28, c, "white"); txt(0.8 + k * 2.3, ly, lab, 8.5, ha="left")
 ax.add_patch(RegularPolygon((7.6, ly), 4, radius=0.13, facecolor="#C00000")); txt(7.85, ly, "Milestone", 8.5, ha="left")
-box(10.3, ly - 0.14, 0.45, 0.28, GOLD, "white"); txt(10.9, ly, "Current week (9 Nov)", 8.5, ha="left")
+box(10.3, ly - 0.14, 0.45, 0.28, GOLD, "white"); txt(10.9, ly, "Current week (23 Nov)", 8.5, ha="left")
 txt(total_w, ly, "O1 to O3 are the three objectives in Section 1.3", 8.5, ha="right")
 ax.set_ylim(total_h + 0.65, 0)
 fig.savefig(OUT, dpi=220, bbox_inches="tight")
