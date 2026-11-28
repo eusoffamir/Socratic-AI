@@ -57,4 +57,4 @@ On the 40 held-out "test" rows (kappa, old prompt then new):
 
 So deductive and epistemic got better on answers the fix never saw. Inductive cannot be judged, since the human marked it in only 1 of the 40 test answers. The 9 standards rules were not changed, so their small moves are run to run noise (with 40 answers one changed mark moves kappa a lot).
 
-Some human marks go against the guide's own rule that a bare claim shows no reasoning type (for example R25 "then theres no correlation" marked deductive and epistemic, R36 and R37). The prompt was not tuned toward these. A second marker, or a second look at these rows, should settle them.
+Some human marks go against the guide's own rule that a bare claim shows no reasoning type (for example R25 "then theres no correlation" marked deductive and epistemic, R36 and R37). The prompt was not tuned toward these. Eusoff then looked at these 3 rows again and re-marked them by the guide (no reasoning type on any, and R36 and R37 lost epistemic, R25 kept it). All 3 are tune rows, so the test numbers above do not change. On the tune rows the new prompt now reaches kappa 0.74 for deductive and 0.62 for epistemic.
