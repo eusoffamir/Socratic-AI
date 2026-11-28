@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from . import (auth, builder, copycheck, diagnose, files, explainer, graph, heuristics, knowledge, limits, llm_client, orchestrator, pgm,
-               skillcheck, sources, stats, storage)
+               skillcheck, sources, stats, storage, study)
 from .llm_client import LLMError
 from .content import CONCEPTS, LEVELS, QUANT_TOPIC, STANDARD_TIPS, STANDARDS, case_of
 
@@ -57,7 +57,7 @@ def study_codes():
     (pre and post) without a name. Off (empty) by default, until the
     supervisor and the ethics approval agree. Read each time, so tests can
     switch it."""
-    return {c.strip().upper() for c in os.getenv("STUDY_CODES", "").split(",") if c.strip()}
+    return study.codes()  # both groups; STUDY_CONTROL lists the control group (app/study.py)
 
 
 class TopicFile(BaseModel):
@@ -314,7 +314,59 @@ def logout(response: Response):
 @app.post("/api/participant/check")
 def check_participant(req: CodeRequest):
     """Lets the consent screen say "wrong code" before a session starts."""
-    return {"ok": req.code.strip().upper() in study_codes()}
+    g = study.group(req.code)
+    return {"ok": g is not None, "group": g}
+
+
+class StudyRequest(BaseModel):
+    code: str = ""
+
+
+class ReadRequest(BaseModel):
+    code: str = ""
+    consent: bool = False
+    case_id: str = ""
+    seconds: int = 0  # how long the reading was open
+
+
+def _study_code(code):
+    """The code and its group, or 403. Study mode must be on."""
+    code = code.strip().upper()
+    g = study.group(code)
+    if g is None:
+        raise HTTPException(403, "This participant code is not on the study list, so please check it with your lecturer.")
+    return code, g
+
+
+@app.post("/api/study/topic")
+def study_topic(req: StudyRequest):
+    """The study cases for a participant. The tool group gets the whole cases
+    (to start chats with), the control group only what it reads. No model call."""
+    _, g = _study_code(req.code)
+    t = study.topic()
+    if t is None:
+        raise HTTPException(404, "The study topic is not ready yet, so please ask your lecturer.")
+    cases = t["cases"] if g == "tool" else [study.reading(c) for c in t["cases"]]
+    return {"group": g, "topic": t["topic"], "cases": cases}
+
+
+@app.post("/api/study/read")
+def study_read(req: ReadRequest):
+    """Saves one finished reading of the control group (which case, how long),
+    with the code and consent time, like a session but with no turns."""
+    code, g = _study_code(req.code)
+    if g != "control":
+        raise HTTPException(403, "Only the control group uses the reading page.")
+    if not req.consent:
+        raise HTTPException(403, "Please agree to take part before you start.")
+    if study.case(req.case_id) is None:
+        raise HTTPException(400, "This case is not part of the study.")
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    sid = str(uuid.uuid4())
+    _persist(sid, {"mode": "control_reading", "participant_code": code, "consent_at": now,
+                   "concept_id": req.case_id, "reading_seconds": max(0, min(req.seconds, 3 * 3600)),
+                   "finished_at": now, "turns": []})
+    return {"ok": True}
 
 
 @app.get("/api/concepts")
@@ -446,6 +498,12 @@ def topic_angles(req: TopicRequest):
 @app.post("/api/session")
 def start_session(req: StartRequest):
     case = None
+    if study_codes() and study.topic():
+        # In the study every student gets the saved study topic, never a case the page made.
+        stored = study.case((req.case or {}).get("id") or req.concept_id)
+        if stored is None:
+            raise HTTPException(400, "This case is not part of the study, so please pick one of the study cases.")
+        req.case = stored
     if req.case is not None:
         try:
             case = builder.recheck(req.case)
@@ -463,6 +521,8 @@ def start_session(req: StartRequest):
         code = req.participant_code.strip().upper()
         if code not in codes:
             raise HTTPException(403, "This participant code is not on the study list, so please check it with your lecturer.")
+        if study.group(code) == "control":
+            raise HTTPException(403, "Your group reads the material without the tutor, so please use the reading page.")
         if not req.consent:
             raise HTTPException(403, "Please agree to take part before you start.")
         new["participant_code"] = code
