@@ -347,12 +347,14 @@
   .kd-pick.set > button{background:var(--signal-soft); color:var(--signal); border-color:color-mix(in srgb, var(--signal) 45%, transparent);}
   .kd-pick .ov-menu{left:auto; right:0; min-width:150px;}
   /* A chat case's From data: each chance as a sentence with its bar */
-  .kf-group{margin:24px 0 0;}
-  .know-net .kf-group .mono-label{margin:0 0 14px; display:block;}
-  .kf-row{padding:10px 0; border-top:1px solid var(--rule);}
+  .kf-group{margin:32px 0 0; padding:32px 36px;}
+  .know-net .kf-group .mono-label{margin:0 0 20px; display:block;}
+  .kf-row{padding:22px 0; border-top:1px solid var(--rule);}
   .kf-group .mono-label + .kf-row{border-top:0; padding-top:0;}
-  .kf-row p{margin:0 0 8px; font-size:14.5px; line-height:1.55; color:var(--ink);}
-  .dg-bar.kf-bar{grid-template-columns:minmax(0, 1fr) 44px; padding:0;}
+  .kf-row:last-child{padding-bottom:0;}
+  .kf-row p{margin:0 0 14px; font-size:15px; line-height:1.65; color:var(--ink);}
+  .dg-bar.kf-bar{grid-template-columns:minmax(0, 1fr) 48px; gap:20px; padding:0;}
+  @media (max-width:700px){ .kf-group{padding:22px 20px;} }
   .kn-whole .know-decs{max-width:720px; margin:0 auto;}
   /* Rules of thumb: one question in focus, the answers so far above it, the flowchart folded */
   .kn-rules{max-width:720px; margin:0 auto;}
