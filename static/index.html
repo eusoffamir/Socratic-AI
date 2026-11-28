@@ -300,7 +300,7 @@
   .know-net svg{display:block; width:100%; height:auto; margin:0 auto;}
   .know-net rect{fill:color-mix(in srgb, var(--signal) 8%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 35%, transparent); stroke-width:1;}
   .know-net rect.cause{fill:color-mix(in srgb, var(--signal) 16%, var(--panel)); stroke:color-mix(in srgb, var(--signal) 50%, transparent);}
-  .know-net text{font-size:11.5px; font-weight:500; fill:var(--ink);}
+  .know-net text{font-size:13px; font-weight:400; fill:var(--ink);}
   .know-net .ed{stroke:var(--ink-faint); stroke-width:1.2; opacity:.6; fill:none;}
   .know-net .rel{font-size:10px; fill:var(--ink-faint); paint-order:stroke; stroke:var(--bg); stroke-width:5px;}  /* a halo, so the word stays clear of the arrow */
   .know-quote a{color:var(--signal);}
@@ -350,9 +350,10 @@
   .kf-group{margin:32px 0 0; padding:32px 36px;}
   .know-net .kf-group .mono-label{margin:0 0 20px; display:block;}
   .kf-row{padding:22px 0; border-top:1px solid var(--rule);}
-  .kf-group .mono-label + .kf-row{border-top:0; padding-top:0;}
+  .kf-group .kf-what + .kf-row{border-top:0; padding-top:0;}
+  .kf-what{font-family:var(--serif); font-size:18px; line-height:1.4; margin:0 0 20px; color:var(--ink);}
   .kf-row:last-child{padding-bottom:0;}
-  .kf-row p{margin:0 0 14px; font-size:15px; line-height:1.65; color:var(--ink);}
+  .kf-row p{margin:0 0 14px; font-size:15px; line-height:1.65; color:var(--ink-soft);}
   .dg-bar.kf-bar{grid-template-columns:minmax(0, 1fr) 48px; gap:20px; padding:0;}
   @media (max-width:700px){ .kf-group{padding:22px 20px;} }
   .kn-whole .know-decs{margin:0;}
@@ -1757,7 +1758,8 @@ $('recents').addEventListener('click', e => {
   const open = e.target.closest('[data-chat]'), forget = e.target.closest('[data-forget]');
   if(forget){
     saveAskChats(askChats().filter(c => c.id !== forget.dataset.forget));
-    if(ask.chatId === forget.dataset.forget && !$('askMain').classList.contains('hidden')){ askReset(); showPage('ask'); }
+    // the removed chat's cases leave the Knowledge menu too, even when another page is open
+    if(ask.chatId === forget.dataset.forget){ const here = !$('askMain').classList.contains('hidden'); askReset(); if(here) showPage('ask'); }
     renderRecents();
   } else if(open){
     const id = open.dataset.chat;
@@ -3265,7 +3267,8 @@ function knowDataHTML(){
 // the cases on the learner's own topics, the open chat first, then every recent chat
 // (loaded once by knowLoadRecents), so the page is not empty after New chat
 function knowCases(){
-  const mine = [...ask.cases, ...(know.recent || [])].filter(c => c.generated);
+  const open = ask.chatId && !askChats().some(c => c.id === ask.chatId) ? [] : ask.cases;  // a chat removed from Recents drops out
+  const mine = [...open, ...(know.recent || [])].filter(c => c.generated);
   return mine.filter((c, i) => mine.findIndex(x => x.id === c.id) === i);
 }
 const KNOW_RECENT_CHATS = 10;
@@ -3349,27 +3352,33 @@ function knowTreeHTML(t, answers){
 // The Bayesian network: causes on top, what they cause below, then the chances it learned.
 function knowNetHTML(v){
   const tops = v.nodes.filter(n => !n.parents.length), lows = v.nodes.filter(n => n.parents.length);
-  const labels = Object.fromEntries(v.nodes.map(n => [n.id, wrapAll(n.text.replace(/\.$/, ''), 27)]));  // full text, as many lines as it needs
+  const labels = Object.fromEntries(v.nodes.map(n => [n.id, wrapAll(n.text.replace(/\.$/, ''), 30)]));  // full text, as many lines as it needs
   const most = Math.max(1, ...Object.values(labels).map(l => l.length));
-  const W = 184, H = Math.max(44, 18 + most * 14), GAP = 28, ROW = H + 52, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
+  const W = 250, LH = 18, H = Math.max(64, 32 + most * LH), GAP = 48, ROW = H + 72, width = Math.max(tops.length, lows.length) * (W + GAP) - GAP, pos = {};
   [tops, lows].forEach((row, r) => row.forEach((n, i) => {
     pos[n.id] = {x: (width - (row.length * (W + GAP) - GAP)) / 2 + i * (W + GAP), y: 4 + r * ROW};
   }));
   const lines = v.edges.map(([a, rel, b]) => {
     const p = pos[a], q = pos[b], x1 = p.x + W / 2, y1 = p.y + H, x2 = q.x + W / 2, y2 = q.y - 2;
-    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 28} ${x2} ${y2 - 28} ${x2} ${y2}" marker-end="url(#netArrow)"/>
+    return `<path class="ed" d="M${x1} ${y1} C${x1} ${y1 + 36} ${x2} ${y2 - 36} ${x2} ${y2}" marker-end="url(#netArrow)"/>
       <text class="rel" x="${(x1 + x2) / 2 + (x2 > x1 ? 8 : -8)}" y="${(y1 + y2) / 2 + 4}" text-anchor="${x2 > x1 ? 'start' : 'end'}">${esc(rel)}</text>`;
   }).join('');
   const boxes = v.nodes.map(n => {
-    const {x, y} = pos[n.id], label = labels[n.id], top = y + (H - label.length * 14) / 2 + 11;
+    const {x, y} = pos[n.id], label = labels[n.id], top = y + (H - label.length * LH) / 2 + 12;
     return `<rect class="${n.parents.length ? '' : 'cause'}" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>${label.map((l, k) =>
-      `<text x="${x + W / 2}" y="${top + k * 14}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
+      `<text x="${x + W / 2}" y="${top + k * LH}" text-anchor="middle">${esc(l)}</text>`).join('')}`;
   }).join('');
   // Each chance as one sentence with its bar under it, in two plain groups (Eusoff, 28 November 2026)
-  const bar = f => `<div class="kf-row"><p>${esc(capFirst(f.label))}</p><div class="dg-bar kf-bar"><i><b style="width:${Math.max(1, f.percent)}%"></b></i><em>${f.percent}%</em></div></div>`;
-  const forward = v.findings.filter(f => f.move !== 'abductive'), back = v.findings.filter(f => f.move === 'abductive');
-  const group = (title, list) => list.length ? `<div class="dg-bars kf-group"><span class="mono-label">${title}</span>${list.map(bar).join('')}</div>` : '';
-  const bars = group('If the cause is there', forward) + group('Working back to the cause', back);
+  // Each label is "what, when". Rows with the same "what" share one title, "Chance that ...",
+  // and each row keeps only the "when", so the same long sentence is not repeated (Eusoff, 28 November 2026).
+  const split = f => { const i = f.label.indexOf(', '); return i < 0 ? ['', f.label] : [f.label.slice(0, i), f.label.slice(i + 2)]; };
+  const groups = [];
+  [...v.findings.filter(f => f.move !== 'abductive'), ...v.findings.filter(f => f.move === 'abductive')].forEach(f => {
+    const [what, when] = split(f), last = groups[groups.length - 1];
+    if(last && last.what === what) last.rows.push({when, f}); else groups.push({what, rows: [{when, f}]});
+  });
+  const bar = r => `<div class="kf-row"><p>${esc(capFirst(r.when))}</p><div class="dg-bar kf-bar"><i><b style="width:${Math.max(1, r.f.percent)}%"></b></i><em>${r.f.percent}%</em></div></div>`;
+  const bars = groups.map(g => `<div class="dg-bars kf-group">${g.what ? `<p class="kf-what">Chance that ${esc(dgLow(g.what))}</p>` : ''}${g.rows.map(bar).join('')}</div>`).join('');
   return `<div class="know-net kn-rules">
     <div class="know-net-fig"><svg viewBox="-2 0 ${width + 4} ${4 + ROW + H + 4}" style="max-width:${Math.round((width + 4) * 1.17)}px" aria-label="What causes what in this case">
       <defs><marker id="netArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
