@@ -1,0 +1,13 @@
+id,run,clarity,accuracy,precision,relevance,depth,breadth,logic,significance,fairness,level,inductive,deductive,abductive,k_factual,k_conceptual,k_procedural,k_causal,k_relational,k_strategic,k_metacognitive,k_epistemic,graph_inductive,graph_deductive,graph_abductive,graph_steps,evidence_quote
+C25,1,1,1,1,1,1,0,1,1,0,evidence,1,0,0,1,0,0,0,0,0,0,1,,,,[],"I looked at 3 other stocks that went up 5 days last month, and all 3 went down after."
+C26,1,1,1,1,1,1,0,1,1,0,evidence,1,0,1,1,0,0,1,0,0,0,1,0,1,0,"[[""many_rules"", ""best_10""], [""best_10"", ""overfit""]]","we tried 4 sets of rules, and every time the best one on old data did worse on the new data"
+C27,1,1,1,1,1,1,1,1,1,0,evidence,1,1,0,1,1,0,0,0,0,0,0,,,,[],"Ice cream and sunburn move together, and so do swimming and shark attacks, and none of them cause each other."
+C28,1,1,1,1,1,1,0,1,1,0,evidence,1,1,0,1,0,0,0,0,0,0,1,1,0,0,"[[""count_500"", ""not_proof""]]","About 15 of the 500 stocks do this by luck, and the few I checked did not keep going. So in general a 5-day streak tells us very little about day 6."
+C29,1,1,1,1,1,1,0,1,1,0,evidence,1,0,0,0,0,1,0,0,1,0,1,0,1,0,"[[""step_test"", ""new_data_proof""]]","I would test it on 5 different years. If it makes money in most of them, it probably works in general"
+C30,1,1,1,0,1,0,0,1,1,0,evidence,1,0,0,0,0,1,0,0,1,0,1,,,,[],I would want to see the link hold in many cities and many years
+C31,1,1,1,0,1,1,0,1,1,0,evidence,0,1,0,1,0,0,0,0,0,0,0,,,,[],"My cousin's stock went up 5 days and then crashed, so streaks are luck."
+C32,1,1,1,0,1,1,0,1,1,0,evidence,1,0,0,1,0,0,0,0,0,0,1,,,,[],"The last 3 best rules my friend found online all stopped working within a month, so rules like this tend to fail on new data"
+C33,1,1,1,1,1,1,0,1,1,0,evidence,0,1,1,1,0,0,0,0,0,0,1,1,0,0,"[[""random_pairs"", ""luck_or_hidden""]]",About 19 of 100 random pairs move together by luck
+C34,1,1,1,0,1,1,0,1,1,0,none,0,0,0,0,1,0,0,1,0,0,0,,,,[],"A trend is when the price keeps going up month after month, through many ups and downs. A single streak is only one short run, so you cannot see a pattern from it."
+C35,1,1,1,0,1,1,0,1,1,0,none,0,0,1,0,1,0,1,0,0,0,0,,,,[],"Overfitting is like that, learning the old data too well."
+C36,1,1,1,1,1,1,0,1,1,0,implication,0,1,0,1,0,0,0,1,1,0,1,1,1,0,"[[""many_tries"", ""count_500""], [""count_500"", ""not_proof""]]","If 30 stocks did it by luck, and they look just like the one my friend picked, then most streaks we see are luck. So his stock is probably luck too"
