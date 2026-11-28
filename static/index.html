@@ -310,8 +310,6 @@
     .know-bar .lab{grid-column:1 / -1;}
   }
   /* Knowledge Summary: one row per fault, with the sources that know it */
-  .ks-head{font-size:16px; margin:0 0 16px; color:var(--ink-soft);}
-  .ks-head b{color:var(--ink);}
   .ks-table{border:1px solid var(--rule); background:var(--panel); border-radius:14px; padding:6px 20px;}
   .ks-row{display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) 270px; gap:14px; align-items:center;
           padding:13px 0; border-top:1px solid var(--rule); font-size:14.5px;}
@@ -455,6 +453,7 @@
     background:var(--panel); color:var(--ink); font:inherit; font-weight:500; text-align:right;}
   .dg-own-in input:focus{outline:none; border-color:var(--signal);}
   .dg-own-in i{font-style:normal; font-weight:500; color:var(--ink-faint); width:30px;}
+  .dg-req{font-style:normal; color:var(--caution);}
   .dg-own-err{color:var(--caution); margin:0 0 12px;}
   .ov-menu .dg-own-item{border-top:1px solid var(--rule);}
   .dg-legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:12.5px; color:var(--ink-soft);}
@@ -2841,9 +2840,8 @@ function diagOwnHTML(){
   const field = o => `<label class="dg-own-f"><span>${esc(o.name)}</span><span class="dg-own-in">
       <input type="number" inputmode="decimal" step="any" min="${o.min}" max="${o.max}" data-own="${o.id}" value="${esc(f[o.id] ?? '')}">
       <i>${esc(o.unit)}</i></span></label>`;
-  return `<p class="diag-story"><b>Type the readings you have.</b> Leave out any you do not know.</p>
-    <div class="dg-own">
-      <div class="dg-own-f"><span>Product type</span><div class="kn-seg" role="group" aria-label="Product type">${['L', 'M', 'H'].map(x =>
+  return `<div class="dg-own">
+      <div class="dg-own-f"><span>Product type <i class="dg-req" aria-label="required">*</i></span><div class="kn-seg" role="group" aria-label="Product type">${['L', 'M', 'H'].map(x =>
         `<button type="button" data-own-type="${x}" aria-pressed="${t === x}">${x}</button>`).join('')}</div></div>
       ${diag.list.own.map(field).join('')}</div>
     ${diag.err ? `<p class="dg-own-err" role="alert">${esc(diag.err)}</p>` : ''}
@@ -2863,7 +2861,7 @@ function diagPaneHTML(v, busy){
   const top = v.faults[0], m = v.machine, names = diag.list.names, running = diag.auto;
   const next = v.best ? dgLow(names[v.best] || v.best) : '';
   const steps = v.done.map(d => `<li class="dg-t ${d.kind}"><b>${esc(d.name)}</b> is ${esc(d.band)}, ${esc(d.value)}, so it ${esc(dgLow(d.text))}.</li>`).join('');
-  const intro = `<li class="dg-t intro"><b>${esc(diagName(m.udi))} has stopped.</b> RootAI checks the reading that tells the most first, until it is sure.</li>`;
+  const intro = `<li class="dg-t intro"><b>${esc(diagName(m.udi))} has stopped.</b></li>`;
   const ask = v.finished ? '' : `<li class="dg-t ask"><p>${v.done.length ? 'Next, check' : 'Check'} <b>${esc(next)}</b>, because it tells the most${v.done.length ? ' now' : ''}.</p>
       <div class="dg-controls"><button type="button" class="dg-run" data-check="${esc(v.best || '')}"${busy || running || !v.best ? ' disabled' : ''}>${running || busy ? 'Checking...' : `Check ${esc(next)}`}</button>
       ${running ? '' : `<button type="button" class="dg-link" data-diag-play${busy ? ' disabled' : ''}>Check all for me</button>`}</div></li>`;
@@ -3046,8 +3044,7 @@ function knowSummaryHTML(){
     return `<div class="ks-row"><b class="ks-name">${esc(f.name)}</b><span class="ks-cause">${esc(cause)}</span><span class="ks-fix">${esc(f.short)}</span>
       <span class="ks-srcs">${src(true, 'books', 'Book')}${src(inRules.has(f.id), 'rules', 'Rules of thumb')}${src(same(d.learned[f.id] || [], f.causes), 'data', 'Data')}</span></div>`;
   }).join('');
-  return `<p class="ks-head">RootAI knows <b>${d.book.length} ways</b> this machine can fail, and what to do about each.</p>
-    <div class="ks-table"><div class="ks-row ks-th"><span>Fault</span><span>Caused by</span><span>What to do</span><span>Known from</span></div>${rows}</div>
+  return `<div class="ks-table"><div class="ks-row ks-th"><span>Fault</span><span>Caused by</span><span>What to do</span><span>Known from</span></div>${rows}</div>
     ${d.agree ? `<p class="dg-fleet">The data from ${d.records.toLocaleString('en')} past runs found the same causes as the book, without being told them.</p>` : ''}`;
 }
 // A graph in columns, drawn like the Diagnosis graph. cols is a list of id lists; the first
