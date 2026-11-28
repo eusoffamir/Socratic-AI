@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from app import diagnose, llm_client, main
 
-# docs/supervisor/relation-classes.md
+# docs/industrial/relation-classes.md
 CLASSES = {"part_of", "causes", "prevents", "tests", "rules_out", "supports", "weakens",
            "fixed_by", "then", "defines", "leads_to"}
 

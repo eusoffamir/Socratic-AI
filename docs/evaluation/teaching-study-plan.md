@@ -1,6 +1,6 @@
 # Teaching study plan (backup paper, January 2027)
 
-Draft 1, 27 November 2026, by Claude for Eusoff, to be agreed with Dr Ho. Based on Meeting 3 (`docs/supervisor/meeting3-notes.md`, section 2.2) and Dr Ho's grant proposal (history file, "Dr Ho's proposal vs the free tier").
+Draft 1, 27 November 2026, by Claude for Eusoff, to be agreed with Dr Ho. Based on Meeting 3 (`docs/supervisor/meetings/meeting3-notes.md`, section 2.2) and Dr Ho's grant proposal (history file, "Dr Ho's proposal vs the free tier").
 
 ## The question
 

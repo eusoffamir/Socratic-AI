@@ -1,7 +1,7 @@
 """A small Bayesian network on an open dataset (Meeting 3, task 8).
 
 Proof of concept for Dr Ho, using what we read in Koller and Friedman (2009)
-(notes in docs/supervisor/pgm-reading.md, results in docs/supervisor/pgm-ai4i.md).
+(notes in docs/industrial/pgm-reading.md, results in docs/industrial/pgm-ai4i.md).
 
 Data: the AI4I 2020 Predictive Maintenance Dataset (UCI, CC BY 4.0,
 https://doi.org/10.24432/C5HS5C, introduced by Matzka, 2020). 10,000 machine

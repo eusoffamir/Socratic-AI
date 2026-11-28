@@ -33,3 +33,6 @@ docs/personal/
 **/*Koller*
 **/meeting3*.txt
 **/meeting3-notes-full.md
+
+# Word lock files
+~$*

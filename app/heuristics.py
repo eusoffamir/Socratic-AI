@@ -8,7 +8,7 @@ and the book knowledge in knowledge.py stay joined.
 
 Walking the tree from the top question to a decision is deductive reasoning,
 because known facts (the answers) and fixed rules (the branches) give the
-conclusion. See docs/supervisor/goal3-plan.md.
+conclusion. See docs/supervisor/goals/goal3-plan.md.
 
 DRAFT: drafted by Claude on 22 October 2026, to be checked by Dr Ho.
 """

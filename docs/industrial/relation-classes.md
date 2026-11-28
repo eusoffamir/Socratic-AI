@@ -1,6 +1,6 @@
 # Standard relation classes for diagnosis (Meeting 3, task 5)
 
-Draft 1, 27 November 2026, by Claude for Eusoff, to be checked by Dr Ho. Builds on the knowledge graph review (thesis section 2.8, `docs/thesis/kg-generation-review.md`) and the storage note (`docs/supervisor/kg-storage.md`).
+Draft 1, 27 November 2026, by Claude for Eusoff, to be checked by Dr Ho. Builds on the knowledge graph review (thesis section 2.8, `docs/thesis/drafts/kg-generation-review.md`) and the storage note (`docs/industrial/kg-storage.md`).
 
 ## Why we need a fixed set
 
@@ -39,7 +39,7 @@ We did not add "symptom_of", because it is just "causes" read backward. Walking 
 5. **Update with "supports" and "weakens" (inductive).** The result of the check changes the chances. Repeat from step 3 until one fault is clear enough.
 6. **Act with "fixed_by".** Give the repair, and use "then" to order the steps.
 
-This is the same loop as the Bayesian network test on the AI4I data (`docs/supervisor/pgm-ai4i.md`). There, each check was a reading such as power or strain, and the network named the right fault after one to three checks every time.
+This is the same loop as the Bayesian network test on the AI4I data (`docs/industrial/pgm-ai4i.md`). There, each check was a reading such as power or strain, and the network named the right fault after one to three checks every time.
 
 ## Worked example 1, the AI4I milling machine (open data)
 

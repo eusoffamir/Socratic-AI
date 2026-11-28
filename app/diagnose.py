@@ -15,7 +15,7 @@ hand-written one when there is no model or the reply fails a check
 ("agents decide, rules guard"; agents only where an algorithm cannot do it).
 
 The edges use the standard relation classes drafted for task 5
-(docs/supervisor/relation-classes.md). DRAFT by Claude, 27 November 2026.
+(docs/industrial/relation-classes.md). DRAFT by Claude, 27 November 2026.
 """
 import json
 import math

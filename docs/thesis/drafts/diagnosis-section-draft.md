@@ -1,6 +1,6 @@
 # Thesis draft, diagnosis on open machine data (for FYP1.docx Chapter 3, or the FYP2 dissertation)
 
-Draft 1, 27 November 2026, by Claude for Eusoff. Not yet in `FYP1.docx`. When it goes in, add it as tracked changes by "Claude", in UTP format, and check the section number. Every number below comes from `eval/pgm_ai4i.py`, `app/diagnose.py` and their tests, run on 27 November 2026. References are the two already checked for `docs/supervisor/pgm-ai4i.md`.
+Draft 1, 27 November 2026, by Claude for Eusoff. Not yet in `FYP1.docx`. When it goes in, add it as tracked changes by "Claude", in UTP format, and check the section number. Every number below comes from `eval/pgm_ai4i.py`, `app/diagnose.py` and their tests, run on 27 November 2026. References are the two already checked for `docs/industrial/pgm-ai4i.md`.
 
 ## 3.x Diagnosis on open machine data
 

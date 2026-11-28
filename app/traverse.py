@@ -6,7 +6,7 @@ Plain code then reads each step against the graph's links and says which type
 of reasoning the moves show, so the agent's own label can be checked by an
 algorithm (Dr Ho, Meeting 2, "reasoning is an operation on the graph").
 
-First definitions (docs/supervisor/goal3-plan.md, question 4 for Dr Ho):
+First definitions (docs/supervisor/goals/goal3-plan.md, question 4 for Dr Ho):
 - A step WITH a link (a causes b, learner goes a to b) is forward. A step
   AGAINST a link (learner goes from b back to a) is backward.
 - Inductive: a forward step out of a counted result (a "data" node), or two or

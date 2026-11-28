@@ -14,7 +14,7 @@ The story to tell is simple. RootAI has two kinds of users. For students, it tea
 4. Open https://socratic-ai-qlk6.onrender.com about 5 minutes before, so the server is awake, and press Ctrl+Shift+R so the RootAI logo shows.
 5. Open /api/health and check it says ok. Open /api/config and check ai_guard is true.
 6. Open the Diagnosis page once, so the network is already learned (the first load takes a few seconds). Then open Knowledge, press Start again on Rules of thumb and Clear all on From data, so both start clean.
-7. Have these open in tabs, the knowledge graph review (thesis section 2.8 or `docs/thesis/kg-generation-review.md`), the relation classes doc, the Ex problem statement, the teaching study plan and the AI4I results.
+7. Have these open in tabs, the knowledge graph review (thesis section 2.8 or `docs/thesis/drafts/kg-generation-review.md`), the relation classes doc, the Ex problem statement, the teaching study plan and the AI4I results.
 8. If you forget what a page does, press the question mark at the bottom of the sidebar. It walks through the page that is open, and Dr Ho can see it too.
 
 ## What to show and what to say

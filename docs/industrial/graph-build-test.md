@@ -1,6 +1,6 @@
 # Which way of building the graph works best (28 November 2026)
 
-A test of the methods from the knowledge graph review (`docs/thesis/kg-generation-review.md`) on one machine. Code `eval/graph_build_test.py`, run with `python -m eval.graph_build_test` (about 6 minutes, plain Python, no model tokens).
+A test of the methods from the knowledge graph review (`docs/thesis/drafts/kg-generation-review.md`) on one machine. Code `eval/graph_build_test.py`, run with `python -m eval.graph_build_test` (about 6 minutes, plain Python, no model tokens).
 
 ## Set up
 

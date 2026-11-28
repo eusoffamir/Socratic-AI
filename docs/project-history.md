@@ -57,12 +57,12 @@ Full text and dates: `docs/supervisor/dr-ho-messages.md`. Two messages matter mo
 
 ## Meeting 2 with Dr Ho (19 October 2026): the new direction
 
-Full notes: `docs/supervisor/meeting2-notes.md` (read it before any Goal 1 work). In short:
+Full notes: `docs/supervisor/meetings/meeting2-notes.md` (read it before any Goal 1 work). In short:
 
 - **Three goals.** Goal 1 (now, done by about **mid November 2026**): the product, a tool that shows a learner's critical reasoning attainment in three dimensions: **type of reasoning** (inductive, deductive, abductive first; analogic, counterfactual, triangulation later), **type of knowledge** used (factual, conceptual, procedural, causal, relational, plus strategic, metacognitive, epistemic), and **quality** (the 9 Paul-Elder standards, already built). Goal 2: show it works on another topic (easy to swap). Goal 3 (next semester): knowledge as graphs, decision trees and probabilistic graph models, with reasoning as a graph operation.
 - **Framework layers** (Dr Ho's working model, not final; "put dots" where a link is unclear): the 8 elements of thought as prerequisites (purpose, question, information come first), types of knowledge, modes of reasoning (causal is knowledge, not reasoning), Paul-Elder quality, SOLO taxonomy for complexity (how many knowledge types are combined), and statistics over many trials (Hamming distance first, then factor analysis). Paul's 6 levels stay as the question ladder.
 - **To build for Goal 1:** a types-of-knowledge layer (an agent drafts the quant knowledge and a knowledge graph), **new agents** rather than rebuilding old ones (a Reasoning agent marking reasoning type and knowledge used as 1/0 with evidence; an **Explainer agent** giving a plain "why this matters" scenario), several questions per skill (5, 10 or 20 trials), statistics, and a dashboard ("you have not mastered inductive reasoning on causal knowledge"). The rubric is a placeholder that AI applies; human experts refine it later.
-- **Not decided yet, ask the student before building:** the order of steps in `docs/supervisor/meeting2-notes.md` section 8. Factor analysis needs many learners (the grant plans 50), so per-learner mastery needs a simpler estimate; check with Dr Ho. Each new agent costs free Gemini calls (daily budget 400).
+- **Not decided yet, ask the student before building:** the order of steps in `docs/supervisor/meetings/meeting2-notes.md` section 8. Factor analysis needs many learners (the grant plans 50), so per-learner mastery needs a simpler estimate; check with Dr Ho. Each new agent costs free Gemini calls (daily budget 400).
 - **Thesis and defence:** add an agent flow diagram with the information passed between agents, show how agents are prompted, make the talk easy for examiners outside the field, prepare 1 or 2 product slides, and do a mock presentation with Dr Ho around mid November 2026.
 - **Remind Dr Ho** to submit the requests for a Claude subscription and a Render subscription (about USD 25 a month mentioned, not checked). He asked to be reminded. Until approved, stay on free tiers.
 
@@ -92,7 +92,7 @@ Eusoff wants it to work like ChatGPT: the learner types ANY topic and practises 
 
 ## Goal 3: one way to represent knowledge (started 22 October 2026)
 
-Plan for Dr Ho: `docs/supervisor/goal3-plan.md` (7 steps, 4 questions for him). Books become knowledge graphs, human heuristics become decision trees, data becomes a small Bayesian network, all as nodes and links. Reasoning is a move on the graph: deductive is a forward walk, inductive is counting over data, abductive is a backward walk from what was seen to its likely cause.
+Plan for Dr Ho: `docs/supervisor/goals/goal3-plan.md` (7 steps, 4 questions for him). Books become knowledge graphs, human heuristics become decision trees, data becomes a small Bayesian network, all as nodes and links. Reasoning is a move on the graph: deductive is a forward walk, inductive is counting over data, abductive is a backward walk from what was seen to its likely cause.
 
 - **Choices (22 October 2026, Eusoff):** plain Python, no new libraries (pgmpy pulls in torch, too heavy for Render free). Data for the networks is simulated first, like `app/tools.py`.
 - **Step 2, decision trees** (`app/heuristics.py`, tests `tests/test_heuristics.py`). One rule-of-thumb tree per quant case (2 to 4 yes or no questions, 3 to 5 decisions), DRAFT by Claude for Dr Ho. Every node has a "why" that names a knowledge graph node. `walk()` is the deductive move and stops at the next unanswered question, `rules()` reads the tree as IF-THEN rules, `problems()` checks any tree (so Builder drafts can be checked in step 7). A case dict can carry its own tree under "heuristics". Not used by the app yet.
@@ -183,7 +183,7 @@ R1 clear mission at start. R2 fixed rounds and visible progress. R3 remember wha
 
 ## Next steps, in order
 
-0. **Goal 1 from Meeting 2 comes first** (target mid November 2026): see `docs/supervisor/meeting2-notes.md` section 8, one step at a time, with the student's OK before each step. In parallel, the interim report gaps in section 6 of those notes (abstract, Chapter 4 Conclusion and Future Work, timeline, agent flow diagram, 20-page limit).
+0. **Goal 1 from Meeting 2 comes first** (target mid November 2026): see `docs/supervisor/meetings/meeting2-notes.md` section 8, one step at a time, with the student's OK before each step. In parallel, the interim report gaps in section 6 of those notes (abstract, Chapter 4 Conclusion and Future Work, timeline, agent flow diagram, 20-page limit).
 1. Partly done. Real Gemini runs worked for the old 2-agent version. Transcript saving is now built. Still to do: run full sessions with the new agents on Gemini. Check that the Tutor returns valid JSON, uses a tool, stays short, and that the Planner and Checker give sensible output. Check the free-tier limits with about 25 to 30 calls per session.
 2. Improve the Tutor and Assessor prompts based on real transcripts. Keep every transcript, since they become thesis Results.
 3. Replace the hand-written notes with real quant reading material chosen with the supervisor, then add simple RAG.

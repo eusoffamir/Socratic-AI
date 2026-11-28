@@ -1,7 +1,7 @@
 """Which way of building the knowledge graph works best? (28 November 2026)
 
 The same milling machine (AI4I 2020, see eval/pgm_ai4i.py) is built several
-ways, matching families from the review (docs/thesis/kg-generation-review.md),
+ways, matching families from the review (docs/thesis/drafts/kg-generation-review.md),
 and every build is scored on the same failed test machines.
 
 Builds

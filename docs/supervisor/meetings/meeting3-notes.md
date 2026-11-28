@@ -73,7 +73,7 @@ Eusoff's idea. Choose the graph-building algorithm adaptively from the input and
 
 ## 6. Action list
 
-- [ ] Write the review of knowledge graph generation algorithms (how nodes and edges are chosen), then discuss with Dr Ho. (Written 25 November 2026, thesis section 2.8 and `docs/thesis/kg-generation-review.md`. Discussion with Dr Ho still to do.)
+- [ ] Write the review of knowledge graph generation algorithms (how nodes and edges are chosen), then discuss with Dr Ho. (Written 25 November 2026, thesis section 2.8 and `docs/thesis/drafts/kg-generation-review.md`. Discussion with Dr Ho still to do.)
 - [x] Read Koller and Friedman on probabilistic graphical models; try a small model on an open source dataset. (Done 25 November 2026, `pgm-reading.md` and `pgm-ai4i.md`.)
 - [x] Find and document how the tool's knowledge graph is stored and passed to the agents. (Done 25 November 2026, `kg-storage.md`.)
 - [ ] When Azure access arrives, switch the agents to Azure models and test.

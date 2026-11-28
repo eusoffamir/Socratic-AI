@@ -1,6 +1,6 @@
 # A small Bayesian network on an open dataset (Meeting 3, task 8)
 
-Proof of concept, 25 November 2026. Code `eval/pgm_ai4i.py`, tests `tests/test_pgm_ai4i.py`, reading notes `docs/supervisor/pgm-reading.md`. Plain Python with no new libraries. It runs in about 5 seconds with `python eval/pgm_ai4i.py`.
+Proof of concept, 25 November 2026. Code `eval/pgm_ai4i.py`, tests `tests/test_pgm_ai4i.py`, reading notes `docs/industrial/pgm-reading.md`. Plain Python with no new libraries. It runs in about 5 seconds with `python eval/pgm_ai4i.py`.
 
 ## Why this dataset
 

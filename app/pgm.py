@@ -10,7 +10,7 @@ over seeded simulated data, which is the inductive move. Asking the network
 for the chance of a cause given what was seen is the abductive move, and the
 chance of an effect given its cause is a forward, deductive-style prediction.
 Plain Python, exact answers by adding up every case (fine for 3 or 4 nodes).
-See docs/supervisor/goal3-plan.md.
+See docs/supervisor/goals/goal3-plan.md.
 
 DRAFT: drafted by Claude on 22 October 2026, to be checked by Dr Ho. The
 simulated numbers (how often a pattern is real, how strong it is) are made up
