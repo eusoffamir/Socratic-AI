@@ -37,3 +37,24 @@ What it means.
 3. **Epistemic is under-marked.** The human saw it in 29 answers and the AI in 12, so the rule for "judges how strong the evidence is" needs sharper wording in the prompt or in the guide.
 4. **The graph reading rarely applies.** Most answers' steps do not land on a real link, and a forward walk is not the same as deductive reasoning as a person reads it.
 5. **The run is stable.** Against the first run of the same prompt (21 October), the numbers moved only a little (for example level 62% then 65%).
+
+## Prompt fix, version 2026-11-28
+
+The Reasoning agent's rules were sharpened from the disagreements on the 21 "tune" rows only (`app/reasoning.py`, `PROMPT`). Deductive now counts "a rule or fact, so a conclusion". Abductive needs something seen plus a cause offered for it, so proposing a test, a better question or "it might be luck" is not abductive. Inductive needs several cases turned into a pattern. Epistemic counts saying how strong the evidence is. The prompt's examples come from tune rows or are new, never from test rows. Then the new Assessor ran on all 61 (`eval/ai_marks_2026-11-28.csv`, every answer got a reply).
+
+On the 40 held-out "test" rows (kappa, old prompt then new):
+
+| Mark | Old | New |
+|---|---|---|
+| deductive | 0.32 | 0.47 |
+| abductive | 0.50 | 0.52 |
+| k_epistemic | 0.17 | 0.30 |
+| inductive | 0.00 | 0.00 |
+| level | 0.43 | 0.43 |
+| depth | 0.77 | 0.72 |
+| clarity | 0.47 | 0.36 |
+| breadth | 0.42 | 0.29 |
+
+So deductive and epistemic got better on answers the fix never saw. Inductive cannot be judged, since the human marked it in only 1 of the 40 test answers. The 9 standards rules were not changed, so their small moves are run to run noise (with 40 answers one changed mark moves kappa a lot).
+
+Some human marks go against the guide's own rule that a bare claim shows no reasoning type (for example R25 "then theres no correlation" marked deductive and epistemic, R36 and R37). The prompt was not tuned toward these. A second marker, or a second look at these rows, should settle them.

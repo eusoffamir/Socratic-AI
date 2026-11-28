@@ -43,6 +43,10 @@ knowledge_used, give 1 if the answer:
 
 Rules for this job:
 - A claim with no reason shows no reasoning type. "I don't know" or a single word is all 0.
+- deductive: a general rule or known fact, then "so" a conclusion for this case, is deductive even when the rule is short ("prices do not remember yesterday, so the assumption may be wrong", "19 of 100 random pairs line up by luck, so one pair is weak proof").
+- abductive needs something that was seen (a streak, a link, a result) AND a cause offered to explain why it happened ("the price jumped, probably because the company reported good sales"). These alone are NOT abductive: proposing a test, asking a better question, saying a claim may be wrong, or saying "it might be luck" as a reason not to act.
+- inductive needs several cases or observations turned into a general pattern. One case, or a plan to test, is not inductive.
+- epistemic: 1 when the answer says how strong the evidence is, such as one streak or one pair is weak proof, luck is enough to explain it, or new data would be stronger proof.
 - Naming a word is not using that knowledge. "It is causal" with no cause named is 0 for causal.
 - Repeating a fact from the question is not factual knowledge of the learner's own.
 - NOTE_TYPES gives the knowledge type of each item in NOTES, as a guide only.
