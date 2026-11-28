@@ -120,3 +120,24 @@ What it means.
 4. **So check AI rules against data, not only against the text.** The quote check proves the source is real. Only the data showed the mapping was wrong.
 
 Limits. The manuals are for factory screw compressors, not this train's air production unit, so they fit only roughly. Only 4 leaks of one kind.
+
+## A data guard for AI-drafted rules (28 November 2026)
+
+Code `eval/rule_guard.py` (`python -m eval.rule_guard`, no model calls). Before a rule the AI drafted is used, it is checked against past records. Three questions.
+
+1. **Caught.** Of the past runs with this fault, how many does the rule fire on? The app lets a rule rule a fault out, so it must almost never miss. At 95% or more it may **rule out**.
+2. **False alarms.** Of the runs without this fault, how many does it fire on? Under 2% and with no loose limit, it may also **name** the fault on its own.
+3. **Loose limits.** For each product type, does each limit sit close to where the faults really start in the data? More than 5% looser is reported.
+
+A rule that catches under 95% is **flagged** for a person to fix. The limits were set so the published rules pass (they are the right answer here), not tuned on the AI drafts. The guard judges on the 7,000 training runs, since the 3,000 test runs alone have too few faults of each type.
+
+| Rule | Published | AI drafts 1, 3, 4, 5 | AI draft 2 |
+|---|---|---|---|
+| Tool wear | rule out (97%, 7.6% false alarms) | flag (93%) | flag (93%) |
+| Heat | name | name | name |
+| Power | name | name | name |
+| Overstrain | name | name | rule out, "for type M the limit 11,000 is loose, since its faults start at 12,337" |
+
+So the guard finds the hidden mistake in draft 2 that a person reading the rule could miss, and says what the data suggests instead. It also flags every AI tool wear rule. The AI copied "200 to 240 minutes" from the text as an upper limit too, but in the data some tools fail after 240 minutes, so that rule would wrongly rule tool wear out for 2 of 29 runs. The published rule has no upper limit.
+
+Limits. False alarms alone could not see draft 2's mistake (0.2% overall, under 1% for type M), so the loose limit check is what catches it. On real records the limits will be fuzzier, and a fault seen fewer than 10 times cannot be judged at all. The guard is not in the app yet, because the app's rules are the published ones; it is ready for the partner's records, where AI-drafted rules would be used.

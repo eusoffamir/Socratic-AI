@@ -73,3 +73,19 @@ def test_run_assessor_writes_reasoning_and_graph_columns():
     assert run_assessor.reasoning_cols({"reasoning": None}) == {}
     only_jumps = {"reasoning": {**a["reasoning"], "graph": {"steps": [{"dir": "jump"}], "types": types}}}
     assert "graph_inductive" not in run_assessor.reasoning_cols(only_jumps)  # no real link, no graph reading
+
+
+def test_rule_guard_rules_out_names_and_flags():
+    from eval.rule_guard import check
+    # 20 runs with the fault at strain 12,500 to 13,450, 100 without, strain 5,000 to 11,500
+    recs = ([{"type": "M", "strain": 12500 + 50 * i, "OSF": 1} for i in range(20)]
+            + [{"type": "M", "strain": 5000 + 65 * i, "OSF": 0} for i in range(101)])
+    rule = lambda limit: [[{"reading": "strain", "op": ">", "value": limit}]]
+    def run(limit):
+        from eval.graph_build_ai import holds
+        return check(lambda r: holds(rule(limit), r), recs, "OSF", rule(limit), lambda r: r)
+    assert run(12000)["verdict"] == "name"
+    loose = run(11000)  # catches every fault, few false alarms, but far below where faults start
+    assert loose["verdict"] == "rule_out" and "loose" in loose["why"]
+    assert run(13000)["verdict"] == "flag"  # misses faults
+    assert check(lambda r: True, recs[:5], "OSF")["verdict"] is None  # too few faults to judge
