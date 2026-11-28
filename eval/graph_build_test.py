@@ -14,6 +14,9 @@ Builds
   net_eng    the same, nodes are the readings an engineer would compute (2.11)
   net_blind  the engineer nodes, but the bands are cut at the data's own thirds,
              so no number from the book is used at all (data only)
+  ai_rules   rules an AI model drafted from the dataset page text (family 2.9, saved
+             drafts from eval/graph_build_ai.py), in the order best on the training runs
+  ai_mix     net_eng ranks the faults, the AI-drafted rules may only rule one out
   mix        net_eng ranks the faults, and a rule may only rule a fault out:
              the top fault is named unless its rule can be checked and fails
 
@@ -35,6 +38,9 @@ Run from the project folder (a few minutes):
 import itertools
 import time
 
+import csv
+
+from eval import graph_build_ai as ai
 from eval import pgm_ai4i as net
 
 M = net.MODES
@@ -120,6 +126,88 @@ def blind(rows, train):
     return out
 
 
+# ---------- the AI-drafted builds ----------
+
+def raw_numbers():
+    """The raw readings of every run as numbers, by run id, for the AI's rules."""
+    out = {}
+    with open(net.DATA, encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            out[int(r["UDI"])] = {"type": r["Type"], "air": float(r["Air temperature [K]"]),
+                                  "process": float(r["Process temperature [K]"]),
+                                  "speed": float(r["Rotational speed [rpm]"]), "torque": float(r["Torque [Nm]"]),
+                                  "wear": float(r["Tool wear [min]"])}
+    return out
+
+
+RAW_NUM = None
+
+
+def ai_values(r, d, no_torque=False):
+    v = dict(RAW_NUM[r["udi"]])
+    if no_torque:
+        v.pop("torque")
+    return ai.values(v, d.get("derived"))
+
+
+def ai_rules_of(d):
+    return {f.get("id"): f.get("rule") for f in d["faults"] if f.get("id") in NEEDS}
+
+
+def ai_guess(d, r, no_torque, order):
+    v, rules = ai_values(r, d, no_torque), ai_rules_of(d)
+    for m in order:
+        if m in rules and ai.holds(rules[m], v):
+            return m
+    return "RNF"
+
+
+def ai_order(d, rows):
+    f = failed(rows)
+    return list(max(itertools.permutations(DRAFT_ORDER),
+                    key=lambda o: sum(r[ai_guess(d, r, False, o)] == 1 for r in f)))
+
+
+def ai_mix_guess(d, model, r, known, no_torque):
+    _, ch = net_guess(model, r, known)
+    v, rules = ai_values(r, d, no_torque), ai_rules_of(d)
+    for m in sorted(ch, key=ch.get, reverse=True):
+        if m in rules and ai.holds(rules[m], v) is not False:
+            return m
+    return max(ch, key=ch.get)
+
+
+def ai_report(train, test, eng):
+    global RAW_NUM
+    if not ai.SAVED.exists():
+        print("AI-drafted graph: no saved drafts, run eval.graph_build_ai first\n")
+        return
+    RAW_NUM = raw_numbers()
+    runs = __import__("json").loads(ai.SAVED.read_text(encoding="utf-8"))
+    drafts = [ai.parse(x["reply"]) for x in runs]
+    ok = [d for d in drafts if d]
+    print(f"AI-drafted graph (family 2.9), {len(runs)} runs, {len(ok)} usable, "
+          f"{len({x['reply'] for x in runs if x['reply']})} different replies, models {sorted({m for x in runs for m in x['models']})}")
+    tokens = sum(x["chars_in"] + x["chars_out"] for x in runs) / len(runs) / 4
+    print(f"  about {tokens:,.0f} tokens per draft (characters / 4)")
+    known_nt = [c for c in ALL if c not in NO_TORQUE]
+    for i, d in enumerate(drafts, 1):
+        if not d:
+            print(f"  run {i}: not usable")
+            continue
+        cz = ai.canonical(d)
+        right = sum(len(cz.get(m, set()) & net.TRUE_PARENTS[m]) for m in M)
+        got = sum(len(cz.get(m, set())) for m in M)
+        order = ai_order(d, train)
+        a, n = score(lambda r: ai_guess(d, r, False, order), test)
+        b, _ = score(lambda r: ai_guess(d, r, True, order), test)
+        c, _ = score(lambda r: ai_mix_guess(d, eng, r, ALL, False), test)
+        e, _ = score(lambda r: ai_mix_guess(d, eng, r, known_nt, True), test)
+        print(f"  run {i}: arrows right {right} of 6, {got - right} extra, power factor ok {ai.check_power_factor(d)}"
+              f" | ai_rules {pct(a, n)} all, {pct(b, n)} no torque | ai_mix {pct(c, n)} all, {pct(e, n)} no torque")
+    print()
+
+
 def score(guess, rows):
     f = failed(rows)
     return sum(r[guess(r)] == 1 for r in f), len(f)
@@ -167,6 +255,8 @@ def main():
         b, _ = score(lambda r: g(r, known_nt), rs) if name != "nb" else (None, n)
         print(f"  {name:12} {a:>4} of {n} {pct(a, n):>4}   " + (f"{b:>3} of {n} {pct(b, n):>4}" if b is not None else "   (needs all)"))
     print()
+
+    ai_report(train, test, eng)
 
     print("Test 3, every limit 10% wrong (all readings)")
     for k, word in ((0.1, "too strict"), (-0.1, "too loose")):
