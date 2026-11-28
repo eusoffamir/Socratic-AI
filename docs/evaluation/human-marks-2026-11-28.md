@@ -58,3 +58,14 @@ On the 40 held-out "test" rows (kappa, old prompt then new):
 So deductive and epistemic got better on answers the fix never saw. Inductive cannot be judged, since the human marked it in only 1 of the 40 test answers. The 9 standards rules were not changed, so their small moves are run to run noise (with 40 answers one changed mark moves kappa a lot).
 
 Some human marks go against the guide's own rule that a bare claim shows no reasoning type (for example R25 "then theres no correlation" marked deductive and epistemic, R36 and R37). The prompt was not tuned toward these. Eusoff then looked at these 3 rows again and re-marked them by the guide (no reasoning type on any, and R36 and R37 lost epistemic, R25 kept it). All 3 are tune rows, so the test numbers above do not change. On the tune rows the new prompt now reaches kappa 0.74 for deductive and 0.62 for epistemic.
+
+## Graph reading, two tries (28 November 2026, later)
+
+Why it rarely applied. The run now saves the model's steps (`graph_steps` column), and in 50 of 61 answers the model gave no steps at all. The human saw reasoning in 24 answers. So the reading rules were not the main problem.
+
+1. **Reading rules** (`app/traverse.py`, kept). A step may follow a chain of up to 3 links, and only reasoning links (causes, supports, weakens, tests) give a type, since then, defines and leads_to are order or teaching links. On the same saved steps (`eval/ai_marks_2026-11-28_graph.csv`), 9 answers land instead of 11, deductive agrees 56% instead of 45% and abductive 100% instead of 91%. Too few answers to call it better, but no worse, and it follows the relation classes draft.
+2. **Asking the model for steps more often** (version 2026-11-28b, undone). The prompt told it to match the learner's words to nodes by meaning. 23 answers got steps and 17 landed, but the reading got worse. It read deductive in 15 answers where the human saw 5, and abductive in 0 where the human saw 5 (`eval/ai_marks_2026-11-28b.csv`). On the test rows accuracy, precision and relevance also fell, partly run to run noise. So the prompt was put back to 2026-11-28.
+
+What it means. Getting more steps does not help, because "forward along a link is deductive, backward is abductive" is not how a person reads these answers. A learner who says "it might be luck, so it is not proof" walks forward from luck to not proof, which the human reads as abductive or epistemic. This is a question about the definition, for Dr Ho (questions list, item 23), not a prompt problem. Until then the graph reading stays a draft and is not used for any mark.
+
+Re-reading saved steps with new rules needs no model call: `python eval/reread_graph.py <file>`.

@@ -20,6 +20,7 @@ calls. 61 answers take about 5 minutes. Run --repeats 3 on a quiet day.
 """
 import argparse
 import csv
+import json
 import sys
 import time
 from pathlib import Path
@@ -30,6 +31,7 @@ sys.path.insert(0, str(ROOT))
 from app.content import CONCEPTS, STANDARDS  # noqa: E402
 from app.knowledge import KNOWLEDGE_TYPES  # noqa: E402
 from app.reasoning import REASONING_TYPES  # noqa: E402
+from app import traverse  # noqa: E402
 
 # The Goal 1 and Goal 3 columns, named as in eval/marks_template.csv
 REASONING_COLS = list(REASONING_TYPES)
@@ -53,7 +55,9 @@ def reasoning_cols(a):
         return {}
     out = {**{k: r["types"][k] for k in REASONING_TYPES}, **{f"k_{k}": r["knowledge"][k] for k in KNOWLEDGE_TYPES}}
     g = r.get("graph")
-    if g and any(s["dir"] != "jump" for s in g["steps"]):  # only when a step landed on a real link
+    if g:  # the raw steps, so the reading can be done again offline (eval/reread_graph.py)
+        out["graph_steps"] = json.dumps([[st.get("from"), st.get("to")] for st in g["steps"]])
+    if g and traverse.landed(g):  # only when a step followed reasoning links
         out.update({f"graph_{k}": g["types"][k] for k in REASONING_TYPES})
     return out
 
@@ -63,6 +67,7 @@ def main():
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--limit", type=int, default=0, help="only the first N answers (0 = all)")
     ap.add_argument("--split", choices=["tune", "test"], help="only rows of this split")
+    ap.add_argument("--out", help="output file (default eval/ai_marks_<assessor version>.csv, which a run of the same version overwrites)")
     args = ap.parse_args()
 
     from app.env import load_env
@@ -77,10 +82,10 @@ def main():
     if args.limit:
         rows = rows[:args.limit]
 
-    out = ROOT / "eval" / f"ai_marks_{prompts.ASSESSOR_VERSION}.csv"
+    out = Path(args.out) if args.out else ROOT / "eval" / f"ai_marks_{prompts.ASSESSOR_VERSION}.csv"
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["id", "run", *STANDARDS, "level", *REASONING_COLS, *KNOWLEDGE_COLS, *GRAPH_COLS,
-                                          "evidence_quote"])
+                                          "graph_steps", "evidence_quote"])
         w.writeheader()
         for run in range(1, args.repeats + 1):
             for i, row in enumerate(rows, 1):

@@ -23,7 +23,7 @@ def test_forward_chain_is_deductive():
 def test_backward_step_is_abductive():
     # many_tries causes count_500. Seeing the count and going back to its cause is abduction.
     r = read("pattern_or_luck", [["count_500", "many_tries"]])
-    assert r["steps"] == [{"from": "count_500", "to": "many_tries", "dir": "backward", "rel": "causes"}]
+    assert r["steps"] == [{"from": "count_500", "to": "many_tries", "dir": "backward", "rel": "causes", "hops": 1}]
     assert r["types"] == {"inductive": 0, "deductive": 0, "abductive": 1}
 
 
@@ -38,6 +38,24 @@ def test_counted_data_or_many_into_one_is_inductive():
 def test_jumps_show_no_type():
     r = read("pattern_or_luck", [["coin", "check_repeat"]])
     assert r["steps"][0]["dir"] == "jump" and r["types"] == {"inductive": 0, "deductive": 0, "abductive": 0}
+
+
+def test_a_step_may_follow_a_short_chain():
+    # streak_chance supports count_500 supports not_proof: the learner skips the count.
+    r = read("pattern_or_luck", [["streak_chance", "not_proof"]])
+    assert r["steps"][0]["dir"] == "forward" and r["steps"][0]["hops"] == 2
+    assert r["types"]["deductive"] == 1
+    # the same chain walked back, from the conclusion to what explains it
+    assert read("pattern_or_luck", [["not_proof", "streak_chance"]])["types"]["abductive"] == 1
+
+
+def test_order_and_teaching_links_show_no_type():
+    # step_count then step_compare is the order of a method, not reasoning.
+    r = read("pattern_or_luck", [["step_count", "step_compare"], ["not_proof", "check_repeat"]])
+    assert [s["dir"] for s in r["steps"]] == ["order", "order"]
+    assert r["types"] == {"inductive": 0, "deductive": 0, "abductive": 0}
+    # but a chain with one reasoning link in it counts (then, then tests)
+    assert read("pattern_or_luck", [["step_count", "real_pattern"]])["steps"][0]["dir"] == "forward"
 
 
 def test_agreement_counts_only_answers_on_the_graph():

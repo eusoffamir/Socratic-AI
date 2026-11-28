@@ -15,6 +15,14 @@ First definitions (docs/supervisor/goals/goal3-plan.md, question 4 for Dr Ho):
 - Abductive: a backward step, from what was seen back to what explains it.
 Steps between nodes with no link are kept as "jump" but show no type.
 
+28 November 2026, after the human marker check (only 11 of 60 answers had a
+step on a real link, and forward walks were read as deductive far too often):
+- A step may follow a short chain of links in one direction (at most
+  MAX_HOPS), because learners skip ideas the graph spells out.
+- Only reasoning links count toward a type (REASONING_RELATIONS). "then" is
+  the order of steps and "defines" and "leads_to" are teaching links, so a
+  step along only those is kept as "order" and shows no type.
+
 DRAFT: drafted by Claude on 22 October 2026, to be checked by Dr Ho.
 """
 
@@ -22,6 +30,9 @@ from .knowledge import case_graph, source_of
 from .reasoning import REASONING_TYPES
 
 MAX_STEPS = 4
+MAX_HOPS = 3  # links a single step may follow
+# Links that carry reasoning. The others (then, defines, leads_to) are order or teaching.
+REASONING_RELATIONS = {"causes", "supports", "weakens", "tests", "rules_out", "prevents"}
 
 
 def clean_steps(raw, case):
@@ -36,19 +47,34 @@ def clean_steps(raw, case):
     return steps[:MAX_STEPS]
 
 
+def _path(links, a, b):
+    """The shortest chain of links from a to b, as a list of relations, or None."""
+    frontier, seen = [(a, [])], {a}
+    for _ in range(MAX_HOPS):
+        nxt = []
+        for node, rels in frontier:
+            for (x, y), rel in links.items():
+                if x == node and y not in seen:
+                    if y == b:
+                        return rels + [rel]
+                    seen.add(y)
+                    nxt.append((y, rels + [rel]))
+        frontier = nxt
+    return None
+
+
 def read(case, raw_steps):
-    """Each step with its direction and link, and the reasoning types the moves show (1 or 0)."""
+    """Each step with its direction and links, and the reasoning types the moves show (1 or 0)."""
     g = case_graph(case)
     data_nodes = {n["id"] for n in g["nodes"] if (source_of(case, n) or {}).get("kind") == "data"}
     links = {(a, b): rel for a, rel, b in g["edges"]}
     steps = []
     for a, b in clean_steps(raw_steps, case):
-        if (a, b) in links:
-            steps.append({"from": a, "to": b, "dir": "forward", "rel": links[(a, b)]})
-        elif (b, a) in links:
-            steps.append({"from": a, "to": b, "dir": "backward", "rel": links[(b, a)]})
-        else:
-            steps.append({"from": a, "to": b, "dir": "jump", "rel": None})
+        fwd, back = _path(links, a, b), _path(links, b, a)
+        rels, d = (fwd, "forward") if fwd else (back, "backward") if back else (None, "jump")
+        if rels and not REASONING_RELATIONS & set(rels):
+            d = "order"  # only then, defines or leads_to links, so no reasoning type
+        steps.append({"from": a, "to": b, "dir": d, "rel": rels[0] if rels and len(rels) == 1 else rels, "hops": len(rels or [])})
     forward = [s for s in steps if s["dir"] == "forward"]
     into = {}
     for s in forward:
@@ -61,11 +87,16 @@ def read(case, raw_steps):
     return {"steps": steps, "types": types}
 
 
+def landed(reading):
+    """True when at least 1 step followed reasoning links, so the reading says something."""
+    return any(s["dir"] in ("forward", "backward") for s in reading["steps"])
+
+
 def agreement(assessments):
     """For each reasoning type, how often the graph reading and the agent's label
     agree, over answers whose steps landed on at least 1 link. For Dr Ho and the thesis."""
     marked = [a["reasoning"] for a in assessments
               if (a.get("reasoning") or {}).get("graph")
-              and any(s["dir"] != "jump" for s in a["reasoning"]["graph"]["steps"])]
+              and landed(a["reasoning"]["graph"])]
     return {"answers": len(marked),
             "agree": {k: sum(r["graph"]["types"][k] == r["types"][k] for r in marked) for k in REASONING_TYPES}}

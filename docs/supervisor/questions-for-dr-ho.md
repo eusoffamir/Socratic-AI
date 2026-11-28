@@ -32,7 +32,7 @@ Gathered 27 November 2026 from every open question in the project files, so noth
 20. **Bayesian network.** Is a small Bayesian network the "probabilistic graph model" you meant, or a Markov network? (`goal3-plan.md`)
 21. **Decision trees.** Should they come from real experts, for example a short interview, or are drafted rules of thumb enough for now? (`goal3-plan.md`)
 22. **A book for the quant graph.** Which book should the quant graph come from, so each idea can cite a page? Wikipedia is used until then. (`goal3-plan.md`)
-23. **Reasoning as graph moves.** Is "deductive is a forward walk, inductive is counting over data, abductive is a backward walk" a good first definition? (`goal3-plan.md`)
+23. **Reasoning as graph moves.** Is "deductive is a forward walk, inductive is counting over data, abductive is a backward walk" a good first definition? (`goal3-plan.md` Tested against a human marker on 28 November, it does not match how a person reads the answers (forward walks read as deductive 15 times where the human saw 5), so a better definition is needed. (`human-marks-2026-11-28.md`, last section)
 
 ## 4. Reminders and admin
 
