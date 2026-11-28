@@ -185,7 +185,7 @@ Updated 28 November 2026.
 
 ## Next steps, in order
 
-1. Done 28 November. Eusoff marked all 61 answers (`docs/evaluation/human-marks-2026-11-28.md`). Next, a second marker marks the same 61.
+1. Done 28 November. Eusoff marked all 61 answers (`docs/evaluation/human-marks-2026-11-28.md`). Next, a second marker marks the same answers (73 now, with 12 inductive ones added) on the "Second Marker Sheet" artifact, https://claude.ai/artifact/PCfAnxbc1yykZKBi1eo1rP (its own saved marks; share it with them with permission to interact), and Eusoff marks the 12 new ones on his sheet.
 2. Demo to Dr Ho (`docs/industrial/demo-dr-ho.md`) and go through `docs/supervisor/questions-for-dr-ho.md`.
 3. After his answers, task 3 (graph prompt) and task 5 (relation classes) for the Ex inspection use case.
 4. Plan the January 2027 teaching study (cohort, test forms, ethics).
