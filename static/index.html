@@ -336,6 +336,33 @@
     .ks-cause::before{content:"Caused by "; color:var(--ink-faint);}
     .ks-fix::before{content:"What to do "; color:var(--ink-faint);}
   }
+  /* From data: what you know beside the chance of each fault */
+  .kd-two{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr); gap:28px; align-items:start;}
+  @media (max-width:860px){ .kd-two{grid-template-columns:1fr;} }
+  .kd-two .dg-bars{margin:0;}
+  .kd-row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 0; font-size:14.5px; color:var(--ink);}
+  .kd-row select{font:inherit; font-size:14px; padding:7px 12px; border-radius:10px; min-width:130px; cursor:pointer;
+                 background:var(--paper); color:var(--ink); border:1px solid var(--rule);}
+  .kd-row select:focus{outline:none; border-color:var(--signal);}
+  .kd-clear{margin-top:10px;}
+  /* Rules of thumb: one question in focus, the answers so far above it, the flowchart folded */
+  .kn-rules{max-width:720px; margin:0 auto;}
+  .kq-trail{margin:0 0 28px;}
+  .kq-trail .dg-t b{margin-left:4px; color:var(--signal);}
+  .kq-card{border:1px solid var(--rule); background:var(--panel); border-radius:18px; box-shadow:var(--shadow);
+           padding:36px 40px; text-align:center;}
+  .kq-q{font-family:var(--serif); font-size:24px; line-height:1.35; margin:0 0 10px; color:var(--ink);}
+  .kq-sub{font-size:15px; color:var(--ink-soft); margin:0;}
+  .kq-yn{display:flex; justify-content:center; gap:16px; margin:28px 0 0;}
+  .kq-yn .dg-run{min-width:120px;}
+  .kq-card .dg-link{margin-top:16px;}
+  .kq-end{text-align:center;}
+  .kn-whole{margin:44px 0 0;}
+  .kn-whole > summary{cursor:pointer; font-weight:600; font-size:14px; color:var(--signal); margin:0 0 16px; text-align:center; list-style:none;}
+  .kn-whole > summary::-webkit-details-marker{display:none;}
+  .kn-whole > summary::after{content:" ▾";}
+  .kn-whole[open] > summary::after{content:" ▴";}
+  @media (max-width:700px){ .kq-card{padding:26px 20px;} .kq-q{font-size:20px;} }
   /* Diagnosis laid out like New chat: a start with three machines, then one check at a time */
   .dg-start{max-width:720px; margin:0 auto; padding-top:16vh; text-align:center;}
   .dg-pick{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px;}
@@ -3148,17 +3175,21 @@ function knowRulesHTML(){
       ${lines.map((l, k) => `<text x="${x + 14}" y="${top + k * 16}" class="t">${esc(l)}</text>`).join('')}
       ${sub ? `<text x="${x + 14}" y="${top + lines.length * 16}" class="s">${esc(sub)}</text>` : ''}</g>`;
   }).join('');
+  // The question is the point: one question in focus, the answers so far as a short trail,
+  // and the whole flowchart folded away (Eusoff, 28 November 2026).
+  const trail = taken.map(([a, ans]) => `<li class="dg-t${ans === 'yes' ? ' up' : ''}">${esc(nodes[a].text)} <b>${ans === 'yes' ? 'Yes' : 'No'}</b></li>`).join('');
   const ask = ended
-    ? `<div class="kn-ask kn-end"><p><span class="mono-label">The engineer decides</span><b>${esc(at.text)}</b>, so ${esc(at.fix.toLowerCase())}.</p>
-        <button type="button" class="dg-step" data-krestart>Start again</button></div>`
-    : `<div class="kn-ask"><p>${esc(at.text)}</p><div class="kn-yn-row">
-        <button type="button" class="dg-run" data-kans="yes">Yes</button><button type="button" class="dg-run" data-kans="no">No</button>
-        ${know.flow.length ? '<button type="button" class="dg-step" data-krestart>Start again</button>' : ''}</div></div>`;
-  return `<p class="know-story"><b>How an engineer checks a stopped machine.</b> Answer each question, and the path leads to the fault and its fix.</p>
-    ${ask}
+    ? `<div class="diag-end kq-end"><span class="mono-label">The fault</span><p class="dg-res-name">${esc(at.text)}</p>
+        <p class="dg-res-fix">${esc(capFirst(at.fix))}.</p></div>
+      <div class="dg-controls dg-again"><button type="button" class="dg-step" data-krestart>Start again</button></div>`
+    : `<div class="kq-card"><p class="kq-q">${esc(at.text)}</p>${at.sub ? `<p class="kq-sub">${esc(at.sub)}</p>` : ''}
+        <div class="kq-yn"><button type="button" class="dg-run" data-kans="yes">Yes</button><button type="button" class="dg-run" data-kans="no">No</button></div>
+        ${know.flow.length ? '<button type="button" class="dg-link" data-krestart>Start again</button>' : ''}</div>`;
+  return `<div class="kn-rules">${trail ? `<ol class="dg-thread kq-trail">${trail}</ol>` : ''}${ask}
+    <details class="kn-whole" data-k="whole"${know.whole ? ' open' : ''}><summary>Whole checklist</summary>
     <div class="dg-card"><div class="dg-svgwrap"><svg class="dgg kn-flow" viewBox="0 0 ${DX + DW + 8} ${H + 8}" role="img" aria-label="The engineer's checklist as a flowchart">
       <defs><marker id="knArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M0 0 10 5 0 10z" fill="context-stroke"/></marker></defs>${lines}${boxes}</svg></div></div>`;
+        <path d="M0 0 10 5 0 10z" fill="context-stroke"/></marker></defs>${lines}${boxes}</svg></div></div></details></div>`;
 }
 // From data: say what you know about a stopped machine, and the network learned from past runs
 // gives the chance of each fault. Set readings light their links.
@@ -3178,25 +3209,27 @@ function knowDataHTML(){
   const bandText = (k, v) => (d.bands[k].find(b => b.value === v) || {}).text || '';
   const edges = Object.entries(d.learned).flatMap(([f, ps]) => ps.map(p => [p, f, `ed${ev[p] ? ' on' : ''}`]));
   const arcs = d.links.map(([a, b]) => [a, b, `ed${ev[a] || ev[b] ? ' on' : ''}`]);
-  const top = faults.reduce((a, b) => b.percent > a.percent ? b : a);
   const node = id => {
     const f = faults.find(x => x.id === id);
     if(f) return {cls: `nd ft${id === lead ? ' lead' : ''}`, title: capFirst(f.name.replace(' failure', '')), percent: f.percent};
     return {cls: `nd rd${ev[id] ? ' up' : ''}`, title: d.names[id],
       sub: ev[id] ? (id === 'type' ? `Type ${ev[id]}` : `${capFirst(ev[id])}, ${bandText(id, ev[id])}`) : "Don't know"};
   };
-  const row = k => `<div class="kn-set-row"><span class="kn-set-name">${esc(d.names[k])}</span><div class="kn-seg" role="group" aria-label="${esc(d.names[k])}">
-      <button type="button" data-kev="${k}" data-v="" aria-pressed="${!ev[k]}">Don't know</button>
-      ${d.bands[k].map(b => `<button type="button" data-kev="${k}" data-v="${esc(b.value)}" aria-pressed="${ev[k] === b.value}" title="${esc(b.text)}">${esc(k === 'type' ? b.value : capFirst(b.value))}</button>`).join('')}</div></div>`;
-  return `<p class="know-story"><b>What ${d.records.toLocaleString('en')} past runs say.</b> A machine has stopped. Set what you know, and see the chance of each fault change.</p>
-    <div class="kn-set">${KN_READINGS.map(row).join('')}</div>
-    ${Object.keys(ev).length ? '<button type="button" class="dg-step kn-clear" data-kclear>Clear all</button>' : ''}
-    <p class="kn-top">Most likely <b>${esc(top.name)}</b>, at ${top.percent}%.</p>
+  // Laid out like Diagnosis (Eusoff, 28 November 2026): a short list of what you know on the left,
+  // the chance of each fault on the right, and the network folded away.
+  const pick = k => `<label class="kd-row"><span>${esc(d.names[k])}</span><select data-kevsel="${k}">
+      <option value=""${ev[k] ? '' : ' selected'}>Don't know</option>
+      ${d.bands[k].map(b => `<option value="${esc(b.value)}"${ev[k] === b.value ? ' selected' : ''}>${esc(k === 'type' ? `Type ${b.value}` : capFirst(b.value))}</option>`).join('')}</select></label>`;
+  const sorted = [...faults].sort((a, b) => b.percent - a.percent);
+  const bars = `<div class="dg-bars kd-bars"><span class="mono-label">Chance of each fault</span>${sorted.map((f, i) =>
+    `<div class="dg-bar${i === 0 && lead ? ' top' : ''}"><span>${esc(capFirst(f.name))}</span><i><b style="width:${Math.max(1, f.percent)}%"></b></i><em>${f.percent}%</em></div>`).join('')}</div>`;
+  return `<div class="kd-two"><div class="dg-bars kd-set"><span class="mono-label">What you know</span>${KN_READINGS.map(pick).join('')}
+      ${Object.keys(ev).length ? '<button type="button" class="dg-link kd-clear" data-kclear>Clear all</button>' : ''}</div>${bars}</div>
+    <details class="kn-whole" data-k="wholeNet"${know.wholeNet ? ' open' : ''}><summary>Whole network</summary>
     <div class="dg-card">${knowGraph([KN_READINGS, faults.map(f => f.id)], ['READINGS', 'CHANCE OF EACH FAULT'], edges, node,
       'Readings and the faults they cause, learned from past runs, with the chance of each fault', arcs)}
       <div class="dg-legend"><span><i class="lg-ed"></i>Links learned from ${d.records.toLocaleString('en')} past runs</span>
-        <span><i class="lg-on"></i>What you set</span></div></div>
-    ${d.agree ? `<div class="know-lesson"><span class="mono-label">What this shows</span>The data found the same causes as the book, without being told them.</div>` : ''}`;
+        <span><i class="lg-on"></i>What you set</span></div></div></details>`;
 }
 // the cases on the learner's own topics, the open chat first, then every recent chat
 // (loaded once by knowLoadRecents), so the page is not empty after New chat
@@ -3388,6 +3421,8 @@ $('knowBody').addEventListener('click', e => {
   const a = e.target.closest('[data-kans]');
   if(a){ know.flow.push(a.dataset.kans); renderKnowPane(); return; }
   if(e.target.closest('[data-krestart]')){ know.flow = []; renderKnowPane(); return; }
+  const wh = e.target.closest('.kn-whole > summary');
+  if(wh){ know[wh.parentElement.dataset.k] = !wh.parentElement.open; }
   const s = e.target.closest('[data-kev]');
   if(s){
     const ev = {...know.ev};
@@ -3395,6 +3430,13 @@ $('knowBody').addEventListener('click', e => {
     know.ev = ev; knowWhatIf(); return;
   }
   if(e.target.closest('[data-kclear]')){ know.ev = {}; knowWhatIf(); }
+});
+$('knowBody').addEventListener('change', e => {
+  const s = e.target.closest('[data-kevsel]');
+  if(!s) return;
+  const ev = {...know.ev};
+  if(s.value) ev[s.dataset.kevsel] = s.value; else delete ev[s.dataset.kevsel];
+  know.ev = ev; knowWhatIf();
 });
 $('knowBody').addEventListener('keydown', e => {
   const f = e.target.closest('[data-kfault]');
@@ -3926,9 +3968,9 @@ const TOURS = {
     {title: 'Each fault, its cause and its fix', text: '', target: '.ks-table'},
     {title: 'Three kinds of knowledge', text: '', target: '.know-tabs'},
     {title: 'Tap a fault to read its rule', text: '', target: '.kn-book'},
-    {title: 'Answer like an engineer', text: '', target: '.kn-ask'},
-    {title: 'Set what you know', text: '', target: '.kn-set'},
-    {title: 'Watch the chances change', text: '', target: () => document.querySelector('.kn-set') && lastOf('#knowPane .dgg')},
+    {title: 'Answer like an engineer', text: '', target: '.kq-card'},
+    {title: 'Set what you know', text: '', target: '.kd-set'},
+    {title: 'Watch the chances change', text: '', target: '.kd-bars'},
     {title: 'Tap a box to see its source', text: '', target: '#knowPane .am-map'},
     {title: 'Watch it walk the links', text: '', target: '[data-walk]'},
     {title: 'Answer like an expert', text: '', target: '.know-rules'},
